@@ -1,0 +1,10 @@
+#!/usr/bin/python
+
+from gi.repository import Gtk
+from MainWindow import MainWindow
+
+# setup the main window
+window = MainWindow()
+window.show_all()
+
+Gtk.main()
