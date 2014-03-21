@@ -4,7 +4,7 @@ FINGERPRINT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
 SAMPLE = [(
     "Andrei Macavei",
     "andrei.macavei@example.com",
-    "4096R/BC66DFE3"
+    "4096R/BC66DFE1"
     ),(
     "Anonymus Hacker",
     "anonymus.hacker@hackit.com",
@@ -88,7 +88,7 @@ class IdentityPage(Gtk.HBox):
         instrLabel.set_halign(Gtk.Align.START)
         instrLabel.set_margin_bottom(10)
 
-        # createthe name label
+        # create name label
         self.peerNameLabel = Gtk.Label()
         self.peerNameLabel.set_markup('<span size="10000">' + SAMPLE_ID[0] + '</span>')
 
