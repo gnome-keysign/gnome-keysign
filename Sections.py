@@ -1,5 +1,5 @@
 from gi.repository import Gtk
-from SignKeysPages import KeysPage, FingerprintPage, IdentityPage, SignedPage
+from GeysignPages import KeysPage, FingerprintPage, IdentityPage, SignedPage
 
 FINGERPRINT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
 

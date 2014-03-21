@@ -4,7 +4,11 @@ FINGERPRINT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
 DATA = [(
     "Andrei Macavei",
     "andrei.macavei@example.com",
-    "4096R/DC378D64"
+    "4096R/BC66DFE3"
+    ),(
+    "Anonymus Hacker",
+    "anonymus.hacker@hackit.com",
+    "4096R//BC662E46"
     )]
 SAMPLE_ID = DATA[0]
 
