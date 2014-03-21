@@ -1,16 +1,21 @@
 from gi.repository import Gtk
-from GeysignPages import KeysPage, FingerprintPage, IdentityPage, SignedPage
+from SignPages import KeysPage, FingerprintPage, IdentityPage, SignedPage
 
 FINGERPRINT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
 
-class KeysSection(Gtk.VBox):
+class KeySignSection(Gtk.VBox):
 
     def __init__(self):
-        super(KeysSection, self).__init__()
+        super(KeySignSection, self).__init__()
 
         # create notebook container
         self.notebook = Gtk.Notebook()
         self.notebook.append_page(KeysPage(), None)
+        # self.notebook.append_page(FingerprintPage(), None)
+        # self.notebook.append_page(IdentityPage(), None)
+        # self.notebook.append_page(SignedPage(), None)
+
+        #TODO make notebook change pages according to current step
 
         self.notebook.set_show_tabs(False)
 
@@ -32,13 +37,13 @@ class KeysSection(Gtk.VBox):
         self.pack_start(hBox, False, False, 0)
 
 
-class SignedSection(Gtk.Box):
+class SignedKeysSection(Gtk.Box):
 
     def __init__(self):
-        super(SignedSection, self).__init__()
+        super(SignedKeysSection, self).__init__()
 
         # create fingerprint label
         self.fingerprintLabel = Gtk.Label()
-        self.fingerprintLabel.set_markup('<span size="30720">' + FINGERPRINT + '</span>')
+        self.fingerprintLabel.set_markup('<span size="10000">' + FINGERPRINT + '</span>')
 
         self.pack_start(self.fingerprintLabel, True, False, 0)

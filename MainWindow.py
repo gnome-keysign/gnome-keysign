@@ -1,5 +1,5 @@
 from gi.repository import Gtk, GdkPixbuf
-from Sections import KeysSection, SignedSection
+from Sections import KeySignSection, SignedKeysSection
 
 class MainWindow(Gtk.Window):
 
@@ -9,8 +9,8 @@ class MainWindow(Gtk.Window):
 
         # create notebook container
         notebook = Gtk.Notebook()
-        notebook.append_page(KeysSection(), Gtk.Label('Sign'))
-        notebook.append_page(SignedSection(), Gtk.Label('Key signed'))
+        notebook.append_page(KeySignSection(), Gtk.Label('Sign'))
+        notebook.append_page(SignedKeysSection(), Gtk.Label('Get signed key'))
         self.add(notebook)
 
         # setup signals

@@ -1,7 +1,7 @@
 from gi.repository import Gtk, GdkPixbuf
 
 FINGERPRINT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
-DATA = [(
+SAMPLE = [(
     "Andrei Macavei",
     "andrei.macavei@example.com",
     "4096R/BC66DFE3"
@@ -10,16 +10,16 @@ DATA = [(
     "anonymus.hacker@hackit.com",
     "4096R//BC662E46"
     )]
-SAMPLE_ID = DATA[0]
+SAMPLE_ID = SAMPLE[0]
 
 class KeysPage(Gtk.HBox):
 
     def __init__(self):
         super(KeysPage, self).__init__()
 
-        # create and fill up the list store
+        # create and fill up the list store with sample values
         self.store = Gtk.ListStore(str, str, str)
-        for entry in DATA:
+        for entry in SAMPLE:
             self.store.append(entry)
 
         # create the tree
@@ -38,7 +38,7 @@ class KeysPage(Gtk.HBox):
         self.tree.append_column(emailColumn)
         self.tree.append_column(keyColumn)
 
-        # create key logo
+        # create image
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size('logo.jpg', 200, -1)
         self.image = Gtk.Image()
         self.image.set_from_pixbuf(pixbuf)
@@ -56,7 +56,7 @@ class FingerprintPage(Gtk.HBox):
 
         # create the instructions label
         instrLabel = Gtk.Label()
-        instrLabel.set_markup('The user should enter the <b>Key signed</b> section.\n' +
+        instrLabel.set_markup('The user should enter the <b>Key signed key</b> section.\n' +
                             'Compare the two fingerprints to verify the authenticity of the key.')
         instrLabel.set_justify(Gtk.Justification.LEFT)
         instrLabel.set_halign(Gtk.Align.START)
@@ -64,7 +64,7 @@ class FingerprintPage(Gtk.HBox):
 
         # create the fingerprint label
         self.peerFingerprintLabel = Gtk.Label()
-        self.peerFingerprintLabel.set_markup('<span size="30720">' + FINGERPRINT + '</span>')
+        self.peerFingerprintLabel.set_markup('<span size="10000">' + FINGERPRINT + '</span>')
 
         # use a container for alignment
         container = Gtk.VBox()
@@ -90,7 +90,7 @@ class IdentityPage(Gtk.HBox):
 
         # createthe name label
         self.peerNameLabel = Gtk.Label()
-        self.peerNameLabel.set_markup('<span size="30720">' + SAMPLE_ID[0] + '</span>')
+        self.peerNameLabel.set_markup('<span size="10000">' + SAMPLE_ID[0] + '</span>')
 
         # use a container for alignment
         container = Gtk.VBox()
