@@ -1,5 +1,5 @@
-from gi.repository import Gtk, GdkPixbuf
-from SignPages import KeysPage, SelectedKeyPage, FingerprintPage, IdentityPage, SignedPage
+from gi.repository import Gtk
+from SignPages import KeysPage, SelectedKeyPage
 
 FINGERPRINT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
 
@@ -12,11 +12,8 @@ class KeySignSection(Gtk.VBox):
         self.notebook = Gtk.Notebook()
         self.notebook.append_page(KeysPage(), None)
         self.notebook.append_page(SelectedKeyPage(), None)
-        # self.notebook.append_page(FingerprintPage(), None)
-        # self.notebook.append_page(IdentityPage(), None)
-        # self.notebook.append_page(SignedPage(), None)
 
-        #TODO make notebook change pages according to current step
+        #TODO make notebook change pages according to current step and set show tabs to false
 
         self.notebook.set_show_tabs(True)
 

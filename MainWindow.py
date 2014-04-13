@@ -1,4 +1,4 @@
-from gi.repository import Gtk, GdkPixbuf
+from gi.repository import Gtk
 from Sections import KeySignSection, GetKey
 
 class MainWindow(Gtk.Window):
