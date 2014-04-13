@@ -12,7 +12,7 @@ SAMPLE = [(
     )]
 SAMPLE_ID = SAMPLE[0]
 
-class KeysPage(Gtk.HBox):
+class KeysPage(Gtk.VBox):
 
     def __init__(self):
         super(KeysPage, self).__init__()
@@ -31,22 +31,58 @@ class KeysPage(Gtk.HBox):
         emailRenderer = Gtk.CellRendererText()
         emailColumn = Gtk.TreeViewColumn("Email", emailRenderer, text=1)
 
-        keyRenderer = Gtk.CellRendererText()
-        keyColumn = Gtk.TreeViewColumn("Key", keyRenderer, text=2)
+        # keyRenderer = Gtk.CellRendererText()
+        # keyColumn = Gtk.TreeViewColumn("Key", keyRenderer, text=2)
 
         self.tree.append_column(nameColumn)
         self.tree.append_column(emailColumn)
-        self.tree.append_column(keyColumn)
-
-        # create image
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size('logo.jpg', 200, -1)
-        self.image = Gtk.Image()
-        self.image.set_from_pixbuf(pixbuf)
-        self.image.props.valign = Gtk.Align.START
-        self.image.props.margin = 5
+        # self.tree.append_column(keyColumn)
 
         self.pack_start(self.tree, True, True, 0)
-        self.pack_start(self.image, False, False, 0)
+
+class SelectedKeyPage(Gtk.HBox):
+    def __init__(self):
+        super(SelectedKeyPage, self).__init__()
+
+        # create labelFingerprint
+        labelFingerprint = Gtk.Label()
+        labelFingerprint.set_markup('Your key Fingerprint')
+        labelFingerprint.set_justify(Gtk.Justification.CENTER)
+        labelFingerprint.set_halign(Gtk.Align.CENTER)
+        labelFingerprint.set_margin_bottom(10)
+
+        # create fingerprint labelFingerprint
+        self.fingerprintLabel = Gtk.Label()
+        self.fingerprintLabel.set_markup('<span size="20000">' + FINGERPRINT + '</span>')
+
+        containerLeft = Gtk.VBox()
+        containerLeft.pack_start(labelFingerprint, False, False, 0)
+        containerLeft.pack_start(self.fingerprintLabel, False, False, 0)
+
+
+        # create label and QR image
+
+        labelImage = Gtk.Label()
+        labelImage.set_markup('Your QR code')
+        labelImage.set_justify(Gtk.Justification.CENTER)
+        labelImage.set_halign(Gtk.Align.CENTER)
+        labelImage.set_margin_bottom(10)
+
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size('qr_code_sample.png', 200, -1)
+        self.image = Gtk.Image()
+        self.image.set_from_pixbuf(pixbuf)
+        self.image.props.valign = Gtk.Align.CENTER
+        self.image.props.margin = 5
+
+
+        containerRight = Gtk.VBox()
+        containerRight.pack_start(labelImage, False, False, 0)
+        containerRight.pack_start(self.image, False, False, 0)
+
+
+
+        self.pack_start(containerLeft, True, True, 0)
+        self.pack_start(containerRight, False, False, 0)
 
 
 class FingerprintPage(Gtk.HBox):
@@ -54,16 +90,16 @@ class FingerprintPage(Gtk.HBox):
     def __init__(self):
         super(FingerprintPage, self).__init__()
 
-        # create the instructions label
-        instrLabel = Gtk.Label()
-        instrLabel.set_markup('The user should enter the <b>Key signed key</b> section.\n' +
+        # create the instructions labelFingerprint
+        instrLabel = Gtk.labelFingerprint()
+        instrLabel.set_markup('The user should enter the <b>Fingerprint</b> section.\n' +
                             'Compare the two fingerprints to verify the authenticity of the key.')
         instrLabel.set_justify(Gtk.Justification.LEFT)
         instrLabel.set_halign(Gtk.Align.START)
         instrLabel.set_margin_bottom(10)
 
-        # create the fingerprint label
-        self.peerFingerprintLabel = Gtk.Label()
+        # create the fingerprint labelFingerprint
+        self.peerFingerprintLabel = Gtk.labelFingerprint()
         self.peerFingerprintLabel.set_markup('<span size="10000">' + FINGERPRINT + '</span>')
 
         # use a container for alignment
@@ -80,16 +116,16 @@ class IdentityPage(Gtk.HBox):
     def __init__(self):
         super(IdentityPage, self).__init__()
 
-        # create the instructions label
-        instrLabel = Gtk.Label()
+        # create the instructions labelFingerprint
+        instrLabel = Gtk.labelFingerprint()
         instrLabel.set_markup('Check the <b>identification papers</b> of the other person.\n' +
                                      '<b>Make sure</b> the name below and the ID name <b>match</b>!')
         instrLabel.set_justify(Gtk.Justification.LEFT)
         instrLabel.set_halign(Gtk.Align.START)
         instrLabel.set_margin_bottom(10)
 
-        # create name label
-        self.peerNameLabel = Gtk.Label()
+        # create name labelFingerprint
+        self.peerNameLabel = Gtk.labelFingerprint()
         self.peerNameLabel.set_markup('<span size="10000">' + SAMPLE_ID[0] + '</span>')
 
         # use a container for alignment
@@ -106,8 +142,8 @@ class SignedPage(Gtk.HBox):
     def __init__(self):
         super(SignedPage, self).__init__()
 
-        # create label
-        signedLabel = Gtk.Label()
+        # create labelFingerprint
+        signedLabel = Gtk.labelFingerprint()
         signedLabel.set_text('Key signed!')
 
         # create buttons
