@@ -10,7 +10,7 @@ class MainWindow(Gtk.Window):
         # create notebook container
         notebook = Gtk.Notebook()
         notebook.append_page(KeySignSection(), Gtk.Label('Keys'))
-        notebook.append_page(GetKeySection(), Gtk.Label('Get Fingerprint'))
+        notebook.append_page(GetKeySection(), Gtk.Label('Get Key'))
         self.add(notebook)
 
         # setup signals

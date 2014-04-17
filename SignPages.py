@@ -31,12 +31,12 @@ class KeysPage(Gtk.VBox):
         emailRenderer = Gtk.CellRendererText()
         emailColumn = Gtk.TreeViewColumn("Email", emailRenderer, text=1)
 
-        # keyRenderer = Gtk.CellRendererText()
-        # keyColumn = Gtk.TreeViewColumn("Key", keyRenderer, text=2)
+        keyRenderer = Gtk.CellRendererText()
+        keyColumn = Gtk.TreeViewColumn("Key", keyRenderer, text=2)
 
         self.tree.append_column(nameColumn)
         self.tree.append_column(emailColumn)
-        # self.tree.append_column(keyColumn)
+        self.tree.append_column(keyColumn)
 
         self.pack_start(self.tree, True, True, 0)
 
@@ -44,42 +44,29 @@ class SelectedKeyPage(Gtk.HBox):
     def __init__(self):
         super(SelectedKeyPage, self).__init__()
 
-        # create labelFingerprint
-        labelFingerprint = Gtk.Label()
-        labelFingerprint.set_markup('Your key Fingerprint')
-        labelFingerprint.set_justify(Gtk.Justification.CENTER)
-        labelFingerprint.set_halign(Gtk.Align.CENTER)
-        labelFingerprint.set_margin_bottom(10)
+        # create fingerprint label
+        fingerprintMark = Gtk.Label()
+        fingerprintMark.set_markup('<span size="15000">' + 'Your key Fingerprint' + '</span>')
 
-        # create fingerprint labelFingerprint
         self.fingerprintLabel = Gtk.Label()
         self.fingerprintLabel.set_markup('<span size="20000">' + FINGERPRINT + '</span>')
 
-        containerLeft = Gtk.VBox()
-        containerLeft.pack_start(labelFingerprint, False, False, 0)
+        containerLeft = Gtk.VBox(spacing=10)
+        containerLeft.pack_start(fingerprintMark, False, False, 0)
         containerLeft.pack_start(self.fingerprintLabel, False, False, 0)
 
-
-        # create label and QR image
-
-        labelImage = Gtk.Label()
-        labelImage.set_markup('Your QR code')
-        labelImage.set_justify(Gtk.Justification.CENTER)
-        labelImage.set_halign(Gtk.Align.CENTER)
-        labelImage.set_margin_bottom(10)
+        # create QR image
+        imageLabel = Gtk.Label()
+        imageLabel.set_markup('<span size="15000">' + 'Your QR code' + '</span>')
 
         pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size('qr_code_sample.png', 200, -1)
         self.image = Gtk.Image()
         self.image.set_from_pixbuf(pixbuf)
-        self.image.props.valign = Gtk.Align.CENTER
-        self.image.props.margin = 5
+        self.image.props.margin = 10
 
-
-        containerRight = Gtk.VBox()
-        containerRight.pack_start(labelImage, False, False, 0)
+        containerRight = Gtk.VBox(spacing=10)
+        containerRight.pack_start(imageLabel, False, False, 0)
         containerRight.pack_start(self.image, False, False, 0)
-
-
 
         self.pack_start(containerLeft, True, True, 0)
         self.pack_start(containerRight, False, False, 0)
