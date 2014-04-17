@@ -1,5 +1,5 @@
 from gi.repository import Gtk
-from Sections import KeySignSection, GetKey
+from Sections import KeySignSection, GetKeySection
 
 class MainWindow(Gtk.Window):
 
@@ -10,7 +10,7 @@ class MainWindow(Gtk.Window):
         # create notebook container
         notebook = Gtk.Notebook()
         notebook.append_page(KeySignSection(), Gtk.Label('Keys'))
-        notebook.append_page(GetKey(), Gtk.Label('Get Fingerprint'))
+        notebook.append_page(GetKeySection(), Gtk.Label('Get Fingerprint'))
         self.add(notebook)
 
         # setup signals

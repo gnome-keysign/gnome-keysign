@@ -13,15 +13,15 @@ class KeySignSection(Gtk.VBox):
         self.notebook.append_page(KeysPage(), None)
         self.notebook.append_page(SelectedKeyPage(), None)
 
-        #TODO make notebook change pages according to current step and set show tabs to false
+        #TODO make notebook change pages according to current step # TODO
 
-        self.notebook.set_show_tabs(True)
+        self.notebook.set_show_tabs(True) # TODO
 
         # create progress bar
         self.progressBar = Gtk.ProgressBar()
         self.progressBar.set_text("Step 1: Choose a key and click on 'Select' button.")
         self.progressBar.set_show_text(True)
-        self.progressBar.set_fraction(0.50)
+        self.progressBar.set_fraction(0.50) #TODO : Fix Hardcoded
 
         # create proceed button
         self.proceedButton = Gtk.Button('Select')
@@ -36,37 +36,40 @@ class KeySignSection(Gtk.VBox):
         self.pack_start(hBox, False, False, 0)
 
 
-class GetKey(Gtk.Box):
+class GetKeySection(Gtk.Box):
 
     def __init__(self):
-        super(GetKey, self).__init__()
-
+        super(GetKeySection, self).__init__()
 
         # create fingerprint label
-        entryLabel = Gtk.Label()
-        entryLabel.set_markup('<span size="30000">' + 'Type fingerprint'+ '</span>')
+        self.fingerprintEntryLabel = Gtk.Label()
+        self.fingerprintEntryLabel.set_markup('Type fingerprint')
+        # self.fingerprintEntryLabel.set_markup('<span size="30000">' + 'Type fingerprint'+ '</span>')
 
         self.fingerprintEntry = Gtk.Entry()
 
-        scanLabel = Gtk.Label()
-        scanLabel.set_markup('<span size="30000">' + 'or scan QR code'+ '</span>')
+        leftVBox = Gtk.VBox()
+        leftVBox.pack_start(self.fingerprintEntryLabel, False, False, 0)
+        leftVBox.pack_start(self.fingerprintEntry, False, False, 5)
 
-        self.frame = Gtk.Frame(label='QR')
+        self.scanFrameLabel = Gtk.Label()
+        self.scanFrameLabel.set_markup('... or scan QR code')
+        # self.scanFrameLabel.set_markup('<span size="30000">' + 'or scan QR code'+ '</span>')
+
+        self.scanFrame = Gtk.Frame(label='QR')
         # frame.set_shadow_type(Gtk.SHADOW_IN)
 
         self.scanButton = Gtk.Button('Scan')
         self.scanButton.set_image(Gtk.Image.new_from_icon_name(Gtk.STOCK_APPLY, Gtk.IconSize.BUTTON))
         self.scanButton.set_always_show_image(True)
 
-        container = Gtk.VBox()
-        container.pack_start(entryLabel, False, False, 0)
-        container.pack_start(self.fingerprintEntry, False, False, 0)
-        container.pack_start(scanLabel, False, False, 0)
-        container.pack_start(self.frame, False, False, 0)
-        container.pack_start(self.scanButton, False, False, 0)
+        rightVBox = Gtk.VBox()
+        rightVBox.pack_start(self.scanFrameLabel, False, False, 0)
+        rightVBox.pack_start(self.scanFrame, True, True, 5)
+        rightVBox.pack_start(self.scanButton, False, False, 5)
 
-        self.pack_start(container, True, False, 0)
+        mainBox = Gtk.HBox()
+        mainBox.pack_start(leftVBox, True, True, 0)
+        mainBox.pack_start(rightVBox, True, True, 0)
 
-
-    def entry_callback(self, widget, entry):
-        return self.entryLabel.get_text()
+        self.pack_start(mainBox, True, True, 0)
