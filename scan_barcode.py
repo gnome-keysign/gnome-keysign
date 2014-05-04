@@ -15,22 +15,22 @@ def test():
 
 
 class BarcodeReader:
+
+    def on_message(self, bus, message):
+        if message:
+            struct = message.get_structure()
+            if struct.get_name() == 'barcode':
+                assert struct.nth_field_name(2) == 'symbol'
+                barcode = struct.get_string('symbol')
+                print("Read Barcode: {}".format(barcode))
+        
     def run(self):
         p = 'v4l2src ! tee name=t ! queue ! videoconvert ! zbar ! fakesink t. ! queue ! xvimagesink'
         Gst.init(sys.argv)
         self.a = a = Gst.parse_launch(p)
         self.bus = bus = a.get_bus()
         
-        def my_handler(bus, message):
-            message = bus.pop_filtered(Gst.MessageType.ELEMENT)
-            if message:
-                struct = message.get_structure()
-                if struct.get_name() == 'barcode':
-                    assert struct.nth_field_name(2) == 'symbol'
-                    barcode = struct.get_string('symbol')
-                    print("Read Barcode: {}".format(barcode))
-        
-        bus.connect('message', my_handler)
+        bus.connect('message', self.on_message)
         bus.add_signal_watch()
     
         a.set_state(Gst.State.PLAYING)
