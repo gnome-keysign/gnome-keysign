@@ -1,10 +1,20 @@
 #!/usr/bin/env python
 
+import argparse
+import logging
 import signal
 import sys
 
 from gi.repository import Gst
 from gi.repository import Gtk, GLib
+# Because of https://bugzilla.gnome.org/show_bug.cgi?id=698005
+from gi.repository import Gtk, GdkX11
+# Needed for window.get_xid(), xvimagesink.set_window_handle(), respectively:
+from gi.repository import GdkX11, GstVideo
+
+log = logging.getLogger()
+
+
 
 def test():
     print("hello")
@@ -15,9 +25,10 @@ def test():
 
 
 
-class BarcodeReader:
+class BarcodeReader(object):
 
     def on_message(self, bus, message):
+        log.debug("Message: %s", message)
         if message:
             struct = message.get_structure()
             if struct.get_name() == 'barcode':
@@ -31,15 +42,93 @@ class BarcodeReader:
         self.bus = bus = a.get_bus()
         
         bus.connect('message', self.on_message)
+        bus.connect('sync-message::element', self.on_sync_message)
         bus.add_signal_watch()
     
         a.set_state(Gst.State.PLAYING)
-        running = True
-        while running and False:
+        self.running = True
+        while self.running and False:
             pass
         #a.set_state(Gst.State.NULL)
 
-if __name__ == '__main__':
+    def on_sync_message(self, bus, message):
+        log.debug("Sync Message!")
+        pass
+
+class SimpleInterface(BarcodeReader):
+    def __init__(self, *args, **kwargs):
+        super(SimpleInterface, self).__init__(*args, **kwargs)
+
+        self.playing = False
+
+        # GTK window and widgets
+        self.window = Gtk.Window()
+        self.window.set_size_request(300,350)
+        self.window.connect('delete-event', Gtk.main_quit)
+
+        vbox = Gtk.Box(Gtk.Orientation.HORIZONTAL, 0)
+        vbox.set_margin_top(3)
+        vbox.set_margin_bottom(3)
+        self.window.add(vbox)
+        
+        self.da = Gtk.DrawingArea()
+        self.da.set_size_request (250, 200)
+        self.da.show()
+        #self.window.add(self.da)
+        #vbox.add(self.da)
+        vbox.pack_start(self.da, False, False, 0)
+        
+
+        self.playButtonImage = Gtk.Image()
+        self.playButtonImage.set_from_stock("gtk-media-play", Gtk.IconSize.BUTTON)
+        self.playButton = Gtk.Button.new()
+        self.playButton.add(self.playButtonImage)
+        self.playButton.connect("clicked", self.playToggled)
+        vbox.pack_start(self.playButton, False, False, 1)
+
+        self.window.show_all()
+
+
+        da_win = self.da.get_property('window')
+        assert da_win
+        self.xid = da_win.get_xid()
+        
+
+    def playToggled(self, w):
+        print("Play!")
+        self.run()
+        pass
+
+    def on_sync_message(self, bus, message):
+        print "Sync Message!"
+        if message.structure is None:
+            return
+        if message.structure.get_name() == 'prepare-window-handle':
+            #self.videoslot.set_sink(message.src)
+            message.src.set_window_handle(self.xid)
+
+
+    def on_message(self, bus, message):
+        log.debug("Message: %s", message)
+        struct = message.get_structure()
+        assert struct
+        name = struct.get_name()
+        log.debug("Name: %s", name)
+        if name == "prepare-window-handle":
+            log.debug('XWindow ID')
+            #self.videoslot.set_sink(message.src)
+            message.src.set_window_handle(self.xid)
+        else:
+            return super(SimpleInterface, self).on_message(bus, message)
+
+
+    
+
+
+
+def main():
+    logging.basicConfig(stream=sys.stderr, level=logging.DEBUG,
+                        format='%(name)s (%(levelname)s): %(message)s')
     br = BarcodeReader()
     Gst.init(sys.argv)
 
@@ -50,7 +139,11 @@ if __name__ == '__main__':
         # Whatever, it is only to enable Ctrl+C anyways
         pass
 
-    GLib.idle_add(br.run)
+    #GLib.idle_add(br.run)
 
+    SimpleInterface()
     Gtk.main()
 
+
+if __name__ == '__main__':
+    main()
