@@ -21,7 +21,7 @@ class BarcodeReader:
         if message:
             struct = message.get_structure()
             if struct.get_name() == 'barcode':
-                assert struct.nth_field_name(2) == 'symbol'
+                assert struct.has_field('symbol')
                 barcode = struct.get_string('symbol')
                 print("Read Barcode: {}".format(barcode))
         
