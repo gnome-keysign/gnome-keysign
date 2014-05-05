@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import signal
 import sys
 
 from gi.repository import Gst
@@ -41,6 +42,14 @@ class BarcodeReader:
 
 if __name__ == '__main__':
     br = BarcodeReader()
+
+    try:
+        # Exit the mainloop if Ctrl+C is pressed in the terminal.
+        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : Gtk.main_quit(), None)
+    except AttributeError:
+        # Whatever, it is only to enable Ctrl+C anyways
+        pass
+
     GLib.idle_add(br.run)
 
     Gtk.main()
