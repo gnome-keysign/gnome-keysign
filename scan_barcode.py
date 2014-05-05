@@ -27,7 +27,6 @@ class BarcodeReader:
         
     def run(self):
         p = 'v4l2src ! tee name=t ! queue ! videoconvert ! zbar ! fakesink t. ! queue ! xvimagesink'
-        Gst.init(sys.argv)
         self.a = a = Gst.parse_launch(p)
         self.bus = bus = a.get_bus()
         
@@ -42,6 +41,7 @@ class BarcodeReader:
 
 if __name__ == '__main__':
     br = BarcodeReader()
+    Gst.init(sys.argv)
 
     try:
         # Exit the mainloop if Ctrl+C is pressed in the terminal.
