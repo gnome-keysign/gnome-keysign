@@ -55,6 +55,37 @@ class BarcodeReader(object):
         log.debug("Sync Message!")
         pass
 
+class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
+    def __init__(self, *args, **kwargs):
+        super(BarcodeReaderGTK, self).__init__(*args, **kwargs)
+
+    @property
+    def x_window_id(self, *args, **kwargs):
+        window = self.get_property('window')
+        # If you have not requested a size, the window might not exist
+        assert window, "Window is %s (%s), but not a window" % (window, type(window))
+        self._x_window_id = xid = window.get_xid()
+        return xid
+
+    def on_message(self, bus, message):
+        log.debug("Message: %s", message)
+        struct = message.get_structure()
+        assert struct
+        name = struct.get_name()
+        log.debug("Name: %s", name)
+        if name == "prepare-window-handle":
+            log.debug('XWindow ID')
+            message.src.set_window_handle(self.x_window_id)
+        else:
+            return super(BarcodeReaderGTK, self).on_message(bus, message)
+
+    def do_realize(self, *args, **kwargs):
+        #super(BarcodeReaderGTK, self).do_realize(*args, **kwargs)
+        # ^^^^ does not work :-\
+        Gtk.DrawingArea.do_realize(self)
+        self.run()
+
+
 class SimpleInterface(BarcodeReader):
     def __init__(self, *args, **kwargs):
         super(SimpleInterface, self).__init__(*args, **kwargs)

@@ -1,6 +1,15 @@
 from gi.repository import Gtk
 from SignPages import KeysPage, SelectedKeyPage
 
+from gi.repository import Gst
+from gi.repository import Gtk, GLib
+# Because of https://bugzilla.gnome.org/show_bug.cgi?id=698005
+from gi.repository import Gtk, GdkX11
+# Needed for window.get_xid(), xvimagesink.set_window_handle(), respectively:
+from gi.repository import GdkX11, GstVideo
+
+Gst.init([])
+
 FINGERPRINT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
 
 class KeySignSection(Gtk.VBox):
@@ -59,6 +68,11 @@ class GetKeySection(Gtk.Box):
         self.scanFrameLabel.set_markup('<span size="15000">' + '... or scan QR code'+ '</span>')
 
         self.scanFrame = Gtk.Frame(label='QR Scanner')
+        from scan_barcode import BarcodeReaderGTK
+        self.scanFrame = BarcodeReaderGTK()
+        self.scanFrame.set_size_request(150,50)
+        self.scanFrame.show()
+        #GLib.idle_add(        self.scanFrame.run)
 
         container.pack_start(self.scanFrameLabel, False, False, 0)
         container.pack_start(self.scanFrame, True, True, 0)
@@ -68,6 +82,8 @@ class GetKeySection(Gtk.Box):
         self.saveButton.set_image(Gtk.Image.new_from_icon_name(Gtk.STOCK_SAVE, Gtk.IconSize.BUTTON))
         self.saveButton.set_always_show_image(True)
         self.saveButton.set_margin_bottom(10)
+        
+        self.saveButton.connect('clicked', lambda x: self.scanFrame.run())
 
         container.pack_start(self.saveButton, False, False, 0)
 
