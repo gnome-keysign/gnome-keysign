@@ -59,7 +59,7 @@ class SelectedKeyPage(Gtk.HBox):
         imageLabel = Gtk.Label()
         imageLabel.set_markup('<span size="15000">' + 'Your QR code' + '</span>')
 
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size('qr_code_sample.png', 200, -1)
+        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size('qrsample.png', 200, -1)
         self.image = Gtk.Image()
         self.image.set_from_pixbuf(pixbuf)
         self.image.props.margin = 10
