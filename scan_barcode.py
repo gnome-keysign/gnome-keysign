@@ -83,14 +83,30 @@ class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
         #super(BarcodeReaderGTK, self).do_realize(*args, **kwargs)
         # ^^^^ does not work :-\
         Gtk.DrawingArea.do_realize(self)
-        self.run()
+        #self.run()
+        #self.connect('hide', self.on_hide)
+        self.connect('unmap', self.on_unmap)
+        self.connect('map', self.on_map)
 
+
+    def on_map(self, *args, **kwargs):
+        '''It seems this is called when the widget is becoming visible'''
+        self.run()
 
     def do_unrealize(self, *args, **kwargs):
         '''This appears to be called when the app is destroyed,
         not when a tab is hidden.'''
         self.a.set_state(Gst.State.NULL)
         Gtk.DrawingArea.do_unrealize(self)
+
+    
+    def on_unmap(self, *args, **kwargs):
+        '''Hopefully called when this widget is hidden,
+        e.g. when the tab of a notebook has changed'''
+        self.a.set_state(Gst.State.PAUSED)
+        # Actually, we stop the thing for real
+        self.a.set_state(Gst.State.NULL)
+        
 
 
 class SimpleInterface(BarcodeReader):
