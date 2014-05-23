@@ -70,7 +70,7 @@ class GetKeySection(Gtk.Box):
         self.scanFrame = Gtk.Frame(label='QR Scanner')
         from scan_barcode import BarcodeReaderGTK
         self.scanFrame = BarcodeReaderGTK()
-        self.scanFrame.set_size_request(150,50)
+        self.scanFrame.set_size_request(150,150)
         self.scanFrame.show()
         #GLib.idle_add(        self.scanFrame.run)
 
@@ -87,4 +87,4 @@ class GetKeySection(Gtk.Box):
 
         container.pack_start(self.saveButton, False, False, 0)
 
-        self.pack_start(container, True, False, 0)
+        self.pack_start(container, True, True, 0)
