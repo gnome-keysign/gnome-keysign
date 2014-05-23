@@ -86,6 +86,13 @@ class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
         self.run()
 
 
+    def do_unrealize(self, *args, **kwargs):
+        '''This appears to be called when the app is destroyed,
+        not when a tab is hidden.'''
+        self.a.set_state(Gst.State.NULL)
+        Gtk.DrawingArea.do_unrealize(self)
+
+
 class SimpleInterface(BarcodeReader):
     def __init__(self, *args, **kwargs):
         super(SimpleInterface, self).__init__(*args, **kwargs)
