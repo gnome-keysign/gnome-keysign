@@ -19,7 +19,7 @@ class MainWindow(Gtk.Application):
         self.log = logging
 
 
-    def on_quit(self, app):
+    def on_quit(self, app, param=None):
         self.quit()
 
 
@@ -40,6 +40,18 @@ class MainWindow(Gtk.Application):
         self.add_accelerator("<Primary>q", "app.quit", None)
         quit.connect("activate", self.on_quit)
         
+        ## App menus
+        appmenu = Gio.Menu.new()
+        section = Gio.Menu.new()
+        appmenu.append_section(None, section)
+
+        some_item = Gio.MenuItem.new("Scan Image", "app.scan-image")
+        section.append_item(some_item)
+
+        quit_item = Gio.MenuItem.new("Quit", "app.quit")
+        section.append_item(quit_item)
+
+        self.set_app_menu(appmenu)
 
 
     def on_activate(self, app):
