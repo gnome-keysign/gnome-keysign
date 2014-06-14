@@ -83,16 +83,20 @@ class GetKeySection(Gtk.Box):
         container.pack_start(self.scanFrame, True, True, 0)
 
         # create save key button
-        self.saveButton = Gtk.Button('Save key')
-        self.saveButton.set_image(Gtk.Image.new_from_icon_name(Gtk.STOCK_SAVE, Gtk.IconSize.BUTTON))
-        self.saveButton.set_always_show_image(True)
-        self.saveButton.set_margin_bottom(10)
+        self.load_button = Gtk.Button('Open Image')
+        self.load_button.set_image(Gtk.Image.new_from_icon_name(Gtk.STOCK_OPEN, Gtk.IconSize.BUTTON))
+        self.load_button.set_always_show_image(True)
+        self.load_button.set_margin_bottom(10)
         
-        self.saveButton.connect('clicked', lambda x: self.scanFrame.run())
+        self.load_button.connect('clicked', self.on_loadbutton_clicked)
 
-        container.pack_start(self.saveButton, False, False, 0)
+        container.pack_start(self.load_button, False, False, 0)
 
         self.pack_start(container, True, True, 0)
+
+
+    def on_loadbutton_clicked(self, *args, **kwargs):
+        print "load"
         
     
     def on_barcode(self, sender, barcode, message=None):

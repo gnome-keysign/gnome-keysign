@@ -46,7 +46,8 @@ class BarcodeReader(object):
                 self.on_barcode(barcode, message)
         
     def run(self):
-        p = 'v4l2src ! tee name=t ! queue ! videoconvert ! zbar ! fakesink t. ! queue ! xvimagesink'
+        p = 'v4l2src ! tee name=t ! queue ! videoconvert ! zbar ! fakesink t. ! queue ! videoconvert ! xvimagesink'
+        #p = 'uridecodebin file:///tmp/image.jpg ! tee name=t ! queue ! videoconvert ! zbar ! fakesink t. ! queue ! videoconvert ! xvimagesink'
         self.a = a = Gst.parse_launch(p)
         self.bus = bus = a.get_bus()
         
