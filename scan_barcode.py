@@ -5,6 +5,7 @@ import logging
 import signal
 import sys
 
+from gi.repository import GObject
 from gi.repository import Gst
 from gi.repository import Gtk, GLib
 # Because of https://bugzilla.gnome.org/show_bug.cgi?id=698005
@@ -64,6 +65,12 @@ class BarcodeReader(object):
         pass
 
 class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
+
+    __gsignals__ = {
+        'barcode': (GObject.SIGNAL_RUN_LAST, None,  (str, ))
+    }
+
+
     def __init__(self, *args, **kwargs):
         super(BarcodeReaderGTK, self).__init__(*args, **kwargs)
 
@@ -116,6 +123,18 @@ class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
         self.a.set_state(Gst.State.NULL)
         
 
+    def do_barcode(self, barcode):
+        "This is called by GObject, I think"
+        log.debug("Emitting a barcode signal, %s", barcode)
+
+
+    def on_barcode(self, barcode, message):
+        '''You can implement this function to
+        get notified when a new barcode has been read.
+        If you do, you will not get the GObject "barcode" signal
+        as it is emitted from here.'''
+        log.debug("About to emit barcode signal: %s", barcode)
+        self.emit('barcode', barcode)
 
 class SimpleInterface(BarcodeReader):
     def __init__(self, *args, **kwargs):
