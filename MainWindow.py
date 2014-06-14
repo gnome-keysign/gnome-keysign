@@ -59,6 +59,9 @@ class MainWindow(Gtk.Application):
         #self.window = Gtk.ApplicationWindow(application=app)
         
         self.window.show_all()
+        # In case the user runs the application a second time,
+        # we raise the existing window.
+        self.window.present()
 
 
 def main():
