@@ -1,12 +1,13 @@
-from gi.repository import Gtk
-from SignPages import KeysPage, SelectedKeyPage
-
 from gi.repository import Gst
 from gi.repository import Gtk, GLib
 # Because of https://bugzilla.gnome.org/show_bug.cgi?id=698005
 from gi.repository import Gtk, GdkX11
 # Needed for window.get_xid(), xvimagesink.set_window_handle(), respectively:
 from gi.repository import GdkX11, GstVideo
+
+from SignPages import KeysPage, SelectedKeyPage
+
+from key import Key, KeyError
 
 Gst.init([])
 
@@ -72,6 +73,10 @@ class GetKeySection(Gtk.Box):
         self.scanFrame = BarcodeReaderGTK()
         self.scanFrame.set_size_request(150,150)
         self.scanFrame.show()
+        # We *could* overwrite the on_barcode function, but
+        # let's rather go with a GObject signal
+        #self.scanFrame.on_barcode = self.on_barcode
+        self.scanFrame.connect('barcode', self.on_barcode)
         #GLib.idle_add(        self.scanFrame.run)
 
         container.pack_start(self.scanFrameLabel, False, False, 0)
@@ -88,3 +93,16 @@ class GetKeySection(Gtk.Box):
         container.pack_start(self.saveButton, False, False, 0)
 
         self.pack_start(container, True, True, 0)
+        
+    
+    def on_barcode(self, sender, barcode, message=None):
+        '''This is connected to the "barcode" signal.
+        The message argument is a left over of an experimental
+        API design.'''
+        try:
+            key = Key(barcode)
+        except KeyError:
+            log.exception("Could not create key from %s", barcode)
+        else:
+            print("barcode signal %s %s" %( barcode, message))
+
