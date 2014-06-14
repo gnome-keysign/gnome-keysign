@@ -45,6 +45,9 @@ class MainWindow(Gtk.Application):
         section = Gio.Menu.new()
         appmenu.append_section(None, section)
 
+        some_action = Gio.SimpleAction.new("scan-image", None)
+        some_action.connect('activate', self.on_scan_image)
+        self.add_action(some_action)
         some_item = Gio.MenuItem.new("Scan Image", "app.scan-image")
         section.append_item(some_item)
 
@@ -53,6 +56,9 @@ class MainWindow(Gtk.Application):
 
         self.set_app_menu(appmenu)
 
+
+    def on_scan_image(self, *args, **kwargs):
+        print "scanimage"
 
     def on_activate(self, app):
         self.log.error("Activate!")
