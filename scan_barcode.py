@@ -68,7 +68,8 @@ class BarcodeReader(object):
 class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
 
     __gsignals__ = {
-        'barcode': (GObject.SIGNAL_RUN_LAST, None,  (str, ))
+        'barcode': (GObject.SIGNAL_RUN_LAST, None,
+                    (str, Gst.Message.__gtype__))
     }
 
 
@@ -124,9 +125,9 @@ class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
         self.a.set_state(Gst.State.NULL)
         
 
-    def do_barcode(self, barcode):
+    def do_barcode(self, barcode, message):
         "This is called by GObject, I think"
-        log.debug("Emitting a barcode signal, %s", barcode)
+        log.debug("Emitting a barcode signal %s, %s", barcode, message)
 
 
     def on_barcode(self, barcode, message):
@@ -135,7 +136,7 @@ class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
         If you do, you will not get the GObject "barcode" signal
         as it is emitted from here.'''
         log.debug("About to emit barcode signal: %s", barcode)
-        self.emit('barcode', barcode)
+        self.emit('barcode', barcode, message)
 
 class SimpleInterface(BarcodeReader):
     def __init__(self, *args, **kwargs):

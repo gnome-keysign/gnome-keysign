@@ -101,8 +101,8 @@ class GetKeySection(Gtk.Box):
     
     def on_barcode(self, sender, barcode, message=None):
         '''This is connected to the "barcode" signal.
-        The message argument is a left over of an experimental
-        API design.'''
+        The message argument is a GStreamer message that created
+        the barcode.'''
         try:
             key = Key(barcode)
         except KeyError:
