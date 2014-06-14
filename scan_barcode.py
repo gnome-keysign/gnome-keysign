@@ -27,6 +27,13 @@ def test():
 
 class BarcodeReader(object):
 
+    def on_barcode(self, barcode, message):
+        '''This is called when a barcode is available
+        with barcode being the decoded barcode.
+        Message is the GStreamer message containing
+        the barcode.'''
+        return barcode
+
     def on_message(self, bus, message):
         log.debug("Message: %s", message)
         if message:
@@ -34,7 +41,8 @@ class BarcodeReader(object):
             if struct.get_name() == 'barcode':
                 assert struct.has_field('symbol')
                 barcode = struct.get_string('symbol')
-                print("Read Barcode: {}".format(barcode))
+                log.info("Read Barcode: {}".format(barcode))
+                self.on_barcode(barcode, message)
         
     def run(self):
         p = 'v4l2src ! tee name=t ! queue ! videoconvert ! zbar ! fakesink t. ! queue ! xvimagesink'
