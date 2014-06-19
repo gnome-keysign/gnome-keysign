@@ -1,11 +1,14 @@
 import dbus
 import avahi
-import gobject
+
+from gi.repository import Gtk
 from dbus.mainloop.glib import DBusGMainLoop
+
+__all__ = ["ServiceDiscover"]
 
 class ServiceDiscover:
 
-    def __init__(self, stype):
+    def __init__(self, stype='_http._tcp'):
         self.domain = ""
         self.stype = stype
 
@@ -23,14 +26,17 @@ class ServiceDiscover:
                     avahi.DBUS_INTERFACE_SERVICE_BROWSER)
 
         self.sbrowser.connect_to_signal("ItemNew", self.handler)
+        self.run_loop()
 
-        gobject.MainLoop().run()
+    def run_loop(self):
+        # FIXME make it use the main loop of the Gtk MainWindow object
+        Gtk.main()
 
     def handler(self, interface, protocol, name, stype, domain, flags):
         print "Found service '%s' type '%s' domain '%s' " % (name, stype, domain)
 
         if flags & avahi.LOOKUP_RESULT_LOCAL:
-            # FIXME: skip local services
+            # FIXME skip local services
             pass
 
         self.server.ResolveService(interface, protocol, name, stype,

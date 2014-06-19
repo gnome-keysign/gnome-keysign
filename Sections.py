@@ -20,8 +20,9 @@ class KeySignSection(Gtk.VBox):
         # create progress bar
         self.progressBar = Gtk.ProgressBar()
         self.progressBar.set_text("Step 1: Choose a key and click on 'Next' button.")
+        # self.progressBar.set_text("Step 2: Choose a key and click on 'Next' button.")
         self.progressBar.set_show_text(True)
-        self.progressBar.set_fraction(0.50) #TODO : Fix Hardcoded
+        self.progressBar.set_fraction(0.25) #TODO : Fix Hardcoded
 
         # create proceed button
         self.proceedButton = Gtk.Button('Next')

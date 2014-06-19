@@ -1,6 +1,6 @@
 import avahi
 import dbus
-import gobject
+
 from dbus.mainloop.glib import DBusGMainLoop
 
 __all__ = ["ServicePublisher"]
@@ -44,7 +44,7 @@ class ServicePublisher:
 
 
 def test():
-    service = ServicePublisher(name="TestService", port=3000)
+    service = ServicePublisher(name="TestService", port=9001)
     print "Adding service '%s' of type '%s' ..." % ("TestService", "_http._tcp")
 
     service.publish()
