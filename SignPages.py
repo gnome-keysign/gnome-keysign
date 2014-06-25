@@ -28,14 +28,18 @@ class KeysPage(Gtk.VBox):
             for e in uidslist:
                 # UID general format: Real Name (Comment) <email@address>
                 uid = str(e.uid)
-                # Remove (Comment) if exists
+                # remove (Comment) if exists
                 com_start = uid.find('(')
                 if com_start != -1:
                     com_end = uid.find(')')
                     uid = uid[:com_start].strip() + uid[com_end+1:].strip()
 
-                name = uid.split('<')[0].strip()
-                email = uid.split('<')[1].replace('>','').strip()
+                # get the user name and (if exists) email
+                tokens = uid.split('<')
+                name = tokens[0].strip()
+                email = 'unknown'
+                if len(tokens) > 1:
+                    email = tokens[1].replace('>','').strip()
 
                 self.store.append((name, email, str(key.keyid())))
 

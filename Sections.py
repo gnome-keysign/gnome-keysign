@@ -19,8 +19,6 @@ class KeySignSection(Gtk.VBox):
         self.notebook.append_page(KeysPage(), None)
         self.notebook.append_page(SelectedKeyPage(), None)
 
-        #TODO make notebook change pages according to current step
-
         self.notebook.set_show_tabs(False) # TODO
 
         # create progress bar
@@ -31,7 +29,7 @@ class KeySignSection(Gtk.VBox):
 
         # create back button
         self.backButton = Gtk.Button('Back')
-        # FIXME not working, button is still visible
+        # FIXME not working, button is still visible at start
         self.backButton.set_visible(False)
         self.backButton.connect('clicked', self.on_button_clicked)
 
@@ -51,6 +49,8 @@ class KeySignSection(Gtk.VBox):
         self.pack_start(hBox, False, False, 0)
 
     def on_button_clicked(self, button):
+
+        page_index = self.notebook.get_current_page()
 
         if button == self.proceedButton:
             self.notebook.next_page()
