@@ -9,7 +9,7 @@ except ImportError, e:
     sys.exit()
 
 
-FINGERPRINT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
+FINGERPRINT_DEFAULT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
 
 class KeysPage(Gtk.VBox):
 
@@ -74,10 +74,10 @@ class SelectedKeyPage(Gtk.HBox):
 
         # create fingerprint label
         fingerprintMark = Gtk.Label()
-        fingerprintMark.set_markup('<span size="15000">' + 'Your key Fingerprint' + '</span>')
+        fingerprintMark.set_markup('<span size="15000">' + 'Key Fingerprint' + '</span>')
 
         self.fingerprintLabel = Gtk.Label()
-        self.fingerprintLabel.set_markup('<span size="20000">' + FINGERPRINT + '</span>')
+        self.fingerprintLabel.set_markup('<span size="20000">' + FINGERPRINT_DEFAULT + '</span>')
 
         containerLeft = Gtk.VBox(spacing=10)
         containerLeft.pack_start(fingerprintMark, False, False, 0)
@@ -98,3 +98,7 @@ class SelectedKeyPage(Gtk.HBox):
 
         self.pack_start(containerLeft, True, True, 0)
         self.pack_start(containerRight, False, False, 0)
+
+    def display_key_details(self, uid):
+        # FIXME it should display key fingerprint not user id
+        self.fingerprintLabel.set_markup('<span size="20000">' + uid + '</span>')

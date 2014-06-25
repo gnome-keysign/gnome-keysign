@@ -1,8 +1,6 @@
 from gi.repository import Gtk
 from SignPages import KeysPage, SelectedKeyPage
 
-FINGERPRINT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
-
 progress_bar_text = ["Step 1: Choose a key and click on 'Next' button",
                      "Step2: Compare the recieved fingerprint with the owner's key fpr",
                      "Step3: Check if the identification papers match",
@@ -11,15 +9,18 @@ progress_bar_text = ["Step 1: Choose a key and click on 'Next' button",
 
 class KeySignSection(Gtk.VBox):
 
+
     def __init__(self):
         super(KeySignSection, self).__init__()
 
         # create notebook container
         self.notebook = Gtk.Notebook()
-        self.notebook.append_page(KeysPage(), None)
-        self.notebook.append_page(SelectedKeyPage(), None)
+        self.keysPage = KeysPage()
+        self.selectedKeyPage = SelectedKeyPage()
+        self.notebook.append_page(self.keysPage, None)
+        self.notebook.append_page(self.selectedKeyPage, None)
 
-        self.notebook.set_show_tabs(False) # TODO
+        self.notebook.set_show_tabs(False)
 
         # create progress bar
         self.progressBar = Gtk.ProgressBar()
@@ -39,7 +40,6 @@ class KeySignSection(Gtk.VBox):
         self.proceedButton.set_always_show_image(True)
         self.proceedButton.connect('clicked', self.on_button_clicked)
 
-
         hBox = Gtk.HBox()
         hBox.pack_start(self.progressBar, True, True, 0)
         hBox.pack_start(self.backButton, False, False, 0)
@@ -57,6 +57,15 @@ class KeySignSection(Gtk.VBox):
             page_index = self.notebook.get_current_page()
             if page_index != 0:
                 self.backButton.set_visible(True)
+
+            # Get the fingerprint of the selected key
+            selection = self.keysPage.tree.get_selection()
+            model, paths = selection.get_selected_rows()
+            if page_index == 1:
+                for path in paths:
+                    iterator = model.get_iter(path)
+                    (name, email) = model.get(iterator, 0, 1)
+                    self.selectedKeyPage.display_key_details(name)
 
         elif button == self.backButton:
             self.notebook.prev_page()
