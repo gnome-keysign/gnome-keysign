@@ -1,5 +1,13 @@
-from gi.repository import Gtk, GdkPixbuf
-from monkeysign.gpg import Keyring
+
+import sys
+
+try:
+    from gi.repository import Gtk, GdkPixbuf
+    from monkeysign.gpg import Keyring
+except ImportError, e:
+    print "A required python module is missing!\n%s" % (e,)
+    sys.exit()
+
 
 FINGERPRINT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
 
@@ -11,14 +19,25 @@ class KeysPage(Gtk.VBox):
         # create and fill up the list store with sample values
         self.store = Gtk.ListStore(str, str, str)
 
-        # FIXME use a callback function to refresh display when keys change
+        # FIXME use a callback function to refresh the display when keys change
         for key in Keyring().get_keys().values():
             if key.invalid or key.disabled or key.expired or key.revoked:
                 continue
-            uid = str(key.uidslist[0].uid)
-            name = uid.split('<')[0][:-1]
-            email = uid.split('<')[1][:-1]
-            self.store.append((name, email, str(key.keyid())))
+            # get all UIDs for key
+            uidslist = key.uidslist
+            for e in uidslist:
+                # UID general format: Real Name (Comment) <email@address>
+                uid = str(e.uid)
+                # Remove (Comment) if exists
+                com_start = uid.find('(')
+                if com_start != -1:
+                    com_end = uid.find(')')
+                    uid = uid[:com_start].strip() + uid[com_end+1:].strip()
+
+                name = uid.split('<')[0].strip()
+                email = uid.split('<')[1].replace('>','').strip()
+
+                self.store.append((name, email, str(key.keyid())))
 
         # create the tree
         self.tree = Gtk.TreeView(model=self.store)
@@ -36,7 +55,13 @@ class KeysPage(Gtk.VBox):
         self.tree.append_column(emailColumn)
         self.tree.append_column(keyColumn)
 
-        self.pack_start(self.tree, True, True, 0)
+        # Use ScrolledWindow to make the TreeView scrollable
+        self.scrolled_window = Gtk.ScrolledWindow()
+        self.scrolled_window.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        self.scrolled_window.add(self.tree)
+        self.scrolled_window.set_min_content_height(200)
+
+        self.pack_start(self.scrolled_window, True, True, 0)
 
 
 class SelectedKeyPage(Gtk.HBox):

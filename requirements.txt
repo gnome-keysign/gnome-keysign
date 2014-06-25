@@ -1,0 +1,2 @@
+# Debian packages
+monkeysign==1.1
