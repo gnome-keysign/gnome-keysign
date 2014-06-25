@@ -3,6 +3,12 @@ from SignPages import KeysPage, SelectedKeyPage
 
 FINGERPRINT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
 
+progress_bar_text = ["Step 1: Choose a key and click on 'Next' button",
+                     "Step2: Compare the recieved fingerprint with the owner's key fpr",
+                     "Step3: Check if the identification papers match",
+                     "Step4: Key was succesfully signed"
+                    ]
+
 class KeySignSection(Gtk.VBox):
 
     def __init__(self):
@@ -19,18 +25,26 @@ class KeySignSection(Gtk.VBox):
 
         # create progress bar
         self.progressBar = Gtk.ProgressBar()
-        self.progressBar.set_text("Step 1: Choose a key and click on 'Next' button")
+        self.progressBar.set_text(progress_bar_text[0])
         self.progressBar.set_show_text(True)
         self.progressBar.set_fraction(0.25) #TODO : Fix Hardcoded
 
-        # create proceed button
+        # create back button
+        self.backButton = Gtk.Button('Back')
+        # FIXME not working, button is still visible
+        self.backButton.set_visible(False)
+        self.backButton.connect('clicked', self.on_button_clicked)
+
+        # create next button
         self.proceedButton = Gtk.Button('Next')
         self.proceedButton.set_image(Gtk.Image.new_from_icon_name(Gtk.STOCK_EDIT, Gtk.IconSize.BUTTON))
         self.proceedButton.set_always_show_image(True)
         self.proceedButton.connect('clicked', self.on_button_clicked)
 
+
         hBox = Gtk.HBox()
         hBox.pack_start(self.progressBar, True, True, 0)
+        hBox.pack_start(self.backButton, False, False, 0)
         hBox.pack_start(self.proceedButton, False, False, 0)
 
         self.pack_start(self.notebook, True, True, 0)
@@ -38,19 +52,20 @@ class KeySignSection(Gtk.VBox):
 
     def on_button_clicked(self, button):
 
-        if (button == self.proceedButton):
+        if button == self.proceedButton:
             self.notebook.next_page()
+            page_index = self.notebook.get_current_page()
+            if page_index != 0:
+                self.backButton.set_visible(True)
 
-            page_index = self.notebook.get_current_page() + 1
-            if page_index == 2:
-                progressBar_text = "Step2: Compare the recieved fingerprint with the owner's key fpr"
-            elif page_index == 3:
-                progressBar_text = "Step3: Check if the identification papers match"
-            elif page_index == 4:
-                progressBar_text = "Step4: Key was succesfully signed"
+        elif button == self.backButton:
+            self.notebook.prev_page()
+            page_index = self.notebook.get_current_page()
+            if page_index == 0:
+                self.backButton.set_visible(False)
 
-            self.progressBar.set_fraction(page_index * 0.25)
-            self.progressBar.set_text(progressBar_text)
+        self.progressBar.set_fraction((page_index+1) * 0.25)
+        self.progressBar.set_text(progress_bar_text[page_index])
 
 class GetKeySection(Gtk.Box):
 
