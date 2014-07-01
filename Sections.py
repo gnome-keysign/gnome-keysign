@@ -2,9 +2,9 @@ from gi.repository import Gtk
 from SignPages import KeysPage, SelectedKeyPage
 
 progress_bar_text = ["Step 1: Choose a key and click on 'Next' button",
-                     "Step2: Compare the recieved fingerprint with the owner's key fpr",
-                     "Step3: Check if the identification papers match",
-                     "Step4: Key was succesfully signed"
+                     "Step 2: Compare the recieved fingerprint with the owner's key fpr",
+                     "Step 3: Check if the identification papers match",
+                     "Step 4: Key was succesfully signed"
                     ]
 
 class KeySignSection(Gtk.VBox):
@@ -49,32 +49,44 @@ class KeySignSection(Gtk.VBox):
         self.pack_start(hBox, False, False, 0)
 
     def on_button_clicked(self, button):
-
+        # current tab index in notebook
         page_index = self.notebook.get_current_page()
 
         if button == self.proceedButton:
+            # switch to the next page in the notebook
             self.notebook.next_page()
             page_index = self.notebook.get_current_page()
             if page_index != 0:
                 self.backButton.set_visible(True)
 
-            # Get the fingerprint of the selected key
-            selection = self.keysPage.tree.get_selection()
+            # get a Gtk.TreeSelection object to process the selected rows
+            selection = self.keysPage.treeView.get_selection()
             model, paths = selection.get_selected_rows()
+
             if page_index == 1:
                 for path in paths:
                     iterator = model.get_iter(path)
-                    (name, email) = model.get(iterator, 0, 1)
-                    self.selectedKeyPage.display_key_details(name)
+                    (name, email, keyid) = model.get(iterator, 0, 1, 2)
+
+                    try:
+                        openPgpKey = self.keysPage.keysDict[keyid]
+                        self.selectedKeyPage.display_key_details(openPgpKey)
+
+                    except KeyError:
+                        print "No key details can be shown for this id:%s" % (keyid,)
+
 
         elif button == self.backButton:
+            # switch to the previous page in the notebook
             self.notebook.prev_page()
             page_index = self.notebook.get_current_page()
             if page_index == 0:
                 self.backButton.set_visible(False)
 
+        # move the progress bar acording to current step
         self.progressBar.set_fraction((page_index+1) * 0.25)
         self.progressBar.set_text(progress_bar_text[page_index])
+
 
 class GetKeySection(Gtk.Box):
 
