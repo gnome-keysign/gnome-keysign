@@ -42,13 +42,13 @@ class KeySignSection(Gtk.VBox):
         self.proceedButton.set_always_show_image(True)
         self.proceedButton.connect('clicked', self.on_button_clicked)
 
-        hBox = Gtk.HBox()
-        hBox.pack_start(self.progressBar, True, True, 0)
-        hBox.pack_start(self.backButton, False, False, 0)
-        hBox.pack_start(self.proceedButton, False, False, 0)
+        buttonBox = Gtk.HBox()
+        buttonBox.pack_start(self.progressBar, True, True, 0)
+        buttonBox.pack_start(self.backButton, False, False, 0)
+        buttonBox.pack_start(self.proceedButton, False, False, 0)
 
         self.pack_start(self.notebook, True, True, 0)
-        self.pack_start(hBox, False, False, 0)
+        self.pack_start(buttonBox, False, False, 0)
 
     def on_button_clicked(self, button):
         # current tab index in notebook
@@ -111,7 +111,6 @@ class GetKeySection(Gtk.Box):
         # create scanner frame
         self.scanFrameLabel = Gtk.Label()
         self.scanFrameLabel.set_markup('<span size="15000">' + '... or scan QR code'+ '</span>')
-
         self.scanFrame = Gtk.Frame(label='QR Scanner')
 
         container.pack_start(self.scanFrameLabel, False, False, 0)
@@ -124,5 +123,57 @@ class GetKeySection(Gtk.Box):
         self.saveButton.set_margin_bottom(10)
 
         container.pack_start(self.saveButton, False, False, 0)
-
         self.pack_start(container, True, False, 0)
+
+
+class KeysFromNetworkSection(Gtk.VBox):
+
+    def __init__(self):
+        super(KeysFromNetworkSection, self).__init__()
+        self.set_spacing(5)
+
+        # setup label
+        topLabel = Gtk.Label()
+        topLabel.set_text("Send/Recieve key from network")
+
+        # FIXME: use a proper way of uploading a key (i.e. FileChooserDialog).
+        # For now the scenario is simple, you press "SendKey" and it sends a key
+        # from the text editor to network, press "GetKey" and it display a key
+        # recieved through network.
+
+        # setup multiline editor
+        self.textview = Gtk.TextView()
+        self.textbuffer = self.textview.get_buffer()
+
+        # setup scrolled window
+        scrolledwindow = Gtk.ScrolledWindow()
+        scrolledwindow.set_hexpand(False)
+        scrolledwindow.set_vexpand(False)
+        scrolledwindow.add(self.textview)
+
+        # setup button for sending a key
+        self.sendKeyButton = Gtk.Button("SendKey")
+        self.sendKeyButton.connect('clicked', self.on_sendkey_button_clicked)
+        self.sendKeyButton.set_halign(Gtk.Align.CENTER)
+
+        # setup button for recieving a key
+        self.getKeyButton = Gtk.Button("GetKey")
+        self.getKeyButton.connect('clicked', self.on_getkey_button_clicked)
+        self.getKeyButton.set_halign(Gtk.Align.CENTER)
+
+        # setup box to hold the 2 buttons above
+        buttonBox = Gtk.HBox(spacing=10)
+        buttonBox.pack_start(self.sendKeyButton, False, False, 0)
+        buttonBox.pack_start(self.getKeyButton, False, False, 0)
+        buttonBox.set_halign(Gtk.Align.CENTER)
+
+        # pack up
+        self.pack_start(scrolledwindow, True, True, 0)
+        self.pack_start(buttonBox, True, False, 0)
+
+
+    def on_sendkey_button_clicked(self, button):
+        pass
+
+    def on_getkey_button_clicked(self, button):
+        pass
