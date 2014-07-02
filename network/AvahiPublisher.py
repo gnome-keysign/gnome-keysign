@@ -3,13 +3,13 @@ import dbus
 
 from dbus.mainloop.glib import DBusGMainLoop
 
-__all__ = ["ServicePublisher"]
+__all__ = ["AvahiPublisher"]
 
 # Publishes a service of type '_demo._tcp'
 
 TYPE = '_demo._tcp'
 
-class ServicePublisher:
+class AvahiPublisher:
     """A simple class to publish a network service with zeroconf using
     avahi.
 
@@ -49,7 +49,7 @@ class ServicePublisher:
 
 def main():
     name = "DemoService"
-    service = ServicePublisher(name=name, port=9001)
+    service = AvahiPublisher(name=name, port=9001)
     print "Adding service '%s' of type '%s' ..." % (name, TYPE)
 
     service.publish()

@@ -1,4 +1,6 @@
+from gi.repository import GLib
 from gi.repository import Gtk
+
 from SignPages import KeysPage, SelectedKeyPage
 
 progress_bar_text = ["Step 1: Choose a key and click on 'Next' button",
