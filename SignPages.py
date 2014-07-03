@@ -84,9 +84,9 @@ class KeysPage(Gtk.VBox):
 
         self.pack_start(self.scrolled_window, True, True, 0)
 
-class SelectedKeyPage(Gtk.HBox):
+class KeyPresentPage(Gtk.HBox):
     def __init__(self):
-        super(SelectedKeyPage, self).__init__()
+        super(KeyPresentPage, self).__init__()
 
         # create left side Key labels
         fingerprintMark = Gtk.Label()
@@ -133,3 +133,31 @@ class SelectedKeyPage(Gtk.HBox):
 
         fpr = fpr.rstrip()
         self.fingerprintLabel.set_markup('<span size="20000">' + fpr + '</span>')
+
+
+class KeyDetailsPage(Gtk.VBox):
+
+    def __init__(self):
+        super(KeyDetailsPage, self).__init__()
+        self.set_spacing(10)
+
+        uidsLabel = Gtk.Label()
+        uidsLabel.set_text("UIDs")
+
+        # this will later be populated with uids when user selects a key
+        self.uidsBox = Gtk.HBox(spacing=5)
+
+        expireLabel = Gtk.Label()
+        expireLabel.set_text("Expires 0000-00-00")
+
+        signaturesLabel = Gtk.Label()
+        signaturesLabel.set_text("Signatures")
+
+        # this will also be populated later
+        signaturesBox = Gtk.HBox(spacing=5)
+
+        self.pack_start(uidsLabel, False, False, 0)
+        self.pack_start(self.uidsBox, True, True, 0)
+        self.pack_start(expireLabel, False, False, 0)
+        self.pack_start(signaturesLabel, False, False, 0)
+        self.pack_start(signaturesBox, True, True, 0)

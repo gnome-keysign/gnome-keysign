@@ -1,5 +1,5 @@
 from gi.repository import Gtk
-from SignPages import KeysPage, SelectedKeyPage
+from SignPages import KeysPage, KeyPresentPage, KeyDetailsPage
 
 progress_bar_text = ["Step 1: Choose a key and click on 'Next' button",
                      "Step 2: Compare the recieved fingerprint with the owner's key fpr",
@@ -16,9 +16,12 @@ class KeySignSection(Gtk.VBox):
         # create notebook container
         self.notebook = Gtk.Notebook()
         self.keysPage = KeysPage()
-        self.selectedKeyPage = SelectedKeyPage()
+        self.keyDetaislPage = KeyDetailsPage()
+        self.presentKeyPage = KeyPresentPage()
+
         self.notebook.append_page(self.keysPage, None)
-        self.notebook.append_page(self.selectedKeyPage, None)
+        self.notebook.append_page(KeyDetailsPage(), None)
+        self.notebook.append_page(self.presentKeyPage, None)
 
         self.notebook.set_show_tabs(False)
 
@@ -26,7 +29,7 @@ class KeySignSection(Gtk.VBox):
         self.progressBar = Gtk.ProgressBar()
         self.progressBar.set_text(progress_bar_text[0])
         self.progressBar.set_show_text(True)
-        self.progressBar.set_fraction(float(1.0/3)) #TODO : Fix Hardcoded
+        self.progressBar.set_fraction(float(1.0/3)) #FIXME Hardcoded
 
         # create back button
         self.backButton = Gtk.Button('Back')
@@ -70,7 +73,7 @@ class KeySignSection(Gtk.VBox):
 
                     try:
                         openPgpKey = self.keysPage.keysDict[keyid]
-                        self.selectedKeyPage.display_key_details(openPgpKey)
+                        self.presentKeyPage.display_key_details(openPgpKey)
 
                     except KeyError:
                         print "No key details can be shown for this id:%s" % (keyid,)
