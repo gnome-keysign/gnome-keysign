@@ -27,7 +27,7 @@ class KeysPage(Gtk.VBox):
         # FIXME: this should be a callback function to update the display
         # when a key is changed/deleted
 
-        for key in self.keyring.get_keys().values():
+        for key in self.keyring.get_keys(None, True, False).values():
             if key.invalid or key.disabled or key.expired or key.revoked:
                 continue
 
@@ -93,6 +93,8 @@ class SelectedKeyPage(Gtk.HBox):
         fingerprintMark.set_markup('<span size="15000">' + 'Key Fingerprint' + '</span>')
 
         self.fingerprintLabel = Gtk.Label()
+        # FIXME: there shouldn't be a default fingerprint, instead the 'Next' button should be
+        # disabled until user selects an UID
         self.fingerprintLabel.set_markup('<span size="20000">' + FINGERPRINT_DEFAULT + '</span>')
 
         # left vertical box

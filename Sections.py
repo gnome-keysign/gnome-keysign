@@ -26,7 +26,7 @@ class KeySignSection(Gtk.VBox):
         self.progressBar = Gtk.ProgressBar()
         self.progressBar.set_text(progress_bar_text[0])
         self.progressBar.set_show_text(True)
-        self.progressBar.set_fraction(0.25) #TODO : Fix Hardcoded
+        self.progressBar.set_fraction(float(1.0/3)) #TODO : Fix Hardcoded
 
         # create back button
         self.backButton = Gtk.Button('Back')
@@ -84,7 +84,7 @@ class KeySignSection(Gtk.VBox):
                 self.backButton.set_visible(False)
 
         # move the progress bar acording to current step
-        self.progressBar.set_fraction((page_index+1) * 0.25)
+        self.progressBar.set_fraction((page_index+1) * float(1.0/3))
         self.progressBar.set_text(progress_bar_text[page_index])
 
 
