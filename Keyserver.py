@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 
 import BaseHTTPServer
+import logging
+import socket
 from SocketServer import ThreadingMixIn
+
+log = logging.getLogger()
 
 class KeyRequestHandlerBase(BaseHTTPServer.BaseHTTPRequestHandler):
     '''This is the "base class" which needs to be given access
@@ -29,10 +33,38 @@ class ThreadedKeyserver(BaseHTTPServer.HTTPServer, ThreadingMixIn):
     pass
 
 
-if __name__ == '__main__':
-    KEYDATA = 'Example data'
-    class ExampleKeyRequestHandler(KeyRequestHandlerBase):
+        
+def serve_key(keydata, port=9001, **kwargs):
+    tries = 10
+
+    class KeyRequestHandler(KeyRequestHandlerBase):
         '''You will need to create this during runtime'''
         keydata = KEYDATA
+    HandlerClass = KeyRequestHandler
+    
+    for port_i in (port + p for p in range(tries)):
+        try:
+            log.info('Trying port %d', port_i)
+            server_address = ('', port_i)
+            httpd = ThreadedKeyserver(server_address, HandlerClass, **kwargs)
+            sa = httpd.socket.getsockname()
+            try:
+                log.info('Serving now, this is probably blocking...')
+                httpd.serve_forever()
+            finally:
+                log.info('finished serving')
+                #httpd.dispose()
 
-    BaseHTTPServer.test(ExampleKeyRequestHandler, ThreadedKeyserver)
+        except socket.error, value:
+            errno = value.errno
+            if errno == 10054 or errno == 32:
+                # This seems to be harmless
+                break
+        finally:
+            pass
+
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
+    KEYDATA = 'Example data'
+    serve_key(KEYDATA)
+    log.warn('Last line')
