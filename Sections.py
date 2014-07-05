@@ -175,5 +175,26 @@ class KeysFromNetworkSection(Gtk.VBox):
     def on_sendkey_button_clicked(self, button):
         pass
 
+    def obtain_key_async(self, fingerprint, callback=None, data=None):
+        import time
+        keydata = str(time.sleep(1))
+        GLib.idle_add(callback, keydata, data)
+        # If this function is added itself via idle_add, then idle_add will
+        # keep adding this function to the loop until this func ret False
+        return False
+
     def on_getkey_button_clicked(self, button):
-        pass
+
+        # FIXME: User should be able to type fpr or scan its QR Code
+        start_iter = self.textbuffer.get_start_iter()
+        end_iter = self.textbuffer.get_end_iter()
+        fingerprint = self.textbuffer.get_text(start_iter, end_iter, False)
+        self.textbuffer.delete(start_iter, end_iter)
+
+        self.textbuffer.set_text("downloading key with fingerprint: \n%s\n...\n"
+                                % fingerprint)
+        GLib.idle_add(self.obtain_key_async, fingerprint, self.recieved_key, fingerprint)
+
+
+    def recieved_key(self, keydata, *data):
+        self.textbuffer.insert_at_cursor(str(keydata))
