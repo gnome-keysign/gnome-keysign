@@ -37,9 +37,10 @@ class ThreadedKeyserver(BaseHTTPServer.HTTPServer, ThreadingMixIn):
 def serve_key(keydata, port=9001, **kwargs):
     tries = 10
 
+    kd = keydata
     class KeyRequestHandler(KeyRequestHandlerBase):
         '''You will need to create this during runtime'''
-        keydata = KEYDATA
+        keydata = kd
     HandlerClass = KeyRequestHandler
     
     for port_i in (port + p for p in range(tries)):
