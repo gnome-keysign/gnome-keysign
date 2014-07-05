@@ -64,6 +64,17 @@ def serve_key(keydata, port=9001, **kwargs):
         finally:
             pass
 
+
+from threading import Thread
+class ServeKeyThread(Thread):
+    def __init__(self, keydata, *args, **kwargs):
+        self.keydata = keydata
+        super(ServeKeyThread, self).__init__(*args, **kwargs)
+        self.daemon = True
+        
+    def run(self):
+        serve_key(self.keydata)
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     KEYDATA = 'Example data'
