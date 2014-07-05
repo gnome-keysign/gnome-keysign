@@ -166,10 +166,16 @@ class KeysFromNetworkSection(Gtk.VBox):
         self.getKeyButton.connect('clicked', self.on_getkey_button_clicked)
         self.getKeyButton.set_halign(Gtk.Align.CENTER)
 
+        # button for deleting text inside TextView
+        self.clearTextButton = Gtk.Button("Clear")
+        self.clearTextButton.connect('clicked', self.on_clear_button_clicked)
+        self.clearTextButton.set_halign(Gtk.Align.CENTER)
+
         # setup box to hold the 2 buttons above
         buttonBox = Gtk.HBox(spacing=10)
         buttonBox.pack_start(self.sendKeyButton, False, False, 0)
         buttonBox.pack_start(self.getKeyButton, False, False, 0)
+        buttonBox.pack_start(self.clearTextButton, False, False, 0)
         buttonBox.set_halign(Gtk.Align.CENTER)
 
         # pack up
@@ -203,3 +209,9 @@ class KeysFromNetworkSection(Gtk.VBox):
 
     def recieved_key(self, keydata, *data):
         self.textbuffer.insert_at_cursor(str(keydata))
+
+
+    def on_clear_button_clicked(self, button):
+        start_iter = self.textbuffer.get_start_iter()
+        end_iter = self.textbuffer.get_end_iter()
+        self.textbuffer.delete(start_iter, end_iter)
