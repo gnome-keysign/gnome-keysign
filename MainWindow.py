@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+
+import logging
+
 from gi.repository import GLib
 from gi.repository import Gtk
 
@@ -9,6 +13,8 @@ class MainWindow(Gtk.Window):
 
     def __init__(self):
         Gtk.Window.__init__(self, title="Geysign")
+        self.log = logging.getLogger()
+
         self.set_border_width(10)
         self.set_position(Gtk.WindowPosition.CENTER)
 

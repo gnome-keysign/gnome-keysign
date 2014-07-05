@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+
+import logging
+
 from gi.repository import GLib
 from gi.repository import Gtk
 
@@ -14,6 +18,7 @@ class KeySignSection(Gtk.VBox):
 
     def __init__(self):
         super(KeySignSection, self).__init__()
+        self.log = logging.getLogger()
 
         # create notebook container
         self.notebook = Gtk.Notebook()
