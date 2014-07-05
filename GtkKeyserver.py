@@ -22,11 +22,28 @@ class ServerWindow(Gtk.Window):
         self.log = logging.getLogger()
     
         Gtk.Window.__init__(self, title="Gtk and Python threads")
+        self.set_border_width(10)
 
         self.connect("delete-event", Gtk.main_quit)
         
-        GLib.idle_add(self.setup_server)
+        hBox = Gtk.HBox()
+        self.button = Gtk.ToggleButton('Start')
+        hBox.pack_start(self.button, False, False, 0)
+        self.add(hBox)
+        
+        self.button.connect('toggled', self.on_button_toggled)
+        
+        #GLib.idle_add(self.setup_server)
 
+
+    def on_button_toggled(self, button):
+        self.log.debug('toggled button')
+        if button.get_active():
+            self.log.debug("I am being switched on")
+            self.setup_server()
+        else:
+            self.log.debug("I am being switched off")
+            self.stop_server()
 
     def setup_server(self):
         self.log.info('Serving now')
@@ -40,8 +57,8 @@ class ServerWindow(Gtk.Window):
         self.log.info('Finsihed serving')
         return False
 
-    def dispose(self):
-        self.keyserver.stop()
+    def stop_server(self):
+        self.keyserver.shutdown()
 
 def main(args):
     log.debug('Running main with args: %s', args)

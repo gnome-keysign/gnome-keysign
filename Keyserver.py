@@ -4,6 +4,7 @@ import BaseHTTPServer
 import logging
 import socket
 from SocketServer import ThreadingMixIn
+from threading import Thread
 
 log = logging.getLogger()
 
@@ -30,51 +31,79 @@ class KeyRequestHandlerBase(BaseHTTPServer.BaseHTTPRequestHandler):
         return kd
 
 class ThreadedKeyserver(BaseHTTPServer.HTTPServer, ThreadingMixIn):
+    '''The keyserver in a threaded fashion'''
     pass
 
 
         
-def serve_key(keydata, port=9001, **kwargs):
-    tries = 10
-
-    kd = keydata
-    class KeyRequestHandler(KeyRequestHandlerBase):
-        '''You will need to create this during runtime'''
-        keydata = kd
-    HandlerClass = KeyRequestHandler
-    
-    for port_i in (port + p for p in range(tries)):
-        try:
-            log.info('Trying port %d', port_i)
-            server_address = ('', port_i)
-            httpd = ThreadedKeyserver(server_address, HandlerClass, **kwargs)
-            sa = httpd.socket.getsockname()
-            try:
-                log.info('Serving now, this is probably blocking...')
-                httpd.serve_forever()
-            finally:
-                log.info('finished serving')
-                #httpd.dispose()
-
-        except socket.error, value:
-            errno = value.errno
-            if errno == 10054 or errno == 32:
-                # This seems to be harmless
-                break
-        finally:
-            pass
 
 
-from threading import Thread
 class ServeKeyThread(Thread):
-    def __init__(self, keydata, *args, **kwargs):
-        self.keydata = keydata
+    '''Serves requests and manages the server in separates threads.
+    You can create an object and call start() to let it run.
+    If you want to stop serving, call shutdown().
+    '''
+    
+    def __init__(self, data, port=9001, *args, **kwargs):
+        '''Initializes the server to serve the data'''
+        self.keydata = data
+        self.port = port
         super(ServeKeyThread, self).__init__(*args, **kwargs)
         self.daemon = True
-        
-    def run(self):
-        serve_key(self.keydata)
+        self.httpd = None
 
+        
+    def serve_key(self, data=None, port=None, **kwargs):
+        '''Starts serving the data either from the argument
+        or from the field of the object.
+        An HTTPd is started and being put to serve_forever.
+        You need to call shutdown() in order to stop
+        serving.
+        '''
+        
+        port = port or self.port or 9001
+        
+        tries = 10
+    
+        kd = data if data else self.keydata
+        class KeyRequestHandler(KeyRequestHandlerBase):
+            '''You will need to create this during runtime'''
+            keydata = kd
+        HandlerClass = KeyRequestHandler
+        
+        for port_i in (port + p for p in range(tries)):
+            try:
+                log.info('Trying port %d', port_i)
+                server_address = ('', port_i)
+                self.httpd = ThreadedKeyserver(server_address, HandlerClass, **kwargs)
+                sa = self.httpd.socket.getsockname()
+                try:
+                    log.info('Serving now, this is probably blocking...')
+                    self.httpd.serve_forever()
+                finally:
+                    log.info('finished serving')
+                    #httpd.dispose()
+                    break
+    
+            except socket.error, value:
+                errno = value.errno
+                if errno == 10054 or errno == 32:
+                    # This seems to be harmless
+                    break
+            finally:
+                pass
+    
+
+    def run(self):
+        '''This is being run by Thread in a separate thread
+        after you call start()'''
+        self.serve_key(self.keydata)
+
+    def shutdown(self):
+        '''Sends shutdown to the underlying httpd'''
+        log.info("Shutting down httpd %r", self.httpd)
+        self.httpd.shutdown()
+    
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     KEYDATA = 'Example data'
