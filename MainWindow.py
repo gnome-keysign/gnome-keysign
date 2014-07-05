@@ -42,19 +42,20 @@ class MainWindow(Gtk.Window):
 
 
     def on_new_service(self, browser, name, address, port):
+        self.log.info("Probably discovered something, let me check; %s %s:%i",
+            name, address, port)
         if self.verify_service(name, address, port):
             GLib.idle_add(self.add_discovered_service, name, address, port)
-
+        else:
+            self.log.warn("Client was rejected: %s %s %i",
+                        name, address, port)
 
     def verify_service(self, name, address, port):
         '''A tiny function to return whether the service
         is indeed something we are interested in'''
-        if name == self.avahi_service_name:
-            return True
-        else:
-            return False
+        return True
 
     def add_discovered_service(self, name, address, port):
-        self.discovered_services += (name, address, port)
+        self.discovered_services += ((name, address, port))
 
         return False
