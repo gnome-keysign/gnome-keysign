@@ -22,7 +22,7 @@ class MainWindow(Gtk.Window):
         notebook = Gtk.Notebook()
         notebook.append_page(KeySignSection(), Gtk.Label('Keys'))
         notebook.append_page(GetKeySection(), Gtk.Label('Get Key'))
-        notebook.append_page(KeysFromNetworkSection(), Gtk.Label('Get from network'))
+        notebook.append_page(KeysFromNetworkSection(self), Gtk.Label('Get from network'))
         self.add(notebook)
 
         # setup signals
