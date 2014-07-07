@@ -54,6 +54,11 @@ class ServeKeyThread(Thread):
     
 
     def start(self, data=None, port=None, *args, **kwargs):
+        '''This is run in the same thread as the caller.
+        This calls run() in a separate thread.
+        In order to resolve DBus issues, most things
+        are done here.
+        '''
 
         port = port or self.port or 9001
         
@@ -86,17 +91,16 @@ class ServeKeyThread(Thread):
         super(ServeKeyThread, self).start(*args, **kwargs)
         
 
-    def serve_key(self, data=None, port=None, **kwargs):
-        '''Starts serving the data either from the argument
-        or from the field of the object.
-        An HTTPd is started and being put to serve_forever.
+    def serve_key(self):
+        '''An HTTPd is started and being put to serve_forever.
         You need to call shutdown() in order to stop
         serving.
         '''
         
-        sa = self.httpd.socket.getsockname()
+        #sa = self.httpd.socket.getsockname()
         try:
-            log.info('Serving now, this is probably blocking...')
+            log.info('Serving now on %s, this is probably blocking...',
+                     self.httpd.socket.getsockname())
             self.httpd.serve_forever()
         finally:
             log.info('finished serving')
@@ -107,7 +111,8 @@ class ServeKeyThread(Thread):
     def run(self):
         '''This is being run by Thread in a separate thread
         after you call start()'''
-        self.serve_key(self.keydata)
+        self.serve_key()
+
 
     def shutdown(self):
         '''Sends shutdown to the underlying httpd'''
