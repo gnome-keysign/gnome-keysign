@@ -51,16 +51,10 @@ class ServeKeyThread(Thread):
         super(ServeKeyThread, self).__init__(*args, **kwargs)
         self.daemon = True
         self.httpd = None
+    
 
-        
-    def serve_key(self, data=None, port=None, **kwargs):
-        '''Starts serving the data either from the argument
-        or from the field of the object.
-        An HTTPd is started and being put to serve_forever.
-        You need to call shutdown() in order to stop
-        serving.
-        '''
-        
+    def start(self, data=None, port=None, *args, **kwargs):
+
         port = port or self.port or 9001
         
         tries = 10
@@ -76,22 +70,38 @@ class ServeKeyThread(Thread):
                 log.info('Trying port %d', port_i)
                 server_address = ('', port_i)
                 self.httpd = ThreadedKeyserver(server_address, HandlerClass, **kwargs)
-                sa = self.httpd.socket.getsockname()
-                try:
-                    log.info('Serving now, this is probably blocking...')
-                    self.httpd.serve_forever()
-                finally:
-                    log.info('finished serving')
-                    #httpd.dispose()
-                    break
     
             except socket.error, value:
                 errno = value.errno
                 if errno == 10054 or errno == 32:
                     # This seems to be harmless
                     break
+            else:
+                break
+ 
             finally:
                 pass
+
+
+        super(ServeKeyThread, self).start(*args, **kwargs)
+        
+
+    def serve_key(self, data=None, port=None, **kwargs):
+        '''Starts serving the data either from the argument
+        or from the field of the object.
+        An HTTPd is started and being put to serve_forever.
+        You need to call shutdown() in order to stop
+        serving.
+        '''
+        
+        sa = self.httpd.socket.getsockname()
+        try:
+            log.info('Serving now, this is probably blocking...')
+            self.httpd.serve_forever()
+        finally:
+            log.info('finished serving')
+            #httpd.dispose()
+    
     
 
     def run(self):
@@ -104,6 +114,7 @@ class ServeKeyThread(Thread):
         log.info("Shutting down httpd %r", self.httpd)
         self.httpd.shutdown()
     
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     KEYDATA = 'Example data'
