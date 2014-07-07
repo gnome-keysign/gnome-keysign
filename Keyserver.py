@@ -6,6 +6,8 @@ import socket
 from SocketServer import ThreadingMixIn
 from threading import Thread
 
+from AvahiPublish import AvahiPublisher
+
 log = logging.getLogger()
 
 class KeyRequestHandlerBase(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -75,6 +77,19 @@ class ServeKeyThread(Thread):
                 log.info('Trying port %d', port_i)
                 server_address = ('', port_i)
                 self.httpd = ThreadedKeyserver(server_address, HandlerClass, **kwargs)
+                
+                ###
+                # This is a bit of a hack, it really should be
+                # in some lower layer, such as the place were
+                # the socket is created and listen()ed on.
+                self.avahi_publisher = ap = AvahiPublisher(
+                    service_port = port_i,
+                    service_name = 'HTTP Keyserver',
+                    service_txt = self.keydata,
+                    service_type = '_geysign._tcp',
+                )
+                log.info('Trying to add Avahi Service')
+                ap.add_service()
     
             except socket.error, value:
                 errno = value.errno
