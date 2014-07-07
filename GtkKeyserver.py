@@ -65,7 +65,13 @@ def main(args):
     w = ServerWindow()
     w.show_all()
     log.debug('Starting main')
+    from dbus.mainloop.glib import DBusGMainLoop
+    # Hm. I actually don't know why I have to do this.
+    # It feels a bit strange. Anyway, this is needed to make
+    # dbus work.
+    DBusGMainLoop( set_as_default=True )
     Gtk.main()
+
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG,

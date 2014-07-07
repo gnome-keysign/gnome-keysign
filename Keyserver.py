@@ -60,6 +60,9 @@ class ServeKeyThread(Thread):
         This calls run() in a separate thread.
         In order to resolve DBus issues, most things
         are done here.
+        However, you probably need to start
+        dbus.mainloop.glib.DBusGMainLoop (set_as_default=True)
+        in order for this work.
         '''
 
         port = port or self.port or 9001
@@ -137,7 +140,8 @@ class ServeKeyThread(Thread):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
-    import time
+    import dbus, time
+    dbus.mainloop.glib.DBusGMainLoop (set_as_default=True)
     def stop_thread(t, seconds=5):
         log.info('Sleeping %d seconds, then stopping', seconds)
         time.sleep(seconds)
