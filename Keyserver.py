@@ -122,6 +122,15 @@ class ServeKeyThread(Thread):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
+    import time
+    def stop_thread(t, seconds=5):
+        log.info('Sleeping %d seconds, then stopping', seconds)
+        time.sleep(seconds)
+        t.shutdown()
+
     KEYDATA = 'Example data'
-    serve_key(KEYDATA)
+    t = ServeKeyThread(KEYDATA)
+    stop_t = Thread(target=stop_thread, args=(t,5))
+    t.start()
+    stop_t.start()
     log.warn('Last line')
