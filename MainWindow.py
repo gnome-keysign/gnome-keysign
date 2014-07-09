@@ -6,7 +6,7 @@ from gi.repository import GLib
 from gi.repository import Gtk
 
 from network.AvahiBrowser import AvahiBrowser
-from Sections import KeySignSection, GetKeySection, KeysFromNetworkSection
+from Sections import KeySignSection, GetKeySection
 
 
 class MainWindow(Gtk.Window):
@@ -21,8 +21,7 @@ class MainWindow(Gtk.Window):
         # create notebook container
         notebook = Gtk.Notebook()
         notebook.append_page(KeySignSection(), Gtk.Label('Keys'))
-        notebook.append_page(GetKeySection(), Gtk.Label('Get Key'))
-        notebook.append_page(KeysFromNetworkSection(self), Gtk.Label('Get from network'))
+        notebook.append_page(GetKeySection(self), Gtk.Label('Get Key'))
         self.add(notebook)
 
         # setup signals
@@ -56,6 +55,6 @@ class MainWindow(Gtk.Window):
         return True
 
     def add_discovered_service(self, name, address, port):
-        self.discovered_services += ((name, address, port))
+        self.discovered_services += ((name, address, port), )
 
         return False
