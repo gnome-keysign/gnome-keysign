@@ -6,7 +6,7 @@ from gi.repository import GLib
 from gi.repository import Gtk
 
 from network.AvahiBrowser import AvahiBrowser
-from Sections import KeySignSection, GetKeySection, TempNetworkSection
+from Sections import KeySignSection, GetKeySection
 
 
 class MainWindow(Gtk.Window):
@@ -22,7 +22,6 @@ class MainWindow(Gtk.Window):
         notebook = Gtk.Notebook()
         notebook.append_page(KeySignSection(), Gtk.Label('Keys'))
         notebook.append_page(GetKeySection(), Gtk.Label('Get Key'))
-        notebook.append_page(TempNetworkSection(self), Gtk.Label('Get from network'))
         self.add(notebook)
 
         # setup signals

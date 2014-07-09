@@ -24,7 +24,7 @@ class KeySignSection(Gtk.VBox):
         self.keysPage = KeysPage()
         self.selectedKeyPage = SelectedKeyPage()
 
-        # create notebook container
+        # create notebook mainBox
         self.notebook = Gtk.Notebook()
         self.notebook.append_page(self.keysPage, None)
         self.notebook.append_page(self.selectedKeyPage, None)
@@ -49,7 +49,7 @@ class KeySignSection(Gtk.VBox):
         self.pack_start(buttonBox, False, False, 0)
 
     def on_button_clicked(self, button):
-        # get current index of page
+        # get index of current page
         page_index = self.notebook.get_current_page()
 
         if button == self.nextButton:
@@ -68,8 +68,8 @@ class KeySignSection(Gtk.VBox):
                         self.selectedKeyPage.display_key_details(openPgpKey)
                     except KeyError:
                         print "No key details can be shown for this id:%s" % (keyid,)
+
         elif button == self.backButton:
-            # switch to the previous page in the notebook
             self.notebook.prev_page()
 
 
@@ -78,83 +78,36 @@ class GetKeySection(Gtk.Box):
     def __init__(self):
         super(GetKeySection, self).__init__()
 
-        # create main container
-        container = Gtk.VBox(spacing=10)
-
-        # create fingerprint entry
-        self.fingerprintEntryLabel = Gtk.Label()
-        self.fingerprintEntryLabel.set_markup('<span size="15000">' + 'Type fingerprint'+ '</span>')
-        self.fingerprintEntryLabel.set_margin_top(10)
-
-        self.fingerprintEntry = Gtk.Entry()
-
-        container.pack_start(self.fingerprintEntryLabel, False, False, 0)
-        container.pack_start(self.fingerprintEntry, False, False, 0)
-
-        # create scanner frame
-        self.scanFrameLabel = Gtk.Label()
-        self.scanFrameLabel.set_markup('<span size="15000">' + '... or scan QR code'+ '</span>')
-        self.scanFrame = Gtk.Frame(label='QR Scanner')
-
-        container.pack_start(self.scanFrameLabel, False, False, 0)
-        container.pack_start(self.scanFrame, True, True, 0)
-
-        # create save key button
-        self.saveButton = Gtk.Button('Save key')
-        self.saveButton.set_image(Gtk.Image.new_from_icon_name(Gtk.STOCK_SAVE, Gtk.IconSize.BUTTON))
-        self.saveButton.set_always_show_image(True)
-        self.saveButton.set_margin_bottom(10)
-
-        container.pack_start(self.saveButton, False, False, 0)
-        self.pack_start(container, True, False, 0)
-
-
-class TempNetworkSection(Gtk.VBox):
-
-    def __init__(self, app):
-        super(TempNetworkSection, self).__init__()
-
-        self.app = app
-        self.log = logging.getLogger()
-
-        self.set_spacing(5)
-
-        # setup multiline editor
+        # set up main container
+        mainBox = Gtk.VBox(spacing=10)
+        # set up labels
+        self.topLabel = Gtk.Label()
+        self.topLabel.set_markup('Type fingerprint')
+        midLabel = Gtk.Label()
+        midLabel.set_markup('... or scan QR code')
+        # set up text editor
         self.textview = Gtk.TextView()
         self.textbuffer = self.textview.get_buffer()
-
-        # setup scrolled window
+        # set up scrolled window
         scrolledwindow = Gtk.ScrolledWindow()
         scrolledwindow.add(self.textview)
-
-        # create progress bar
-        self.progressBar = Gtk.ProgressBar()
-        self.progressBar.set_text(progress_bar_text[0])
-        self.progressBar.set_show_text(True)
-        self.progressBar.set_fraction(0.25) #TODO : Fix Hardcoded
-
-        # Temporary scenario: press "Get" button to request data from network.
-        # It will make use of the (ip_address, port) avahi has discovered
-
-        # setup button for recieving data
-        self.getButton = Gtk.Button("Get")
-        self.getButton.connect('clicked', self.on_get_button_clicked)
-        self.getButton.set_halign(Gtk.Align.CENTER)
-
-        # button for deleting text inside TextView
-        self.clearButton = Gtk.Button("Clear")
-        self.clearButton.connect('clicked', self.on_clear_button_clicked)
-        self.clearButton.set_halign(Gtk.Align.CENTER)
-
-        # setup box to hold the 2 buttons above
-        buttonBox = Gtk.HBox(spacing=10)
-        buttonBox.pack_start(self.getButton, False, False, 0)
-        buttonBox.pack_start(self.clearButton, False, False, 0)
-        buttonBox.set_halign(Gtk.Align.CENTER)
-
+        # set up webcam frame
+        # FIXME  create the actual webcam widgets
+        self.scanFrame = Gtk.Frame(label='QR Scanner')
+        # set up download button
+        # Scenario: When download button is clicked it will request data
+        # from network. It makes use of self.app.discovered_services
+        self.downloadButton = Gtk.Button('Download Key')
+        self.downloadButton.connect('clicked', self.on_button_clicked)
+        self.downloadButton.set_image(Gtk.Image.new_from_icon_name("document-save", Gtk.IconSize.BUTTON))
+        self.downloadButton.set_always_show_image(True)
         # pack up
-        self.pack_start(scrolledwindow, True, True, 0)
-        self.pack_start(buttonBox, True, False, 0)
+        mainBox.pack_start(self.topLabel, False, False, 0)
+        mainBox.pack_start(scrolledwindow, False, False, 0)
+        mainBox.pack_start(midLabel, False, False, 0)
+        mainBox.pack_start(self.scanFrame, True, True, 0)
+        mainBox.pack_start(self.downloadButton, False, False, 0)
+        self.pack_start(mainBox, True, False, 0)
 
     def obtain_key_async(self, fingerprint, callback=None, data=None):
         import time
@@ -164,28 +117,17 @@ class TempNetworkSection(Gtk.VBox):
         # keep adding this function to the loop until this func ret False
         return False
 
-    def on_get_button_clicked(self, button):
+    def on_button_clicked(self, button):
 
-        # FIXME: User should be able to type fpr or scan its QR Code
         start_iter = self.textbuffer.get_start_iter()
         end_iter = self.textbuffer.get_end_iter()
         fingerprint = self.textbuffer.get_text(start_iter, end_iter, False)
         self.textbuffer.delete(start_iter, end_iter)
 
-        self.textbuffer.set_text("downloading key with fingerprint: \n%s\n...\n"
+        self.topLabel.set_text("downloading key with fingerprint:\n%s"
                                 % fingerprint)
-        GLib.idle_add(self.obtain_key_async, fingerprint, self.recieved_key, fingerprint)
-
-        # move the progress bar acording to current step
-        # self.progressBar.set_fraction((page_index+1) * 0.25)
-        # self.progressBar.set_text(progress_bar_text[page_index])
-
+        GLib.idle_add(self.obtain_key_async, fingerprint, self.recieved_key,
+                    fingerprint)
 
     def recieved_key(self, keydata, *data):
         self.textbuffer.insert_at_cursor(str(keydata))
-
-
-    def on_clear_button_clicked(self, button):
-        start_iter = self.textbuffer.get_start_iter()
-        end_iter = self.textbuffer.get_end_iter()
-        self.textbuffer.delete(start_iter, end_iter)
