@@ -15,84 +15,62 @@ progress_bar_text = ["Step 1: Choose a key and click on 'Next' button",
 
 class KeySignSection(Gtk.VBox):
 
-
     def __init__(self):
         super(KeySignSection, self).__init__()
         self.log = logging.getLogger()
 
-        # create notebook container
-        self.notebook = Gtk.Notebook()
+        # these are needed later when we need to get details about
+        # a selected key
         self.keysPage = KeysPage()
         self.selectedKeyPage = SelectedKeyPage()
+
+        # create notebook container
+        self.notebook = Gtk.Notebook()
         self.notebook.append_page(self.keysPage, None)
         self.notebook.append_page(self.selectedKeyPage, None)
-
         self.notebook.set_show_tabs(False)
-
-        # create progress bar
-        self.progressBar = Gtk.ProgressBar()
-        self.progressBar.set_text(progress_bar_text[0])
-        self.progressBar.set_show_text(True)
-        self.progressBar.set_fraction(0.25) #TODO : Fix Hardcoded
 
         # create back button
         self.backButton = Gtk.Button('Back')
-        # FIXME not working, button is still visible at start
-        self.backButton.set_visible(False)
+        self.backButton.set_image(Gtk.Image.new_from_icon_name("go-previous", Gtk.IconSize.BUTTON))
+        self.backButton.set_always_show_image(True)
         self.backButton.connect('clicked', self.on_button_clicked)
-
         # create next button
-        self.proceedButton = Gtk.Button('Next')
-        self.proceedButton.set_image(Gtk.Image.new_from_icon_name(Gtk.STOCK_EDIT, Gtk.IconSize.BUTTON))
-        self.proceedButton.set_always_show_image(True)
-        self.proceedButton.connect('clicked', self.on_button_clicked)
+        self.nextButton = Gtk.Button('Next')
+        self.nextButton.set_image(Gtk.Image.new_from_icon_name("go-next", Gtk.IconSize.BUTTON))
+        self.nextButton.set_always_show_image(True)
+        self.nextButton.connect('clicked', self.on_button_clicked)
 
         buttonBox = Gtk.HBox()
-        buttonBox.pack_start(self.progressBar, True, True, 0)
         buttonBox.pack_start(self.backButton, False, False, 0)
-        buttonBox.pack_start(self.proceedButton, False, False, 0)
+        buttonBox.pack_start(self.nextButton, False, False, 0)
 
         self.pack_start(self.notebook, True, True, 0)
         self.pack_start(buttonBox, False, False, 0)
 
     def on_button_clicked(self, button):
-        # current tab index in notebook
+        # get current index of page
         page_index = self.notebook.get_current_page()
 
-        if button == self.proceedButton:
+        if button == self.nextButton:
             # switch to the next page in the notebook
             self.notebook.next_page()
             page_index = self.notebook.get_current_page()
-            if page_index != 0:
-                self.backButton.set_visible(True)
-
             # get a Gtk.TreeSelection object to process the selected rows
             selection = self.keysPage.treeView.get_selection()
             model, paths = selection.get_selected_rows()
-
             if page_index == 1:
                 for path in paths:
                     iterator = model.get_iter(path)
                     (name, email, keyid) = model.get(iterator, 0, 1, 2)
-
                     try:
                         openPgpKey = self.keysPage.keysDict[keyid]
                         self.selectedKeyPage.display_key_details(openPgpKey)
-
                     except KeyError:
                         print "No key details can be shown for this id:%s" % (keyid,)
-
-
         elif button == self.backButton:
             # switch to the previous page in the notebook
             self.notebook.prev_page()
-            page_index = self.notebook.get_current_page()
-            if page_index == 0:
-                self.backButton.set_visible(False)
-
-        # move the progress bar acording to current step
-        self.progressBar.set_fraction((page_index+1) * 0.25)
-        self.progressBar.set_text(progress_bar_text[page_index])
 
 
 class GetKeySection(Gtk.Box):
@@ -131,20 +109,15 @@ class GetKeySection(Gtk.Box):
         self.pack_start(container, True, False, 0)
 
 
-class KeysFromNetworkSection(Gtk.VBox):
+class TempNetworkSection(Gtk.VBox):
 
-    def __init__(self):
-        super(KeysFromNetworkSection, self).__init__()
+    def __init__(self, app):
+        super(TempNetworkSection, self).__init__()
+
+        self.app = app
+        self.log = logging.getLogger()
+
         self.set_spacing(5)
-
-        # setup label
-        topLabel = Gtk.Label()
-        topLabel.set_text("Send/Recieve key from network")
-
-        # FIXME: use a proper way of uploading a key (i.e. FileChooserDialog).
-        # For now the scenario is simple, you press "SendKey" and it sends a key
-        # from the text editor to network, press "GetKey" and it display a key
-        # recieved through network.
 
         # setup multiline editor
         self.textview = Gtk.TextView()
@@ -152,39 +125,36 @@ class KeysFromNetworkSection(Gtk.VBox):
 
         # setup scrolled window
         scrolledwindow = Gtk.ScrolledWindow()
-        scrolledwindow.set_hexpand(False)
-        scrolledwindow.set_vexpand(False)
         scrolledwindow.add(self.textview)
 
-        # setup button for sending a key
-        self.sendKeyButton = Gtk.Button("SendKey")
-        self.sendKeyButton.connect('clicked', self.on_sendkey_button_clicked)
-        self.sendKeyButton.set_halign(Gtk.Align.CENTER)
+        # create progress bar
+        self.progressBar = Gtk.ProgressBar()
+        self.progressBar.set_text(progress_bar_text[0])
+        self.progressBar.set_show_text(True)
+        self.progressBar.set_fraction(0.25) #TODO : Fix Hardcoded
 
-        # setup button for recieving a key
-        self.getKeyButton = Gtk.Button("GetKey")
-        self.getKeyButton.connect('clicked', self.on_getkey_button_clicked)
-        self.getKeyButton.set_halign(Gtk.Align.CENTER)
+        # Temporary scenario: press "Get" button to request data from network.
+        # It will make use of the (ip_address, port) avahi has discovered
+
+        # setup button for recieving data
+        self.getButton = Gtk.Button("Get")
+        self.getButton.connect('clicked', self.on_get_button_clicked)
+        self.getButton.set_halign(Gtk.Align.CENTER)
 
         # button for deleting text inside TextView
-        self.clearTextButton = Gtk.Button("Clear")
-        self.clearTextButton.connect('clicked', self.on_clear_button_clicked)
-        self.clearTextButton.set_halign(Gtk.Align.CENTER)
+        self.clearButton = Gtk.Button("Clear")
+        self.clearButton.connect('clicked', self.on_clear_button_clicked)
+        self.clearButton.set_halign(Gtk.Align.CENTER)
 
         # setup box to hold the 2 buttons above
         buttonBox = Gtk.HBox(spacing=10)
-        buttonBox.pack_start(self.sendKeyButton, False, False, 0)
-        buttonBox.pack_start(self.getKeyButton, False, False, 0)
-        buttonBox.pack_start(self.clearTextButton, False, False, 0)
+        buttonBox.pack_start(self.getButton, False, False, 0)
+        buttonBox.pack_start(self.clearButton, False, False, 0)
         buttonBox.set_halign(Gtk.Align.CENTER)
 
         # pack up
         self.pack_start(scrolledwindow, True, True, 0)
         self.pack_start(buttonBox, True, False, 0)
-
-
-    def on_sendkey_button_clicked(self, button):
-        pass
 
     def obtain_key_async(self, fingerprint, callback=None, data=None):
         import time
@@ -194,7 +164,7 @@ class KeysFromNetworkSection(Gtk.VBox):
         # keep adding this function to the loop until this func ret False
         return False
 
-    def on_getkey_button_clicked(self, button):
+    def on_get_button_clicked(self, button):
 
         # FIXME: User should be able to type fpr or scan its QR Code
         start_iter = self.textbuffer.get_start_iter()
@@ -205,6 +175,10 @@ class KeysFromNetworkSection(Gtk.VBox):
         self.textbuffer.set_text("downloading key with fingerprint: \n%s\n...\n"
                                 % fingerprint)
         GLib.idle_add(self.obtain_key_async, fingerprint, self.recieved_key, fingerprint)
+
+        # move the progress bar acording to current step
+        # self.progressBar.set_fraction((page_index+1) * 0.25)
+        # self.progressBar.set_text(progress_bar_text[page_index])
 
 
     def recieved_key(self, keydata, *data):
