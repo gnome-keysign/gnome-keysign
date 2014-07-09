@@ -10,7 +10,7 @@ from requests.exceptions import ConnectionError
 from gi.repository import GLib
 from gi.repository import Gtk
 
-from SignPages import KeysPage, SelectedKeyPage
+from SignPages import KeysPage, KeyPresentPage, KeyDetailsPage
 
 progress_bar_text = ["Step 1: Choose a key and click on 'Next' button",
                      "Step 2: Compare the recieved fingerprint with the owner's key fpr",
@@ -27,12 +27,14 @@ class KeySignSection(Gtk.VBox):
         # these are needed later when we need to get details about
         # a selected key
         self.keysPage = KeysPage()
-        self.selectedKeyPage = SelectedKeyPage()
+        self.keyDetailsPage = KeyDetailsPage()
+        self.keyPresentPage = KeyPresentPage()
 
-        # create notebook mainBox
+        # set up notebook container
         self.notebook = Gtk.Notebook()
         self.notebook.append_page(self.keysPage, None)
-        self.notebook.append_page(self.selectedKeyPage, None)
+        self.notebook.append_page(self.keyDetailsPage, None)
+        self.notebook.append_page(self.keyPresentPage, None)
         self.notebook.set_show_tabs(False)
 
         # create back button
@@ -49,7 +51,7 @@ class KeySignSection(Gtk.VBox):
         buttonBox = Gtk.HBox()
         buttonBox.pack_start(self.backButton, False, False, 0)
         buttonBox.pack_start(self.nextButton, False, False, 0)
-
+        # pack up
         self.pack_start(self.notebook, True, True, 0)
         self.pack_start(buttonBox, False, False, 0)
 
@@ -70,7 +72,7 @@ class KeySignSection(Gtk.VBox):
                     (name, email, keyid) = model.get(iterator, 0, 1, 2)
                     try:
                         openPgpKey = self.keysPage.keysDict[keyid]
-                        self.selectedKeyPage.display_key_details(openPgpKey)
+                        self.keyPresentPage.display_key_details(openPgpKey)
                     except KeyError:
                         print "No key details can be shown for this id:%s" % (keyid,)
 
@@ -106,12 +108,14 @@ class GetKeySection(Gtk.Box):
         # set up scrolled window
         scrolledwindow = Gtk.ScrolledWindow()
         scrolledwindow.add(self.textview)
+
         # set up webcam frame
         # FIXME  create the actual webcam widgets
         self.scanFrame = Gtk.Frame(label='QR Scanner')
+
         # set up download button
-        # Scenario: When download button is clicked it will request data
-        # from network. It makes use of self.app.discovered_services
+        # Scenario: When 'Download' button is clicked it will request data
+        # from network using self.app.discovered_services to get address
         self.downloadButton = Gtk.Button('Download Key')
         self.downloadButton.connect('clicked', self.on_button_clicked)
         self.downloadButton.set_image(Gtk.Image.new_from_icon_name("document-save", Gtk.IconSize.BUTTON))
@@ -195,5 +199,4 @@ class GetKeySection(Gtk.Box):
             )
 
     def recieved_key(self, keydata, *data):
-        # self.textbuffer.insert_at_cursor(str(keydata))
-        print "Recieved key %s", keydata
+        self.textbuffer.insert_at_cursor(str(keydata))
