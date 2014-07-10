@@ -55,6 +55,6 @@ class MainWindow(Gtk.Window):
         return True
 
     def add_discovered_service(self, name, address, port):
-        self.discovered_services += ((name, address, port))
+        self.discovered_services += ((name, address, port), )
 
         return False
