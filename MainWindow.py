@@ -6,6 +6,7 @@ from gi.repository import GLib
 from gi.repository import Gtk
 
 from network.AvahiBrowser import AvahiBrowser
+from network.AvahiPublisher import AvahiPublisher
 from Sections import KeySignSection, GetKeySection
 
 
@@ -28,17 +29,29 @@ class MainWindow(Gtk.Window):
         self.connect("delete-event", Gtk.main_quit)
 
         self.avahi_browser = None
-        self.avahi_service_name = '_demo._tcp'
+        self.avahi_service_type = '_demo._tcp'
         self.discovered_services = []
         GLib.idle_add(self.setup_avahi_browser)
 
+        self.avahi_publisher = None
+        self.avahi_publish_name = "DemoService"
+        self.port = 9001
+        GLib.idle_add(self.setup_avahi_publisher)
+
     def setup_avahi_browser(self):
-        # FIXME: place a proper service string there
-        self.avahi_browser = AvahiBrowser(service=self.avahi_service_name)
+        # FIXME: place a proper service type
+        self.avahi_browser = AvahiBrowser(service=self.avahi_service_type)
         self.avahi_browser.connect('new_service', self.on_new_service)
 
         return False
 
+    def setup_avahi_publisher(self):
+        # FIXME: make it skip local services
+        self.avahi_publisher = AvahiPublisher(name=self.avahi_publish_name,
+                                port=self.port, stype=self.avahi_service_type)
+        self.avahi_publisher.publish()
+        # For now the service is un-published when the program is closed
+        return False
 
     def on_new_service(self, browser, name, address, port):
         self.log.info("Probably discovered something, let me check; %s %s:%i",
