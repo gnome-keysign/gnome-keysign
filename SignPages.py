@@ -1,12 +1,17 @@
+#!/usr/bin/env python
+
+import sys
+import StringIO
+import Image
 
 try:
     from gi.repository import Gtk, GdkPixbuf
     from monkeysign.gpg import Keyring
+    from qrencode import encode_scaled
 except ImportError, e:
     print "A required python module is missing!\n%s" % (e,)
     sys.exit()
 
-import sys
 
 
 FINGERPRINT_DEFAULT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
@@ -102,26 +107,26 @@ class KeyPresentPage(Gtk.HBox):
         leftVBox.pack_start(fingerprintMark, False, False, 0)
         leftVBox.pack_start(self.fingerprintLabel, False, False, 0)
 
-        # display QR code on the right side
-        imageLabel = Gtk.Label()
-        imageLabel.set_markup('<span size="15000">' + 'Key QR code' + '</span>')
+        self.pixbuf = None # Hold QR code in pixbuf
 
-        pixbuf = GdkPixbuf.Pixbuf.new_from_file_at_size('qrsample.png', 200, -1)
-        self.image = Gtk.Image()
-        self.image.set_from_pixbuf(pixbuf)
-        self.image.props.margin = 10
+        # display QR code on the right side
+        qrcodeLabel = Gtk.Label()
+        qrcodeLabel.set_markup('<span size="15000">' + 'Fingerprint QR code' + '</span>')
+
+        self.qrcode = Gtk.Image()
+        self.qrcode.props.margin = 10
 
         # right vertical box
-        rightVBox = Gtk.VBox(spacing=10)
-        rightVBox.pack_start(imageLabel, False, False, 0)
-        rightVBox.pack_start(self.image, False, False, 0)
+        self.rightVBox = Gtk.VBox(spacing=10)
+        self.rightVBox.pack_start(qrcodeLabel, False, False, 0)
+        self.rightVBox.pack_start(self.qrcode, True, True, 0)
 
         self.pack_start(leftVBox, True, True, 0)
-        self.pack_start(rightVBox, False, False, 0)
+        self.pack_start(self.rightVBox, False, False, 0)
 
     def display_key_details(self, openPgpKey):
         rawfpr = openPgpKey.fpr
-
+        # display a clean version of the fingerprint
         fpr = ""
         for i in xrange(0, len(rawfpr), 4):
 
@@ -134,6 +139,32 @@ class KeyPresentPage(Gtk.HBox):
         fpr = fpr.rstrip()
         self.fingerprintLabel.set_markup('<span size="20000">' + fpr + '</span>')
 
+        # draw qr code for this fingerprint
+        self.draw_qrcode(rawfpr)
+
+
+    def draw_qrcode(self, fpr):
+        # self.pixbuf = self.image_to_pixbuf(self.create_qrcode(fpr))
+        self.pixbuf = self.image_to_pixbuf(self.create_qrcode(fpr))
+        self.qrcode.set_from_pixbuf(self.pixbuf)
+
+    def create_qrcode(self, fpr):
+        box = self.rightVBox.get_allocation()
+        size = box.width
+        version, width, image = encode_scaled('OPENPGP4FPR:'+fpr,size,0,1,2,True)
+        return image
+
+    def image_to_pixbuf(self, image):
+        # convert PIL image instance to Pixbuf
+        fd = StringIO.StringIO()
+        image.save(fd, "ppm")
+        contents = fd.getvalue()
+        fd.close()
+        loader = GdkPixbuf.PixbufLoader.new_with_type('pnm')
+        loader.write(contents)
+        pixbuf = loader.get_pixbuf()
+        loader.close()
+        return pixbuf
 
 class KeyDetailsPage(Gtk.VBox):
 
