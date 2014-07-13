@@ -150,7 +150,10 @@ class KeyPresentPage(Gtk.HBox):
 
     def create_qrcode(self, fpr):
         box = self.rightVBox.get_allocation()
-        size = box.width
+        if box.width < box.height:
+            size = box.width - 30
+        else:
+            size = box.height - 30
         version, width, image = encode_scaled('OPENPGP4FPR:'+fpr,size,0,1,2,True)
         return image
 
