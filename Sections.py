@@ -138,7 +138,12 @@ class GetKeySection(Gtk.Box):
             params='',
             query='',
             fragment='')
-        return requests.get(url.geturl()).text
+        # return requests.get(url.geturl()).text
+
+        # FIXME: Right now it passes a key that was read from a local file
+        fd = open('testkey.gpg', "r")
+        text = fd.read()
+        return text
 
     def try_download_keys(self, clients):
         for client in clients:
