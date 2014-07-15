@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 
 import logging
+from urlparse import ParseResult
+
+import requests
+from requests.exceptions import ConnectionError
+
 
 from gi.repository import GLib
 from gi.repository import Gtk
@@ -77,8 +82,18 @@ class KeySignSection(Gtk.VBox):
 
 class GetKeySection(Gtk.Box):
 
-    def __init__(self):
+    def __init__(self, app):
+        '''Initialises the section which lets the user
+        start signing a key.
+
+        ``app'' should be the "app" itself. The place
+        which holds global app data, especially the discovered
+        clients on the network.
+        '''
         super(GetKeySection, self).__init__()
+
+        self.app = app
+        self.log = logging.getLogger()
 
         # set up main container
         mainBox = Gtk.VBox(spacing=10)
@@ -113,9 +128,54 @@ class GetKeySection(Gtk.Box):
         mainBox.pack_start(self.downloadButton, False, False, 0)
         self.pack_start(mainBox, True, False, 0)
 
-    def obtain_key_async(self, fingerprint, callback=None, data=None):
-        import time
-        keydata = str(time.sleep(1))
+
+    def download_key_http(self, address, port):
+        url = ParseResult(
+            scheme='http',
+            # This seems to work well enough with both IPv6 and IPv4
+            netloc="[[%s]]:%d" % (address, port),
+            path='/',
+            params='',
+            query='',
+            fragment='')
+        return requests.get(url.geturl()).text
+
+    def try_download_keys(self, clients):
+        for client in clients:
+            self.log.debug("Getting key from client %s", client)
+            name, address, port = client
+            try:
+                keydata = self.download_key_http(address, port)
+                yield keydata
+            except ConnectionError, e:
+                # FIXME : We probably have other errors to catch
+                self.log.exception("While downloading key from %s %i",
+                                    address, port)
+
+
+    def obtain_key_async(self, fingerprint, callback=None, data=None, error_cb=None):
+        other_clients = self.app.discovered_services
+        self.log.debug("The clients found on the network: %s", other_clients)
+
+        for keydata in self.try_download_keys(other_clients):
+            # FIXME : check whether the keydata makes sense,
+            # i.e. compute the fingerprint from the obtained key
+            # and compare it with the intended key
+            is_valid = True
+            if is_valid:
+                break
+        else:
+            self.log.error("Could not find fingerprint %s " +\
+                           "with the available clients (%s)",
+                           fingerprint, other_clients)
+            self.log.debug("Calling error callback, if available: %s",
+                            error_cb)
+
+            if error_cb:
+                GLib.idle_add(error_cb, data)
+            # FIXME : don't return here
+            return
+
         GLib.idle_add(callback, keydata, data)
         # If this function is added itself via idle_add, then idle_add will
         # keep adding this function to the loop until this func ret False
@@ -130,8 +190,13 @@ class GetKeySection(Gtk.Box):
 
         self.topLabel.set_text("downloading key with fingerprint:\n%s"
                                 % fingerprint)
-        GLib.idle_add(self.obtain_key_async, fingerprint, self.recieved_key,
-                    fingerprint)
+
+        # err = lambda x: self.textbuffer.insert_at_cursor("Error downloading")
+        GLib.idle_add(self.obtain_key_async, fingerprint,
+            self.recieved_key, fingerprint,
+            # FIXME: not working as expected - it enters an infinite loop
+            # err
+            )
 
     def recieved_key(self, keydata, *data):
         self.textbuffer.insert_at_cursor(str(keydata))
