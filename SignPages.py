@@ -2,7 +2,6 @@
 
 import sys
 import StringIO
-import Image
 
 try:
     from gi.repository import Gtk, GdkPixbuf
@@ -89,6 +88,7 @@ class KeysPage(Gtk.VBox):
 
         self.pack_start(self.scrolled_window, True, True, 0)
 
+
 class KeyPresentPage(Gtk.HBox):
     def __init__(self):
         super(KeyPresentPage, self).__init__()
@@ -108,6 +108,7 @@ class KeyPresentPage(Gtk.HBox):
         leftVBox.pack_start(self.fingerprintLabel, False, False, 0)
 
         self.pixbuf = None # Hold QR code in pixbuf
+        self.fpr = None # The fpr of the key selected to sign with
 
         # display QR code on the right side
         qrcodeLabel = Gtk.Label()
@@ -116,16 +117,24 @@ class KeyPresentPage(Gtk.HBox):
         self.qrcode = Gtk.Image()
         self.qrcode.props.margin = 10
 
+        scroll_win = Gtk.ScrolledWindow()
+        scroll_win.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        scroll_win.add_with_viewport(self.qrcode)
+
         # right vertical box
         self.rightVBox = Gtk.VBox(spacing=10)
         self.rightVBox.pack_start(qrcodeLabel, False, False, 0)
-        self.rightVBox.pack_start(self.qrcode, True, True, 0)
+        self.rightVBox.pack_start(scroll_win, True, True, 0)
+
+        self.rightVBox.connect("size-allocate", self.expose_event)
+        self.last_allocation = self.rightVBox.get_allocation()
 
         self.pack_start(leftVBox, True, True, 0)
-        self.pack_start(self.rightVBox, False, False, 0)
+        self.pack_start(self.rightVBox, True, True, 0)
 
     def display_key_details(self, openPgpKey):
         rawfpr = openPgpKey.fpr
+        self.fpr = rawfpr
         # display a clean version of the fingerprint
         fpr = ""
         for i in xrange(0, len(rawfpr), 4):
@@ -140,13 +149,20 @@ class KeyPresentPage(Gtk.HBox):
         self.fingerprintLabel.set_markup('<span size="20000">' + fpr + '</span>')
 
         # draw qr code for this fingerprint
-        self.draw_qrcode(rawfpr)
+        self.draw_qrcode()
 
+    def expose_event(self, widget, event):
+        # when window is resized, regenerate the QR code
+        if self.rightVBox.get_allocation() != self.last_allocation:
+            self.last_allocation = self.rightVBox.get_allocation()
+            self.draw_qrcode()
 
-    def draw_qrcode(self, fpr):
-        # self.pixbuf = self.image_to_pixbuf(self.create_qrcode(fpr))
-        self.pixbuf = self.image_to_pixbuf(self.create_qrcode(fpr))
-        self.qrcode.set_from_pixbuf(self.pixbuf)
+    def draw_qrcode(self):
+        if self.fpr is not None:
+            self.pixbuf = self.image_to_pixbuf(self.create_qrcode(self.fpr))
+            self.qrcode.set_from_pixbuf(self.pixbuf)
+        else:
+            self.qrcode.set_from_icon_name("gtk-dialog-error", Gtk.IconSize.DIALOG)
 
     def create_qrcode(self, fpr):
         box = self.rightVBox.get_allocation()
@@ -168,6 +184,7 @@ class KeyPresentPage(Gtk.HBox):
         pixbuf = loader.get_pixbuf()
         loader.close()
         return pixbuf
+
 
 class KeyDetailsPage(Gtk.VBox):
 
