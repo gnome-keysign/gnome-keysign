@@ -152,10 +152,6 @@ class GetKeySection(Gtk.Box):
             fragment='')
         # return requests.get(url.geturl()).text
 
-        # FIXME: we initialize the temporary keyring here only
-        # for testing if a key can be imported
-        self.tmpkeyring = TmpKeyring()
-
         # FIXME: Right now it passes a key that was read from a local file
         fd = open(FILENAME, "r")
         text = fd.read()
@@ -180,13 +176,16 @@ class GetKeySection(Gtk.Box):
         other_clients = self.app.discovered_services
         self.log.debug("The clients found on the network: %s", other_clients)
 
+        # create a temporary keyring to not mess up with the user's
+        # original keyring
+        self.tmpkeyring = TempKeyring()
+
         is_valid = False
         for keydata in self.try_download_keys(other_clients):
-            # FIXME : check whether the keydata makes sense,
-            # i.e. compute the fingerprint from the obtained key
-            # and compare it with the intended key
-            if self.tmpkeyring.import_from_file(FILENAME):
-                # FIXME: verify for more than one key in the temporary keyring
+
+            if self.tmpkeyring.import_data(keydata):
+                # FIXME: what should happen when there are more keys ?
+
                 imported_key_fpr = self.tmpkeyring.get_keys().keys()[0]
                 if imported_key_fpr == fingerprint:
                     data = imported_key_fpr
@@ -216,7 +215,7 @@ class GetKeySection(Gtk.Box):
         start_iter = self.textbuffer.get_start_iter()
         end_iter = self.textbuffer.get_end_iter()
 
-        # use a hardcoded fingerprint until we test all cases
+        # FIXME: hardcoded
         fingerprint = '140162A978431A0258B3EC24E69EEE14181523F4'
         # fingerprint = self.textbuffer.get_text(start_iter, end_iter, False)
         self.textbuffer.delete(start_iter, end_iter)
@@ -233,22 +232,3 @@ class GetKeySection(Gtk.Box):
     def recieved_key(self, keydata, *data):
         self.textbuffer.insert_at_cursor("Key succesfully imported."
                                 "\nFingerprint is: {}".format(data[0]))
-
-
-class TmpKeyring(TempKeyring):
-
-    def import_from_file(self, filename):
-        # The import_data method from Keyring class is not working
-        # as we expect or I don't know how to use it properly.
-        # It's because of the 'data' argument, if this argument
-        # is a string (StringIO) that represents the filename that holds
-        # the public key, then it gives the next error:
-        # AttributeError: StringIO instance has no attribute '__getitem__'
-        self.context.call_command(['import', filename])
-        fd = StringIO(self.context.stderr)
-        try:
-            self.context.seek(fd, 'IMPORT_OK')
-            self.context.seek(fd, 'IMPORT_RES')
-        except GpgProtocolError:
-            return False
-        return True
