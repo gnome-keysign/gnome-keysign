@@ -1,12 +1,12 @@
 
+import sys
+
 try:
     from gi.repository import Gtk, GdkPixbuf
     from monkeysign.gpg import Keyring
 except ImportError, e:
     print "A required python module is missing!\n%s" % (e,)
     sys.exit()
-
-import sys
 
 
 FINGERPRINT_DEFAULT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
