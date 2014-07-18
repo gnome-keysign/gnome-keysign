@@ -152,7 +152,7 @@ class GetKeySection(Gtk.Box):
             fragment='')
         # return requests.get(url.geturl()).text
 
-        # FIXME: Right now it passes a key that was read from a local file
+        # FIXME: hardcoded. Make it pass the data received from network.
         fd = open(FILENAME, "r")
         text = fd.read()
         fd.close()
@@ -171,25 +171,32 @@ class GetKeySection(Gtk.Box):
                 self.log.exception("While downloading key from %s %i",
                                     address, port)
 
+    def verify_downloaded_key(self, downloaded_data, fingerprint):
+        # FIXME: implement a better and more secure way to verify the key
+        if self.tmpkeyring.import_data(downloaded_data):
+            imported_key_fpr = self.tmpkeyring.get_keys().keys()[0]
+            if imported_key_fpr == fingerprint:
+                return True
+
+        return False
 
     def obtain_key_async(self, fingerprint, callback=None, data=None, error_cb=None):
         other_clients = self.app.discovered_services
         self.log.debug("The clients found on the network: %s", other_clients)
 
-        # create a temporary keyring to not mess up with the user's
-        # original keyring
+        # create a temporary keyring to not mess up with the user's own keyring
         self.tmpkeyring = TempKeyring()
 
-        is_valid = False
         for keydata in self.try_download_keys(other_clients):
+            if self.verify_downloaded_key(keydata, fingerprint):
+                # FIXME: temporary solution to pass the fingerprint
+                # to the callback function.
+                if data is None:
+                    data = self.tmpkeyring.get_keys().keys()[0]
 
-            if self.tmpkeyring.import_data(keydata):
-                # FIXME: what should happen when there are more keys ?
-
-                imported_key_fpr = self.tmpkeyring.get_keys().keys()[0]
-                if imported_key_fpr == fingerprint:
-                    data = imported_key_fpr
-                    is_valid = True
+                is_valid = True
+            else:
+                is_valid = False
 
             if is_valid:
                 break
@@ -230,5 +237,5 @@ class GetKeySection(Gtk.Box):
             )
 
     def recieved_key(self, keydata, *data):
-        self.textbuffer.insert_at_cursor("Key succesfully imported."
-                                "\nFingerprint is: {}".format(data[0]))
+        self.textbuffer.insert_at_cursor("Key succesfully imported with"
+                                " fingerprint:\n{}".format(data[0]))
