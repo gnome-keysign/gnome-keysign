@@ -6,6 +6,14 @@ from urlparse import ParseResult
 import requests
 from requests.exceptions import ConnectionError
 
+import sys
+from StringIO import StringIO
+
+try:
+    from monkeysign.gpg import TempKeyring, GpgProtocolError
+except ImportError, e:
+    print "A required python module is missing!\n%s" % (e,)
+    sys.exit()
 
 from gi.repository import GLib
 from gi.repository import Gtk
@@ -96,6 +104,7 @@ class KeySignSection(Gtk.VBox):
         elif button == self.backButton:
             self.notebook.prev_page()
 
+FILENAME = 'testkey.gpg'
 
 class GetKeySection(Gtk.Box):
 
@@ -111,6 +120,9 @@ class GetKeySection(Gtk.Box):
 
         self.app = app
         self.log = logging.getLogger()
+
+        # the temporary keyring we operate in
+        self.tempkeyring = None
 
         # set up main container
         mainBox = Gtk.VBox(spacing=10)
@@ -155,7 +167,14 @@ class GetKeySection(Gtk.Box):
             params='',
             query='',
             fragment='')
-        return requests.get(url.geturl()).text
+        # return requests.get(url.geturl()).text
+
+        # FIXME: hardcoded. Make it pass the data received from network.
+        fd = open(FILENAME, "r")
+        text = fd.read()
+        fd.close()
+
+        return text
 
     def try_download_keys(self, clients):
         for client in clients:
@@ -169,16 +188,33 @@ class GetKeySection(Gtk.Box):
                 self.log.exception("While downloading key from %s %i",
                                     address, port)
 
+    def verify_downloaded_key(self, downloaded_data, fingerprint):
+        # FIXME: implement a better and more secure way to verify the key
+        if self.tmpkeyring.import_data(downloaded_data):
+            imported_key_fpr = self.tmpkeyring.get_keys().keys()[0]
+            if imported_key_fpr == fingerprint:
+                return True
+
+        return False
 
     def obtain_key_async(self, fingerprint, callback=None, data=None, error_cb=None):
         other_clients = self.app.discovered_services
         self.log.debug("The clients found on the network: %s", other_clients)
 
+        # create a temporary keyring to not mess up with the user's own keyring
+        self.tmpkeyring = TempKeyring()
+
         for keydata in self.try_download_keys(other_clients):
-            # FIXME : check whether the keydata makes sense,
-            # i.e. compute the fingerprint from the obtained key
-            # and compare it with the intended key
-            is_valid = True
+            if self.verify_downloaded_key(keydata, fingerprint):
+                # FIXME: temporary solution to pass the fingerprint
+                # to the callback function.
+                if data is None:
+                    data = self.tmpkeyring.get_keys().keys()[0]
+
+                is_valid = True
+            else:
+                is_valid = False
+
             if is_valid:
                 break
         else:
@@ -202,18 +238,21 @@ class GetKeySection(Gtk.Box):
 
         start_iter = self.textbuffer.get_start_iter()
         end_iter = self.textbuffer.get_end_iter()
-        fingerprint = self.textbuffer.get_text(start_iter, end_iter, False)
+
+        # FIXME: hardcoded
+        fingerprint = '140162A978431A0258B3EC24E69EEE14181523F4'
+        # fingerprint = self.textbuffer.get_text(start_iter, end_iter, False)
         self.textbuffer.delete(start_iter, end_iter)
 
         self.topLabel.set_text("downloading key with fingerprint:\n%s"
                                 % fingerprint)
 
-        # err = lambda x: self.textbuffer.insert_at_cursor("Error downloading")
+        err = lambda x: self.textbuffer.set_text("Error downloading")
         GLib.idle_add(self.obtain_key_async, fingerprint,
             self.recieved_key, fingerprint,
-            # FIXME: not working as expected - it enters an infinite loop
-            # err
+            err
             )
 
     def recieved_key(self, keydata, *data):
-        self.textbuffer.insert_at_cursor(str(keydata))
+        self.textbuffer.insert_at_cursor("Key succesfully imported with"
+                                " fingerprint:\n{}".format(data[0]))
