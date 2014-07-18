@@ -20,8 +20,17 @@ progress_bar_text = ["Step 1: Choose a key and click on 'Next' button",
 
 class KeySignSection(Gtk.VBox):
 
-    def __init__(self):
+    def __init__(self, app):
+        '''Initialises the section which lets the user
+        choose a key to be signed by other person.
+
+        ``app'' should be the "app" itself. The place
+        which holds global app data, especially the discovered
+        clients on the network.
+        '''
         super(KeySignSection, self).__init__()
+
+        self.app = app
         self.log = logging.getLogger()
 
         # these are needed later when we need to get details about
@@ -58,6 +67,14 @@ class KeySignSection(Gtk.VBox):
     def on_button_clicked(self, button):
         # get index of current page
         page_index = self.notebook.get_current_page()
+
+        # FIXME: starting/stopping the avahi publish service
+        # should be done in a more robust way.
+        if (page_index+1 == 2):
+            GLib.idle_add(self.app.setup_avahi_publisher)
+        else:
+            if self.app.avahi_publisher is not None:
+                self.app.avahi_publisher.unpublish()
 
         if button == self.nextButton:
             # switch to the next page in the notebook

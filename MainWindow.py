@@ -21,7 +21,7 @@ class MainWindow(Gtk.Window):
 
         # create notebook container
         notebook = Gtk.Notebook()
-        notebook.append_page(KeySignSection(), Gtk.Label('Keys'))
+        notebook.append_page(KeySignSection(self), Gtk.Label('Keys'))
         notebook.append_page(GetKeySection(self), Gtk.Label('Get Key'))
         self.add(notebook)
 
@@ -34,9 +34,8 @@ class MainWindow(Gtk.Window):
         GLib.idle_add(self.setup_avahi_browser)
 
         self.avahi_publisher = None
-        self.avahi_publish_name = "DemoService"
+        self.avahi_publish_name = "GeysignService"
         self.port = 9001
-        GLib.idle_add(self.setup_avahi_publisher)
 
     def setup_avahi_browser(self):
         # FIXME: place a proper service type
