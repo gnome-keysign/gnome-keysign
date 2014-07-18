@@ -70,7 +70,7 @@ class KeySignSection(Gtk.VBox):
 
         # FIXME: starting/stopping the avahi publish service
         # should be done in a more robust way.
-        if (page_index+1 == 2):
+        if page_index+1 == 2 and button.get_label() == 'Next':
             GLib.idle_add(self.app.setup_avahi_publisher)
         else:
             if self.app.avahi_publisher is not None:
