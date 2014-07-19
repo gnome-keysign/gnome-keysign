@@ -13,9 +13,11 @@ FINGERPRINT_DEFAULT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
 
 class KeysPage(Gtk.VBox):
 
-    def __init__(self):
+    def __init__(self, keySection):
         super(KeysPage, self).__init__()
 
+        # pass a reference to KeySignSection in order to access its widgets
+        self.keySection = keySection
         # create the list store to be filled up with user's gpg keys
         self.store = Gtk.ListStore(str, str, str)
 
@@ -57,7 +59,7 @@ class KeysPage(Gtk.VBox):
                 # append an uid to the list store
                 self.store.append((name, email, keyid))
 
-        # create the treeView
+        # create the tree view
         self.treeView = Gtk.TreeView(model=self.store)
 
         # setup Name column
@@ -76,6 +78,8 @@ class KeysPage(Gtk.VBox):
         self.treeView.append_column(emailColumn)
         self.treeView.append_column(keyColumn)
 
+        self.treeView.get_selection().connect('changed', self.on_selection_changed)
+
         # make the tree view scrollable
         self.scrolled_window = Gtk.ScrolledWindow()
         self.scrolled_window.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
@@ -83,6 +87,10 @@ class KeysPage(Gtk.VBox):
         self.scrolled_window.set_min_content_height(200)
 
         self.pack_start(self.scrolled_window, True, True, 0)
+
+    def on_selection_changed(self, *args):
+        self.keySection.nextButton.set_sensitive(True)
+
 
 class KeyPresentPage(Gtk.HBox):
     def __init__(self):

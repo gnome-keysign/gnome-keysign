@@ -21,7 +21,7 @@ class KeySignSection(Gtk.VBox):
 
         # these are needed later when we need to get details about
         # a selected key
-        self.keysPage = KeysPage()
+        self.keysPage = KeysPage(self)
         self.keyDetailsPage = KeyDetailsPage()
         self.keyPresentPage = KeyPresentPage()
 
@@ -37,11 +37,13 @@ class KeySignSection(Gtk.VBox):
         self.backButton.set_image(Gtk.Image.new_from_icon_name("go-previous", Gtk.IconSize.BUTTON))
         self.backButton.set_always_show_image(True)
         self.backButton.connect('clicked', self.on_button_clicked)
+        self.backButton.set_sensitive(False)
         # create next button
         self.nextButton = Gtk.Button('Next')
         self.nextButton.set_image(Gtk.Image.new_from_icon_name("go-next", Gtk.IconSize.BUTTON))
         self.nextButton.set_always_show_image(True)
         self.nextButton.connect('clicked', self.on_button_clicked)
+        self.nextButton.set_sensitive(False)
 
         buttonBox = Gtk.HBox()
         buttonBox.pack_start(self.backButton, False, False, 0)
@@ -70,10 +72,13 @@ class KeySignSection(Gtk.VBox):
                         self.keyPresentPage.display_key_details(openPgpKey)
                     except KeyError:
                         print "No key details can be shown for this id:%s" % (keyid,)
+            # activate 'Back' button
+            self.backButton.set_sensitive(True)
 
         elif button == self.backButton:
             self.notebook.prev_page()
-
+            if page_index-1 == 0:
+                self.backButton.set_sensitive(False)
 
 class GetKeySection(Gtk.Box):
 
