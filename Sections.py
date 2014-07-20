@@ -7,6 +7,8 @@ from gi.repository import Gtk
 
 from SignPages import KeysPage, KeyPresentPage, KeyDetailsPage
 
+from monkeysign.gpg import OpenPGPkey
+
 progress_bar_text = ["Step 1: Choose a key and click on 'Next' button",
                      "Step 2: Compare the recieved fingerprint with the owner's key fpr",
                      "Step 3: Check if the identification papers match",
@@ -53,29 +55,33 @@ class KeySignSection(Gtk.VBox):
         self.pack_start(buttonBox, False, False, 0)
 
     def on_button_clicked(self, button):
-        # get index of current page
-        page_index = self.notebook.get_current_page()
 
-        if button == self.nextButton:
-            # switch to the next page in the notebook
+        page_index = self.notebook.get_current_page() # current page index
+
+        if button == self.nextButton: # switch to next page
             self.notebook.next_page()
             page_index = self.notebook.get_current_page()
-            # get a Gtk.TreeSelection object to process the selected rows
+
             selection = self.keysPage.treeView.get_selection()
             model, paths = selection.get_selected_rows()
+
+            for path in paths:
+                iterator = model.get_iter(path)
+                (name, email, keyid) = model.get(iterator, 0, 1, 2)
+                try:
+                    openPgpKey = self.keysPage.keysDict[keyid]
+                except KeyError:
+                    print "No key details can be shown for this id:%s" % (keyid,)
+                    openPgpKey = OpenPGPkey(None)
+
             if page_index == 1:
-                for path in paths:
-                    iterator = model.get_iter(path)
-                    (name, email, keyid) = model.get(iterator, 0, 1, 2)
-                    try:
-                        openPgpKey = self.keysPage.keysDict[keyid]
-                        self.keyPresentPage.display_key_details(openPgpKey)
-                    except KeyError:
-                        print "No key details can be shown for this id:%s" % (keyid,)
-            # activate 'Back' button
+                self.keyDetailsPage.display_uids_signatures_page(openPgpKey)
+            elif page_index == 2:
+                self.keyPresentPage.display_fingerprint_qr_page(openPgpKey)
+
             self.backButton.set_sensitive(True)
 
-        elif button == self.backButton:
+        elif button == self.backButton: # switch to previous page
             self.notebook.prev_page()
             if page_index-1 == 0:
                 self.backButton.set_sensitive(False)

@@ -18,25 +18,21 @@ class KeysPage(Gtk.VBox):
 
         # pass a reference to KeySignSection in order to access its widgets
         self.keySection = keySection
+
         # create the list store to be filled up with user's gpg keys
         self.store = Gtk.ListStore(str, str, str)
-
         # an object representing user's keyring
         self.keyring = Keyring()
-
         self.keysDict = {}
 
         # FIXME: this should be a callback function to update the display
         # when a key is changed/deleted
-
         for key in self.keyring.get_keys(None, True, False).values():
             if key.invalid or key.disabled or key.expired or key.revoked:
                 continue
 
-            # get a list of UIDs for each key: Real Name (Comment) <email@address>
-            uidslist = key.uidslist
-            # get the key's short id
-            keyid = str(key.keyid())
+            uidslist = key.uidslist #UIDs: Real Name (Comment) <email@address>
+            keyid = str(key.keyid()) # the key's short id
 
             if not keyid in self.keysDict:
                 self.keysDict[keyid] = key
@@ -56,21 +52,20 @@ class KeysPage(Gtk.VBox):
                 if len(tokens) > 1:
                     email = tokens[1].replace('>','').strip()
 
-                # append an uid to the list store
                 self.store.append((name, email, keyid))
 
         # create the tree view
         self.treeView = Gtk.TreeView(model=self.store)
 
-        # setup Name column
+        # setup 'Name' column
         nameRenderer = Gtk.CellRendererText()
         nameColumn = Gtk.TreeViewColumn("Name", nameRenderer, text=0)
 
-        # setup Email column
+        # setup 'Email' column
         emailRenderer = Gtk.CellRendererText()
         emailColumn = Gtk.TreeViewColumn("Email", emailRenderer, text=1)
 
-        # setup Key column
+        # setup 'Key' column
         keyRenderer = Gtk.CellRendererText()
         keyColumn = Gtk.TreeViewColumn("Key", keyRenderer, text=2)
 
@@ -78,6 +73,7 @@ class KeysPage(Gtk.VBox):
         self.treeView.append_column(emailColumn)
         self.treeView.append_column(keyColumn)
 
+        # make the tree view resposive to single click selection
         self.treeView.get_selection().connect('changed', self.on_selection_changed)
 
         # make the tree view scrollable
@@ -127,7 +123,7 @@ class KeyPresentPage(Gtk.HBox):
         self.pack_start(leftVBox, True, True, 0)
         self.pack_start(rightVBox, False, False, 0)
 
-    def display_key_details(self, openPgpKey):
+    def display_fingerprint_qr_page(self, openPgpKey):
         rawfpr = openPgpKey.fpr
 
         fpr = ""
@@ -153,7 +149,7 @@ class KeyDetailsPage(Gtk.VBox):
         uidsLabel.set_text("UIDs")
 
         # this will later be populated with uids when user selects a key
-        self.uidsBox = Gtk.HBox(spacing=5)
+        self.uidsBox = Gtk.VBox(spacing=5)
 
         expireLabel = Gtk.Label()
         expireLabel.set_text("Expires 0000-00-00")
@@ -169,3 +165,20 @@ class KeyDetailsPage(Gtk.VBox):
         self.pack_start(expireLabel, False, False, 0)
         self.pack_start(signaturesLabel, False, False, 0)
         self.pack_start(signaturesBox, True, True, 0)
+
+    def display_uids_signatures_page(self, openPgpKey):
+
+        # destroy previous uids
+        for child in self.uidsBox.get_children():
+            self.uidsBox.remove(child)
+
+        # display a list of uids
+        labels = []
+        for uid in openPgpKey.uidslist:
+            label = Gtk.Label(str(uid.uid))
+            label.set_line_wrap(True)
+            labels.append(label)
+
+        for label in labels:
+            self.uidsBox.pack_start(label, False, False, 0)
+            label.show()
