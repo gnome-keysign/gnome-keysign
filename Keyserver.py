@@ -6,7 +6,7 @@ import socket
 from SocketServer import ThreadingMixIn
 from threading import Thread
 
-from AvahiPublish import AvahiPublisher
+from network.AvahiPublisher import AvahiPublisher
 
 log = logging.getLogger()
 
