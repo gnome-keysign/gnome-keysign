@@ -156,8 +156,8 @@ class KeyDetailsPage(Gtk.VBox):
         # this will later be populated with uids when user selects a key
         self.uidsBox = Gtk.VBox(spacing=5)
 
-        expireLabel = Gtk.Label()
-        expireLabel.set_text("Expires 0000-00-00")
+        self.expireLabel = Gtk.Label()
+        self.expireLabel.set_text("Expires 0000-00-00")
 
         signaturesLabel = Gtk.Label()
         signaturesLabel.set_text("Signatures")
@@ -167,7 +167,7 @@ class KeyDetailsPage(Gtk.VBox):
 
         self.pack_start(uidsLabel, False, False, 0)
         self.pack_start(self.uidsBox, True, True, 0)
-        self.pack_start(expireLabel, False, False, 0)
+        self.pack_start(self.expireLabel, False, False, 0)
         self.pack_start(signaturesLabel, False, False, 0)
         self.pack_start(self.signaturesBox, True, True, 0)
 
@@ -200,6 +200,15 @@ class KeyDetailsPage(Gtk.VBox):
         for label in labels:
             self.uidsBox.pack_start(label, False, False, 0)
             label.show()
+
+        try:
+            exp_date = datetime.fromtimestamp(float(openPgpKey.expiry))
+            expiry = "Expires {:%Y-%m-%d %H:%M:%S}".format(exp_date)
+        except ValueError, e:
+            expiry = "No expiration date"
+
+        self.expireLabel.set_markup(expiry)
+
         # FIXME: this would be better if it was done in monkeysign
         self.keyring.context.call_command(['list-sigs', str(openPgpKey.keyid())])
 
