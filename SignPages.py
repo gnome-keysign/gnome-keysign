@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+
+import sys
 
 try:
     from gi.repository import Gtk, GdkPixbuf
@@ -6,8 +9,7 @@ except ImportError, e:
     print "A required python module is missing!\n%s" % (e,)
     sys.exit()
 
-import sys
-
+from datetime import datetime
 
 FINGERPRINT_DEFAULT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
 
@@ -19,10 +21,12 @@ class KeysPage(Gtk.VBox):
         # pass a reference to KeySignSection in order to access its widgets
         self.keySection = keySection
 
-        # create the list store to be filled up with user's gpg keys
+        # set up the list store to be filled up with user's gpg keys
         self.store = Gtk.ListStore(str, str, str)
-        # an object representing user's keyring
-        self.keyring = Keyring()
+
+        # FIXME: this should be moved to KeySignSection
+        self.keyring = Keyring() # the user's keyring
+
         self.keysDict = {}
 
         # FIXME: this should be a callback function to update the display
@@ -97,8 +101,6 @@ class KeyPresentPage(Gtk.HBox):
         fingerprintMark.set_markup('<span size="15000">' + 'Key Fingerprint' + '</span>')
 
         self.fingerprintLabel = Gtk.Label()
-        # FIXME: there shouldn't be a default fingerprint, instead the 'Next' button should be
-        # disabled until user selects an UID
         self.fingerprintLabel.set_markup('<span size="20000">' + FINGERPRINT_DEFAULT + '</span>')
 
         # left vertical box
@@ -145,6 +147,9 @@ class KeyDetailsPage(Gtk.VBox):
         super(KeyDetailsPage, self).__init__()
         self.set_spacing(10)
 
+        # FIXME: this should be moved to KeySignSection
+        self.keyring = Keyring()
+
         uidsLabel = Gtk.Label()
         uidsLabel.set_text("UIDs")
 
@@ -158,19 +163,32 @@ class KeyDetailsPage(Gtk.VBox):
         signaturesLabel.set_text("Signatures")
 
         # this will also be populated later
-        signaturesBox = Gtk.HBox(spacing=5)
+        self.signaturesBox = Gtk.VBox(spacing=5)
 
         self.pack_start(uidsLabel, False, False, 0)
         self.pack_start(self.uidsBox, True, True, 0)
         self.pack_start(expireLabel, False, False, 0)
         self.pack_start(signaturesLabel, False, False, 0)
-        self.pack_start(signaturesBox, True, True, 0)
+        self.pack_start(self.signaturesBox, True, True, 0)
+
+    def parse_sig_list(self, text):
+        sigslist = []
+        for block in text.split("\n"):
+            record = block.split(":")
+            if record[0] != "sig":
+                continue
+            (rectype, null, null, algo, keyid, timestamp, null, null, null, uid, null, null) = record
+            sigslist.append((keyid, timestamp, uid))
+
+        return sigslist
 
     def display_uids_signatures_page(self, openPgpKey):
 
         # destroy previous uids
-        for child in self.uidsBox.get_children():
-            self.uidsBox.remove(child)
+        for uid in self.uidsBox.get_children():
+            self.uidsBox.remove(uid)
+        for sig in self.signaturesBox.get_children():
+            self.signaturesBox.remove(sig)
 
         # display a list of uids
         labels = []
@@ -182,3 +200,17 @@ class KeyDetailsPage(Gtk.VBox):
         for label in labels:
             self.uidsBox.pack_start(label, False, False, 0)
             label.show()
+        # FIXME: this would be better if it was done in monkeysign
+        self.keyring.context.call_command(['list-sigs', str(openPgpKey.keyid())])
+
+        sigslist = self.parse_sig_list(self.keyring.context.stdout)
+        # FIXME: what do we actually want to show here: the numbers of signatures
+        # for this key or the number of times this key was used to signed others
+        for (keyid,timestamp,uid) in sigslist:
+            sigLabel = Gtk.Label()
+            date = datetime.fromtimestamp(float(timestamp))
+            sigLabel.set_markup(str(keyid) + "\t\t" + date.ctime())
+            sigLabel.set_line_wrap(True)
+
+            self.signaturesBox.pack_start(sigLabel, False, False, 0)
+            sigLabel.show()
