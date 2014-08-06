@@ -44,10 +44,13 @@ class AvahiPublisher:
                     avahi.DBUS_INTERFACE_ENTRY_GROUP)
             group.connect_to_signal('StateChanged',
                 self.entry_group_state_changed)
+                
+            self.group = group
     
         self.log.info("Adding service '%s' of type '%s'",
             self.service_name, self.service_type)
     
+        group = self.group
         group.AddService(
                 avahi.IF_UNSPEC,    #interface
                 avahi.PROTO_UNSPEC, #protocol
