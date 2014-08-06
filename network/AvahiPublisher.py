@@ -45,14 +45,11 @@ class AvahiPublisher:
             group.connect_to_signal('StateChanged',
                 self.entry_group_state_changed)
 
-        self.log.info("Adding service '%s' of type '%s'",
-            self.service_name, self.service_type)
-
-
             self.group = group
 
         self.log.info("Adding service '%s' of type '%s'",
             self.service_name, self.service_type)
+
 
         group = self.group
         group.AddService(
