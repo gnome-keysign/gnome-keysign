@@ -134,6 +134,8 @@ class ServeKeyThread(Thread):
 
     def shutdown(self):
         '''Sends shutdown to the underlying httpd'''
+        log.info("Removing Avahi Service")
+        self.avahi_publisher.remove_service()
         log.info("Shutting down httpd %r", self.httpd)
         self.httpd.shutdown()
     
