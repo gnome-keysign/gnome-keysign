@@ -44,10 +44,10 @@ class AvahiPublisher:
                     avahi.DBUS_INTERFACE_ENTRY_GROUP)
             group.connect_to_signal('StateChanged',
                 self.entry_group_state_changed)
-    
+
         self.log.info("Adding service '%s' of type '%s'",
             self.service_name, self.service_type)
-    
+
         group.AddService(
                 avahi.IF_UNSPEC,    #interface
                 avahi.PROTO_UNSPEC, #protocol
@@ -57,7 +57,7 @@ class AvahiPublisher:
                 dbus.UInt16 (self.service_port),
                 avahi.string_array_to_txt_array (self.service_txt))
         group.Commit()
-    
+
     def remove_service(self):
         if not self.group is None:
             self.group.Reset()
@@ -69,10 +69,10 @@ class AvahiPublisher:
             self.remove_service()
         elif state == avahi.SERVER_RUNNING:
             self.add_service()
-    
+
     def entry_group_state_changed(self, state, error):
         self.log.debug("state change: %i", state)
-    
+
         if state == avahi.ENTRY_GROUP_ESTABLISHED:
             self.log.info("Service established.")
 
@@ -84,13 +84,13 @@ class AvahiPublisher:
                     name)
                 self.remove_service()
                 self.add_service()
-    
+
             else:
                 # FIXME: max_renames is not defined. We probably want to restructure this a little bit, anyway. i.e. have a self.max_renames and a self.rename_count or so
                 m = "No suitable service name found after %i retries, exiting."
                 self.log.error(m, self.max_renames)
                 raise RuntimeError(m % self.max_renames)
-                
+
         elif state == avahi.ENTRY_GROUP_FAILURE:
             m = "Error in group state changed %s"
             self.log.error(m, error)
@@ -121,3 +121,4 @@ if __name__ == '__main__':
 
     if not ap.group is None:
         ap.group.Free()
+
