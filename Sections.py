@@ -11,12 +11,11 @@ from StringIO import StringIO
 
 try:
     from monkeysign.gpg import TempKeyring, GpgProtocolError
+    from gi.repository import Gtk, GLib
 except ImportError, e:
     print "A required python module is missing!\n%s" % (e,)
     sys.exit()
 
-from gi.repository import GLib
-from gi.repository import Gtk
 
 from SignPages import KeysPage, KeyPresentPage, KeyDetailsPage
 
@@ -82,7 +81,7 @@ class KeySignSection(Gtk.VBox):
             GLib.idle_add(self.app.setup_avahi_publisher)
         else:
             if self.app.avahi_publisher is not None:
-                self.app.avahi_publisher.unpublish()
+                self.app.avahi_publisher.remove_service()
 
         if button == self.nextButton:
             # switch to the next page in the notebook

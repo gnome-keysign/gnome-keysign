@@ -34,7 +34,7 @@ class MainWindow(Gtk.Window):
         GLib.idle_add(self.setup_avahi_browser)
 
         self.avahi_publisher = None
-        self.avahi_publish_name = "GeysignService"
+        self.avahi_publish_name = "Geysign Service"
         self.port = 9001
 
     def setup_avahi_browser(self):
@@ -46,10 +46,9 @@ class MainWindow(Gtk.Window):
 
     def setup_avahi_publisher(self):
         # FIXME: make it skip local services
-        self.avahi_publisher = AvahiPublisher(name=self.avahi_publish_name,
-                                port=self.port, stype=self.avahi_service_type)
-        self.avahi_publisher.publish()
-        # For now the service is un-published when the program is closed
+        self.avahi_publisher = AvahiPublisher(service_name=self.avahi_publish_name,
+                                service_port=self.port, service_type=self.avahi_service_type)
+        self.avahi_publisher.add_service()
         return False
 
     def on_new_service(self, browser, name, address, port):
