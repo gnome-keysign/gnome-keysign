@@ -16,7 +16,7 @@ except ImportError, e:
     print "A required python module is missing!\n%s" % (e,)
     sys.exit()
 
-
+import Keyserver
 from SignPages import KeysPage, KeyPresentPage, KeyDetailsPage
 
 progress_bar_text = ["Step 1: Choose a key and click on 'Next' button",
@@ -75,13 +75,16 @@ class KeySignSection(Gtk.VBox):
         # get index of current page
         page_index = self.notebook.get_current_page()
 
-        # FIXME: starting/stopping the avahi publish service
-        # should be done in a more robust way.
+        # starting/stopping the keyserver and also the avahi publisher
+        # depending on the page User is visiting
         if page_index+1 == 2 and button.get_label() == 'Next':
-            GLib.idle_add(self.app.setup_avahi_publisher)
-        else:
-            if self.app.avahi_publisher is not None:
-                self.app.avahi_publisher.remove_service()
+            self.log.debug("Keyserver switched on")
+            self.app.setup_server()
+
+        elif page_index == 2 and button.get_label() == 'Back':
+            self.log.debug("Keyserver switched off")
+            self.app.stop_server()
+
 
         if button == self.nextButton:
             # switch to the next page in the notebook

@@ -9,6 +9,7 @@ from network.AvahiBrowser import AvahiBrowser
 from network.AvahiPublisher import AvahiPublisher
 from Sections import KeySignSection, GetKeySection
 
+import Keyserver
 
 class MainWindow(Gtk.Window):
 
@@ -33,9 +34,9 @@ class MainWindow(Gtk.Window):
         self.discovered_services = []
         GLib.idle_add(self.setup_avahi_browser)
 
-        self.avahi_publisher = None
-        self.avahi_publish_name = "Geysign Service"
+        self.keyserver = None
         self.port = 9001
+
 
     def setup_avahi_browser(self):
         # FIXME: place a proper service type
@@ -44,12 +45,21 @@ class MainWindow(Gtk.Window):
 
         return False
 
-    def setup_avahi_publisher(self):
-        # FIXME: make it skip local services
-        self.avahi_publisher = AvahiPublisher(service_name=self.avahi_publish_name,
-                                service_port=self.port, service_type=self.avahi_service_type)
-        self.avahi_publisher.add_service()
+    def setup_server(self, keydata='Keydata'):
+        self.log.info('Serving now')
+        #self.keyserver = Thread(name='keyserver',
+        #                        target=Keyserver.serve_key, args=('Foobar',))
+        #self.keyserver.daemon = True
+        self.log.debug('About to call %r', Keyserver.ServeKeyThread)
+        self.keyserver = Keyserver.ServeKeyThread(str(keydata))
+        self.log.info('Starting thread %r', self.keyserver)
+        self.keyserver.start()
+        self.log.info('Finsihed serving')
         return False
+
+    def stop_server(self):
+        self.keyserver.shutdown()
+
 
     def on_new_service(self, browser, name, address, port):
         self.log.info("Probably discovered something, let me check; %s %s:%i",
