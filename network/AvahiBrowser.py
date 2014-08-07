@@ -9,10 +9,6 @@ from gi.repository import GObject
 
 __all__ = ["AvahiBrowser"]
 
-# Looks for '_demo._tcp share'
-
-TYPE = '_demo._tcp'
-
 
 class AvahiBrowser(GObject.GObject):
     __gsignals__ = {
@@ -22,7 +18,7 @@ class AvahiBrowser(GObject.GObject):
     }
 
 
-    def __init__(self, loop=None, service='_._tcp'):
+    def __init__(self, loop=None, service='_geysign._tcp'):
         GObject.GObject.__init__(self)
 
         self.service = service
@@ -35,7 +31,7 @@ class AvahiBrowser(GObject.GObject):
 
         self.sbrowser = dbus.Interface(self.bus.get_object(avahi.DBUS_NAME,
             self.server.ServiceBrowserNew(avahi.IF_UNSPEC,
-                avahi.PROTO_UNSPEC, TYPE, 'local', dbus.UInt32(0))),
+                avahi.PROTO_UNSPEC, self.service, 'local', dbus.UInt32(0))),
             avahi.DBUS_INTERFACE_SERVICE_BROWSER)
 
         self.sbrowser.connect_to_signal("ItemNew", self.on_new_item)

@@ -30,7 +30,7 @@ class MainWindow(Gtk.Window):
         self.connect("delete-event", Gtk.main_quit)
 
         self.avahi_browser = None
-        self.avahi_service_type = '_demo._tcp'
+        self.avahi_service_type = '_geysign._tcp'
         self.discovered_services = []
         GLib.idle_add(self.setup_avahi_browser)
 

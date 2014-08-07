@@ -101,7 +101,8 @@ class KeySignSection(Gtk.VBox):
                         openPgpKey = self.keysPage.keysDict[keyid]
                         self.keyPresentPage.display_key_details(openPgpKey)
                     except KeyError:
-                        print "No key details can be shown for this id:%s" % (keyid,)
+                        m = "No key details can be shown for id {}".format(keyid)
+                        self.log.info(m)
 
         elif button == self.backButton:
             self.notebook.prev_page()
