@@ -18,11 +18,9 @@ except ImportError, e:
 import Keyserver
 from SignPages import KeysPage, KeyPresentPage, KeyDetailsPage
 
-progress_bar_text = ["Step 1: Choose a key and click on 'Next' button",
-                     "Step 2: Compare the recieved fingerprint with the owner's key fpr",
-                     "Step 3: Check if the identification papers match",
-                     "Step 4: Key was succesfully signed"
-                    ]
+### FIXME !!!! This should be replaced with the fingerprint of the key
+# you want it signed. This is the fingerprint that should be scanned
+SCAN_FINGERPRINT = '140162A978431A0258B3EC24E69EEE14181523F4'
 
 class KeySignSection(Gtk.VBox):
 
@@ -97,7 +95,7 @@ class KeySignSection(Gtk.VBox):
                 self.last_selected_key = openPgpKey
 
             elif page_index == 2:
-                keyid = self.last_selected_key.keyid
+                keyid = self.last_selected_key.keyid()
                 self.keyring.export_data(fpr=str(keyid), secret=False)
                 keydata = self.keyring.context.stdout
 
@@ -174,14 +172,7 @@ class GetKeySection(Gtk.Box):
             params='',
             query='',
             fragment='')
-        # return requests.get(url.geturl()).text
-
-        # FIXME: hardcoded. Make it pass the data received from network.
-        fd = open(FILENAME, "r")
-        text = fd.read()
-        fd.close()
-
-        return text
+        return requests.get(url.geturl()).text
 
     def try_download_keys(self, clients):
         for client in clients:
@@ -213,11 +204,6 @@ class GetKeySection(Gtk.Box):
 
         for keydata in self.try_download_keys(other_clients):
             if self.verify_downloaded_key(keydata, fingerprint):
-                # FIXME: temporary solution to pass the fingerprint
-                # to the callback function.
-                if data is None:
-                    data = self.tmpkeyring.get_keys().keys()[0]
-
                 is_valid = True
             else:
                 is_valid = False
@@ -245,21 +231,17 @@ class GetKeySection(Gtk.Box):
 
         start_iter = self.textbuffer.get_start_iter()
         end_iter = self.textbuffer.get_end_iter()
-
-        # FIXME: hardcoded
-        fingerprint = '140162A978431A0258B3EC24E69EEE14181523F4'
-        # fingerprint = self.textbuffer.get_text(start_iter, end_iter, False)
         self.textbuffer.delete(start_iter, end_iter)
 
         self.topLabel.set_text("downloading key with fingerprint:\n%s"
-                                % fingerprint)
+                                % SCAN_FINGERPRINT)
 
         err = lambda x: self.textbuffer.set_text("Error downloading")
-        GLib.idle_add(self.obtain_key_async, fingerprint,
-            self.recieved_key, fingerprint,
+        GLib.idle_add(self.obtain_key_async, SCAN_FINGERPRINT,
+            self.recieved_key, SCAN_FINGERPRINT,
             err
             )
 
     def recieved_key(self, keydata, *data):
         self.textbuffer.insert_at_cursor("Key succesfully imported with"
-                                " fingerprint:\n{}".format(data[0]))
+                                " fingerprint:\n{}\n{}".format(data[0], keydata))
