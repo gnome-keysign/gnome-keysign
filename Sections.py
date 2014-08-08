@@ -7,10 +7,9 @@ import requests
 from requests.exceptions import ConnectionError
 
 import sys
-from StringIO import StringIO
 
 try:
-    from monkeysign.gpg import TempKeyring, GpgProtocolError
+    from monkeysign.gpg import Keyring, TempKeyring, GpgProtocolError
     from gi.repository import Gtk, GLib
 except ImportError, e:
     print "A required python module is missing!\n%s" % (e,)
@@ -39,6 +38,7 @@ class KeySignSection(Gtk.VBox):
 
         self.app = app
         self.log = logging.getLogger()
+        self.keyring = Keyring()
 
         # these are needed later when we need to get details about
         # a selected key
@@ -75,17 +75,6 @@ class KeySignSection(Gtk.VBox):
         # get index of current page
         page_index = self.notebook.get_current_page()
 
-        # starting/stopping the keyserver and also the avahi publisher
-        # depending on the page User is visiting
-        if page_index+1 == 2 and button.get_label() == 'Next':
-            self.log.debug("Keyserver switched on")
-            self.app.setup_server()
-
-        elif page_index == 2 and button.get_label() == 'Back':
-            self.log.debug("Keyserver switched off")
-            self.app.stop_server()
-
-
         if button == self.nextButton:
             # switch to the next page in the notebook
             self.notebook.next_page()
@@ -93,6 +82,7 @@ class KeySignSection(Gtk.VBox):
             # get a Gtk.TreeSelection object to process the selected rows
             selection = self.keysPage.treeView.get_selection()
             model, paths = selection.get_selected_rows()
+
             if page_index == 1:
                 for path in paths:
                     iterator = model.get_iter(path)
@@ -103,8 +93,22 @@ class KeySignSection(Gtk.VBox):
                     except KeyError:
                         m = "No key details can be shown for id {}".format(keyid)
                         self.log.info(m)
+                # save a reference for later use
+                self.last_selected_key = openPgpKey
+
+            elif page_index == 2:
+                keyid = self.last_selected_key.keyid
+                self.keyring.export_data(fpr=str(keyid), secret=False)
+                keydata = self.keyring.context.stdout
+
+                self.log.debug("Keyserver switched on")
+                self.app.setup_server(keydata)
 
         elif button == self.backButton:
+            if page_index == 2:
+                self.log.debug("Keyserver switched off")
+                self.app.stop_server()
+
             self.notebook.prev_page()
 
 FILENAME = 'testkey.gpg'

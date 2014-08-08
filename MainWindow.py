@@ -45,7 +45,7 @@ class MainWindow(Gtk.Window):
 
         return False
 
-    def setup_server(self, keydata='Keydata'):
+    def setup_server(self, keydata=None):
         self.log.info('Serving now')
         #self.keyserver = Thread(name='keyserver',
         #                        target=Keyserver.serve_key, args=('Foobar',))
