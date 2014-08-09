@@ -191,9 +191,17 @@ class GetKeySection(Gtk.Box):
         if self.tmpkeyring.import_data(downloaded_data):
             imported_key_fpr = self.tmpkeyring.get_keys().keys()[0]
             if imported_key_fpr == fingerprint:
-                return True
+                result = True
+            else:
+                self.log.info("Key does not have equal fp: %s != %s", imported_key_fpr, fingerprint)
+                result = False
+        else:
+            self.log.info("Failed to import downloaded data")
+            result = False
 
-        return False
+        self.log.debug("Trying to validate %s against %s: %s", downloaded_data, fingerprint, result)
+        return result
+
 
     def obtain_key_async(self, fingerprint, callback=None, data=None, error_cb=None):
         other_clients = self.app.discovered_services
