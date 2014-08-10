@@ -20,6 +20,8 @@ from gi.repository import Gtk
 
 from SignPages import KeysPage, KeyPresentPage, KeyDetailsPage
 
+from monkeysign.gpg import OpenPGPkey
+
 progress_bar_text = ["Step 1: Choose a key and click on 'Next' button",
                      "Step 2: Compare the recieved fingerprint with the owner's key fpr",
                      "Step 3: Check if the identification papers match",
@@ -43,7 +45,7 @@ class KeySignSection(Gtk.VBox):
 
         # these are needed later when we need to get details about
         # a selected key
-        self.keysPage = KeysPage()
+        self.keysPage = KeysPage(self)
         self.keyDetailsPage = KeyDetailsPage()
         self.keyPresentPage = KeyPresentPage()
 
@@ -59,11 +61,13 @@ class KeySignSection(Gtk.VBox):
         self.backButton.set_image(Gtk.Image.new_from_icon_name("go-previous", Gtk.IconSize.BUTTON))
         self.backButton.set_always_show_image(True)
         self.backButton.connect('clicked', self.on_button_clicked)
+        self.backButton.set_sensitive(False)
         # create next button
         self.nextButton = Gtk.Button('Next')
         self.nextButton.set_image(Gtk.Image.new_from_icon_name("go-next", Gtk.IconSize.BUTTON))
         self.nextButton.set_always_show_image(True)
         self.nextButton.connect('clicked', self.on_button_clicked)
+        self.nextButton.set_sensitive(False)
 
         buttonBox = Gtk.HBox()
         buttonBox.pack_start(self.backButton, False, False, 0)
@@ -73,36 +77,36 @@ class KeySignSection(Gtk.VBox):
         self.pack_start(buttonBox, False, False, 0)
 
     def on_button_clicked(self, button):
-        # get index of current page
-        page_index = self.notebook.get_current_page()
 
-        # FIXME: starting/stopping the avahi publish service
-        # should be done in a more robust way.
-        if page_index+1 == 2 and button.get_label() == 'Next':
-            GLib.idle_add(self.app.setup_avahi_publisher)
-        else:
-            if self.app.avahi_publisher is not None:
-                self.app.avahi_publisher.unpublish()
+        page_index = self.notebook.get_current_page() # current page index
 
-        if button == self.nextButton:
-            # switch to the next page in the notebook
+        if button == self.nextButton: # switch to next page
             self.notebook.next_page()
             page_index = self.notebook.get_current_page()
-            # get a Gtk.TreeSelection object to process the selected rows
+
             selection = self.keysPage.treeView.get_selection()
             model, paths = selection.get_selected_rows()
-            if page_index == 1:
-                for path in paths:
-                    iterator = model.get_iter(path)
-                    (name, email, keyid) = model.get(iterator, 0, 1, 2)
-                    try:
-                        openPgpKey = self.keysPage.keysDict[keyid]
-                        self.keyPresentPage.display_key_details(openPgpKey)
-                    except KeyError:
-                        print "No key details can be shown for this id:%s" % (keyid,)
 
-        elif button == self.backButton:
+            for path in paths:
+                iterator = model.get_iter(path)
+                (name, email, keyid) = model.get(iterator, 0, 1, 2)
+                try:
+                    openPgpKey = self.keysPage.keysDict[keyid]
+                except KeyError:
+                    print "No key details can be shown for this id:%s" % (keyid,)
+                    openPgpKey = OpenPGPkey(None)
+
+            if page_index == 1:
+                self.keyDetailsPage.display_uids_signatures_page(openPgpKey)
+            elif page_index == 2:
+                self.keyPresentPage.display_fingerprint_qr_page(openPgpKey)
+
+            self.backButton.set_sensitive(True)
+
+        elif button == self.backButton: # switch to previous page
             self.notebook.prev_page()
+            if page_index-1 == 0:
+                self.backButton.set_sensitive(False)
 
 FILENAME = 'testkey.gpg'
 
