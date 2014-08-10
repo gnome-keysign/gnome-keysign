@@ -7,26 +7,22 @@ import requests
 from requests.exceptions import ConnectionError
 
 import sys
-from StringIO import StringIO
 
 try:
-    from monkeysign.gpg import TempKeyring, GpgProtocolError
+    from monkeysign.gpg import Keyring, TempKeyring, GpgProtocolError
+    from gi.repository import Gtk, GLib
 except ImportError, e:
     print "A required python module is missing!\n%s" % (e,)
     sys.exit()
 
-from gi.repository import GLib
-from gi.repository import Gtk
-
+import Keyserver
 from SignPages import KeysPage, KeyPresentPage, KeyDetailsPage
 
 from monkeysign.gpg import OpenPGPkey
 
-progress_bar_text = ["Step 1: Choose a key and click on 'Next' button",
-                     "Step 2: Compare the recieved fingerprint with the owner's key fpr",
-                     "Step 3: Check if the identification papers match",
-                     "Step 4: Key was succesfully signed"
-                    ]
+### FIXME !!!! This should be replaced with the fingerprint of the key
+# you want it signed. This is the fingerprint that should be scanned
+SCAN_FINGERPRINT = '140162A978431A0258B3EC24E69EEE14181523F4'
 
 class KeySignSection(Gtk.VBox):
 
@@ -42,6 +38,7 @@ class KeySignSection(Gtk.VBox):
 
         self.app = app
         self.log = logging.getLogger()
+        self.keyring = Keyring()
 
         # these are needed later when we need to get details about
         # a selected key
@@ -76,37 +73,56 @@ class KeySignSection(Gtk.VBox):
         self.pack_start(self.notebook, True, True, 0)
         self.pack_start(buttonBox, False, False, 0)
 
+        # this will hold a reference to the last key selected
+        self.last_selected_key = None
+
     def on_button_clicked(self, button):
 
-        page_index = self.notebook.get_current_page() # current page index
-
-        if button == self.nextButton: # switch to next page
+        if button == self.nextButton:
+            # switch to the next page in the notebook
             self.notebook.next_page()
             page_index = self.notebook.get_current_page()
 
             selection = self.keysPage.treeView.get_selection()
             model, paths = selection.get_selected_rows()
 
-            for path in paths:
-                iterator = model.get_iter(path)
-                (name, email, keyid) = model.get(iterator, 0, 1, 2)
-                try:
-                    openPgpKey = self.keysPage.keysDict[keyid]
-                except KeyError:
-                    print "No key details can be shown for this id:%s" % (keyid,)
-                    openPgpKey = OpenPGPkey(None)
-
             if page_index == 1:
+                for path in paths:
+                    iterator = model.get_iter(path)
+                    (name, email, keyid) = model.get(iterator, 0, 1, 2)
+                    try:
+                        openPgpKey = self.keysPage.keysDict[keyid]
+                    except KeyError:
+                        m = "No key details can be shown for id {}".format(keyid)
+                        self.log.info(m)
+
+                # display uids, exp date and signatures
                 self.keyDetailsPage.display_uids_signatures_page(openPgpKey)
+                # save a reference for later use
+                self.last_selected_key = openPgpKey
+
             elif page_index == 2:
-                self.keyPresentPage.display_fingerprint_qr_page(openPgpKey)
+                self.keyPresentPage.display_fingerprint_qr_page(self.last_selected_key)
 
-            self.backButton.set_sensitive(True)
+                keyid = self.last_selected_key.keyid()
+                self.keyring.export_data(fpr=str(keyid), secret=False)
+                keydata = self.keyring.context.stdout
 
-        elif button == self.backButton: # switch to previous page
-            self.notebook.prev_page()
-            if page_index-1 == 0:
+                self.log.debug("Keyserver switched on")
+                self.app.setup_server(keydata)
+
+                self.backButton.set_sensitive(True)
+
+        elif button == self.backButton:
+            page_index = self.notebook.get_current_page()
+
+            if page_index == 2:
+                self.log.debug("Keyserver switched off")
+                self.app.stop_server()
+            elif page_index-1 == 0:
                 self.backButton.set_sensitive(False)
+
+            self.notebook.prev_page()
 
 FILENAME = 'testkey.gpg'
 
@@ -171,14 +187,7 @@ class GetKeySection(Gtk.Box):
             params='',
             query='',
             fragment='')
-        # return requests.get(url.geturl()).text
-
-        # FIXME: hardcoded. Make it pass the data received from network.
-        fd = open(FILENAME, "r")
-        text = fd.read()
-        fd.close()
-
-        return text
+        return requests.get(url.geturl()).text
 
     def try_download_keys(self, clients):
         for client in clients:
@@ -197,9 +206,17 @@ class GetKeySection(Gtk.Box):
         if self.tmpkeyring.import_data(downloaded_data):
             imported_key_fpr = self.tmpkeyring.get_keys().keys()[0]
             if imported_key_fpr == fingerprint:
-                return True
+                result = True
+            else:
+                self.log.info("Key does not have equal fp: %s != %s", imported_key_fpr, fingerprint)
+                result = False
+        else:
+            self.log.info("Failed to import downloaded data")
+            result = False
 
-        return False
+        self.log.debug("Trying to validate %s against %s: %s", downloaded_data, fingerprint, result)
+        return result
+
 
     def obtain_key_async(self, fingerprint, callback=None, data=None, error_cb=None):
         other_clients = self.app.discovered_services
@@ -210,11 +227,6 @@ class GetKeySection(Gtk.Box):
 
         for keydata in self.try_download_keys(other_clients):
             if self.verify_downloaded_key(keydata, fingerprint):
-                # FIXME: temporary solution to pass the fingerprint
-                # to the callback function.
-                if data is None:
-                    data = self.tmpkeyring.get_keys().keys()[0]
-
                 is_valid = True
             else:
                 is_valid = False
@@ -242,21 +254,17 @@ class GetKeySection(Gtk.Box):
 
         start_iter = self.textbuffer.get_start_iter()
         end_iter = self.textbuffer.get_end_iter()
-
-        # FIXME: hardcoded
-        fingerprint = '140162A978431A0258B3EC24E69EEE14181523F4'
-        # fingerprint = self.textbuffer.get_text(start_iter, end_iter, False)
         self.textbuffer.delete(start_iter, end_iter)
 
         self.topLabel.set_text("downloading key with fingerprint:\n%s"
-                                % fingerprint)
+                                % SCAN_FINGERPRINT)
 
         err = lambda x: self.textbuffer.set_text("Error downloading")
-        GLib.idle_add(self.obtain_key_async, fingerprint,
-            self.recieved_key, fingerprint,
+        GLib.idle_add(self.obtain_key_async, SCAN_FINGERPRINT,
+            self.recieved_key, SCAN_FINGERPRINT,
             err
             )
 
     def recieved_key(self, keydata, *data):
         self.textbuffer.insert_at_cursor("Key succesfully imported with"
-                                " fingerprint:\n{}".format(data[0]))
+                                " fingerprint:\n{}\n{}".format(data[0], keydata))
