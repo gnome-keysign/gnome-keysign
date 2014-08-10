@@ -262,8 +262,8 @@ class GetKeySection(Gtk.Box):
                                 % fpr)
 
         err = lambda x: self.textbuffer.set_text("Error downloading")
-        GLib.idle_add(self.obtain_key_async, SCAN_FINGERPRINT,
-            self.recieved_key, SCAN_FINGERPRINT,
+        GLib.idle_add(self.obtain_key_async, fpr,
+            self.recieved_key, fpr,
             err
             )
 
