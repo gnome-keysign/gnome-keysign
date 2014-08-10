@@ -254,10 +254,12 @@ class GetKeySection(Gtk.Box):
 
         start_iter = self.textbuffer.get_start_iter()
         end_iter = self.textbuffer.get_end_iter()
-        self.textbuffer.delete(start_iter, end_iter)
+        fingerprint = self.textbuffer.get_text(start_iter, end_iter, False)
+        fpr = fingerprint if fingerprint is not '' else SCAN_FINGERPRINT
 
+        self.textbuffer.delete(start_iter, end_iter)
         self.topLabel.set_text("downloading key with fingerprint:\n%s"
-                                % SCAN_FINGERPRINT)
+                                % fpr)
 
         err = lambda x: self.textbuffer.set_text("Error downloading")
         GLib.idle_add(self.obtain_key_async, SCAN_FINGERPRINT,
