@@ -250,12 +250,25 @@ class GetKeySection(Gtk.Box):
         # keep adding this function to the loop until this func ret False
         return False
 
+    def decode_fingerprint(self, fpr, scanner=False):
+
+        if not scanner: # if fingerprint was typed
+
+            fpr = ''.join(fpr.replace(" ", '').split('\n'))
+
+            # a simple check to detect bad fingerprints
+            if len(fpr) != 40:
+                self.log.error("Fingerprint %s has not enough characters", fpr)
+                fpr = ''
+
+        return fpr
+
     def on_button_clicked(self, button):
 
         start_iter = self.textbuffer.get_start_iter()
         end_iter = self.textbuffer.get_end_iter()
         fingerprint = self.textbuffer.get_text(start_iter, end_iter, False)
-        fpr = fingerprint if fingerprint is not '' else SCAN_FINGERPRINT
+        fpr = fingerprint if self.decode_fingerprint(fingerprint) is not '' else SCAN_FINGERPRINT
 
         self.textbuffer.delete(start_iter, end_iter)
         self.topLabel.set_text("downloading key with fingerprint:\n%s"
