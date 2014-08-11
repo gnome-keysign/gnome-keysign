@@ -23,7 +23,7 @@ from gi.repository import GdkX11
 # Needed for window.get_xid(), xvimagesink.set_window_handle(), respectively:
 from gi.repository import GstVideo
 
-from key import Key, KeyError
+import key
 from scan_barcode import BarcodeReaderGTK
 
 Gst.init([])
@@ -214,8 +214,8 @@ class GetKeySection(Gtk.Box):
         The message argument is a GStreamer message that created
         the barcode.'''
         try:
-            key = Key(barcode)
-        except KeyError:
+            key = key.Key(barcode)
+        except key.KeyError:
             log.exception("Could not create key from %s", barcode)
         else:
             print("barcode signal %s %s" %( barcode, message))
