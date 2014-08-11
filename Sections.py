@@ -267,8 +267,9 @@ class GetKeySection(Gtk.Box):
 
         start_iter = self.textbuffer.get_start_iter()
         end_iter = self.textbuffer.get_end_iter()
-        fingerprint = self.textbuffer.get_text(start_iter, end_iter, False)
-        fpr = fingerprint if self.decode_fingerprint(fingerprint) is not '' else SCAN_FINGERPRINT
+        raw_fpr = self.textbuffer.get_text(start_iter, end_iter, False)
+        fpr = self.decode_fingerprint(raw_fpr)
+        fpr = fpr if fpr != '' else SCAN_FINGERPRINT
 
         self.textbuffer.delete(start_iter, end_iter)
         self.topLabel.set_text("downloading key with fingerprint:\n%s"
