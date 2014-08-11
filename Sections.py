@@ -120,7 +120,7 @@ class KeySignSection(Gtk.VBox):
                 self.log.debug("Keyserver switched on")
                 self.app.setup_server(keydata)
 
-                self.backButton.set_sensitive(True)
+            self.backButton.set_sensitive(True)
 
         elif button == self.backButton:
             page_index = self.notebook.get_current_page()
