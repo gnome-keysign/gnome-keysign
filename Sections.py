@@ -10,7 +10,6 @@ import sys
 
 try:
     from monkeysign.gpg import Keyring, TempKeyring
-    from gi.repository import Gtk, GLib
 except ImportError, e:
     print "A required python module is missing!\n%s" % (e,)
     sys.exit()
@@ -18,12 +17,11 @@ except ImportError, e:
 import Keyserver
 from SignPages import KeysPage, KeyPresentPage, KeyDetailsPage
 
-from gi.repository import Gst
-from gi.repository import Gtk, GLib
+from gi.repository import Gst, Gtk, GLib
 # Because of https://bugzilla.gnome.org/show_bug.cgi?id=698005
-from gi.repository import Gtk, GdkX11
+from gi.repository import GdkX11
 # Needed for window.get_xid(), xvimagesink.set_window_handle(), respectively:
-from gi.repository import GdkX11, GstVideo
+from gi.repository import GstVideo
 
 from key import Key, KeyError
 from scan_barcode import BarcodeReaderGTK

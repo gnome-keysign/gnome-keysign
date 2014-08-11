@@ -2,8 +2,6 @@
 
 import sys
 
-import sys
-
 try:
     from gi.repository import Gtk, GdkPixbuf
     from monkeysign.gpg import Keyring
