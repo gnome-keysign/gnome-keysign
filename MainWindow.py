@@ -16,7 +16,7 @@ class MainWindow(Gtk.Application):
 
     def __init__(self):
         Gtk.Application.__init__(
-            self, application_id='org.gnome.Geysign')
+            self, application_id=None) ### org.gnome.Geysign ###
         self.connect("activate", self.on_activate)
         self.connect("startup", self.on_startup)
 
@@ -30,7 +30,7 @@ class MainWindow(Gtk.Application):
 
 
     def on_startup(self, app):
-        self.log.error("Startup")
+        self.log.info("Startup")
         self.window = Gtk.ApplicationWindow(application=app)
 
         self.window.set_border_width(10)
@@ -77,13 +77,13 @@ class MainWindow(Gtk.Application):
         print "scanimage"
 
     def on_activate(self, app):
-        self.log.error("Activate!")
+        self.log.info("Activate!")
         #self.window = Gtk.ApplicationWindow(application=app)
 
         self.window.show_all()
         # In case the user runs the application a second time,
         # we raise the existing window.
-        self.window.present()
+        # self.window.present()
 
     def setup_avahi_browser(self):
         # FIXME: place a proper service type
