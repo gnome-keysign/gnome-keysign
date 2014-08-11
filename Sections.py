@@ -213,12 +213,17 @@ class GetKeySection(Gtk.Box):
         '''This is connected to the "barcode" signal.
         The message argument is a GStreamer message that created
         the barcode.'''
+        # we're using the monkeysign format where we inserting the
+        # string 'OPENPGP4FPR:'' in front of the fingerprint
+        fpr = barcode.split(':')[-1]
+
         try:
-            pgpkey = key.Key(barcode)
+            pgpkey = key.Key(fpr)
         except key.KeyError:
             log.exception("Could not create key from %s", barcode)
         else:
-            print("barcode signal %s %s" %( barcode, message))
+            yield pgpkey
+            # print("barcode signal %s %s" %( pgpkey.fingerprint, message))
 
     def download_key_http(self, address, port):
         url = ParseResult(

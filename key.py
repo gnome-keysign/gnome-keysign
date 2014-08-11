@@ -7,6 +7,8 @@ class KeyError(Exception):
 class Key:
     @classmethod
     def is_valid_fingerprint(cls, fingerprint):
+        if len(fingerprint) != 40:
+            return False
         return True
 
     def __init__(self, fingerprint):
@@ -15,4 +17,4 @@ class Key:
                            "appear to be valid".format(fingerprint))
 
         self.fingerprint = fingerprint
-        
+
