@@ -214,7 +214,7 @@ class GetKeySection(Gtk.Box):
         The message argument is a GStreamer message that created
         the barcode.'''
         try:
-            key = key.Key(barcode)
+            pgpkey = key.Key(barcode)
         except key.KeyError:
             log.exception("Could not create key from %s", barcode)
         else:
