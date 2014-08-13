@@ -91,10 +91,12 @@ class GetKeySection(Gtk.VBox):
     def __init__(self):
         super(GetKeySection, self).__init__()
 
+        self.scanPage = ScanFingerprintPage()
+        self.signPage = SignKeyPage()
         # set up notebook container
         self.notebook = Gtk.Notebook()
-        self.notebook.append_page(ScanFingerprintPage(), None)
-        self.notebook.append_page(SignKeyPage(), None)
+        self.notebook.append_page(self.scanPage, None)
+        self.notebook.append_page(self.signPage, None)
         self.notebook.append_page(PostSignPage(), None)
         self.notebook.set_show_tabs(False)
 
@@ -104,37 +106,49 @@ class GetKeySection(Gtk.VBox):
         self.progressBar.set_show_text(True)
         self.progressBar.set_fraction(1.0/3)
 
-        self.downloadButton = Gtk.Button('Download')
-        self.downloadButton.connect('clicked', self.on_button_clicked)
-        self.downloadButton.set_image(Gtk.Image.new_from_icon_name("document-save", Gtk.IconSize.BUTTON))
-        self.downloadButton.set_always_show_image(True)
+        self.nextButton = Gtk.Button('Next')
+        self.nextButton.connect('clicked', self.on_button_clicked)
+        self.nextButton.set_image(Gtk.Image.new_from_icon_name("go-next", Gtk.IconSize.BUTTON))
+        self.nextButton.set_always_show_image(True)
 
         bottomBox = Gtk.HBox()
         bottomBox.pack_start(self.progressBar, True, True, 0)
-        bottomBox.pack_start(self.downloadButton, False, False, 0)
+        bottomBox.pack_start(self.nextButton, False, False, 0)
 
         self.pack_start(self.notebook, True, True, 0)
         self.pack_start(bottomBox, False, False, 0)
 
+    def set_progress_bar(self):
+        page_index = self.notebook.get_current_page()
+        self.progressBar.set_text(progress_bar_text[page_index])
+        self.progressBar.set_fraction((page_index+1)/3.0)
+
     def obtain_key_async(self, fingerprint, callback=None, data=None):
         import time
         keydata = str(time.sleep(1))
-        GLib.idle_add(callback, keydata, data)
+        GLib.idle_add(callback, fingerprint, keydata, data)
         # If this function is added itself via idle_add, then idle_add will
         # keep adding this function to the loop until this func ret False
         return False
 
     def on_button_clicked(self, button):
 
-        start_iter = self.textbuffer.get_start_iter()
-        end_iter = self.textbuffer.get_end_iter()
-        fingerprint = self.textbuffer.get_text(start_iter, end_iter, False)
-        self.textbuffer.delete(start_iter, end_iter)
+        self.notebook.next_page()
+        self.set_progress_bar()
 
-        self.topLabel.set_text("downloading key with fingerprint:\n%s"
-                                % fingerprint)
-        GLib.idle_add(self.obtain_key_async, fingerprint, self.recieved_key,
+        page_index = self.notebook.get_current_page()
+        if page_index == 1:
+            fingerprint = self.scanPage.get_text_from_scanner()
+            if fingerprint is None:
+                fingerprint = self.scanPage.get_text_from_textview()
+
+            GLib.idle_add(self.obtain_key_async, fingerprint, self.recieved_key,
                     fingerprint)
 
-    def recieved_key(self, keydata, *data):
-        self.textbuffer.insert_at_cursor(str(keydata))
+
+        if page_index == 2:
+            pass
+
+
+    def recieved_key(self, fingerprint, keydata, *data):
+        self.signPage.display_downloaded_key(fingerprint, keydata)

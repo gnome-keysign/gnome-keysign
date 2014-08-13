@@ -264,12 +264,45 @@ class ScanFingerprintPage(Gtk.HBox):
         self.pack_start(leftBox, True, True, 0)
         self.pack_start(rightBox, True, True, 0)
 
+    def get_text_from_textview(self):
+        start_iter = self.textbuffer.get_start_iter()
+        end_iter = self.textbuffer.get_end_iter()
+        fingerprint = self.textbuffer.get_text(start_iter, end_iter, False)
+        self.textbuffer.delete(start_iter, end_iter)
+
+        return fingerprint
+
+    def get_text_from_scanner(self):
+        return None
+
 
 class SignKeyPage(Gtk.VBox):
 
     def __init__(self):
         super(SignKeyPage, self).__init__()
         self.set_spacing(10)
+
+        self.topLabel = Gtk.Label()
+        self.topLabel.set_markup("Downloading key with fingerprint ")
+        self.topLabel.set_line_wrap(True)
+
+        self.textview = Gtk.TextView()
+        self.textbuffer = self.textview.get_buffer()
+
+        hBox = Gtk.HBox(spacing=10)
+        hBox.pack_start(self.topLabel, False, False, 0)
+        hBox.pack_start(self.textview, True, True, 0)
+        self.pack_start(hBox, True, True, 0)
+
+    def display_downloaded_key(self, fpr, keydata):
+        self.topLabel.set_markup("Downloading key with fingerprint \n%s" % fpr)
+        self.topLabel.show()
+
+        start_iter = self.textbuffer.get_start_iter()
+        end_iter = self.textbuffer.get_end_iter()
+        self.textbuffer.delete(start_iter, end_iter)
+
+        self.textbuffer.insert_at_cursor(keydata, len(keydata))
 
 
 class PostSignPage(Gtk.VBox):
