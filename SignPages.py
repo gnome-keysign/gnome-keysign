@@ -310,3 +310,33 @@ class PostSignPage(Gtk.VBox):
     def __init__(self):
         super(PostSignPage, self).__init__()
         self.set_spacing(10)
+
+        # setup the label
+        signedLabel = Gtk.Label()
+        signedLabel.set_text('The key was signed and an email was sent to key owner! What next?')
+
+        # setup the buttons
+        sendBackButton = Gtk.Button('  Resend email  ')
+        sendBackButton.set_image(Gtk.Image.new_from_icon_name("gtk-network", Gtk.IconSize.BUTTON))
+        sendBackButton.set_always_show_image(True)
+        sendBackButton.set_halign(Gtk.Align.CENTER)
+
+        saveButton = Gtk.Button('Save key locally')
+        saveButton.set_image(Gtk.Image.new_from_icon_name("gtk-save", Gtk.IconSize.BUTTON))
+        saveButton.set_always_show_image(True)
+        saveButton.set_halign(Gtk.Align.CENTER)
+
+        emailButton = Gtk.Button('Revoke signature')
+        emailButton.set_image(Gtk.Image.new_from_icon_name("gtk-clear", Gtk.IconSize.BUTTON))
+        emailButton.set_always_show_image(True)
+        emailButton.set_halign(Gtk.Align.CENTER)
+
+        # pack them into a container for alignment
+        container = Gtk.VBox(spacing=3)
+        container.pack_start(signedLabel, False, False, 5)
+        container.pack_start(sendBackButton, False, False, 0)
+        container.pack_start(saveButton, False, False, 0)
+        container.pack_start(emailButton, False, False, 0)
+        container.set_valign(Gtk.Align.CENTER)
+
+        self.pack_start(container, True, False, 0)
