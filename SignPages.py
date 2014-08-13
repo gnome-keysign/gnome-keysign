@@ -223,3 +223,57 @@ class KeyDetailsPage(Gtk.VBox):
 
             self.signaturesBox.pack_start(sigLabel, False, False, 0)
             sigLabel.show()
+
+
+
+class ScanFingerprintPage(Gtk.HBox):
+
+    def __init__(self):
+        super(ScanFingerprintPage, self).__init__()
+        self.set_spacing(10)
+
+        # set up labels
+        leftLabel = Gtk.Label()
+        leftLabel.set_markup('Type fingerprint')
+        rightLabel = Gtk.Label()
+        rightLabel.set_markup('... or scan QR code')
+
+        # set up text editor
+        self.textview = Gtk.TextView()
+        self.textbuffer = self.textview.get_buffer()
+
+        # set up scrolled window
+        scrolledwindow = Gtk.ScrolledWindow()
+        scrolledwindow.add(self.textview)
+
+        # set up webcam frame
+        # FIXME  create the actual webcam widgets
+        self.scanFrame = Gtk.Frame(label='QR Scanner')
+
+        # set up left box
+        leftBox = Gtk.VBox(spacing=10)
+        leftBox.pack_start(leftLabel, False, False, 0)
+        leftBox.pack_start(scrolledwindow, True, True, 0)
+
+        # set up right box
+        rightBox = Gtk.VBox(spacing=10)
+        rightBox.pack_start(rightLabel, False, False, 0)
+        rightBox.pack_start(self.scanFrame, True, True, 0)
+
+        # pack up
+        self.pack_start(leftBox, True, True, 0)
+        self.pack_start(rightBox, True, True, 0)
+
+
+class SignKeyPage(Gtk.VBox):
+
+    def __init__(self):
+        super(SignKeyPage, self).__init__()
+        self.set_spacing(10)
+
+
+class PostSignPage(Gtk.VBox):
+
+    def __init__(self):
+        super(PostSignPage, self).__init__()
+        self.set_spacing(10)

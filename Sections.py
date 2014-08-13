@@ -6,14 +6,14 @@ from gi.repository import GLib
 from gi.repository import Gtk
 
 from SignPages import KeysPage, KeyPresentPage, KeyDetailsPage
+from SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 
 from monkeysign.gpg import OpenPGPkey
 
-progress_bar_text = ["Step 1: Choose a key and click on 'Next' button",
-                     "Step 2: Compare the recieved fingerprint with the owner's key fpr",
-                     "Step 3: Check if the identification papers match",
-                     "Step 4: Key was succesfully signed"
-                    ]
+
+progress_bar_text = ["Step 1: Scan QR Code or type fingerprint and click on 'Download' button",
+                     "Step 2: Compare the received fpr with the owner's fpr and click 'Sign'",
+                     "Step 3: Key was succesfully signed and an email was send to owner."]
 
 class KeySignSection(Gtk.VBox):
 
@@ -86,43 +86,35 @@ class KeySignSection(Gtk.VBox):
             if page_index-1 == 0:
                 self.backButton.set_sensitive(False)
 
-class GetKeySection(Gtk.Box):
+class GetKeySection(Gtk.VBox):
 
     def __init__(self):
         super(GetKeySection, self).__init__()
 
-        # set up main container
-        mainBox = Gtk.VBox(spacing=10)
-        # set up labels
-        self.topLabel = Gtk.Label()
-        self.topLabel.set_markup('Type fingerprint')
-        midLabel = Gtk.Label()
-        midLabel.set_markup('... or scan QR code')
-        # set up text editor
-        self.textview = Gtk.TextView()
-        self.textbuffer = self.textview.get_buffer()
-        # set up scrolled window
-        scrolledwindow = Gtk.ScrolledWindow()
-        scrolledwindow.add(self.textview)
+        # set up notebook container
+        self.notebook = Gtk.Notebook()
+        self.notebook.append_page(ScanFingerprintPage(), None)
+        self.notebook.append_page(SignKeyPage(), None)
+        self.notebook.append_page(PostSignPage(), None)
+        self.notebook.set_show_tabs(False)
 
-        # set up webcam frame
-        # FIXME  create the actual webcam widgets
-        self.scanFrame = Gtk.Frame(label='QR Scanner')
+        # set up the progress bar
+        self.progressBar = Gtk.ProgressBar()
+        self.progressBar.set_text(progress_bar_text[0])
+        self.progressBar.set_show_text(True)
+        self.progressBar.set_fraction(1.0/3)
 
-        # set up download button
-        # Scenario: When 'Download' button is clicked it will request data
-        # from network using self.app.discovered_services to get address
-        self.downloadButton = Gtk.Button('Download Key')
+        self.downloadButton = Gtk.Button('Download')
         self.downloadButton.connect('clicked', self.on_button_clicked)
         self.downloadButton.set_image(Gtk.Image.new_from_icon_name("document-save", Gtk.IconSize.BUTTON))
         self.downloadButton.set_always_show_image(True)
-        # pack up
-        mainBox.pack_start(self.topLabel, False, False, 0)
-        mainBox.pack_start(scrolledwindow, False, False, 0)
-        mainBox.pack_start(midLabel, False, False, 0)
-        mainBox.pack_start(self.scanFrame, True, True, 0)
-        mainBox.pack_start(self.downloadButton, False, False, 0)
-        self.pack_start(mainBox, True, False, 0)
+
+        bottomBox = Gtk.HBox()
+        bottomBox.pack_start(self.progressBar, True, True, 0)
+        bottomBox.pack_start(self.downloadButton, False, False, 0)
+
+        self.pack_start(self.notebook, True, True, 0)
+        self.pack_start(bottomBox, False, False, 0)
 
     def obtain_key_async(self, fingerprint, callback=None, data=None):
         import time
