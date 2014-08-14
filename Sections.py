@@ -111,8 +111,14 @@ class GetKeySection(Gtk.VBox):
         self.nextButton.set_image(Gtk.Image.new_from_icon_name("go-next", Gtk.IconSize.BUTTON))
         self.nextButton.set_always_show_image(True)
 
+        self.backButton = Gtk.Button('Back')
+        self.backButton.connect('clicked', self.on_button_clicked)
+        self.backButton.set_image(Gtk.Image.new_from_icon_name('go-previous', Gtk.IconSize.BUTTON))
+        self.backButton.set_always_show_image(True)
+
         bottomBox = Gtk.HBox()
         bottomBox.pack_start(self.progressBar, True, True, 0)
+        bottomBox.pack_start(self.backButton, False, False, 0)
         bottomBox.pack_start(self.nextButton, False, False, 0)
 
         self.pack_start(self.notebook, True, True, 0)
@@ -133,7 +139,11 @@ class GetKeySection(Gtk.VBox):
 
     def on_button_clicked(self, button):
 
-        self.notebook.next_page()
+        if button == self.nextButton:
+            self.notebook.next_page()
+        else:
+            self.notebook.prev_page()
+
         self.set_progress_bar()
 
         page_index = self.notebook.get_current_page()

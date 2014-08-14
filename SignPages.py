@@ -316,12 +316,12 @@ class PostSignPage(Gtk.VBox):
         signedLabel.set_text('The key was signed and an email was sent to key owner! What next?')
 
         # setup the buttons
-        sendBackButton = Gtk.Button('  Resend email  ')
+        sendBackButton = Gtk.Button('   Resend email   ')
         sendBackButton.set_image(Gtk.Image.new_from_icon_name("gtk-network", Gtk.IconSize.BUTTON))
         sendBackButton.set_always_show_image(True)
         sendBackButton.set_halign(Gtk.Align.CENTER)
 
-        saveButton = Gtk.Button('Save key locally')
+        saveButton = Gtk.Button(' Save key locally ')
         saveButton.set_image(Gtk.Image.new_from_icon_name("gtk-save", Gtk.IconSize.BUTTON))
         saveButton.set_always_show_image(True)
         saveButton.set_halign(Gtk.Align.CENTER)
