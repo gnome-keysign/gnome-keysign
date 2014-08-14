@@ -87,15 +87,16 @@ class KeySignSection(Gtk.VBox):
 
     def on_button_clicked(self, button):
 
+        page_index = self.notebook.get_current_page()
+
         if button == self.nextButton:
             # switch to the next page in the notebook
             self.notebook.next_page()
-            page_index = self.notebook.get_current_page()
 
             selection = self.keysPage.treeView.get_selection()
             model, paths = selection.get_selected_rows()
 
-            if page_index == 1:
+            if page_index+1 == 1:
                 for path in paths:
                     iterator = model.get_iter(path)
                     (name, email, keyid) = model.get(iterator, 0, 1, 2)
@@ -110,7 +111,7 @@ class KeySignSection(Gtk.VBox):
                 # save a reference for later use
                 self.last_selected_key = openPgpKey
 
-            elif page_index == 2:
+            elif page_index+1 == 2:
                 self.keyPresentPage.display_fingerprint_qr_page(self.last_selected_key)
 
                 keyid = self.last_selected_key.keyid()
@@ -123,7 +124,6 @@ class KeySignSection(Gtk.VBox):
             self.backButton.set_sensitive(True)
 
         elif button == self.backButton:
-            page_index = self.notebook.get_current_page()
 
             if page_index == 2:
                 self.log.debug("Keyserver switched off")
