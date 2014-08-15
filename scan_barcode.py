@@ -19,7 +19,7 @@ log = logging.getLogger()
 
 def test():
     print("hello")
-    # exist mainloop    
+    # exist mainloop
     Gtk.main_quit()
     # Do not run again.
     return False
@@ -44,17 +44,17 @@ class BarcodeReader(object):
                 barcode = struct.get_string('symbol')
                 log.info("Read Barcode: {}".format(barcode))
                 self.on_barcode(barcode, message)
-        
+
     def run(self):
         p = 'v4l2src ! tee name=t ! queue ! videoconvert ! zbar ! fakesink t. ! queue ! videoconvert ! xvimagesink'
         #p = 'uridecodebin file:///tmp/image.jpg ! tee name=t ! queue ! videoconvert ! zbar ! fakesink t. ! queue ! videoconvert ! xvimagesink'
         self.a = a = Gst.parse_launch(p)
         self.bus = bus = a.get_bus()
-        
+
         bus.connect('message', self.on_message)
         bus.connect('sync-message::element', self.on_sync_message)
         bus.add_signal_watch()
-    
+
         a.set_state(Gst.State.PLAYING)
         self.running = True
         while self.running and False:
@@ -116,14 +116,14 @@ class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
         self.a.set_state(Gst.State.NULL)
         Gtk.DrawingArea.do_unrealize(self)
 
-    
+
     def on_unmap(self, *args, **kwargs):
         '''Hopefully called when this widget is hidden,
         e.g. when the tab of a notebook has changed'''
         self.a.set_state(Gst.State.PAUSED)
         # Actually, we stop the thing for real
         self.a.set_state(Gst.State.NULL)
-        
+
 
     def do_barcode(self, barcode, message):
         "This is called by GObject, I think"
@@ -153,14 +153,14 @@ class SimpleInterface(BarcodeReader):
         vbox.set_margin_top(3)
         vbox.set_margin_bottom(3)
         self.window.add(vbox)
-        
+
         self.da = Gtk.DrawingArea()
         self.da.set_size_request (250, 200)
         self.da.show()
         #self.window.add(self.da)
         #vbox.add(self.da)
         vbox.pack_start(self.da, False, False, 0)
-        
+
 
         self.playButtonImage = Gtk.Image()
         self.playButtonImage.set_from_stock("gtk-media-play", Gtk.IconSize.BUTTON)
@@ -175,7 +175,7 @@ class SimpleInterface(BarcodeReader):
         da_win = self.da.get_property('window')
         assert da_win
         self.xid = da_win.get_xid()
-        
+
 
     def playToggled(self, w):
         print("Play!")
@@ -205,7 +205,7 @@ class SimpleInterface(BarcodeReader):
             return super(SimpleInterface, self).on_message(bus, message)
 
 
-    
+
 
 
 

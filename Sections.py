@@ -25,7 +25,6 @@ from gi.repository import GstVideo
 
 import key
 from scan_barcode import BarcodeReaderGTK
-
 Gst.init([])
 
 ### FIXME !!!! This should be replaced with the fingerprint of the key
@@ -216,14 +215,17 @@ class GetKeySection(Gtk.Box):
         # we're using the monkeysign format where we inserting the
         # string 'OPENPGP4FPR:'' in front of the fingerprint
         fpr = barcode.split(':')[-1]
-
         try:
             pgpkey = key.Key(fpr)
         except key.KeyError:
             log.exception("Could not create key from %s", barcode)
         else:
-            yield pgpkey
-            # print("barcode signal %s %s" %( pgpkey.fingerprint, message))
+            print("barcode signal %s %s" %( pgpkey.fingerprint, message))
+            err = lambda x: self.textbuffer.set_text("Error downloading")
+            GLib.idle_add(self.obtain_key_async, fpr,
+                self.recieved_key, fpr,
+                err
+                )
 
     def download_key_http(self, address, port):
         url = ParseResult(
