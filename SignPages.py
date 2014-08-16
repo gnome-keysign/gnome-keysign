@@ -11,6 +11,8 @@ except ImportError, e:
 
 from datetime import datetime
 
+from scan_barcode import BarcodeReaderGTK
+
 FINGERPRINT_DEFAULT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
 
 class KeysPage(Gtk.VBox):
@@ -223,3 +225,148 @@ class KeyDetailsPage(Gtk.VBox):
 
             self.signaturesBox.pack_start(sigLabel, False, False, 0)
             sigLabel.show()
+
+# Pages for the "GetKeySection"
+
+class ScanFingerprintPage(Gtk.HBox):
+
+    def __init__(self):
+        super(ScanFingerprintPage, self).__init__()
+        self.set_spacing(10)
+
+        # set up labels
+        leftLabel = Gtk.Label()
+        leftLabel.set_markup('Type fingerprint')
+        rightLabel = Gtk.Label()
+        rightLabel.set_markup('... or scan QR code')
+
+        # set up text editor
+        self.textview = Gtk.TextView()
+        self.textbuffer = self.textview.get_buffer()
+
+        # set up scrolled window
+        scrolledwindow = Gtk.ScrolledWindow()
+        scrolledwindow.add(self.textview)
+
+        # set up webcam frame
+        self.scanFrame = Gtk.Frame(label='QR Scanner')
+        self.scanFrame = BarcodeReaderGTK()
+        self.scanFrame.set_size_request(150,150)
+        self.scanFrame.show()
+
+        # set up load button: this will be used to load a qr code from a file
+        self.loadButton = Gtk.Button('Open Image')
+        self.loadButton.set_image(Gtk.Image.new_from_icon_name('gtk-open', Gtk.IconSize.BUTTON))
+        self.loadButton.connect('clicked', self.on_loadbutton_clicked)
+        self.loadButton.set_always_show_image(True)
+
+        # set up left box
+        leftBox = Gtk.VBox(spacing=10)
+        leftBox.pack_start(leftLabel, False, False, 0)
+        leftBox.pack_start(scrolledwindow, True, True, 0)
+
+        # set up right box
+        rightBox = Gtk.VBox(spacing=10)
+        rightBox.pack_start(rightLabel, False, False, 0)
+        rightBox.pack_start(self.scanFrame, True, True, 0)
+        rightBox.pack_start(self.loadButton, False, False, 0)
+
+        # pack up
+        self.pack_start(leftBox, True, True, 0)
+        self.pack_start(rightBox, True, True, 0)
+
+    def format_fingerprint(self, fpr, scanner=False):
+
+        if not scanner: # if fingerprint was typed
+
+            fpr = ''.join(fpr.replace(" ", '').split('\n'))
+
+            # a simple check to detect bad fingerprints
+            if len(fpr) != 40:
+                print("Fingerprint %s has not enough characters", fpr)
+                fpr = ''
+
+        return fpr
+
+
+    def get_text_from_textview(self):
+        start_iter = self.textbuffer.get_start_iter()
+        end_iter = self.textbuffer.get_end_iter()
+        raw_fpr = self.textbuffer.get_text(start_iter, end_iter, False)
+        fpr = self.format_fingerprint(raw_fpr)
+
+        self.textbuffer.delete(start_iter, end_iter)
+
+        return fingerprint
+
+    def get_text_from_scanner(self):
+        return None
+
+    def on_loadbutton_clicked(self, *args, **kwargs):
+        print "load"
+
+
+class SignKeyPage(Gtk.VBox):
+
+    def __init__(self):
+        super(SignKeyPage, self).__init__()
+        self.set_spacing(10)
+
+        self.topLabel = Gtk.Label()
+        self.topLabel.set_markup("Downloading key with fingerprint ")
+        self.topLabel.set_line_wrap(True)
+
+        self.textview = Gtk.TextView()
+        self.textbuffer = self.textview.get_buffer()
+
+        hBox = Gtk.HBox(spacing=10)
+        hBox.pack_start(self.topLabel, False, False, 0)
+        hBox.pack_start(self.textview, True, True, 0)
+        self.pack_start(hBox, True, True, 0)
+
+    def display_downloaded_key(self, fpr, keydata):
+        self.topLabel.set_markup("Downloading key with fingerprint \n%s" % fpr)
+        self.topLabel.show()
+
+        start_iter = self.textbuffer.get_start_iter()
+        end_iter = self.textbuffer.get_end_iter()
+        self.textbuffer.delete(start_iter, end_iter)
+
+        self.textbuffer.insert_at_cursor(keydata, len(keydata))
+
+
+class PostSignPage(Gtk.VBox):
+
+    def __init__(self):
+        super(PostSignPage, self).__init__()
+        self.set_spacing(10)
+
+        # setup the label
+        signedLabel = Gtk.Label()
+        signedLabel.set_text('The key was signed and an email was sent to key owner! What next?')
+
+        # setup the buttons
+        sendBackButton = Gtk.Button('   Resend email   ')
+        sendBackButton.set_image(Gtk.Image.new_from_icon_name("gtk-network", Gtk.IconSize.BUTTON))
+        sendBackButton.set_always_show_image(True)
+        sendBackButton.set_halign(Gtk.Align.CENTER)
+
+        saveButton = Gtk.Button(' Save key locally ')
+        saveButton.set_image(Gtk.Image.new_from_icon_name("gtk-save", Gtk.IconSize.BUTTON))
+        saveButton.set_always_show_image(True)
+        saveButton.set_halign(Gtk.Align.CENTER)
+
+        emailButton = Gtk.Button('Revoke signature')
+        emailButton.set_image(Gtk.Image.new_from_icon_name("gtk-clear", Gtk.IconSize.BUTTON))
+        emailButton.set_always_show_image(True)
+        emailButton.set_halign(Gtk.Align.CENTER)
+
+        # pack them into a container for alignment
+        container = Gtk.VBox(spacing=3)
+        container.pack_start(signedLabel, False, False, 5)
+        container.pack_start(sendBackButton, False, False, 0)
+        container.pack_start(saveButton, False, False, 0)
+        container.pack_start(emailButton, False, False, 0)
+        container.set_valign(Gtk.Align.CENTER)
+
+        self.pack_start(container, True, False, 0)

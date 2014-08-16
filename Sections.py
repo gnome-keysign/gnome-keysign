@@ -16,6 +16,7 @@ except ImportError, e:
 
 import Keyserver
 from SignPages import KeysPage, KeyPresentPage, KeyDetailsPage
+from SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 
 from gi.repository import Gst, Gtk, GLib
 # Because of https://bugzilla.gnome.org/show_bug.cgi?id=698005
@@ -24,12 +25,16 @@ from gi.repository import GdkX11
 from gi.repository import GstVideo
 
 import key
-from scan_barcode import BarcodeReaderGTK
 Gst.init([])
 
 ### FIXME !!!! This should be replaced with the fingerprint of the key
 # you want it signed. This is the fingerprint that should be scanned
 SCAN_FINGERPRINT = '140162A978431A0258B3EC24E69EEE14181523F4'
+
+
+progress_bar_text = ["Step 1: Scan QR Code or type fingerprint and click on 'Download' button",
+                     "Step 2: Compare the received fpr with the owner's fpr and click 'Sign'",
+                     "Step 3: Key was succesfully signed and an email was send to owner."]
 
 
 class KeySignSection(Gtk.VBox):
@@ -133,7 +138,7 @@ class KeySignSection(Gtk.VBox):
             self.notebook.prev_page()
 
 
-class GetKeySection(Gtk.Box):
+class GetKeySection(Gtk.VBox):
 
     def __init__(self, app):
         '''Initialises the section which lets the user
@@ -151,81 +156,65 @@ class GetKeySection(Gtk.Box):
         # the temporary keyring we operate in
         self.tempkeyring = None
 
-        # set up main container
-        mainBox = Gtk.VBox(spacing=10)
-        # set up labels
-        self.topLabel = Gtk.Label()
-        self.topLabel.set_markup('Type fingerprint')
-        midLabel = Gtk.Label()
-        midLabel.set_markup('... or scan QR code')
-        # set up text editor
-        self.textview = Gtk.TextView()
-        self.textbuffer = self.textview.get_buffer()
-        # set up scrolled window
-        scrolledwindow = Gtk.ScrolledWindow()
-        scrolledwindow.add(self.textview)
+        self.scanPage = ScanFingerprintPage()
+        self.signPage = SignKeyPage()
+        # set up notebook container
+        self.notebook = Gtk.Notebook()
+        self.notebook.append_page(self.scanPage, None)
+        self.notebook.append_page(self.signPage, None)
+        self.notebook.append_page(PostSignPage(), None)
+        self.notebook.set_show_tabs(False)
 
-        # set up webcam frame
-        # FIXME  create the actual webcam widgets
-        self.scanFrame = Gtk.Frame(label='QR Scanner')
-        self.scanFrame = BarcodeReaderGTK()
-        self.scanFrame.set_size_request(150,150)
-        self.scanFrame.show()
+        # set up the progress bar
+        self.progressBar = Gtk.ProgressBar()
+        self.progressBar.set_text(progress_bar_text[0])
+        self.progressBar.set_show_text(True)
+        self.progressBar.set_fraction(1.0/3)
+
+        self.nextButton = Gtk.Button('Next')
+        self.nextButton.connect('clicked', self.on_button_clicked)
+        self.nextButton.set_image(Gtk.Image.new_from_icon_name("go-next", Gtk.IconSize.BUTTON))
+        self.nextButton.set_always_show_image(True)
+
+        self.backButton = Gtk.Button('Back')
+        self.backButton.connect('clicked', self.on_button_clicked)
+        self.backButton.set_image(Gtk.Image.new_from_icon_name('go-previous', Gtk.IconSize.BUTTON))
+        self.backButton.set_always_show_image(True)
+
+        bottomBox = Gtk.HBox()
+        bottomBox.pack_start(self.progressBar, True, True, 0)
+        bottomBox.pack_start(self.backButton, False, False, 0)
+        bottomBox.pack_start(self.nextButton, False, False, 0)
+
+        self.pack_start(self.notebook, True, True, 0)
+        self.pack_start(bottomBox, False, False, 0)
+
         # We *could* overwrite the on_barcode function, but
         # let's rather go with a GObject signal
         #self.scanFrame.on_barcode = self.on_barcode
-        self.scanFrame.connect('barcode', self.on_barcode)
+        self.scanPage.scanFrame.connect('barcode', self.on_barcode)
         #GLib.idle_add(        self.scanFrame.run)
 
-        # set up download button
-        # Scenario: When 'Download' button is clicked it will request data
-        # from network using self.app.discovered_services to get address
-        self.downloadButton = Gtk.Button('Download Key')
-        self.downloadButton.connect('clicked', self.on_download_button_clicked)
-        self.downloadButton.set_image(Gtk.Image.new_from_icon_name("document-save", Gtk.IconSize.BUTTON))
-        self.downloadButton.set_always_show_image(True)
-
-         # set up load button: this will be used to load a qr code from a file
-        self.loadButton = Gtk.Button('Open Image')
-        self.loadButton.set_image(Gtk.Image.new_from_icon_name(Gtk.STOCK_OPEN, Gtk.IconSize.BUTTON))
-        self.loadButton.connect('clicked', self.on_loadbutton_clicked)
-        self.loadButton.set_always_show_image(True)
-
-        buttonBox = Gtk.HBox()
-        buttonBox.pack_start(self.downloadButton, False, False, 0)
-        buttonBox.pack_start(self.loadButton, False, False, 0)
-
-        # pack up
-        mainBox.pack_start(self.topLabel, False, False, 0)
-        mainBox.pack_start(scrolledwindow, False, False, 0)
-        mainBox.pack_start(midLabel, False, False, 0)
-        mainBox.pack_start(self.scanFrame, True, True, 0)
-        mainBox.pack_start(buttonBox, False, False, 0)
-        self.pack_start(mainBox, True, False, 0)
-
-
-    def on_loadbutton_clicked(self, *args, **kwargs):
-        print "load"
+    def set_progress_bar(self):
+        page_index = self.notebook.get_current_page()
+        self.progressBar.set_text(progress_bar_text[page_index])
+        self.progressBar.set_fraction((page_index+1)/3.0)
 
 
     def on_barcode(self, sender, barcode, message=None):
         '''This is connected to the "barcode" signal.
         The message argument is a GStreamer message that created
         the barcode.'''
-        # we're using the monkeysign format where we inserting the
+        # we're using the monkeysign format where we insert the
         # string 'OPENPGP4FPR:'' in front of the fingerprint
         fpr = barcode.split(':')[-1]
         try:
             pgpkey = key.Key(fpr)
         except key.KeyError:
-            log.exception("Could not create key from %s", barcode)
+            self.log.exception("Could not create key from %s", barcode)
         else:
-            print("barcode signal %s %s" %( pgpkey.fingerprint, message))
-            err = lambda x: self.textbuffer.set_text("Error downloading")
-            GLib.idle_add(self.obtain_key_async, fpr,
-                self.recieved_key, fpr,
-                err
-                )
+            self.log.info("Barcode signal %s %s" %( pgpkey.fingerprint, message))
+            self.on_button_clicked(self.nextButton, pgpkey, message)
 
     def download_key_http(self, address, port):
         url = ParseResult(
@@ -295,41 +284,62 @@ class GetKeySection(Gtk.Box):
             return
 
         GLib.idle_add(callback, keydata, data)
+
         # If this function is added itself via idle_add, then idle_add will
         # keep adding this function to the loop until this func ret False
         return False
 
-    def decode_fingerprint(self, fpr, scanner=False):
 
-        if not scanner: # if fingerprint was typed
+    def on_button_clicked(self, button, *args, **kwargs):
 
-            fpr = ''.join(fpr.replace(" ", '').split('\n'))
+        if button == self.nextButton:
+            self.notebook.next_page()
+        else:
+            self.notebook.prev_page()
 
-            # a simple check to detect bad fingerprints
-            if len(fpr) != 40:
-                self.log.error("Fingerprint %s has not enough characters", fpr)
-                fpr = ''
+        self.set_progress_bar()
 
-        return fpr
+        page_index = self.notebook.get_current_page()
+        if page_index == 1:
+            if args:
+                pgpkey = args[0]
+                message = args[1]
+                fingerprint = pgpkey.fingerprint
+            else:
+                fingerprint = self.scanPage.get_text_from_scanner()
+                if fingerprint is None:
+                    fingerprint = self.scanPage.get_text_from_textview()
 
-    def on_download_button_clicked(self, button):
+            GLib.idle_add(self.obtain_key_async, fingerprint, self.recieved_key,
+                    fingerprint)
 
-        start_iter = self.textbuffer.get_start_iter()
-        end_iter = self.textbuffer.get_end_iter()
-        raw_fpr = self.textbuffer.get_text(start_iter, end_iter, False)
-        fpr = self.decode_fingerprint(raw_fpr)
-        fpr = fpr if fpr != '' else SCAN_FINGERPRINT
 
-        self.textbuffer.delete(start_iter, end_iter)
-        self.topLabel.set_text("downloading key with fingerprint:\n%s"
-                                % fpr)
+        if page_index == 2:
+            pass
 
-        err = lambda x: self.textbuffer.set_text("Error downloading")
-        GLib.idle_add(self.obtain_key_async, fpr,
-            self.recieved_key, fpr,
-            err
-            )
 
-    def recieved_key(self, keydata, *data):
-        self.textbuffer.insert_at_cursor("Key succesfully imported with"
-                                " fingerprint:\n{}\n{}".format(data[0], keydata))
+    def recieved_key(self, fingerprint, keydata, *data):
+        self.signPage.display_downloaded_key(fingerprint, keydata)
+
+
+    # def on_download_button_clicked(self, button):
+
+    #     start_iter = self.textbuffer.get_start_iter()
+    #     end_iter = self.textbuffer.get_end_iter()
+    #     raw_fpr = self.textbuffer.get_text(start_iter, end_iter, False)
+    #     fpr = self.decode_fingerprint(raw_fpr)
+    #     fpr = fpr if fpr != '' else SCAN_FINGERPRINT
+
+    #     self.textbuffer.delete(start_iter, end_iter)
+    #     self.topLabel.set_text("downloading key with fingerprint:\n%s"
+    #                             % fpr)
+
+    #     err = lambda x: self.textbuffer.set_text("Error downloading")
+    #     GLib.idle_add(self.obtain_key_async, fpr,
+    #         self.recieved_key, fpr,
+    #         err
+    #         )
+
+    # def recieved_key(self, keydata, *data):
+    #     self.textbuffer.insert_at_cursor("Key succesfully imported with"
+    #                             " fingerprint:\n{}\n{}".format(data[0], keydata))
