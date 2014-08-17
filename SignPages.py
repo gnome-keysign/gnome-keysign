@@ -297,7 +297,7 @@ class ScanFingerprintPage(Gtk.HBox):
 
         self.textbuffer.delete(start_iter, end_iter)
 
-        return fingerprint
+        return fpr
 
     def get_text_from_scanner(self):
         return None
@@ -319,9 +319,13 @@ class SignKeyPage(Gtk.VBox):
         self.textview = Gtk.TextView()
         self.textbuffer = self.textview.get_buffer()
 
+        self.scrolled_window = Gtk.ScrolledWindow()
+        self.scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
+        self.scrolled_window.add(self.textview)
+
         hBox = Gtk.HBox(spacing=10)
         hBox.pack_start(self.topLabel, False, False, 0)
-        hBox.pack_start(self.textview, True, True, 0)
+        hBox.pack_start(self.scrolled_window, True, True, 0)
         self.pack_start(hBox, True, True, 0)
 
     def display_downloaded_key(self, fpr, keydata):

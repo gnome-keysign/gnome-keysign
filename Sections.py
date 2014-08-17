@@ -283,7 +283,7 @@ class GetKeySection(Gtk.VBox):
             # FIXME : don't return here
             return
 
-        GLib.idle_add(callback, keydata, data)
+        GLib.idle_add(callback, fingerprint, keydata, data)
 
         # If this function is added itself via idle_add, then idle_add will
         # keep adding this function to the loop until this func ret False
