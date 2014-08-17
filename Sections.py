@@ -294,52 +294,30 @@ class GetKeySection(Gtk.VBox):
 
         if button == self.nextButton:
             self.notebook.next_page()
-        else:
+            self.set_progress_bar()
+
+            page_index = self.notebook.get_current_page()
+            if page_index == 1:
+                if args:
+                    pgpkey = args[0]
+                    message = args[1]
+                    fingerprint = pgpkey.fingerprint
+                else:
+                    fingerprint = self.scanPage.get_text_from_scanner()
+                    if fingerprint is None:
+                        fingerprint = self.scanPage.get_text_from_textview()
+
+                GLib.idle_add(self.obtain_key_async, fingerprint, self.recieved_key,
+                        fingerprint)
+
+            if page_index == 2:
+                pass
+
+
+        elif button == self.backButton:
             self.notebook.prev_page()
-
-        self.set_progress_bar()
-
-        page_index = self.notebook.get_current_page()
-        if page_index == 1:
-            if args:
-                pgpkey = args[0]
-                message = args[1]
-                fingerprint = pgpkey.fingerprint
-            else:
-                fingerprint = self.scanPage.get_text_from_scanner()
-                if fingerprint is None:
-                    fingerprint = self.scanPage.get_text_from_textview()
-
-            GLib.idle_add(self.obtain_key_async, fingerprint, self.recieved_key,
-                    fingerprint)
-
-
-        if page_index == 2:
-            pass
+            self.set_progress_bar()
 
 
     def recieved_key(self, fingerprint, keydata, *data):
         self.signPage.display_downloaded_key(fingerprint, keydata)
-
-
-    # def on_download_button_clicked(self, button):
-
-    #     start_iter = self.textbuffer.get_start_iter()
-    #     end_iter = self.textbuffer.get_end_iter()
-    #     raw_fpr = self.textbuffer.get_text(start_iter, end_iter, False)
-    #     fpr = self.decode_fingerprint(raw_fpr)
-    #     fpr = fpr if fpr != '' else SCAN_FINGERPRINT
-
-    #     self.textbuffer.delete(start_iter, end_iter)
-    #     self.topLabel.set_text("downloading key with fingerprint:\n%s"
-    #                             % fpr)
-
-    #     err = lambda x: self.textbuffer.set_text("Error downloading")
-    #     GLib.idle_add(self.obtain_key_async, fpr,
-    #         self.recieved_key, fpr,
-    #         err
-    #         )
-
-    # def recieved_key(self, keydata, *data):
-    #     self.textbuffer.insert_at_cursor("Key succesfully imported with"
-    #                             " fingerprint:\n{}\n{}".format(data[0], keydata))
