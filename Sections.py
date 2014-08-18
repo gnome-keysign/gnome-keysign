@@ -290,6 +290,15 @@ class GetKeySection(Gtk.VBox):
         return False
 
 
+
+    def sign_key_async(self, fingerprint, callback=None, data=None, error_cb=None):
+        self.log.debug("I will sign key with fpr {}".format(fingerprint))
+
+        return False
+
+    def send_email(self, fingerprint, *data):
+        pass
+
     def on_button_clicked(self, button, *args, **kwargs):
 
         if button == self.nextButton:
@@ -306,12 +315,18 @@ class GetKeySection(Gtk.VBox):
                     fingerprint = self.scanPage.get_text_from_scanner()
                     if fingerprint is None:
                         fingerprint = self.scanPage.get_text_from_textview()
+                # save a reference for later use
+                self.last_received_fingerprint = fingerprint
 
+                err = lambda x: self.signPage.topLabel.set_markup("Error downloading"
+                                    " key with fpr \n%s" %fingerprint)
                 GLib.idle_add(self.obtain_key_async, fingerprint, self.recieved_key,
-                        fingerprint)
+                        fingerprint, err)
+
 
             if page_index == 2:
-                pass
+                GLib.idle_add(self.sign_key_async, self.last_received_fingerprint,
+                    self.send_email, self.last_received_fingerprint)
 
 
         elif button == self.backButton:
