@@ -1,2 +1,3 @@
 # Debian packages
 monkeysign==1.1
+qrencode
