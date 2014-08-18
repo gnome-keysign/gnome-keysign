@@ -197,7 +197,7 @@ class GetKeySection(Gtk.VBox):
         self.scanPage.scanFrame.connect('barcode', self.on_barcode)
         #GLib.idle_add(        self.scanFrame.run)
 
-        self.sui = SignUi(self.app)
+        self.signui = SignUi(self.app)
 
     def set_progress_bar(self):
         page_index = self.notebook.get_current_page()
@@ -298,12 +298,49 @@ class GetKeySection(Gtk.VBox):
     def sign_key_async(self, fingerprint, callback=None, data=None, error_cb=None):
         self.log.debug("I will sign key with fpr {}".format(fingerprint))
 
-        res = self.sui.yes_no("What is the meaning of life?")
+        self.signui.pattern = fingerprint
+        # 1. fetch the key into a temporary keyring
+        # 1.a) from the local keyring
+        self.log.debug("looking for key %s in your keyring", self.signui.pattern)
+        self.signui.keyring.context.set_option('export-options', 'export-minimal')
+        if self.signui.tmpkeyring.import_data(self.signui.keyring.export_data(self.signui.pattern)):
 
-        response = "yes" if res else "no"
-        self.log.debug("User answered %s", response)
+            # 2. copy the signing key secrets into the keyring
+            self.signui.copy_secrets()
+            # 3. for every user id (or all, if -a is specified)
+            # 3.1. sign the uid, using gpg-agent
+            self.signui.sign_key()
+
+            # 3.2. export and encrypt the signature
+            # 3.3. mail the key to the user
+            # FIXME: for now only export it to a file
+            self.save_to_file()
+            # self.sign.export_key()
+
+
+            # 3.4. optionnally (-l), create a local signature and import in
+            # local keyring
+            # 4. trash the temporary keyring
+
+
+        else:
+            self.log.error('data found in barcode does not match a OpenPGP fingerprint pattern: %s', fingerprint)
 
         return False
+
+    def save_to_file(self):
+        # temporary function to export signed key
+        if len(self.signui.signed_keys) < 1:
+            self.log.error('no key signed, nothing to export')
+
+        for fpr, key in self.signui.signed_keys.items():
+            filename = "%s_signed.gpg" %fpr
+            f = fopen(filename, "wt")
+
+            f.write(self.signui.tmpkeyring.export_data(fpr))
+
+            self.log.info("Key with fpr %s was signed and exported to file %s", fpr, filename)
+
 
     def send_email(self, fingerprint, *data):
         pass
@@ -356,7 +393,7 @@ This program assumes you have gpg-agent configured to prompt for
 passwords."""
 
     def __init__(self, app, args = None):
-        MonkeysignUi().__init__(args)
+        super(SignUi, self).__init__(args)
 
         self.app = app
 
@@ -375,7 +412,7 @@ passwords."""
     def choose_uid(self, prompt, key):
         dialog = Gtk.Dialog(prompt, self.app.window, 0,
                 (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                 Gtk.Stock_OK, Gtk.ResponseType.OK))
+                 Gtk.STOCK_OK, Gtk.ResponseType.OK))
 
         label = Gtk.Label(prompt)
         self.box = dialog.get_content_area()
