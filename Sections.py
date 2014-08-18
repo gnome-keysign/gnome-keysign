@@ -10,6 +10,7 @@ import sys
 
 try:
     from monkeysign.gpg import Keyring, TempKeyring
+    from monkeysign.ui import MonkeysignUi
 except ImportError, e:
     print "A required python module is missing!\n%s" % (e,)
     sys.exit()
@@ -17,6 +18,7 @@ except ImportError, e:
 import Keyserver
 from SignPages import KeysPage, KeyPresentPage, KeyDetailsPage
 from SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
+import MainWindow
 
 from gi.repository import Gst, Gtk, GLib
 # Because of https://bugzilla.gnome.org/show_bug.cgi?id=698005
@@ -195,6 +197,8 @@ class GetKeySection(Gtk.VBox):
         self.scanPage.scanFrame.connect('barcode', self.on_barcode)
         #GLib.idle_add(        self.scanFrame.run)
 
+        self.sui = SignUi(self.app)
+
     def set_progress_bar(self):
         page_index = self.notebook.get_current_page()
         self.progressBar.set_text(progress_bar_text[page_index])
@@ -294,6 +298,11 @@ class GetKeySection(Gtk.VBox):
     def sign_key_async(self, fingerprint, callback=None, data=None, error_cb=None):
         self.log.debug("I will sign key with fpr {}".format(fingerprint))
 
+        res = self.sui.yes_no("What is the meaning of life?")
+
+        response = "yes" if res else "no"
+        self.log.debug("User answered %s", response)
+
         return False
 
     def send_email(self, fingerprint, *data):
@@ -336,3 +345,60 @@ class GetKeySection(Gtk.VBox):
 
     def recieved_key(self, fingerprint, keydata, *data):
         self.signPage.display_downloaded_key(fingerprint, keydata)
+
+
+
+
+class SignUi(MonkeysignUi):
+    """sign a key in a safe fashion.
+
+This program assumes you have gpg-agent configured to prompt for
+passwords."""
+
+    def __init__(self, app, args = None):
+        MonkeysignUi().__init__(args)
+
+        self.app = app
+
+
+    def main(self):
+
+        MonkeysignUi.main(self)
+
+    def yes_no(self, prompt, default = None):
+        dialog = Gtk.MessageDialog(self.app.window, 0, Gtk.MessageType.INFO,
+                    Gtk.ButtonsType.OK_CANCEL, prompt)
+        response = dialog.run()
+        dialog.destroy()
+        return response == Gtk.ResponseType.OK
+
+    def choose_uid(self, prompt, key):
+        dialog = Gtk.Dialog(prompt, self.app.window, 0,
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 Gtk.Stock_OK, Gtk.ResponseType.OK))
+
+        label = Gtk.Label(prompt)
+        self.box = dialog.get_content_area()
+        self.box.add(label)
+        label.show()
+
+        self.uid_radios = None
+        for uid in key.uidslist:
+            r = Gtk.RadioButton(self.uid_radios, uid.uid)
+            r.show()
+            self.box.add(r)
+            if self.uid_radios is None:
+                self.uid_radios = r
+                self.uid_radios.set_active(True)
+
+        response = dialog.run()
+
+        label = None
+        if response == Gtk.ResponseType.OK:
+            self.log(_('okay, signing'))
+            label = [ r for r in self.uid_radios.get_group() if r.get_active()][0].get_label()
+        else:
+            self.log(_('user denied signature'))
+
+        dialog.destroy
+        return label
