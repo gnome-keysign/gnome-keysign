@@ -156,7 +156,7 @@ class GetKeySection(Gtk.VBox):
         self.log = logging.getLogger()
 
         # the temporary keyring we operate in
-        self.tempkeyring = None
+        self.tmpkeyring = None
 
         self.scanPage = ScanFingerprintPage()
         self.signPage = SignKeyPage()
@@ -264,7 +264,8 @@ class GetKeySection(Gtk.VBox):
         other_clients = self.app.discovered_services
         self.log.debug("The clients found on the network: %s", other_clients)
 
-        # create a temporary keyring to not mess up with the user's own keyring
+        #FIXME: should we create a new TempKeyring for each key we want
+        # to sign it ?
         self.tmpkeyring = TempKeyring()
 
         for keydata in self.try_download_keys(other_clients):
@@ -329,9 +330,11 @@ class GetKeySection(Gtk.VBox):
         return False
 
     def save_to_file(self):
-        # temporary function to export signed key
+        #FIXME: this is a temporary function to export signed key,
+        # it should send an email to the key owner
         if len(self.signui.signed_keys) < 1:
             self.log.error('no key signed, nothing to export')
+
 
         for fpr, key in self.signui.signed_keys.items():
             filename = "%s_signed.gpg" %fpr
@@ -341,6 +344,7 @@ class GetKeySection(Gtk.VBox):
 
             self.log.info("Key with fpr %s was signed and exported to file %s", fpr, filename)
 
+        return False
 
     def send_email(self, fingerprint, *data):
         pass
@@ -354,23 +358,29 @@ class GetKeySection(Gtk.VBox):
             page_index = self.notebook.get_current_page()
             if page_index == 1:
                 if args:
+                    # If we call on_button_clicked() from on_barcode()
+                    # then we get extra arguments
                     pgpkey = args[0]
                     message = args[1]
                     fingerprint = pgpkey.fingerprint
                 else:
-                    fingerprint = self.scanPage.get_text_from_scanner()
-                    if fingerprint is None:
-                        fingerprint = self.scanPage.get_text_from_textview()
-                # save a reference for later use
+                    fingerprint = self.scanPage.get_text_from_textview()
+
+                # save a reference to the last received fingerprint
                 self.last_received_fingerprint = fingerprint
 
+                # error callback function
                 err = lambda x: self.signPage.topLabel.set_markup("Error downloading"
                                     " key with fpr \n%s" %fingerprint)
+                # use GLib.idle_add to use a separate thread for the downloading of
+                # the keydata
                 GLib.idle_add(self.obtain_key_async, fingerprint, self.recieved_key,
                         fingerprint, err)
 
 
             if page_index == 2:
+                # signing of key and sending an email is done on separate
+                # threads also
                 GLib.idle_add(self.sign_key_async, self.last_received_fingerprint,
                     self.send_email, self.last_received_fingerprint)
 

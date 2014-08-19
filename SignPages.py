@@ -274,7 +274,7 @@ class KeyDetailsPage(Gtk.VBox):
             self.signaturesBox.pack_start(sigLabel, False, False, 0)
             sigLabel.show()
 
-# Pages for the "GetKeySection"
+# Pages shown on "Get Key" Tab
 
 class ScanFingerprintPage(Gtk.HBox):
 
@@ -347,8 +347,6 @@ class ScanFingerprintPage(Gtk.HBox):
 
         return fpr
 
-    def get_text_from_scanner(self):
-        return None
 
     def on_loadbutton_clicked(self, *args, **kwargs):
         print "load"
