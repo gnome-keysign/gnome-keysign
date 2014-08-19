@@ -7,6 +7,7 @@ import requests
 from requests.exceptions import ConnectionError
 
 import sys
+import re
 
 try:
     from monkeysign.gpg import Keyring, TempKeyring
@@ -20,18 +21,15 @@ from SignPages import KeysPage, KeyPresentPage, KeyDetailsPage
 from SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 import MainWindow
 
+import key
+
 from gi.repository import Gst, Gtk, GLib
 # Because of https://bugzilla.gnome.org/show_bug.cgi?id=698005
 from gi.repository import GdkX11
 # Needed for window.get_xid(), xvimagesink.set_window_handle(), respectively:
 from gi.repository import GstVideo
 
-import key
 Gst.init([])
-
-### FIXME !!!! This should be replaced with the fingerprint of the key
-# you want it signed. This is the fingerprint that should be scanned
-SCAN_FINGERPRINT = '140162A978431A0258B3EC24E69EEE14181523F4'
 
 
 progress_bar_text = ["Step 1: Scan QR Code or type fingerprint and click on 'Download' button",
@@ -209,16 +207,20 @@ class GetKeySection(Gtk.VBox):
         '''This is connected to the "barcode" signal.
         The message argument is a GStreamer message that created
         the barcode.'''
-        # we're using the monkeysign format where we insert the
-        # string 'OPENPGP4FPR:'' in front of the fingerprint
-        fpr = barcode.split(':')[-1]
-        try:
-            pgpkey = key.Key(fpr)
-        except key.KeyError:
-            self.log.exception("Could not create key from %s", barcode)
+        # barcode string starts with 'OPENPGP4FPR:' followed by the fingerprint
+        m = re.search("((?:[0-9A-F]{4}\s*){10})", barcode, re.IGNORECASE)
+        if m != None:
+            fpr = m.group(1).replace(' ', '')
+            try:
+                pgpkey = key.Key(fpr)
+            except key.KeyError:
+                self.log.exception("Could not create key from %s", barcode)
+            else:
+                self.log.info("Barcode signal %s %s" %( pgpkey.fingerprint, message))
+                self.on_button_clicked(self.nextButton, pgpkey, message)
         else:
-            self.log.info("Barcode signal %s %s" %( pgpkey.fingerprint, message))
-            self.on_button_clicked(self.nextButton, pgpkey, message)
+            self.log.error("data found in barcode does not match a OpenPGP fingerprint pattern: %s", barcode)
+
 
     def download_key_http(self, address, port):
         url = ParseResult(
