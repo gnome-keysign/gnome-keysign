@@ -204,14 +204,25 @@ class GetKeySection(Gtk.VBox):
         self.progressBar.set_fraction((page_index+1)/3.0)
 
 
+    def verify_fingerprint(self, input_string):
+        # Check for a fingerprint in the given string. It can be provided
+        # from the QR scanner or from the text user typed in.
+        m = re.search("((?:[0-9A-F]{4}\s*){10})", input_string, re.IGNORECASE)
+        if m != None:
+            fpr = m.group(1).replace(' ', '')
+        else:
+            fpr = None
+
+        return fpr
+
     def on_barcode(self, sender, barcode, message=None):
         '''This is connected to the "barcode" signal.
         The message argument is a GStreamer message that created
         the barcode.'''
-        # barcode string starts with 'OPENPGP4FPR:' followed by the fingerprint
-        m = re.search("((?:[0-9A-F]{4}\s*){10})", barcode, re.IGNORECASE)
-        if m != None:
-            fpr = m.group(1).replace(' ', '')
+
+        fpr = verify_fingerprint(barcode)
+
+        if fpr != None:
             try:
                 pgpkey = key.Key(fpr)
             except key.KeyError:
@@ -278,6 +289,8 @@ class GetKeySection(Gtk.VBox):
                 is_valid = False
 
             if is_valid:
+                # FIXME: make it to exit the entire process of signing
+                # if fingerprint was different ?
                 break
         else:
             self.log.error("Could not find fingerprint %s " +\
@@ -371,14 +384,22 @@ class GetKeySection(Gtk.VBox):
                     message = args[1]
                     fingerprint = pgpkey.fingerprint
                 else:
-                    fingerprint = self.scanPage.get_text_from_textview()
+                    raw_text = self.scanPage.get_text_from_textview()
+                    fingerprint = self.verify_fingerprint(raw_text)
+
+                    if fingerprint == None:
+                        self.log.error("The fingerprint typed was wrong."
+                        " Please re-check : {}".format(raw_text))
+                        # FIXME: make it to stop switch the page if this happens
+                        return
 
                 # save a reference to the last received fingerprint
                 self.last_received_fingerprint = fingerprint
 
                 # error callback function
-                err = lambda x: self.signPage.topLabel.set_markup("Error downloading"
-                                    " key with fpr \n%s" %fingerprint)
+                err = lambda x: self.signPage.mainLabel.set_markup('<span size="15000">'
+                        'Error downloading key with fpr\n{}</span>'
+                        .format(fingerprint))
                 # use GLib.idle_add to use a separate thread for the downloading of
                 # the keydata
                 GLib.idle_add(self.obtain_key_async, fingerprint, self.recieved_key,
@@ -388,6 +409,7 @@ class GetKeySection(Gtk.VBox):
             if page_index == 2:
                 # signing of key and sending an email is done on separate
                 # threads also
+
                 GLib.idle_add(self.sign_key_async, self.last_received_fingerprint,
                     self.send_email, self.last_received_fingerprint)
 
@@ -397,8 +419,9 @@ class GetKeySection(Gtk.VBox):
             self.set_progress_bar()
 
 
-    def recieved_key(self, fingerprint, keydata, *data):
-        self.signPage.display_downloaded_key(fingerprint, keydata)
+    def recieved_key(self, fingerprint, *data):
+        openpgpkey = self.tmpkeyring.get_keys(fingerprint).values()[0]
+        self.signPage.display_downloaded_key(openpgpkey, fingerprint)
 
 
 
@@ -455,10 +478,10 @@ passwords."""
 
         label = None
         if response == Gtk.ResponseType.ACCEPT:
-            self.log(_('okay, signing'))
+            self.app.log.info("okay signing")
             label = [ r for r in self.uid_radios.get_group() if r.get_active()][0].get_label()
         else:
-            self.log(_('user denied signature'))
+            self.app.log.info('user denied signature')
 
         dialog.destroy()
         return label
