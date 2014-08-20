@@ -12,6 +12,7 @@ import re
 try:
     from monkeysign.gpg import Keyring, TempKeyring
     from monkeysign.ui import MonkeysignUi
+    from monkeysign.gpg import GpgRuntimeError
 except ImportError, e:
     print "A required python module is missing!\n%s" % (e,)
     sys.exit()
@@ -312,14 +313,16 @@ class GetKeySection(Gtk.VBox):
             self.signui.copy_secrets()
             # 3. for every user id (or all, if -a is specified)
             # 3.1. sign the uid, using gpg-agent
-            self.signui.sign_key()
+            try:
+                self.signui.sign_key()
+            except GpgRuntimeError, e:
+                self.log.error("There was an error signing key: \n%s", e)
 
             # 3.2. export and encrypt the signature
             # 3.3. mail the key to the user
             # FIXME: for now only export it to a file
             self.save_to_file()
             # self.sign.export_key()
-
 
             # 3.4. optionnally (-l), create a local signature and import in
             # local keyring
@@ -328,6 +331,8 @@ class GetKeySection(Gtk.VBox):
 
         else:
             self.log.error('data found in barcode does not match a OpenPGP fingerprint pattern: %s', fingerprint)
+            if error_cb:
+                GLib.idle_add(error_cb, data)
 
         return False
 
@@ -416,38 +421,44 @@ passwords."""
 
     def yes_no(self, prompt, default = None):
         dialog = Gtk.MessageDialog(self.app.window, 0, Gtk.MessageType.INFO,
-                    Gtk.ButtonsType.OK_CANCEL, prompt)
+                    Gtk.ButtonsType.YES_NO, prompt)
         response = dialog.run()
         dialog.destroy()
-        return response == Gtk.ResponseType.OK
+
+        return response == Gtk.ResponseType.YES
+        # Simply return True for now
+        # return True
 
     def choose_uid(self, prompt, key):
         dialog = Gtk.Dialog(prompt, self.app.window, 0,
-                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                 Gtk.STOCK_OK, Gtk.ResponseType.OK))
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+                 Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
 
         label = Gtk.Label(prompt)
-        self.box = dialog.get_content_area()
-        self.box.add(label)
+        dialog.vbox.pack_start(label, False, False, 0)
         label.show()
 
         self.uid_radios = None
         for uid in key.uidslist:
-            r = Gtk.RadioButton(self.uid_radios, uid.uid)
+            r = Gtk.RadioButton.new_with_label_from_widget(
+                        self.uid_radios, uid.uid)
             r.show()
-            self.box.add(r)
+            dialog.vbox.pack_start(r, False, False, 0)
+
             if self.uid_radios is None:
                 self.uid_radios = r
                 self.uid_radios.set_active(True)
+            else:
+                self.uid_radios.set_active(False)
 
         response = dialog.run()
 
         label = None
-        if response == Gtk.ResponseType.OK:
+        if response == Gtk.ResponseType.ACCEPT:
             self.log(_('okay, signing'))
             label = [ r for r in self.uid_radios.get_group() if r.get_active()][0].get_label()
         else:
             self.log(_('user denied signature'))
 
-        dialog.destroy
+        dialog.destroy()
         return label
