@@ -340,7 +340,7 @@ class GetKeySection(Gtk.VBox):
 
         for fpr, key in self.signui.signed_keys.items():
             filename = "%s_signed.gpg" %fpr
-            f = fopen(filename, "wt")
+            f = open(filename, "wt")
 
             f.write(self.signui.tmpkeyring.export_data(fpr))
 
