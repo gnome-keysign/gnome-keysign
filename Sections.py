@@ -220,7 +220,7 @@ class GetKeySection(Gtk.VBox):
         The message argument is a GStreamer message that created
         the barcode.'''
 
-        fpr = verify_fingerprint(barcode)
+        fpr = self.verify_fingerprint(barcode)
 
         if fpr != None:
             try:
