@@ -105,6 +105,7 @@ class KeyPresentPage(Gtk.HBox):
         leftTopLabel.set_markup('<span size="15000">' + 'Key Fingerprint' + '</span>')
 
         self.fingerprintLabel = Gtk.Label()
+        self.fingerprintLabel.set_selectable(True)
 
         # left vertical box
         leftVBox = Gtk.VBox(spacing=10)
