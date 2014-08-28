@@ -101,23 +101,22 @@ class KeyPresentPage(Gtk.HBox):
         super(KeyPresentPage, self).__init__()
 
         # create left side Key labels
-        fingerprintMark = Gtk.Label()
-        fingerprintMark.set_markup('<span size="15000">' + 'Key Fingerprint' + '</span>')
+        leftTopLabel = Gtk.Label()
+        leftTopLabel.set_markup('<span size="15000">' + 'Key Fingerprint' + '</span>')
 
         self.fingerprintLabel = Gtk.Label()
-        self.fingerprintLabel.set_markup('<span size="20000">' + FINGERPRINT_DEFAULT + '</span>')
 
         # left vertical box
         leftVBox = Gtk.VBox(spacing=10)
-        leftVBox.pack_start(fingerprintMark, False, False, 0)
+        leftVBox.pack_start(leftTopLabel, False, False, 0)
         leftVBox.pack_start(self.fingerprintLabel, False, False, 0)
 
         self.pixbuf = None # Hold QR code in pixbuf
         self.fpr = None # The fpr of the key selected to sign with
 
         # display QR code on the right side
-        qrcodeLabel = Gtk.Label()
-        qrcodeLabel.set_markup('<span size="15000">' + 'Fingerprint QR code' + '</span>')
+        rightTopLabel = Gtk.Label()
+        rightTopLabel.set_markup('<span size="15000">' + 'Fingerprint QR code' + '</span>')
 
         self.qrcode = Gtk.Image()
         self.qrcode.props.margin = 10
@@ -128,7 +127,7 @@ class KeyPresentPage(Gtk.HBox):
 
         # right vertical box
         self.rightVBox = Gtk.VBox(spacing=10)
-        self.rightVBox.pack_start(qrcodeLabel, False, False, 0)
+        self.rightVBox.pack_start(rightTopLabel, False, False, 0)
         self.rightVBox.pack_start(scroll_win, True, True, 0)
 
         self.rightVBox.connect("size-allocate", self.expose_event)
@@ -274,7 +273,7 @@ class KeyDetailsPage(Gtk.VBox):
             self.signaturesBox.pack_start(sigLabel, False, False, 0)
             sigLabel.show()
 
-# Pages for the "GetKeySection"
+# Pages shown on "Get Key" Tab
 
 class ScanFingerprintPage(Gtk.HBox):
 
@@ -347,8 +346,6 @@ class ScanFingerprintPage(Gtk.HBox):
 
         return fpr
 
-    def get_text_from_scanner(self):
-        return None
 
     def on_loadbutton_clicked(self, *args, **kwargs):
         print "load"

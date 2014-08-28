@@ -8,6 +8,7 @@ import requests
 from requests.exceptions import ConnectionError
 
 import sys
+import re
 
 try:
     from monkeysign.gpg import Keyring, TempKeyring
@@ -21,6 +22,8 @@ from SignPages import KeysPage, KeyPresentPage, KeyDetailsPage
 from SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 import MainWindow
 
+import key
+
 from gi.repository import Gst, Gtk, GLib
 # Because of https://bugzilla.gnome.org/show_bug.cgi?id=698005
 from gi.repository import GdkX11
@@ -30,10 +33,6 @@ from gi.repository import GstVideo
 import key
 
 Gst.init([])
-
-### FIXME !!!! This should be replaced with the fingerprint of the key
-# you want it signed. This is the fingerprint that should be scanned
-SCAN_FINGERPRINT = '140162A978431A0258B3EC24E69EEE14181523F4'
 
 
 progress_bar_text = ["Step 1: Scan QR Code or type fingerprint and click on 'Download' button",
@@ -158,7 +157,7 @@ class GetKeySection(Gtk.VBox):
         self.log = logging.getLogger()
 
         # the temporary keyring we operate in
-        self.tempkeyring = None
+        self.tmpkeyring = None
 
         self.scanPage = ScanFingerprintPage()
         self.signPage = SignKeyPage()
@@ -211,16 +210,20 @@ class GetKeySection(Gtk.VBox):
         '''This is connected to the "barcode" signal.
         The message argument is a GStreamer message that created
         the barcode.'''
-        # we're using the monkeysign format where we insert the
-        # string 'OPENPGP4FPR:'' in front of the fingerprint
-        fpr = barcode.split(':')[-1]
-        try:
-            pgpkey = key.Key(fpr)
-        except key.KeyError:
-            self.log.exception("Could not create key from %s", barcode)
+        # barcode string starts with 'OPENPGP4FPR:' followed by the fingerprint
+        m = re.search("((?:[0-9A-F]{4}\s*){10})", barcode, re.IGNORECASE)
+        if m != None:
+            fpr = m.group(1).replace(' ', '')
+            try:
+                pgpkey = key.Key(fpr)
+            except key.KeyError:
+                self.log.exception("Could not create key from %s", barcode)
+            else:
+                self.log.info("Barcode signal %s %s" %( pgpkey.fingerprint, message))
+                self.on_button_clicked(self.nextButton, pgpkey, message)
         else:
-            self.log.info("Barcode signal %s %s" %( pgpkey.fingerprint, message))
-            self.on_button_clicked(self.nextButton, pgpkey, message)
+            self.log.error("data found in barcode does not match a OpenPGP fingerprint pattern: %s", barcode)
+
 
     def download_key_http(self, address, port):
         url = ParseResult(
@@ -266,7 +269,8 @@ class GetKeySection(Gtk.VBox):
         other_clients = self.app.discovered_services
         self.log.debug("The clients found on the network: %s", other_clients)
 
-        # create a temporary keyring to not mess up with the user's own keyring
+        #FIXME: should we create a new TempKeyring for each key we want
+        # to sign it ?
         self.tmpkeyring = TempKeyring()
 
         for keydata in self.try_download_keys(other_clients):
@@ -344,14 +348,15 @@ class GetKeySection(Gtk.VBox):
         return False
 
     def save_to_file(self):
-        # temporary function to export signed key
+        #FIXME: this is a temporary function to export signed key,
+        # it should send an email to the key owner
         if len(self.signui.signed_keys) < 1:
             self.log.error('no key signed, nothing to export')
 
         filenames = []
         for fpr, key in self.signui.signed_keys.items():
             filename = "%s_signed.gpg" %fpr
-            f = fopen(filename, "wt")
+            f = open(filename, "wt")
 
             f.write(self.signui.tmpkeyring.export_data(fpr))
 
@@ -360,8 +365,9 @@ class GetKeySection(Gtk.VBox):
         
         return filenames
 
-    def send_email(self):
+    def send_email(self, fingerprint, *data):
         self.log.exception("Sending email... NOT")
+        return False
         
     def email_file(self, to, from_=None, subject=None,
                    body=None,
@@ -387,6 +393,7 @@ class GetKeySection(Gtk.VBox):
         retval = call(cmd)
         return retval
 
+
     def on_button_clicked(self, button, *args, **kwargs):
 
         if button == self.nextButton:
@@ -396,23 +403,29 @@ class GetKeySection(Gtk.VBox):
             page_index = self.notebook.get_current_page()
             if page_index == 1:
                 if args:
+                    # If we call on_button_clicked() from on_barcode()
+                    # then we get extra arguments
                     pgpkey = args[0]
                     message = args[1]
                     fingerprint = pgpkey.fingerprint
                 else:
-                    fingerprint = self.scanPage.get_text_from_scanner()
-                    if fingerprint is None:
-                        fingerprint = self.scanPage.get_text_from_textview()
-                # save a reference for later use
+                    fingerprint = self.scanPage.get_text_from_textview()
+
+                # save a reference to the last received fingerprint
                 self.last_received_fingerprint = fingerprint
 
+                # error callback function
                 err = lambda x: self.signPage.topLabel.set_markup("Error downloading"
                                     " key with fpr \n%s" %fingerprint)
+                # use GLib.idle_add to use a separate thread for the downloading of
+                # the keydata
                 GLib.idle_add(self.obtain_key_async, fingerprint, self.recieved_key,
                         fingerprint, err)
 
 
             if page_index == 2:
+                # signing of key and sending an email is done on separate
+                # threads also
                 GLib.idle_add(self.sign_key_async, self.last_received_fingerprint,
                     self.send_email, self.last_received_fingerprint)
 
