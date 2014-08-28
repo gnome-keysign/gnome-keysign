@@ -2,6 +2,7 @@
 
 import logging
 from urlparse import ParseResult
+from string import Template
 from subprocess import call
 
 import requests
@@ -39,6 +40,21 @@ progress_bar_text = ["Step 1: Scan QR Code or type fingerprint and click on 'Dow
                      "Step 2: Compare the received fpr with the owner's fpr and click 'Sign'",
                      "Step 3: Key was succesfully signed and an email was send to owner."]
 
+
+SUBJECT = 'Your signed key $fingerprint'
+BODY = '''Hi $uid,
+
+
+I have just signed your key
+
+      $fingerprint
+
+
+Thanks for letting me sign your key!
+
+--
+GNOME Keysign
+'''
 
 class KeySignSection(Gtk.VBox):
 
@@ -336,7 +352,16 @@ class GetKeySection(Gtk.VBox):
             # FIXME: for now only export it to a file
             filenames = self.save_to_file()
             filename = filenames[0]
-            self.email_file(to=uid_str, files=[filename])
+            keyid = str(key.keyid())
+            ctx = {
+                'uid' : uid_str,
+                'fingerprint': fingerprint,
+                'keyid': keyid,
+            }
+            subject = Template(SUBJECT).safe_substitute(ctx)
+            body = Template(BODY).safe_substitute(ctx)
+            self.email_file (to=uid_str, subject=subject, 
+                             body=body, files=[filename])
             # self.sign.export_key()
 
 
