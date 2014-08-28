@@ -85,7 +85,8 @@ class ServeKeyThread(Thread):
                 self.avahi_publisher = ap = AvahiPublisher(
                     service_port = port_i,
                     service_name = 'HTTP Keyserver',
-                    service_txt = self.keydata,
+                    service_txt = 'FIXME fingeprint', #FIXME Fingerprint
+                    # self.keydata is too big for Avahi; it chrashes
                     service_type = '_geysign._tcp',
                 )
                 log.info('Trying to add Avahi Service')
