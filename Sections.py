@@ -2,6 +2,7 @@
 
 import logging
 from urlparse import ParseResult
+from subprocess import call
 
 import requests
 from requests.exceptions import ConnectionError
@@ -27,6 +28,7 @@ from gi.repository import GdkX11
 from gi.repository import GstVideo
 
 import key
+
 Gst.init([])
 
 ### FIXME !!!! This should be replaced with the fingerprint of the key
@@ -309,12 +311,25 @@ class GetKeySection(Gtk.VBox):
             self.signui.copy_secrets()
             # 3. for every user id (or all, if -a is specified)
             # 3.1. sign the uid, using gpg-agent
-            self.signui.sign_key()
+            keys = self.signui.tmpkeyring.get_keys(fingerprint)
+            self.log.info("Found keys %s for fp %s", keys, fingerprint)
+            assert len(keys) == 1, "We received multiple keys for fp %s: %s" % (fingerprint, keys)
+            key = keys[fingerprint]
+            uidlist = key.uidslist
+            
+            # FIXME: For now, we sign all UIDs. This is bad.
+            for uid in uidlist:
+                # Don't know yet whether that works
+                #self.signui.tmpkeyring.sign_key(uid)
+                pass
+            ret = self.signui.sign_key()
+            self.log.info("Result of signing key %s: %s", fingerprint, ret)
 
             # 3.2. export and encrypt the signature
             # 3.3. mail the key to the user
             # FIXME: for now only export it to a file
-            self.save_to_file()
+            filename = self.save_to_file()
+            self.email_file(to=str(uid), files=[filename])
             # self.sign.export_key()
 
 
@@ -333,6 +348,7 @@ class GetKeySection(Gtk.VBox):
         if len(self.signui.signed_keys) < 1:
             self.log.error('no key signed, nothing to export')
 
+        filenames = []
         for fpr, key in self.signui.signed_keys.items():
             filename = "%s_signed.gpg" %fpr
             f = fopen(filename, "wt")
@@ -340,10 +356,36 @@ class GetKeySection(Gtk.VBox):
             f.write(self.signui.tmpkeyring.export_data(fpr))
 
             self.log.info("Key with fpr %s was signed and exported to file %s", fpr, filename)
+            filenames.append(filename)
+        
+        return filenames
 
+    def send_email(self):
+        self.log.exception("Sending email... NOT")
+        
+    def email_file(self, to, from_=None, subject=None,
+                   body=None,
+                   ccs=None, bccs=None,
+                   files=None, utf8=True):
+        cmd = ['xdg-email']
+        if utf8:
+            cmd += ['--utf8']
+        if subject:
+            cmd += ['--subject', subject]
+        if body:
+            cmd += ['--body', body]
+        for cc in ccs or []:
+            cmd += ['--cc', cc]
+        for bcc in bccs or []:
+            cmd += ['--cc', bcc]
+        for file_ in files or []:
+            cmd += ['--attach', file_]
 
-    def send_email(self, fingerprint, *data):
-        pass
+        cmd += [to]
+
+        self.log.info("Running %s", cmd)
+        retval = call(cmd)
+        return retval
 
     def on_button_clicked(self, button, *args, **kwargs):
 
