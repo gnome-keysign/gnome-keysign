@@ -325,6 +325,8 @@ class GetKeySection(Gtk.VBox):
             for uid in uidlist:
                 # Don't know yet whether that works
                 #self.signui.tmpkeyring.sign_key(uid)
+                uid_str = uid.uid
+                self.log.info("Not processing uid %s %s", uid, uid_str)
                 pass
             ret = self.signui.sign_key()
             self.log.info("Result of signing key %s: %s", fingerprint, ret)
@@ -332,8 +334,9 @@ class GetKeySection(Gtk.VBox):
             # 3.2. export and encrypt the signature
             # 3.3. mail the key to the user
             # FIXME: for now only export it to a file
-            filename = self.save_to_file()
-            self.email_file(to=str(uid), files=[filename])
+            filenames = self.save_to_file()
+            filename = filenames[0]
+            self.email_file(to=uid_str, files=[filename])
             # self.sign.export_key()
 
 
