@@ -350,18 +350,24 @@ class GetKeySection(Gtk.VBox):
             # 3.2. export and encrypt the signature
             # 3.3. mail the key to the user
             # FIXME: for now only export it to a file
-            filenames = self.save_to_file()
-            filename = filenames[0]
+            signed_key = self.signui.tmpkeyring.export_data(uid_str)
+            encrypted_key = self.signui.tmpkeyring.encrypt_data(data=signed_key, recipient=uid_str)
+
             keyid = str(key.keyid())
             ctx = {
                 'uid' : uid_str,
                 'fingerprint': fingerprint,
                 'keyid': keyid,
             }
-            subject = Template(SUBJECT).safe_substitute(ctx)
-            body = Template(BODY).safe_substitute(ctx)
-            self.email_file (to=uid_str, subject=subject, 
-                             body=body, files=[filename])
+            # We could try to dir=tmpkeyring.dir
+            with NamedTemporaryFile(suffix='-gnome-keysign', data=encrypted_key) as tmp:
+                filename = tmp.name
+                tmp.write(encrypted_key)
+                
+                subject = Template(SUBJECT).safe_substitute(ctx)
+                body = Template(BODY).safe_substitute(ctx)
+                self.email_file (to=uid_str, subject=subject, 
+                                 body=body, files=[filename])
             # self.sign.export_key()
 
 
