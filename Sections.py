@@ -56,6 +56,31 @@ Thanks for letting me sign your key!
 GNOME Keysign
 '''
 
+
+
+
+# FIXME: This probably wants to go somewhere more central.
+# Maybe even into Monkeysign.
+log = logging.getLogger()
+def UIDExport(uid, keydata):
+    """Export only the UID of a key.
+    Unfortunately, GnuPG does not provide smth like
+    --export-uid-only in order to obtain a UID and its
+    signatures."""
+    tmp = TempKeyring()
+    tmp.import_data(keydata)
+    for fpr, key in tmp.get_keys(uid).items():
+        for u in key.uidslist:
+            key_uid = u.uid
+            if key_uid != uid:
+                log.info('Deleting UID %s from key %s', key_uid, fpr)
+                tmp.del_uid(fingerprint=fpr, pattern=key_uid)
+    only_uid = tmp.export_data(uid)
+
+    return only_uid
+
+
+
 class KeySignSection(Gtk.VBox):
 
     def __init__(self, app):
