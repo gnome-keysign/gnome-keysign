@@ -367,52 +367,58 @@ class GetKeySection(Gtk.VBox):
             uidlist = key.uidslist
             
             # FIXME: For now, we sign all UIDs. This is bad.
+            ret = self.signui.tmpkeyring.sign_key(uidlist[0].uid, signall=True)
+            
             for uid in uidlist:
                 uid_str = uid.uid
-                self.log.info("Not processing uid %s %s", uid, uid_str)
-                pass
-            ret = self.signui.sign_key()
-            self.log.info("Result of signing key %s: %s", fingerprint, ret)
+                self.log.info("Processing uid %s %s", uid, uid_str)
 
-            # 3.2. export and encrypt the signature
-            # 3.3. mail the key to the user
-            # FIXME: for now only export it to a file
-            signed_key = UIDExport(uid_str, self.signui.tmpkeyring.export_data(uid_str))
-            self.log.info("Exported %d bytes of signed key", len(signed_key))
-            # self.signui.tmpkeyring.context.set_option('armor')
-            self.signui.tmpkeyring.context.set_option('always-trust')
-            encrypted_key = self.signui.tmpkeyring.encrypt_data(data=signed_key, recipient=uid_str)
-
-            keyid = str(key.keyid())
-            ctx = {
-                'uid' : uid_str,
-                'fingerprint': fingerprint,
-                'keyid': keyid,
-            }
-            # We could try to dir=tmpkeyring.dir
-            # We do not use the with ... as construct as the 
-            # tempfile might be deleted before the MUA had the chance
-            # to get hold of it.
-            # Hence we reference the tmpfile and hope that it will be properly
-            # cleaned up when this object will be destroyed...
-            tmpfile = NamedTemporaryFile(prefix='gnome-keysign-', suffix='.asc')
-            self.tmpfiles.append(tmpfile)
-            filename = tmpfile.name
-            self.log.info('Writing keydata to %s', filename)
-            tmpfile.write(encrypted_key)
-            # Interesting, sometimes it would not write the whole thing out,
-            # so we better flush here
-            tmpfile.flush()
-            # As we're done with the file, we close it.
-            tmpfile.close()
+                #ret = self.signui.tmpkeyring.sign_key(uid_str)
+                self.log.info("Result of signing key %s: %s %s", fingerprint, ret, self.signui.signed_keys)
+    
+                # 3.2. export and encrypt the signature
+                # 3.3. mail the key to the user
+                # FIXME: for now only export it to a file
+                signed_key = UIDExport(uid_str, self.signui.tmpkeyring.export_data(uid_str))
+                self.log.info("Exported %d bytes of signed key", len(signed_key))
+                # self.signui.tmpkeyring.context.set_option('armor')
+                self.signui.tmpkeyring.context.set_option('always-trust')
+                #encrypted_key = self.signui.tmpkeyring.encrypt_data(data=signed_key, recipient=uid_str)
+                # FIXME: We want to encrypt here, just for testing purposes
+                encrypted_key = signed_key
+    
+                keyid = str(key.keyid())
+                ctx = {
+                    'uid' : uid_str,
+                    'fingerprint': fingerprint,
+                    'keyid': keyid,
+                }
+                # We could try to dir=tmpkeyring.dir
+                # We do not use the with ... as construct as the 
+                # tempfile might be deleted before the MUA had the chance
+                # to get hold of it.
+                # Hence we reference the tmpfile and hope that it will be properly
+                # cleaned up when this object will be destroyed...
+                tmpfile = NamedTemporaryFile(prefix='gnome-keysign-', suffix='.asc')
+                self.tmpfiles.append(tmpfile)
+                filename = tmpfile.name
+                self.log.info('Writing keydata to %s', filename)
+                tmpfile.write(encrypted_key)
+                # Interesting, sometimes it would not write the whole thing out,
+                # so we better flush here
+                tmpfile.flush()
+                # As we're done with the file, we close it.
+                #tmpfile.close()
+                
+                subject = Template(SUBJECT).safe_substitute(ctx)
+                body = Template(BODY).safe_substitute(ctx)
+                self.email_file (to=uid_str, subject=subject, 
+                                 body=body, files=[filename])
             
-            subject = Template(SUBJECT).safe_substitute(ctx)
-            body = Template(BODY).safe_substitute(ctx)
-            self.email_file (to=uid_str, subject=subject, 
-                             body=body, files=[filename])
-
-
-
+            
+            # FIXME: Can we get rid of self.tmpfiles here already? Even if the MUA is still running?
+            
+            
             # 3.4. optionnally (-l), create a local signature and import in
             # local keyring
             # 4. trash the temporary keyring
