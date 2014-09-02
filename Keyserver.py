@@ -149,9 +149,28 @@ if __name__ == '__main__':
         time.sleep(seconds)
         t.shutdown()
 
-    KEYDATA = 'Example data'
+    import sys
+    if len(sys.argv) >= 2:
+        fname = sys.argv[1]
+        KEYDATA = open(fname, 'r').read()
+    else:
+        KEYDATA = 'Example data'
+
+    if len(sys.argv) >= 3:
+        timeout = int(sys.argv[2])
+    else:
+        timeout = 5
+
     t = ServeKeyThread(KEYDATA)
-    stop_t = Thread(target=stop_thread, args=(t,5))
+    stop_t = Thread(target=stop_thread, args=(t,timeout))
+    stop_t.daemon = True
     t.start()
     stop_t.start()
+    while True:
+        log.info('joining stop %s', stop_t.isAlive())
+        stop_t.join(1)
+        log.info('joining t %s', t.isAlive())
+        t.join(1)
+        if not t.isAlive() or not stop_t.isAlive():
+            break
     log.warn('Last line')
