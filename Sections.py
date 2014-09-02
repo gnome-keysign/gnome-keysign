@@ -4,6 +4,7 @@ import logging
 from urlparse import ParseResult
 from string import Template
 from subprocess import call
+from tempfile import NamedTemporaryFile
 
 import requests
 from requests.exceptions import ConnectionError
@@ -240,6 +241,9 @@ class GetKeySection(Gtk.VBox):
         #GLib.idle_add(        self.scanFrame.run)
 
         self.signui = SignUi(self.app)
+        # A list holding references to temporary files which should probably
+        # be cleaned up on exit...
+        self.tmpfiles = []
 
     def set_progress_bar(self):
         page_index = self.notebook.get_current_page()
@@ -364,8 +368,6 @@ class GetKeySection(Gtk.VBox):
             
             # FIXME: For now, we sign all UIDs. This is bad.
             for uid in uidlist:
-                # Don't know yet whether that works
-                #self.signui.tmpkeyring.sign_key(uid)
                 uid_str = uid.uid
                 self.log.info("Not processing uid %s %s", uid, uid_str)
                 pass
@@ -375,7 +377,10 @@ class GetKeySection(Gtk.VBox):
             # 3.2. export and encrypt the signature
             # 3.3. mail the key to the user
             # FIXME: for now only export it to a file
-            signed_key = self.signui.tmpkeyring.export_data(uid_str)
+            signed_key = UIDExport(uid_str, self.signui.tmpkeyring.export_data(uid_str))
+            self.log.info("Exported %d bytes of signed key", len(signed_key))
+            # self.signui.tmpkeyring.context.set_option('armor')
+            self.signui.tmpkeyring.context.set_option('always-trust')
             encrypted_key = self.signui.tmpkeyring.encrypt_data(data=signed_key, recipient=uid_str)
 
             keyid = str(key.keyid())
@@ -385,15 +390,27 @@ class GetKeySection(Gtk.VBox):
                 'keyid': keyid,
             }
             # We could try to dir=tmpkeyring.dir
-            with NamedTemporaryFile(suffix='-gnome-keysign', data=encrypted_key) as tmp:
-                filename = tmp.name
-                tmp.write(encrypted_key)
-                
-                subject = Template(SUBJECT).safe_substitute(ctx)
-                body = Template(BODY).safe_substitute(ctx)
-                self.email_file (to=uid_str, subject=subject, 
-                                 body=body, files=[filename])
-            # self.sign.export_key()
+            # We do not use the with ... as construct as the 
+            # tempfile might be deleted before the MUA had the chance
+            # to get hold of it.
+            # Hence we reference the tmpfile and hope that it will be properly
+            # cleaned up when this object will be destroyed...
+            tmpfile = NamedTemporaryFile(prefix='gnome-keysign-', suffix='.asc')
+            self.tmpfiles.append(tmpfile)
+            filename = tmpfile.name
+            self.log.info('Writing keydata to %s', filename)
+            tmpfile.write(encrypted_key)
+            # Interesting, sometimes it would not write the whole thing out,
+            # so we better flush here
+            tmpfile.flush()
+            # As we're done with the file, we close it.
+            tmpfile.close()
+            
+            subject = Template(SUBJECT).safe_substitute(ctx)
+            body = Template(BODY).safe_substitute(ctx)
+            self.email_file (to=uid_str, subject=subject, 
+                             body=body, files=[filename])
+
 
 
             # 3.4. optionnally (-l), create a local signature and import in
