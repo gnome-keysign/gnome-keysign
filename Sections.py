@@ -508,23 +508,6 @@ class GetKeySection(Gtk.VBox):
 
         return False
 
-    def save_to_file(self):
-        #FIXME: this is a temporary function to export signed key,
-        # it should send an email to the key owner
-        if len(self.signui.signed_keys) < 1:
-            self.log.error('no key signed, nothing to export')
-
-        filenames = []
-        for fpr, key in self.signui.signed_keys.items():
-            filename = "%s_signed.gpg" %fpr
-            f = open(filename, "wt")
-
-            f.write(self.signui.tmpkeyring.export_data(fpr))
-
-            self.log.info("Key with fpr %s was signed and exported to file %s", fpr, filename)
-            filenames.append(filename)
-        
-        return filenames
 
     def send_email(self, fingerprint, *data):
         self.log.exception("Sending email... NOT")
