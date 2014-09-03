@@ -12,6 +12,8 @@ except ImportError, e:
     sys.exit()
 
 
+from QRCode import QRImage
+
 
 FINGERPRINT_DEFAULT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
 
@@ -114,16 +116,13 @@ class KeyPresentPage(Gtk.HBox):
         qrcodeLabel = Gtk.Label()
         qrcodeLabel.set_markup('<span size="15000">' + 'Fingerprint QR code' + '</span>')
 
-        self.qrcode = Gtk.Image()
+        self.qrcode = QRImage()
         self.qrcode.props.margin = 10
 
         # right vertical box
         self.rightVBox = Gtk.VBox(spacing=10)
         self.rightVBox.pack_start(qrcodeLabel, False, False, 0)
         self.rightVBox.pack_start(self.qrcode, True, True, 0)
-
-        self.rightVBox.connect("size-allocate", self.expose_event)
-        self.last_allocation = self.rightVBox.get_allocation()
 
         self.pack_start(leftVBox, True, True, 0)
         self.pack_start(self.rightVBox, True, True, 0)
@@ -147,16 +146,11 @@ class KeyPresentPage(Gtk.HBox):
         # draw qr code for this fingerprint
         self.draw_qrcode()
 
-    def expose_event(self, widget, event):
-        # when window is resized, regenerate the QR code
-        if self.rightVBox.get_allocation() != self.last_allocation:
-            self.last_allocation = self.rightVBox.get_allocation()
-            self.draw_qrcode()
 
     def draw_qrcode(self):
-        if self.fpr is not None:
-            self.pixbuf = self.image_to_pixbuf(self.create_qrcode(self.fpr))
-            self.qrcode.set_from_pixbuf(self.pixbuf)
+        data = self.fpr
+        if data is not None:
+            self.qrcode.draw_qrcode(data)
         else:
             self.qrcode.set_from_icon_name("gtk-dialog-error", Gtk.IconSize.DIALOG)
 
