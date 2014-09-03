@@ -58,7 +58,8 @@ class QRImage(Gtk.Image):
         version, width, image = encode_scaled(data,size,0,1,2,True)
         return image
 
-    def image_to_pixbuf(self, image):
+    @staticmethod
+    def image_to_pixbuf(image):
         # convert PIL image instance to Pixbuf
         fd = StringIO.StringIO()
         image.save(fd, "ppm")
