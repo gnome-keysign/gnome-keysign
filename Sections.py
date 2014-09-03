@@ -2,6 +2,9 @@
 
 import logging
 from urlparse import ParseResult
+from string import Template
+from subprocess import call
+from tempfile import NamedTemporaryFile
 
 import requests
 from requests.exceptions import ConnectionError
@@ -30,12 +33,57 @@ from gi.repository import GdkX11
 # Needed for window.get_xid(), xvimagesink.set_window_handle(), respectively:
 from gi.repository import GstVideo
 
+import key
+
 Gst.init([])
 
 
 progress_bar_text = ["Step 1: Scan QR Code or type fingerprint and click on 'Download' button",
                      "Step 2: Compare the received fpr with the owner's fpr and click 'Sign'",
                      "Step 3: Key was succesfully signed and an email was send to owner."]
+
+
+SUBJECT = 'Your signed key $fingerprint'
+BODY = '''Hi $uid,
+
+
+I have just signed your key
+
+      $fingerprint
+
+
+Thanks for letting me sign your key!
+
+--
+GNOME Keysign
+'''
+
+
+
+
+# FIXME: This probably wants to go somewhere more central.
+# Maybe even into Monkeysign.
+log = logging.getLogger()
+def UIDExport(uid, keydata):
+    """Export only the UID of a key.
+    Unfortunately, GnuPG does not provide smth like
+    --export-uid-only in order to obtain a UID and its
+    signatures."""
+    tmp = TempKeyring()
+    # Hm, apparently this needs to be set, otherwise gnupg will issue
+    # a stray "gpg: checking the trustdb" which confuses the gnupg library
+    tmp.context.set_option('always-trust')
+    tmp.import_data(keydata)
+    for fpr, key in tmp.get_keys(uid).items():
+        for u in key.uidslist:
+            key_uid = u.uid
+            if key_uid != uid:
+                log.info('Deleting UID %s from key %s', key_uid, fpr)
+                tmp.del_uid(fingerprint=fpr, pattern=key_uid)
+    only_uid = tmp.export_data(uid)
+
+    return only_uid
+
 
 
 class KeySignSection(Gtk.VBox):
@@ -89,6 +137,11 @@ class KeySignSection(Gtk.VBox):
 
         # this will hold a reference to the last key selected
         self.last_selected_key = None
+        
+        # When obtaining a key is successful,
+        # it will save the key data in this field
+        self.received_key_data = None
+
 
     def on_button_clicked(self, button):
 
@@ -197,6 +250,9 @@ class GetKeySection(Gtk.VBox):
         #GLib.idle_add(        self.scanFrame.run)
 
         self.signui = SignUi(self.app)
+        # A list holding references to temporary files which should probably
+        # be cleaned up on exit...
+        self.tmpfiles = []
 
     def set_progress_bar(self):
         page_index = self.notebook.get_current_page()
@@ -304,6 +360,7 @@ class GetKeySection(Gtk.VBox):
             # FIXME : don't return here
             return
 
+        self.log.debug('Adding %s as callback', callback)
         GLib.idle_add(callback, fingerprint, keydata, data)
 
         # If this function is added itself via idle_add, then idle_add will
@@ -318,25 +375,82 @@ class GetKeySection(Gtk.VBox):
         self.signui.pattern = fingerprint
         # 1. fetch the key into a temporary keyring
         # 1.a) from the local keyring
-        self.log.debug("looking for key %s in your keyring", self.signui.pattern)
-        self.signui.keyring.context.set_option('export-options', 'export-minimal')
-        if self.signui.tmpkeyring.import_data(self.signui.keyring.export_data(self.signui.pattern)):
+        # FIXME: WTF?! How would the ring enter the keyring in first place?!
+        keydata = data or self.received_key_data
+        if keydata:
+            tmpkeyring = TempKeyring()
+            ret = tmpkeyring.import_data(keydata)
+            self.log.debug("Returned %s after importing %s", ret, keydata)
+            assert ret
+            tmpkeyring.context.set_option('export-options', 'export-minimal')
+            stripped_key = tmpkeyring.export_data(fingerprint)
+        else: # Do we need this branch at all?
+            self.log.debug("looking for key %s in your keyring", self.signui.pattern)
+            self.signui.keyring.context.set_option('export-options', 'export-minimal')
+            stripped_key = self.signui.keyring.export_data(self.signui.pattern)
 
+        self.log.debug('Trying to import key\n%s', stripped_key)
+        if self.signui.tmpkeyring.import_data(stripped_key):
             # 2. copy the signing key secrets into the keyring
             self.signui.copy_secrets()
             # 3. for every user id (or all, if -a is specified)
             # 3.1. sign the uid, using gpg-agent
-            try:
-                self.signui.sign_key()
-            except GpgRuntimeError, e:
-                self.log.error("There was an error signing key: \n%s", e)
+            keys = self.signui.tmpkeyring.get_keys(fingerprint)
+            self.log.info("Found keys %s for fp %s", keys, fingerprint)
+            assert len(keys) == 1, "We received multiple keys for fp %s: %s" % (fingerprint, keys)
+            key = keys[fingerprint]
+            uidlist = key.uidslist
+            
+            # FIXME: For now, we sign all UIDs. This is bad.
+            ret = self.signui.tmpkeyring.sign_key(uidlist[0].uid, signall=True)
+            
+            for uid in uidlist:
+                uid_str = uid.uid
+                self.log.info("Processing uid %s %s", uid, uid_str)
 
-            # 3.2. export and encrypt the signature
-            # 3.3. mail the key to the user
-            # FIXME: for now only export it to a file
-            self.save_to_file()
-            # self.sign.export_key()
-
+                #ret = self.signui.tmpkeyring.sign_key(uid_str)
+                self.log.info("Result of signing key %s: %s %s", fingerprint, ret, self.signui.signed_keys)
+    
+                # 3.2. export and encrypt the signature
+                # 3.3. mail the key to the user
+                signed_key = UIDExport(uid_str, self.signui.tmpkeyring.export_data(uid_str))
+                self.log.info("Exported %d bytes of signed key", len(signed_key))
+                # self.signui.tmpkeyring.context.set_option('armor')
+                self.signui.tmpkeyring.context.set_option('always-trust')
+                encrypted_key = self.signui.tmpkeyring.encrypt_data(data=signed_key, recipient=uid_str)
+    
+                keyid = str(key.keyid())
+                ctx = {
+                    'uid' : uid_str,
+                    'fingerprint': fingerprint,
+                    'keyid': keyid,
+                }
+                # We could try to dir=tmpkeyring.dir
+                # We do not use the with ... as construct as the 
+                # tempfile might be deleted before the MUA had the chance
+                # to get hold of it.
+                # Hence we reference the tmpfile and hope that it will be properly
+                # cleaned up when this object will be destroyed...
+                tmpfile = NamedTemporaryFile(prefix='gnome-keysign-', suffix='.asc')
+                self.tmpfiles.append(tmpfile)
+                filename = tmpfile.name
+                self.log.info('Writing keydata to %s', filename)
+                tmpfile.write(encrypted_key)
+                # Interesting, sometimes it would not write the whole thing out,
+                # so we better flush here
+                tmpfile.flush()
+                # As we're done with the file, we close it.
+                #tmpfile.close()
+                
+                subject = Template(SUBJECT).safe_substitute(ctx)
+                body = Template(BODY).safe_substitute(ctx)
+                self.email_file (to=uid_str, subject=subject, 
+                                 body=body, files=[filename])
+            
+            
+            # FIXME: Can we get rid of self.tmpfiles here already? Even if the MUA is still running?
+            
+            
             # 3.4. optionnally (-l), create a local signature and import in
             # local keyring
             # 4. trash the temporary keyring
@@ -355,7 +469,7 @@ class GetKeySection(Gtk.VBox):
         if len(self.signui.signed_keys) < 1:
             self.log.error('no key signed, nothing to export')
 
-
+        filenames = []
         for fpr, key in self.signui.signed_keys.items():
             filename = "%s_signed.gpg" %fpr
             f = open(filename, "wt")
@@ -363,11 +477,38 @@ class GetKeySection(Gtk.VBox):
             f.write(self.signui.tmpkeyring.export_data(fpr))
 
             self.log.info("Key with fpr %s was signed and exported to file %s", fpr, filename)
-
-        return False
+            filenames.append(filename)
+        
+        return filenames
 
     def send_email(self, fingerprint, *data):
-        pass
+        self.log.exception("Sending email... NOT")
+        return False
+        
+    def email_file(self, to, from_=None, subject=None,
+                   body=None,
+                   ccs=None, bccs=None,
+                   files=None, utf8=True):
+        cmd = ['xdg-email']
+        if utf8:
+            cmd += ['--utf8']
+        if subject:
+            cmd += ['--subject', subject]
+        if body:
+            cmd += ['--body', body]
+        for cc in ccs or []:
+            cmd += ['--cc', cc]
+        for bcc in bccs or []:
+            cmd += ['--cc', bcc]
+        for file_ in files or []:
+            cmd += ['--attach', file_]
+
+        cmd += [to]
+
+        self.log.info("Running %s", cmd)
+        retval = call(cmd)
+        return retval
+
 
     def on_button_clicked(self, button, *args, **kwargs):
 
@@ -407,11 +548,11 @@ class GetKeySection(Gtk.VBox):
 
 
             if page_index == 2:
-                # signing of key and sending an email is done on separate
-                # threads also
-
+                # self.received_key_data will be set by the callback of the
+                # obtain_key function. At least it should...
+                # The data flow isn't very nice. It probably needs to be redone...
                 GLib.idle_add(self.sign_key_async, self.last_received_fingerprint,
-                    self.send_email, self.last_received_fingerprint)
+                    self.send_email, self.received_key_data)
 
 
         elif button == self.backButton:
@@ -419,7 +560,8 @@ class GetKeySection(Gtk.VBox):
             self.set_progress_bar()
 
 
-    def recieved_key(self, fingerprint, *data):
+    def recieved_key(self, fingerprint, keydata, *data):
+        self.received_key_data = keydata
         openpgpkey = self.tmpkeyring.get_keys(fingerprint).values()[0]
         self.signPage.display_downloaded_key(openpgpkey, fingerprint)
 
