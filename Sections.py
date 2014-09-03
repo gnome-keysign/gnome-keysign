@@ -346,6 +346,7 @@ class GetKeySection(Gtk.VBox):
             # FIXME : don't return here
             return
 
+        self.log.debug('Adding %s as callback', callback)
         GLib.idle_add(callback, fingerprint, keydata, data)
 
         # If this function is added itself via idle_add, then idle_add will
@@ -360,10 +361,22 @@ class GetKeySection(Gtk.VBox):
         self.signui.pattern = fingerprint
         # 1. fetch the key into a temporary keyring
         # 1.a) from the local keyring
-        self.log.debug("looking for key %s in your keyring", self.signui.pattern)
-        self.signui.keyring.context.set_option('export-options', 'export-minimal')
-        if self.signui.tmpkeyring.import_data(self.signui.keyring.export_data(self.signui.pattern)):
+        # FIXME: WTF?! How would the ring enter the keyring in first place?!
+        keydata = data or self.received_key_data
+        if keydata:
+            tmpkeyring = TempKeyring()
+            ret = tmpkeyring.import_data(keydata)
+            self.log.debug("Returned %s after importing %s", ret, keydata)
+            assert ret
+            tmpkeyring.context.set_option('export-options', 'export-minimal')
+            stripped_key = tmpkeyring.export_data(fingerprint)
+        else: # Do we need this branch at all?
+            self.log.debug("looking for key %s in your keyring", self.signui.pattern)
+            self.signui.keyring.context.set_option('export-options', 'export-minimal')
+            stripped_key = self.signui.keyring.export_data(self.signui.pattern)
 
+        self.log.debug('Trying to import key\n%s', stripped_key)
+        if self.signui.tmpkeyring.import_data(stripped_key):
             # 2. copy the signing key secrets into the keyring
             self.signui.copy_secrets()
             # 3. for every user id (or all, if -a is specified)
@@ -386,14 +399,11 @@ class GetKeySection(Gtk.VBox):
     
                 # 3.2. export and encrypt the signature
                 # 3.3. mail the key to the user
-                # FIXME: for now only export it to a file
                 signed_key = UIDExport(uid_str, self.signui.tmpkeyring.export_data(uid_str))
                 self.log.info("Exported %d bytes of signed key", len(signed_key))
                 # self.signui.tmpkeyring.context.set_option('armor')
                 self.signui.tmpkeyring.context.set_option('always-trust')
-                #encrypted_key = self.signui.tmpkeyring.encrypt_data(data=signed_key, recipient=uid_str)
-                # FIXME: We want to encrypt here, just for testing purposes
-                encrypted_key = signed_key
+                encrypted_key = self.signui.tmpkeyring.encrypt_data(data=signed_key, recipient=uid_str)
     
                 keyid = str(key.keyid())
                 ctx = {
