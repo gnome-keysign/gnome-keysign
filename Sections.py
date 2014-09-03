@@ -69,6 +69,9 @@ def UIDExport(uid, keydata):
     --export-uid-only in order to obtain a UID and its
     signatures."""
     tmp = TempKeyring()
+    # Hm, apparently this needs to be set, otherwise gnupg will issue
+    # a stray "gpg: checking the trustdb" which confuses the gnupg library
+    tmp.context.set_option('always-trust')
     tmp.import_data(keydata)
     for fpr, key in tmp.get_keys(uid).items():
         for u in key.uidslist:
