@@ -136,6 +136,11 @@ class KeySignSection(Gtk.VBox):
 
         # this will hold a reference to the last key selected
         self.last_selected_key = None
+        
+        # When obtaining a key is successful,
+        # it will save the key data in this field
+        self.received_key_data = None
+
 
     def on_button_clicked(self, button):
 
@@ -509,10 +514,11 @@ class GetKeySection(Gtk.VBox):
 
 
             if page_index == 2:
-                # signing of key and sending an email is done on separate
-                # threads also
+                # self.received_key_data will be set by the callback of the
+                # obtain_key function. At least it should...
+                # The data flow isn't very nice. It probably needs to be redone...
                 GLib.idle_add(self.sign_key_async, self.last_received_fingerprint,
-                    self.send_email, self.last_received_fingerprint)
+                    self.send_email, self.received_key_data)
 
 
         elif button == self.backButton:
@@ -521,6 +527,7 @@ class GetKeySection(Gtk.VBox):
 
 
     def recieved_key(self, fingerprint, keydata, *data):
+        self.received_key_data = keydata
         self.signPage.display_downloaded_key(fingerprint, keydata)
 
 
