@@ -392,13 +392,18 @@ class GetKeySection(Gtk.VBox):
         # 1.a) from the local keyring
         # FIXME: WTF?! How would the ring enter the keyring in first place?!
         keydata = data or self.received_key_data
-        if keydata:
+
+        def MinimalExport(keydata):
             tmpkeyring = TempKeyring()
             ret = tmpkeyring.import_data(keydata)
             self.log.debug("Returned %s after importing %s", ret, keydata)
             assert ret
             tmpkeyring.context.set_option('export-options', 'export-minimal')
             stripped_key = tmpkeyring.export_data(fingerprint)
+            return stripped_key
+
+        if keydata:
+            stripped_key = MinimalExport(keydata)
         else: # Do we need this branch at all?
             self.log.debug("looking for key %s in your keyring", self.signui.pattern)
             self.signui.keyring.context.set_option('export-options', 'export-minimal')
