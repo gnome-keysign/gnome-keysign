@@ -117,14 +117,10 @@ class KeyPresentPage(Gtk.HBox):
         self.qrcode = Gtk.Image()
         self.qrcode.props.margin = 10
 
-        scroll_win = Gtk.ScrolledWindow()
-        scroll_win.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        scroll_win.add_with_viewport(self.qrcode)
-
         # right vertical box
         self.rightVBox = Gtk.VBox(spacing=10)
         self.rightVBox.pack_start(qrcodeLabel, False, False, 0)
-        self.rightVBox.pack_start(scroll_win, True, True, 0)
+        self.rightVBox.pack_start(self.qrcode, True, True, 0)
 
         self.rightVBox.connect("size-allocate", self.expose_event)
         self.last_allocation = self.rightVBox.get_allocation()
