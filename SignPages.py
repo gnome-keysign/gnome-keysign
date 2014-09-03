@@ -148,32 +148,17 @@ class KeyPresentPage(Gtk.HBox):
 
 
     def draw_qrcode(self):
-        data = self.fpr
-        if data is not None:
-            self.qrcode.draw_qrcode(data)
-        else:
-            self.qrcode.set_from_icon_name("gtk-dialog-error", Gtk.IconSize.DIALOG)
-
-    def create_qrcode(self, fpr):
+        assert self.fpr
         box = self.rightVBox.get_allocation()
         if box.width < box.height:
             size = box.width - 30
         else:
             size = box.height - 30
-        version, width, image = encode_scaled('OPENPGP4FPR:'+fpr,size,0,1,2,True)
-        return image
 
-    def image_to_pixbuf(self, image):
-        # convert PIL image instance to Pixbuf
-        fd = StringIO.StringIO()
-        image.save(fd, "ppm")
-        contents = fd.getvalue()
-        fd.close()
-        loader = GdkPixbuf.PixbufLoader.new_with_type('pnm')
-        loader.write(contents)
-        pixbuf = loader.get_pixbuf()
-        loader.close()
-        return pixbuf
+        data = 'OPENPGP4FPR:' + self.fpr
+        self.qrcode.data = data
+        self.qrcode.draw_qrcode(size=size)
+
 
 
 class KeyDetailsPage(Gtk.VBox):
