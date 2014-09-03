@@ -86,6 +86,16 @@ def UIDExport(uid, keydata):
     return only_uid
 
 
+def MinimalExport(keydata):
+    '''Returns the minimised version of a key'''
+    tmpkeyring = TempKeyring()
+    ret = tmpkeyring.import_data(keydata)
+    self.log.debug("Returned %s after importing %s", ret, keydata)
+    assert ret
+    tmpkeyring.context.set_option('export-options', 'export-minimal')
+    stripped_key = tmpkeyring.export_data(fingerprint)
+    return stripped_key
+
 
 
 
@@ -419,15 +429,6 @@ class GetKeySection(Gtk.VBox):
         # 1.a) from the local keyring
         # FIXME: WTF?! How would the ring enter the keyring in first place?!
         keydata = data or self.received_key_data
-
-        def MinimalExport(keydata):
-            tmpkeyring = TempKeyring()
-            ret = tmpkeyring.import_data(keydata)
-            self.log.debug("Returned %s after importing %s", ret, keydata)
-            assert ret
-            tmpkeyring.context.set_option('export-options', 'export-minimal')
-            stripped_key = tmpkeyring.export_data(fingerprint)
-            return stripped_key
 
         if keydata:
             stripped_key = MinimalExport(keydata)
