@@ -3,6 +3,7 @@
 import logging
 from urlparse import ParseResult
 from string import Template
+import shutil
 from subprocess import call
 from tempfile import NamedTemporaryFile
 
@@ -83,6 +84,80 @@ def UIDExport(uid, keydata):
     only_uid = tmp.export_data(uid)
 
     return only_uid
+
+
+def MinimalExport(keydata):
+    '''Returns the minimised version of a key
+    
+    For now, you must provide one key only.'''
+    tmpkeyring = TempKeyring()
+    ret = tmpkeyring.import_data(keydata)
+    log.debug("Returned %s after importing %s", ret, keydata)
+    assert ret
+    tmpkeyring.context.set_option('export-options', 'export-minimal')
+    keys = tmpkeyring.get_keys()
+    log.debug("Keys after importing: %s (%s)", keys, keys.items())
+    # We assume the keydata to contain one key only
+    fingerprint, key = keys.items()[0]
+    stripped_key = tmpkeyring.export_data(fingerprint)
+    return stripped_key
+
+
+
+class TempKeyringCopy(TempKeyring):
+    """A temporary keyring which uses the secret keys of a parent keyring
+    
+    It mainly copies the public keys from the parent keyring to this temporary
+    keyring and sets this keyring up such that it uses the secret keys of the
+    parent keyring.
+    """
+    def __init__(self, keyring, *args, **kwargs):
+        self.keyring = keyring
+        # Not a new style class...
+        if issubclass(self.__class__, object):
+            super(TempKeyringCopy, self).__init__(*args, **kwargs)
+        else:
+            TempKeyring.__init__(self, *args, **kwargs)
+        
+        self.log = logging.getLogger()
+
+        tmpkeyring = self
+        # Copy and paste job from monkeysign.ui.prepare
+        tmpkeyring.context.set_option('secret-keyring', keyring.homedir + '/secring.gpg')
+
+        # copy the gpg.conf from the real keyring
+        try:
+            from_ = keyring.homedir + '/gpg.conf'
+            to_ = tmpkeyring.homedir
+            shutil.copy(from_, to_)
+            self.log.debug('copied your gpg.conf from %s to %s', from_, to_)
+        except IOError as e:
+            # no such file or directory is alright: it means the use
+            # has no gpg.conf (because we are certain the temp homedir
+            # exists at this point)
+            if e.errno != 2:
+                pass
+
+
+        # Copy the public parts of the secret keys to the tmpkeyring
+        signing_keys = []
+        for fpr, key in keyring.get_keys(None, secret=True, public=False).items():
+            if not key.invalid and not key.disabled and not key.expired and not key.revoked:
+                signing_keys.append(key)
+                tmpkeyring.import_data (keyring.export_data (fpr))
+
+
+
+## Monkeypatching to get more debug output
+import monkeysign.gpg
+bc = monkeysign.gpg.Context.build_command
+def build_command(*args, **kwargs):
+    ret = bc(*args, **kwargs)
+    #log.info("Building command %s", ret)
+    log.debug("Building cmd: %s", ' '.join(["'%s'" % c for c in ret]))
+    return ret
+monkeysign.gpg.Context.build_command = build_command
+
 
 
 
@@ -249,7 +324,6 @@ class GetKeySection(Gtk.VBox):
         self.scanPage.scanFrame.connect('barcode', self.on_barcode)
         #GLib.idle_add(        self.scanFrame.run)
 
-        self.signui = SignUi(self.app)
         # A list holding references to temporary files which should probably
         # be cleaned up on exit...
         self.tmpfiles = []
@@ -372,52 +446,49 @@ class GetKeySection(Gtk.VBox):
     def sign_key_async(self, fingerprint, callback=None, data=None, error_cb=None):
         self.log.debug("I will sign key with fpr {}".format(fingerprint))
 
-        self.signui.pattern = fingerprint
+        keyring = Keyring()
+        keyring.context.set_option('export-options', 'export-minimal')
+        
+        tmpkeyring = TempKeyringCopy(keyring)
+
         # 1. fetch the key into a temporary keyring
         # 1.a) from the local keyring
         # FIXME: WTF?! How would the ring enter the keyring in first place?!
         keydata = data or self.received_key_data
+
         if keydata:
-            tmpkeyring = TempKeyring()
-            ret = tmpkeyring.import_data(keydata)
-            self.log.debug("Returned %s after importing %s", ret, keydata)
-            assert ret
-            tmpkeyring.context.set_option('export-options', 'export-minimal')
-            stripped_key = tmpkeyring.export_data(fingerprint)
+            stripped_key = MinimalExport(keydata)
         else: # Do we need this branch at all?
-            self.log.debug("looking for key %s in your keyring", self.signui.pattern)
-            self.signui.keyring.context.set_option('export-options', 'export-minimal')
-            stripped_key = self.signui.keyring.export_data(self.signui.pattern)
+            self.log.debug("looking for key %s in your keyring", fingerprint)
+            keyring.context.set_option('export-options', 'export-minimal')
+            stripped_key = keyring.export_data(fingerprint)
 
         self.log.debug('Trying to import key\n%s', stripped_key)
-        if self.signui.tmpkeyring.import_data(stripped_key):
-            # 2. copy the signing key secrets into the keyring
-            self.signui.copy_secrets()
+        if tmpkeyring.import_data(stripped_key):
             # 3. for every user id (or all, if -a is specified)
             # 3.1. sign the uid, using gpg-agent
-            keys = self.signui.tmpkeyring.get_keys(fingerprint)
+            keys = tmpkeyring.get_keys(fingerprint)
             self.log.info("Found keys %s for fp %s", keys, fingerprint)
             assert len(keys) == 1, "We received multiple keys for fp %s: %s" % (fingerprint, keys)
             key = keys[fingerprint]
             uidlist = key.uidslist
             
             # FIXME: For now, we sign all UIDs. This is bad.
-            ret = self.signui.tmpkeyring.sign_key(uidlist[0].uid, signall=True)
+            ret = tmpkeyring.sign_key(uidlist[0].uid, signall=True)
+            self.log.info("Result of signing %s on key %s: %s", uidlist[0].uid, fingerprint, ret)
+    
             
             for uid in uidlist:
                 uid_str = uid.uid
                 self.log.info("Processing uid %s %s", uid, uid_str)
 
-                #ret = self.signui.tmpkeyring.sign_key(uid_str)
-                self.log.info("Result of signing key %s: %s %s", fingerprint, ret, self.signui.signed_keys)
-    
                 # 3.2. export and encrypt the signature
                 # 3.3. mail the key to the user
-                signed_key = UIDExport(uid_str, self.signui.tmpkeyring.export_data(uid_str))
+                signed_key = UIDExport(uid_str, tmpkeyring.export_data(uid_str))
                 self.log.info("Exported %d bytes of signed key", len(signed_key))
                 # self.signui.tmpkeyring.context.set_option('armor')
-                self.signui.tmpkeyring.context.set_option('always-trust')
-                encrypted_key = self.signui.tmpkeyring.encrypt_data(data=signed_key, recipient=uid_str)
+                tmpkeyring.context.set_option('always-trust')
+                encrypted_key = tmpkeyring.encrypt_data(data=signed_key, recipient=uid_str)
     
                 keyid = str(key.keyid())
                 ctx = {
@@ -463,23 +534,6 @@ class GetKeySection(Gtk.VBox):
 
         return False
 
-    def save_to_file(self):
-        #FIXME: this is a temporary function to export signed key,
-        # it should send an email to the key owner
-        if len(self.signui.signed_keys) < 1:
-            self.log.error('no key signed, nothing to export')
-
-        filenames = []
-        for fpr, key in self.signui.signed_keys.items():
-            filename = "%s_signed.gpg" %fpr
-            f = open(filename, "wt")
-
-            f.write(self.signui.tmpkeyring.export_data(fpr))
-
-            self.log.info("Key with fpr %s was signed and exported to file %s", fpr, filename)
-            filenames.append(filename)
-        
-        return filenames
 
     def send_email(self, fingerprint, *data):
         self.log.exception("Sending email... NOT")
