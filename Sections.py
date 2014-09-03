@@ -87,12 +87,18 @@ def UIDExport(uid, keydata):
 
 
 def MinimalExport(keydata):
-    '''Returns the minimised version of a key'''
+    '''Returns the minimised version of a key
+    
+    For now, you must provide one key only.'''
     tmpkeyring = TempKeyring()
     ret = tmpkeyring.import_data(keydata)
     log.debug("Returned %s after importing %s", ret, keydata)
     assert ret
     tmpkeyring.context.set_option('export-options', 'export-minimal')
+    keys = tmpkeyring.get_keys()
+    log.debug("Keys after importing: %s (%s)", keys, keys.items())
+    # We assume the keydata to contain one key only
+    fingerprint, key = keys.items()[0]
     stripped_key = tmpkeyring.export_data(fingerprint)
     return stripped_key
 
