@@ -39,10 +39,10 @@ class QRImage(Gtk.Image):
         allocation = self.get_allocation()
         if allocation != self.last_allocation:
             self.last_allocation = allocation
-            self.draw_qrcode(self.data)
+            self.draw_qrcode()
 
-    def draw_qrcode(self, data=None, size=None):
-        data = data or self.data
+    def draw_qrcode(self, size=None):
+        data = self.data
         box = self.get_allocation()
         width, height = box.width, box.height
         size = size or min(width, height) - 10
