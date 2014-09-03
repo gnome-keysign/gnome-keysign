@@ -4,7 +4,7 @@ import sys
 import StringIO
 
 try:
-    from gi.repository import Gtk, GdkPixbuf
+    from gi.repository import Gtk, GLib, GdkPixbuf
     from monkeysign.gpg import Keyring
     from qrencode import encode_scaled
 except ImportError, e:
@@ -15,7 +15,8 @@ from datetime import datetime
 
 from scan_barcode import BarcodeReaderGTK
 
-FINGERPRINT_DEFAULT = 'F628 D3A3 9156 4304 3113\nA5E2 1CB9 C760 BC66 DFE1'
+
+# Pages for 'Keys' Tab
 
 class KeysPage(Gtk.VBox):
 
@@ -273,7 +274,7 @@ class KeyDetailsPage(Gtk.VBox):
             self.signaturesBox.pack_start(sigLabel, False, False, 0)
             sigLabel.show()
 
-# Pages shown on "Get Key" Tab
+# Pages for "Get Key" Tab
 
 class ScanFingerprintPage(Gtk.HBox):
 
@@ -322,29 +323,16 @@ class ScanFingerprintPage(Gtk.HBox):
         self.pack_start(leftBox, True, True, 0)
         self.pack_start(rightBox, True, True, 0)
 
-    def format_fingerprint(self, fpr, scanner=False):
-
-        if not scanner: # if fingerprint was typed
-
-            fpr = ''.join(fpr.replace(" ", '').split('\n'))
-
-            # a simple check to detect bad fingerprints
-            if len(fpr) != 40:
-                print("Fingerprint %s has not enough characters", fpr)
-                fpr = ''
-
-        return fpr
-
 
     def get_text_from_textview(self):
         start_iter = self.textbuffer.get_start_iter()
         end_iter = self.textbuffer.get_end_iter()
-        raw_fpr = self.textbuffer.get_text(start_iter, end_iter, False)
-        fpr = self.format_fingerprint(raw_fpr)
+        raw_text = self.textbuffer.get_text(start_iter, end_iter, False)
 
         self.textbuffer.delete(start_iter, end_iter)
-
-        return fpr
+        # return raw input from user. It will be checked on higher
+        # level if the there was a fingerprint entered
+        return raw_text
 
 
     def on_loadbutton_clicked(self, *args, **kwargs):
@@ -355,33 +343,32 @@ class SignKeyPage(Gtk.VBox):
 
     def __init__(self):
         super(SignKeyPage, self).__init__()
-        self.set_spacing(10)
+        self.set_spacing(5)
 
-        self.topLabel = Gtk.Label()
-        self.topLabel.set_markup("Downloading key with fingerprint ")
-        self.topLabel.set_line_wrap(True)
+        self.mainLabel = Gtk.Label()
+        self.mainLabel.set_line_wrap(True)
 
-        self.textview = Gtk.TextView()
-        self.textbuffer = self.textview.get_buffer()
+        self.pack_start(self.mainLabel, False, False, 0)
 
-        self.scrolled_window = Gtk.ScrolledWindow()
-        self.scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        self.scrolled_window.add(self.textview)
 
-        hBox = Gtk.HBox(spacing=10)
-        hBox.pack_start(self.topLabel, False, False, 0)
-        hBox.pack_start(self.scrolled_window, True, True, 0)
-        self.pack_start(hBox, True, True, 0)
+    def display_downloaded_key(self, key, scanned_fpr):
 
-    def display_downloaded_key(self, fpr, keydata):
-        self.topLabel.set_markup("Downloading key with fingerprint \n%s" % fpr)
-        self.topLabel.show()
+        # FIXME: If the two fingerprints don't match, the button
+        # should be disabled
+        key_text = GLib.markup_escape_text(str(key))
 
-        start_iter = self.textbuffer.get_start_iter()
-        end_iter = self.textbuffer.get_end_iter()
-        self.textbuffer.delete(start_iter, end_iter)
+        markup = """\
 
-        self.textbuffer.insert_at_cursor(keydata, len(keydata))
+
+Signing the following key
+
+<b>{0}</b>
+
+Press 'Next' if you have checked the ID of the person
+and you want to sign all UIDs on this key.""".format(key_text)
+
+        self.mainLabel.set_markup(markup)
+        self.mainLabel.show()
 
 
 class PostSignPage(Gtk.VBox):
