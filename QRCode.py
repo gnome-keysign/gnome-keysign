@@ -29,22 +29,37 @@ class QRImage(Gtk.Image):
     """
     
     def __init__(self, data='Default String', *args, **kwargs):
+        """The QRImage widget inherits from Gtk.Image,
+        but it probably cannot be used as one, as there
+        is an event handler for resizing events which will
+        overwrite to currently loaded image.
+        
+        You made set data now, or later simply via the property.
+        """
         super(QRImage, self).__init__(*args, **kwargs)
         self.log = logging.getLogger()
         # The data to be rendered
         self.data = data
-        # FIXME: Rename this to on_size_allocate
-        self.connect("size-allocate", self.expose_event)
+        self.connect("size-allocate", self.on_size_allocate)
         self.last_allocation = self.get_allocation()
 
-    def expose_event(self, widget, event):
-        # when window is resized, regenerate the QR code
+    def on_size_allocate(self, widget, event):
+        """This is the event handler for the resizing event, i.e.
+        when window is resized. We then want to regenerate the QR code.
+        """
         allocation = self.get_allocation()
         if allocation != self.last_allocation:
             self.last_allocation = allocation
             self.draw_qrcode()
 
+
     def draw_qrcode(self, size=None):
+        """This scales the QR Code up to the widget's
+        size. You may define your own size, but you must
+        be careful not to cause too many resizing events.
+        When you request a too big size, it may loop to death
+        trying to fit the image.
+        """
         data = self.data
         box = self.get_allocation()
         width, height = box.width, box.height
@@ -55,15 +70,18 @@ class QRImage(Gtk.Image):
         else:
             self.set_from_icon_name("gtk-dialog-error", Gtk.IconSize.DIALOG)
 
+
     @staticmethod
     def create_qrcode(data, size):
+        '''Creates a PIL image for the data given'''
         log.debug('Encoding %s', data)
         version, width, image = encode_scaled(data,size,0,1,2,True)
         return image
 
+
     @staticmethod
     def image_to_pixbuf(image):
-        # convert PIL image instance to Pixbuf
+        '''Converts a PIL image instance to Pixbuf'''
         fd = StringIO.StringIO()
         image.save(fd, "ppm")
         contents = fd.getvalue()
@@ -75,8 +93,6 @@ class QRImage(Gtk.Image):
         return pixbuf
 
 
-class QRWindow():
-    pass
 
 def main(data):
     w = Gtk.Window()
