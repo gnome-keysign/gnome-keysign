@@ -15,7 +15,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
-
+import logging
 import StringIO
 
 from gi.repository import Gtk, GdkPixbuf
@@ -26,8 +26,9 @@ class QRImage(Gtk.Image):
     The image tries to scale as big as possible.
     """
     
-    def __init__(self, data='remove me', *args, **kwargs):
+    def __init__(self, data='Default String', *args, **kwargs):
         super(QRImage, self).__init__(*args, **kwargs)
+        self.log = logging.getLogger()
         # The data to be rendered
         self.data = data
         # FIXME: Rename this to on_size_allocate
@@ -53,6 +54,7 @@ class QRImage(Gtk.Image):
             self.set_from_icon_name("gtk-dialog-error", Gtk.IconSize.DIALOG)
 
     def create_qrcode(self, data, size):
+        self.log.debug('Encoding %s', data)
         version, width, image = encode_scaled(data,size,0,1,2,True)
         return image
 
