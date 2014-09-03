@@ -21,6 +21,8 @@ import StringIO
 from gi.repository import Gtk, GdkPixbuf
 from qrencode import encode_scaled
 
+log = logging.getLogger()
+
 class QRImage(Gtk.Image):
     """An Image encoding data as a QR Code.
     The image tries to scale as big as possible.
@@ -53,8 +55,9 @@ class QRImage(Gtk.Image):
         else:
             self.set_from_icon_name("gtk-dialog-error", Gtk.IconSize.DIALOG)
 
-    def create_qrcode(self, data, size):
-        self.log.debug('Encoding %s', data)
+    @staticmethod
+    def create_qrcode(data, size):
+        log.debug('Encoding %s', data)
         version, width, image = encode_scaled(data,size,0,1,2,True)
         return image
 
