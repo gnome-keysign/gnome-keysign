@@ -406,30 +406,49 @@ class GetKeySection(Gtk.VBox):
         keyring = Keyring()
         keyring.context.set_option('export-options', 'export-minimal')
         
-        tmpkeyring = TempKeyring()
-        # Copy and paste job from monkeysign.ui.prepare
-        tmpkeyring.context.set_option('secret-keyring', keyring.homedir + '/secring.gpg')
+        class TempKeyringCopy(TempKeyring):
+            """A temporary keyring which uses the secret keys of a parent keyring
+            
+            It mainly copies the public keys from the parent keyring to this temporary
+            keyring and sets this keyring up such that it uses the secret keys of the
+            parent keyring.
+            """
+            def __init__(self, keyring, *args, **kwargs):
+                self.keyring = keyring
+                # Not a new style class...
+                if issubclass(self.__class__, object):
+                    super(TempKeyringCopy, self).__init__(*args, **kwargs)
+                else:
+                    TempKeyring.__init__(self, *args, **kwargs)
+                
+                self.log = logging.getLogger()
 
-        # copy the gpg.conf from the real keyring
-        try:
-            from_ = keyring.homedir + '/gpg.conf'
-            to_ = tmpkeyring.homedir
-            shutil.copy(from_, to_)
-            self.log.debug('copied your gpg.conf from %s to %s', from_, to_)
-        except IOError as e:
-            # no such file or directory is alright: it means the use
-            # has no gpg.conf (because we are certain the temp homedir
-            # exists at this point)
-            if e.errno != 2:
-                pass
+                tmpkeyring = self
+                # Copy and paste job from monkeysign.ui.prepare
+                tmpkeyring.context.set_option('secret-keyring', keyring.homedir + '/secring.gpg')
+        
+                # copy the gpg.conf from the real keyring
+                try:
+                    from_ = keyring.homedir + '/gpg.conf'
+                    to_ = tmpkeyring.homedir
+                    shutil.copy(from_, to_)
+                    self.log.debug('copied your gpg.conf from %s to %s', from_, to_)
+                except IOError as e:
+                    # no such file or directory is alright: it means the use
+                    # has no gpg.conf (because we are certain the temp homedir
+                    # exists at this point)
+                    if e.errno != 2:
+                        pass
+        
+        
+                # Copy the public parts of the secret keys to the tmpkeyring
+                signing_keys = []
+                for fpr, key in keyring.get_keys(None, secret=True, public=False).items():
+                    if not key.invalid and not key.disabled and not key.expired and not key.revoked:
+                        signing_keys.append(key)
+                        tmpkeyring.import_data (keyring.export_data (fpr))
 
-
-        # Copy the public parts of the secret keys to the tmpkeyring
-        signing_keys = []
-        for fpr, key in keyring.get_keys(None, secret=True, public=False).items():
-            if not key.invalid and not key.disabled and not key.expired and not key.revoked:
-                signing_keys.append(key)
-                tmpkeyring.import_data (keyring.export_data (fpr))
+        tmpkeyring = TempKeyringCopy(keyring)
 
         # 1. fetch the key into a temporary keyring
         # 1.a) from the local keyring
