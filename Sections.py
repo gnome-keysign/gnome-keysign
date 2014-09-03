@@ -86,6 +86,21 @@ def UIDExport(uid, keydata):
 
 
 
+
+
+## Monkeypatching to get more debug output
+import monkeysign.gpg
+bc = monkeysign.gpg.Context.build_command
+def build_command(*args, **kwargs):
+    ret = bc(*args, **kwargs)
+    #log.info("Building command %s", ret)
+    log.debug("Building cmd: %s", ' '.join(["'%s'" % c for c in ret]))
+    return ret
+monkeysign.gpg.Context.build_command = build_command
+
+
+
+
 class KeySignSection(Gtk.VBox):
 
     def __init__(self, app):
