@@ -77,6 +77,7 @@ class QRWindow():
 def main(data):
     w = Gtk.Window()
     w.connect("delete-event", Gtk.main_quit)
+    w.set_default_size(100,100)
     qr = QRImage(data)
     qr.draw_qrcode()
     w.add(qr)
