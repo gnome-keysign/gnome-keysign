@@ -234,7 +234,7 @@ class KeyDetailsPage(Gtk.VBox):
         self.pack_start(uidsLabel, False, False, 0)
         self.pack_start(self.uidsBox, True, True, 0)
         self.pack_start(self.expireLabel, False, False, 0)
-        self.pack_start(signaturesLabel, False, False, 0)
+        #self.pack_start(signaturesLabel, False, False, 0)
         self.pack_start(self.signaturesBox, True, True, 0)
 
     def parse_sig_list(self, text):
@@ -279,9 +279,8 @@ class KeyDetailsPage(Gtk.VBox):
         self.keyring.context.call_command(['list-sigs', str(openPgpKey.keyid())])
 
         sigslist = self.parse_sig_list(self.keyring.context.stdout)
-        # FIXME: what do we actually want to show here: the numbers of signatures
-        # for this key or the number of times this key was used to signed others
-        for (keyid,timestamp,uid) in sigslist:
+        sorted_sigslist = reversed(sorted(sigslist, key=lambda signature:signature[1]))
+        for (keyid,timestamp,uid) in list(sorted_sigslist)[:10]:
             sigLabel = Gtk.Label()
             date = datetime.fromtimestamp(float(timestamp))
             sigLabel.set_markup(str(keyid) + "\t\t" + date.ctime())
@@ -289,6 +288,13 @@ class KeyDetailsPage(Gtk.VBox):
 
             self.signaturesBox.pack_start(sigLabel, False, False, 0)
             sigLabel.show()
+            
+        sigLabel = Gtk.Label()
+        sigLabel.set_markup(str(len(sigslist)) + " signatures")
+        sigLabel.set_line_wrap(True)
+        self.signaturesBox.pack_start(sigLabel, False, False, 0)
+        sigLabel.show()
+
 
 # Pages for "Get Key" Tab
 
