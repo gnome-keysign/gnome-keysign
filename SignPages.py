@@ -149,15 +149,8 @@ class KeyPresentPage(Gtk.HBox):
 
     def draw_qrcode(self):
         assert self.fpr
-        box = self.rightVBox.get_allocation()
-        if box.width < box.height:
-            size = box.width - 30
-        else:
-            size = box.height - 30
-
         data = 'OPENPGP4FPR:' + self.fpr
         self.qrcode.data = data
-        self.qrcode.draw_qrcode(size=size)
 
 
 
