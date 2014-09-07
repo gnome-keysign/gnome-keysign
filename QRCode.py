@@ -55,6 +55,7 @@ class QRImage(Gtk.DrawingArea):
 
 
     def on_button_released(self, widget, event):
+        self.log.info('Event %s', dir(event))
         if event.button == 1:
             w = FullscreenQRImageWindow(data=self.data)
 
@@ -130,8 +131,11 @@ class FullscreenQRImageWindow(Gtk.Window):
         self.add(self.qrimage)
         
         self.connect('button-release-event', self.on_button_released)
+        self.connect('key-release-event', self.on_key_released)
         self.add_events(
-            Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.BUTTON_PRESS_MASK)
+            Gdk.EventMask.KEY_PRESS_MASK | Gdk.EventMask.KEY_RELEASE_MASK |
+            Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.BUTTON_PRESS_MASK
+            )
 
         self.show_all()
 
@@ -139,7 +143,19 @@ class FullscreenQRImageWindow(Gtk.Window):
     def on_button_released(self, widget, event):
         '''Connected to the button-release-event and closes this
         window''' # It's unclear whether all resources are free()d
+        self.log.info('Event on fullscreen: %s', event)
         if event.button == 1:
+            self.unfullscreen()
+            self.hide()
+            self.close()
+
+    def on_key_released(self, widget, event):
+        self.log.info('Event on fullscreen: %s', dir(event))
+        self.log.info('keycode: %s', event.get_keycode())
+        self.log.info('keyval: %s', event.get_keyval())
+        self.log.info('keyval: %s', Gdk.keyval_name(event.keyval))
+        keyname = Gdk.keyval_name(event.keyval).lower()
+        if keyname == 'escape' or keyname == 'f' or keyname == 'q':
             self.unfullscreen()
             self.hide()
             self.close()
