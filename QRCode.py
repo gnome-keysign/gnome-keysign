@@ -18,12 +18,12 @@
 import logging
 import StringIO
 
-from gi.repository import Gtk, GdkPixbuf
+from gi.repository import Gdk, Gtk, GdkPixbuf
 from qrencode import encode_scaled
 
 log = logging.getLogger()
 
-class QRImage(Gtk.Image):
+class QRImage(Gtk.DrawingArea):
     """An Image encoding data as a QR Code.
     The image tries to scale as big as possible.
     """
@@ -40,20 +40,21 @@ class QRImage(Gtk.Image):
         self.log = logging.getLogger()
         # The data to be rendered
         self.data = data
-        self.connect("size-allocate", self.on_size_allocate)
         self.last_allocation = self.get_allocation()
+        self.set_app_paintable(True)
 
-    def on_size_allocate(self, widget, event):
+    def do_size_allocate(self, event):
         """This is the event handler for the resizing event, i.e.
         when window is resized. We then want to regenerate the QR code.
         """
         allocation = self.get_allocation()
         if allocation != self.last_allocation:
             self.last_allocation = allocation
-            self.draw_qrcode()
+            self.queue_draw()
+        Gtk.DrawingArea.do_size_allocate(self, event)
 
 
-    def draw_qrcode(self, size=None):
+    def do_draw(self, cr):
         """This scales the QR Code up to the widget's
         size. You may define your own size, but you must
         be careful not to cause too many resizing events.
@@ -63,12 +64,11 @@ class QRImage(Gtk.Image):
         data = self.data
         box = self.get_allocation()
         width, height = box.width, box.height
-        size = size or min(width, height) - 10
+        size = min(width, height) - 10
         if data is not None:
-            self.pixbuf = self.image_to_pixbuf(self.create_qrcode(data, size))
-            self.set_from_pixbuf(self.pixbuf)
-        else:
-            self.set_from_icon_name("gtk-dialog-error", Gtk.IconSize.DIALOG)
+            pixbuf = self.image_to_pixbuf(self.create_qrcode(data, size))
+            Gdk.cairo_set_source_pixbuf(cr, pixbuf, width//2 - size//2, height//2 - size//2)
+            cr.paint()
 
 
     @staticmethod
