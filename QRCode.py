@@ -28,13 +28,17 @@ class QRImage(Gtk.DrawingArea):
     The image tries to scale as big as possible.
     """
     
-    def __init__(self, data='Default String', *args, **kwargs):
+    def __init__(self, data='Default String', handle_events=True,
+                       *args, **kwargs):
         """The QRImage widget inherits from Gtk.Image,
         but it probably cannot be used as one, as there
         is an event handler for resizing events which will
         overwrite to currently loaded image.
         
         You made set data now, or later simply via the property.
+        
+        handle_events can be set to False if the fullscreen
+        window should not be created on click.
         """
         super(QRImage, self).__init__(*args, **kwargs)
         self.log = logging.getLogger()
@@ -42,6 +46,18 @@ class QRImage(Gtk.DrawingArea):
         self.data = data
         self.last_allocation = self.get_allocation()
         self.set_app_paintable(True)
+
+        self.handle_events = handle_events
+        if handle_events:
+            self.connect('button-release-event', self.on_button_released)
+            self.add_events(
+                Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.BUTTON_PRESS_MASK)
+
+
+    def on_button_released(self, widget, event):
+        if event.button == 1:
+            w = FullscreenQRImageWindow(data=self.data)
+
 
     def do_size_allocate(self, event):
         """This is the event handler for the resizing event, i.e.
@@ -94,16 +110,68 @@ class QRImage(Gtk.DrawingArea):
 
 
 
+class FullscreenQRImageWindow(Gtk.Window):
+    '''Displays a QRImage in a fullscreen window
+    
+    The window is supposed to close itself when a button is
+    clicked.'''
+
+    def __init__(self, data, *args, **kwargs):
+        '''The data will be passed to the QRImage'''
+        self.log = logging.getLogger()
+        if issubclass(self.__class__, object):
+            super(FullscreenQRImageWindow, self).__init__(*args, **kwargs)
+        else:
+            Gtk.Window.__init__(*args, **kwargs)
+
+        self.fullscreen()
+        
+        self.qrimage = QRImage(data=data, handle_events=False)
+        self.add(self.qrimage)
+        
+        self.connect('button-release-event', self.on_button_released)
+        self.add_events(
+            Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.BUTTON_PRESS_MASK)
+
+        self.show_all()
+
+
+    def on_button_released(self, widget, event):
+        '''Connected to the button-release-event and closes this
+        window''' # It's unclear whether all resources are free()d
+        if event.button == 1:
+            self.unfullscreen()
+            self.hide()
+            self.close()
+
+
 def main(data):
     w = Gtk.Window()
     w.connect("delete-event", Gtk.main_quit)
     w.set_default_size(100,100)
     qr = QRImage(data)
+
+    global fullscreen
+    fullscreen = False
+
+    def on_released(widget, event):
+        global fullscreen
+ 
+        if event.button == 1:
+            fullscreen = not fullscreen
+            if fullscreen:
+                w.fullscreen()
+            else:
+                w.unfullscreen()
+        
+    #qr.connect('button-release-event', on_released)
+    #qr.add_events(Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.BUTTON_PRESS_MASK)
     w.add(qr)
     w.show_all()
     Gtk.main()
 
 if __name__ == '__main__':
     import sys
+    logging.basicConfig(level=logging.DEBUG)
     data = sys.argv[1]
     main(data)
