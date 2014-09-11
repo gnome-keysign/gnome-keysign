@@ -1,42 +1,89 @@
 #!/usr/bin/env python
 
 import logging
-
-from gi.repository import GLib
-from gi.repository import Gtk
+import signal
+import sys
 
 from network.AvahiBrowser import AvahiBrowser
 from network.AvahiPublisher import AvahiPublisher
+
+from gi.repository import Gtk, GLib, Gio
 from Sections import KeySignSection, GetKeySection
 
+import Keyserver
 
-class MainWindow(Gtk.Window):
+class MainWindow(Gtk.Application):
 
     def __init__(self):
-        Gtk.Window.__init__(self, title="Geysign")
-        self.log = logging.getLogger()
+        Gtk.Application.__init__(
+            self, application_id=None) ### org.gnome.Geysign ###
+        self.connect("activate", self.on_activate)
+        self.connect("startup", self.on_startup)
 
-        self.set_border_width(10)
-        self.set_position(Gtk.WindowPosition.CENTER)
+        self.log = logging.getLogger()
+        self.log = logging
+
+
+
+    def on_quit(self, app, param=None):
+        self.quit()
+
+
+    def on_startup(self, app):
+        self.log.info("Startup")
+        self.window = Gtk.ApplicationWindow(application=app)
+
+        self.window.set_border_width(10)
+        self.window.set_position(Gtk.WindowPosition.CENTER)
 
         # create notebook container
         notebook = Gtk.Notebook()
-        notebook.append_page(KeySignSection(), Gtk.Label('Keys'))
-        notebook.append_page(GetKeySection(), Gtk.Label('Get Key'))
-        self.add(notebook)
+        notebook.append_page(KeySignSection(self), Gtk.Label('Keys'))
+        notebook.append_page(GetKeySection(self), Gtk.Label('Get Key'))
+        self.window.add(notebook)
 
-        # setup signals
-        self.connect("delete-event", Gtk.main_quit)
+        quit = Gio.SimpleAction(name="quit", parameter_type=None)
+        self.add_action(quit)
+        self.add_accelerator("<Primary>q", "app.quit", None)
+        quit.connect("activate", self.on_quit)
 
+        # Avahi services
         self.avahi_browser = None
-        self.avahi_service_type = '_demo._tcp'
+        self.avahi_service_type = '_geysign._tcp'
         self.discovered_services = []
         GLib.idle_add(self.setup_avahi_browser)
 
-        self.avahi_publisher = None
-        self.avahi_publish_name = "DemoService"
+        self.keyserver = None
         self.port = 9001
-        GLib.idle_add(self.setup_avahi_publisher)
+
+        ## App menus
+        appmenu = Gio.Menu.new()
+        section = Gio.Menu.new()
+        appmenu.append_section(None, section)
+
+        some_action = Gio.SimpleAction.new("scan-image", None)
+        some_action.connect('activate', self.on_scan_image)
+        self.add_action(some_action)
+        some_item = Gio.MenuItem.new("Scan Image", "app.scan-image")
+        section.append_item(some_item)
+
+        quit_item = Gio.MenuItem.new("Quit", "app.quit")
+        section.append_item(quit_item)
+
+        self.set_app_menu(appmenu)
+
+
+    def on_scan_image(self, *args, **kwargs):
+        print "scanimage"
+
+    def on_activate(self, app):
+        self.log.info("Activate!")
+        #self.window = Gtk.ApplicationWindow(application=app)
+
+        self.window.show_all()
+        # In case the user runs the application a second time,
+        # we raise the existing window.
+        # self.window.present()
 
     def setup_avahi_browser(self):
         # FIXME: place a proper service type
@@ -45,13 +92,21 @@ class MainWindow(Gtk.Window):
 
         return False
 
-    def setup_avahi_publisher(self):
-        # FIXME: make it skip local services
-        self.avahi_publisher = AvahiPublisher(name=self.avahi_publish_name,
-                                port=self.port, stype=self.avahi_service_type)
-        self.avahi_publisher.publish()
-        # For now the service is un-published when the program is closed
+    def setup_server(self, keydata=None):
+        self.log.info('Serving now')
+        #self.keyserver = Thread(name='keyserver',
+        #                        target=Keyserver.serve_key, args=('Foobar',))
+        #self.keyserver.daemon = True
+        self.log.debug('About to call %r', Keyserver.ServeKeyThread)
+        self.keyserver = Keyserver.ServeKeyThread(str(keydata))
+        self.log.info('Starting thread %r', self.keyserver)
+        self.keyserver.start()
+        self.log.info('Finsihed serving')
         return False
+
+    def stop_server(self):
+        self.keyserver.shutdown()
+
 
     def on_new_service(self, browser, name, address, port):
         self.log.info("Probably discovered something, let me check; %s %s:%i",
@@ -71,3 +126,19 @@ class MainWindow(Gtk.Window):
         self.discovered_services += ((name, address, port), )
 
         return False
+
+
+
+def main():
+    try:
+        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : Gtk.main_quit(), None)
+    except AttributeError:
+        pass
+
+    app = MainWindow()
+    exit_status = app.run(None)
+
+    return exit_status
+
+if __name__ == '__main__':
+    sys.exit(main())
