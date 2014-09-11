@@ -1,7 +1,27 @@
 #!/usr/bin/env python
+#    Copyright 2014 Tobias Mueller <muelli@cryptobitch.de>
+#
+#    This file is part of GNOME Keysign.
+#
+#    GNOME Keysign is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    GNOME Keysign is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
 from urlparse import ParseResult
+from string import Template
+import shutil
+from subprocess import call
+from tempfile import NamedTemporaryFile
 
 import requests
 from requests.exceptions import ConnectionError
@@ -30,12 +50,131 @@ from gi.repository import GdkX11
 # Needed for window.get_xid(), xvimagesink.set_window_handle(), respectively:
 from gi.repository import GstVideo
 
+import key
+
 Gst.init([])
 
 
 progress_bar_text = ["Step 1: Scan QR Code or type fingerprint and click on 'Download' button",
                      "Step 2: Compare the received fpr with the owner's fpr and click 'Sign'",
                      "Step 3: Key was succesfully signed and an email was send to owner."]
+
+
+SUBJECT = 'Your signed key $fingerprint'
+BODY = '''Hi $uid,
+
+
+I have just signed your key
+
+      $fingerprint
+
+
+Thanks for letting me sign your key!
+
+--
+GNOME Keysign
+'''
+
+
+
+
+# FIXME: This probably wants to go somewhere more central.
+# Maybe even into Monkeysign.
+log = logging.getLogger()
+def UIDExport(uid, keydata):
+    """Export only the UID of a key.
+    Unfortunately, GnuPG does not provide smth like
+    --export-uid-only in order to obtain a UID and its
+    signatures."""
+    tmp = TempKeyring()
+    # Hm, apparently this needs to be set, otherwise gnupg will issue
+    # a stray "gpg: checking the trustdb" which confuses the gnupg library
+    tmp.context.set_option('always-trust')
+    tmp.import_data(keydata)
+    for fpr, key in tmp.get_keys(uid).items():
+        for u in key.uidslist:
+            key_uid = u.uid
+            if key_uid != uid:
+                log.info('Deleting UID %s from key %s', key_uid, fpr)
+                tmp.del_uid(fingerprint=fpr, pattern=key_uid)
+    only_uid = tmp.export_data(uid)
+
+    return only_uid
+
+
+def MinimalExport(keydata):
+    '''Returns the minimised version of a key
+    
+    For now, you must provide one key only.'''
+    tmpkeyring = TempKeyring()
+    ret = tmpkeyring.import_data(keydata)
+    log.debug("Returned %s after importing %s", ret, keydata)
+    assert ret
+    tmpkeyring.context.set_option('export-options', 'export-minimal')
+    keys = tmpkeyring.get_keys()
+    log.debug("Keys after importing: %s (%s)", keys, keys.items())
+    # We assume the keydata to contain one key only
+    fingerprint, key = keys.items()[0]
+    stripped_key = tmpkeyring.export_data(fingerprint)
+    return stripped_key
+
+
+
+class TempKeyringCopy(TempKeyring):
+    """A temporary keyring which uses the secret keys of a parent keyring
+    
+    It mainly copies the public keys from the parent keyring to this temporary
+    keyring and sets this keyring up such that it uses the secret keys of the
+    parent keyring.
+    """
+    def __init__(self, keyring, *args, **kwargs):
+        self.keyring = keyring
+        # Not a new style class...
+        if issubclass(self.__class__, object):
+            super(TempKeyringCopy, self).__init__(*args, **kwargs)
+        else:
+            TempKeyring.__init__(self, *args, **kwargs)
+        
+        self.log = logging.getLogger()
+
+        tmpkeyring = self
+        # Copy and paste job from monkeysign.ui.prepare
+        tmpkeyring.context.set_option('secret-keyring', keyring.homedir + '/secring.gpg')
+
+        # copy the gpg.conf from the real keyring
+        try:
+            from_ = keyring.homedir + '/gpg.conf'
+            to_ = tmpkeyring.homedir
+            shutil.copy(from_, to_)
+            self.log.debug('copied your gpg.conf from %s to %s', from_, to_)
+        except IOError as e:
+            # no such file or directory is alright: it means the use
+            # has no gpg.conf (because we are certain the temp homedir
+            # exists at this point)
+            if e.errno != 2:
+                pass
+
+
+        # Copy the public parts of the secret keys to the tmpkeyring
+        signing_keys = []
+        for fpr, key in keyring.get_keys(None, secret=True, public=False).items():
+            if not key.invalid and not key.disabled and not key.expired and not key.revoked:
+                signing_keys.append(key)
+                tmpkeyring.import_data (keyring.export_data (fpr))
+
+
+
+## Monkeypatching to get more debug output
+import monkeysign.gpg
+bc = monkeysign.gpg.Context.build_command
+def build_command(*args, **kwargs):
+    ret = bc(*args, **kwargs)
+    #log.info("Building command %s", ret)
+    log.debug("Building cmd: %s", ' '.join(["'%s'" % c for c in ret]))
+    return ret
+monkeysign.gpg.Context.build_command = build_command
+
+
 
 
 class KeySignSection(Gtk.VBox):
@@ -89,6 +228,11 @@ class KeySignSection(Gtk.VBox):
 
         # this will hold a reference to the last key selected
         self.last_selected_key = None
+        
+        # When obtaining a key is successful,
+        # it will save the key data in this field
+        self.received_key_data = None
+
 
     def on_button_clicked(self, button):
 
@@ -196,7 +340,9 @@ class GetKeySection(Gtk.VBox):
         self.scanPage.scanFrame.connect('barcode', self.on_barcode)
         #GLib.idle_add(        self.scanFrame.run)
 
-        self.signui = SignUi(self.app)
+        # A list holding references to temporary files which should probably
+        # be cleaned up on exit...
+        self.tmpfiles = []
 
     def set_progress_bar(self):
         page_index = self.notebook.get_current_page()
@@ -220,7 +366,7 @@ class GetKeySection(Gtk.VBox):
         The message argument is a GStreamer message that created
         the barcode.'''
 
-        fpr = verify_fingerprint(barcode)
+        fpr = self.verify_fingerprint(barcode)
 
         if fpr != None:
             try:
@@ -304,6 +450,7 @@ class GetKeySection(Gtk.VBox):
             # FIXME : don't return here
             return
 
+        self.log.debug('Adding %s as callback', callback)
         GLib.idle_add(callback, fingerprint, keydata, data)
 
         # If this function is added itself via idle_add, then idle_add will
@@ -315,28 +462,82 @@ class GetKeySection(Gtk.VBox):
     def sign_key_async(self, fingerprint, callback=None, data=None, error_cb=None):
         self.log.debug("I will sign key with fpr {}".format(fingerprint))
 
-        self.signui.pattern = fingerprint
+        keyring = Keyring()
+        keyring.context.set_option('export-options', 'export-minimal')
+        
+        tmpkeyring = TempKeyringCopy(keyring)
+
         # 1. fetch the key into a temporary keyring
         # 1.a) from the local keyring
-        self.log.debug("looking for key %s in your keyring", self.signui.pattern)
-        self.signui.keyring.context.set_option('export-options', 'export-minimal')
-        if self.signui.tmpkeyring.import_data(self.signui.keyring.export_data(self.signui.pattern)):
+        # FIXME: WTF?! How would the ring enter the keyring in first place?!
+        keydata = data or self.received_key_data
 
-            # 2. copy the signing key secrets into the keyring
-            self.signui.copy_secrets()
+        if keydata:
+            stripped_key = MinimalExport(keydata)
+        else: # Do we need this branch at all?
+            self.log.debug("looking for key %s in your keyring", fingerprint)
+            keyring.context.set_option('export-options', 'export-minimal')
+            stripped_key = keyring.export_data(fingerprint)
+
+        self.log.debug('Trying to import key\n%s', stripped_key)
+        if tmpkeyring.import_data(stripped_key):
             # 3. for every user id (or all, if -a is specified)
             # 3.1. sign the uid, using gpg-agent
-            try:
-                self.signui.sign_key()
-            except GpgRuntimeError, e:
-                self.log.error("There was an error signing key: \n%s", e)
+            keys = tmpkeyring.get_keys(fingerprint)
+            self.log.info("Found keys %s for fp %s", keys, fingerprint)
+            assert len(keys) == 1, "We received multiple keys for fp %s: %s" % (fingerprint, keys)
+            key = keys[fingerprint]
+            uidlist = key.uidslist
+            
+            # FIXME: For now, we sign all UIDs. This is bad.
+            ret = tmpkeyring.sign_key(uidlist[0].uid, signall=True)
+            self.log.info("Result of signing %s on key %s: %s", uidlist[0].uid, fingerprint, ret)
+    
+            
+            for uid in uidlist:
+                uid_str = uid.uid
+                self.log.info("Processing uid %s %s", uid, uid_str)
 
-            # 3.2. export and encrypt the signature
-            # 3.3. mail the key to the user
-            # FIXME: for now only export it to a file
-            self.save_to_file()
-            # self.sign.export_key()
-
+                # 3.2. export and encrypt the signature
+                # 3.3. mail the key to the user
+                signed_key = UIDExport(uid_str, tmpkeyring.export_data(uid_str))
+                self.log.info("Exported %d bytes of signed key", len(signed_key))
+                # self.signui.tmpkeyring.context.set_option('armor')
+                tmpkeyring.context.set_option('always-trust')
+                encrypted_key = tmpkeyring.encrypt_data(data=signed_key, recipient=uid_str)
+    
+                keyid = str(key.keyid())
+                ctx = {
+                    'uid' : uid_str,
+                    'fingerprint': fingerprint,
+                    'keyid': keyid,
+                }
+                # We could try to dir=tmpkeyring.dir
+                # We do not use the with ... as construct as the 
+                # tempfile might be deleted before the MUA had the chance
+                # to get hold of it.
+                # Hence we reference the tmpfile and hope that it will be properly
+                # cleaned up when this object will be destroyed...
+                tmpfile = NamedTemporaryFile(prefix='gnome-keysign-', suffix='.asc')
+                self.tmpfiles.append(tmpfile)
+                filename = tmpfile.name
+                self.log.info('Writing keydata to %s', filename)
+                tmpfile.write(encrypted_key)
+                # Interesting, sometimes it would not write the whole thing out,
+                # so we better flush here
+                tmpfile.flush()
+                # As we're done with the file, we close it.
+                #tmpfile.close()
+                
+                subject = Template(SUBJECT).safe_substitute(ctx)
+                body = Template(BODY).safe_substitute(ctx)
+                self.email_file (to=uid_str, subject=subject, 
+                                 body=body, files=[filename])
+            
+            
+            # FIXME: Can we get rid of self.tmpfiles here already? Even if the MUA is still running?
+            
+            
             # 3.4. optionnally (-l), create a local signature and import in
             # local keyring
             # 4. trash the temporary keyring
@@ -349,25 +550,35 @@ class GetKeySection(Gtk.VBox):
 
         return False
 
-    def save_to_file(self):
-        #FIXME: this is a temporary function to export signed key,
-        # it should send an email to the key owner
-        if len(self.signui.signed_keys) < 1:
-            self.log.error('no key signed, nothing to export')
-
-
-        for fpr, key in self.signui.signed_keys.items():
-            filename = "%s_signed.gpg" %fpr
-            f = open(filename, "wt")
-
-            f.write(self.signui.tmpkeyring.export_data(fpr))
-
-            self.log.info("Key with fpr %s was signed and exported to file %s", fpr, filename)
-
-        return False
 
     def send_email(self, fingerprint, *data):
-        pass
+        self.log.exception("Sending email... NOT")
+        return False
+        
+    def email_file(self, to, from_=None, subject=None,
+                   body=None,
+                   ccs=None, bccs=None,
+                   files=None, utf8=True):
+        cmd = ['xdg-email']
+        if utf8:
+            cmd += ['--utf8']
+        if subject:
+            cmd += ['--subject', subject]
+        if body:
+            cmd += ['--body', body]
+        for cc in ccs or []:
+            cmd += ['--cc', cc]
+        for bcc in bccs or []:
+            cmd += ['--cc', bcc]
+        for file_ in files or []:
+            cmd += ['--attach', file_]
+
+        cmd += [to]
+
+        self.log.info("Running %s", cmd)
+        retval = call(cmd)
+        return retval
+
 
     def on_button_clicked(self, button, *args, **kwargs):
 
@@ -407,11 +618,11 @@ class GetKeySection(Gtk.VBox):
 
 
             if page_index == 2:
-                # signing of key and sending an email is done on separate
-                # threads also
-
+                # self.received_key_data will be set by the callback of the
+                # obtain_key function. At least it should...
+                # The data flow isn't very nice. It probably needs to be redone...
                 GLib.idle_add(self.sign_key_async, self.last_received_fingerprint,
-                    self.send_email, self.last_received_fingerprint)
+                    self.send_email, self.received_key_data)
 
 
         elif button == self.backButton:
@@ -419,7 +630,8 @@ class GetKeySection(Gtk.VBox):
             self.set_progress_bar()
 
 
-    def recieved_key(self, fingerprint, *data):
+    def recieved_key(self, fingerprint, keydata, *data):
+        self.received_key_data = keydata
         openpgpkey = self.tmpkeyring.get_keys(fingerprint).values()[0]
         self.signPage.display_downloaded_key(openpgpkey, fingerprint)
 
@@ -443,45 +655,46 @@ passwords."""
         MonkeysignUi.main(self)
 
     def yes_no(self, prompt, default = None):
-        dialog = Gtk.MessageDialog(self.app.window, 0, Gtk.MessageType.INFO,
-                    Gtk.ButtonsType.YES_NO, prompt)
-        response = dialog.run()
-        dialog.destroy()
+        # dialog = Gtk.MessageDialog(self.app.window, 0, Gtk.MessageType.INFO,
+        #             Gtk.ButtonsType.YES_NO, prompt)
+        # response = dialog.run()
+        # dialog.destroy()
 
-        return response == Gtk.ResponseType.YES
+        # return response == Gtk.ResponseType.YES
         # Simply return True for now
-        # return True
+        return True
 
     def choose_uid(self, prompt, key):
-        dialog = Gtk.Dialog(prompt, self.app.window, 0,
-                (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
-                 Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
+        # dialog = Gtk.Dialog(prompt, self.app.window, 0,
+        #         (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
+        #          Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
 
-        label = Gtk.Label(prompt)
-        dialog.vbox.pack_start(label, False, False, 0)
-        label.show()
+        # label = Gtk.Label(prompt)
+        # dialog.vbox.pack_start(label, False, False, 0)
+        # label.show()
 
-        self.uid_radios = None
-        for uid in key.uidslist:
-            r = Gtk.RadioButton.new_with_label_from_widget(
-                        self.uid_radios, uid.uid)
-            r.show()
-            dialog.vbox.pack_start(r, False, False, 0)
+        # self.uid_radios = None
+        # for uid in key.uidslist:
+        #     r = Gtk.RadioButton.new_with_label_from_widget(
+        #                 self.uid_radios, uid.uid)
+        #     r.show()
+        #     dialog.vbox.pack_start(r, False, False, 0)
 
-            if self.uid_radios is None:
-                self.uid_radios = r
-                self.uid_radios.set_active(True)
-            else:
-                self.uid_radios.set_active(False)
+        #     if self.uid_radios is None:
+        #         self.uid_radios = r
+        #         self.uid_radios.set_active(True)
+        #     else:
+        #         self.uid_radios.set_active(False)
 
-        response = dialog.run()
+        # response = dialog.run()
 
-        label = None
-        if response == Gtk.ResponseType.ACCEPT:
-            self.app.log.info("okay signing")
-            label = [ r for r in self.uid_radios.get_group() if r.get_active()][0].get_label()
-        else:
-            self.app.log.info('user denied signature')
+        # label = None
+        # if response == Gtk.ResponseType.ACCEPT:
+        #     self.app.log.info("okay signing")
+        #     label = [ r for r in self.uid_radios.get_group() if r.get_active()][0].get_label()
+        # else:
+        #     self.app.log.info('user denied signature')
 
-        dialog.destroy()
-        return label
+        # dialog.destroy()
+        # return label
+        return None
