@@ -16,6 +16,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
+from itertools import islice
 import sys
 import StringIO
 
@@ -279,8 +280,10 @@ class KeyDetailsPage(Gtk.VBox):
         self.keyring.context.call_command(['list-sigs', str(openPgpKey.keyid())])
 
         sigslist = self.parse_sig_list(self.keyring.context.stdout)
-        sorted_sigslist = reversed(sorted(sigslist, key=lambda signature:signature[1]))
-        for (keyid,timestamp,uid) in list(sorted_sigslist)[:10]:
+        sorted_sigslist = sorted(sigslist,
+                                 key=lambda signature:signature[1],
+                                 reverse=True)
+        for (keyid,timestamp,uid) in islice(sorted_sigslist, 10):
             sigLabel = Gtk.Label()
             date = datetime.fromtimestamp(float(timestamp))
             sigLabel.set_markup(str(keyid) + "\t\t" + date.ctime())
