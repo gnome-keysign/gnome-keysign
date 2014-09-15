@@ -226,7 +226,7 @@ class KeyDetailsPage(Gtk.VBox):
         self.expireLabel = Gtk.Label()
         self.expireLabel.set_text("Expires 0000-00-00")
 
-        signaturesLabel = Gtk.Label()
+        self.signatures_label = signaturesLabel = Gtk.Label()
         signaturesLabel.set_text("Signatures")
 
         # this will also be populated later
@@ -235,7 +235,7 @@ class KeyDetailsPage(Gtk.VBox):
         self.pack_start(uidsLabel, False, False, 0)
         self.pack_start(self.uidsBox, True, True, 0)
         self.pack_start(self.expireLabel, False, False, 0)
-        #self.pack_start(signaturesLabel, False, False, 0)
+        self.pack_start(signaturesLabel, False, False, 0)
         self.pack_start(self.signaturesBox, True, True, 0)
 
     def parse_sig_list(self, text):
@@ -283,7 +283,10 @@ class KeyDetailsPage(Gtk.VBox):
         sigslist = self.parse_sig_list(self.keyring.context.stdout)
 
         SHOW_SIGNATURES = False
-        if SHOW_SIGNATURES:
+        if not SHOW_SIGNATURES:
+            self.signatures_label.hide()
+        else:
+            self.signatures_label.show()
             sorted_sigslist = sorted(sigslist,
                                      key=lambda signature:signature[1],
                                      reverse=True)
@@ -297,7 +300,7 @@ class KeyDetailsPage(Gtk.VBox):
                 sigLabel.show()
             
         sigLabel = Gtk.Label()
-        sigLabel.set_markup(str(len(sigslist)) + " signatures")
+        sigLabel.set_markup("%d signatures" % len(sigslist))
         sigLabel.set_line_wrap(True)
         self.signaturesBox.pack_start(sigLabel, False, False, 0)
         sigLabel.show()
