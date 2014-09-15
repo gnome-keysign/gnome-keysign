@@ -16,6 +16,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
+from itertools import islice
 import sys
 import StringIO
 
@@ -225,7 +226,7 @@ class KeyDetailsPage(Gtk.VBox):
         self.expireLabel = Gtk.Label()
         self.expireLabel.set_text("Expires 0000-00-00")
 
-        signaturesLabel = Gtk.Label()
+        self.signatures_label = signaturesLabel = Gtk.Label()
         signaturesLabel.set_text("Signatures")
 
         # this will also be populated later
@@ -274,21 +275,36 @@ class KeyDetailsPage(Gtk.VBox):
             expiry = "No expiration date"
 
         self.expireLabel.set_markup(expiry)
-
+        
+        
+        ### Set up signatures
         # FIXME: this would be better if it was done in monkeysign
         self.keyring.context.call_command(['list-sigs', str(openPgpKey.keyid())])
-
         sigslist = self.parse_sig_list(self.keyring.context.stdout)
-        # FIXME: what do we actually want to show here: the numbers of signatures
-        # for this key or the number of times this key was used to signed others
-        for (keyid,timestamp,uid) in sigslist:
-            sigLabel = Gtk.Label()
-            date = datetime.fromtimestamp(float(timestamp))
-            sigLabel.set_markup(str(keyid) + "\t\t" + date.ctime())
-            sigLabel.set_line_wrap(True)
 
-            self.signaturesBox.pack_start(sigLabel, False, False, 0)
-            sigLabel.show()
+        SHOW_SIGNATURES = False
+        if not SHOW_SIGNATURES:
+            self.signatures_label.hide()
+        else:
+            self.signatures_label.show()
+            sorted_sigslist = sorted(sigslist,
+                                     key=lambda signature:signature[1],
+                                     reverse=True)
+            for (keyid,timestamp,uid) in islice(sorted_sigslist, 10):
+                sigLabel = Gtk.Label()
+                date = datetime.fromtimestamp(float(timestamp))
+                sigLabel.set_markup(str(keyid) + "\t\t" + date.ctime())
+                sigLabel.set_line_wrap(True)
+    
+                self.signaturesBox.pack_start(sigLabel, False, False, 0)
+                sigLabel.show()
+            
+        sigLabel = Gtk.Label()
+        sigLabel.set_markup("%d signatures" % len(sigslist))
+        sigLabel.set_line_wrap(True)
+        self.signaturesBox.pack_start(sigLabel, False, False, 0)
+        sigLabel.show()
+
 
 # Pages for "Get Key" Tab
 
