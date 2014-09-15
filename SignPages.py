@@ -275,22 +275,26 @@ class KeyDetailsPage(Gtk.VBox):
             expiry = "No expiration date"
 
         self.expireLabel.set_markup(expiry)
-
+        
+        
+        ### Set up signatures
         # FIXME: this would be better if it was done in monkeysign
         self.keyring.context.call_command(['list-sigs', str(openPgpKey.keyid())])
-
         sigslist = self.parse_sig_list(self.keyring.context.stdout)
-        sorted_sigslist = sorted(sigslist,
-                                 key=lambda signature:signature[1],
-                                 reverse=True)
-        for (keyid,timestamp,uid) in islice(sorted_sigslist, 10):
-            sigLabel = Gtk.Label()
-            date = datetime.fromtimestamp(float(timestamp))
-            sigLabel.set_markup(str(keyid) + "\t\t" + date.ctime())
-            sigLabel.set_line_wrap(True)
 
-            self.signaturesBox.pack_start(sigLabel, False, False, 0)
-            sigLabel.show()
+        SHOW_SIGNATURES = False
+        if SHOW_SIGNATURES:
+            sorted_sigslist = sorted(sigslist,
+                                     key=lambda signature:signature[1],
+                                     reverse=True)
+            for (keyid,timestamp,uid) in islice(sorted_sigslist, 10):
+                sigLabel = Gtk.Label()
+                date = datetime.fromtimestamp(float(timestamp))
+                sigLabel.set_markup(str(keyid) + "\t\t" + date.ctime())
+                sigLabel.set_line_wrap(True)
+    
+                self.signaturesBox.pack_start(sigLabel, False, False, 0)
+                sigLabel.show()
             
         sigLabel = Gtk.Label()
         sigLabel.set_markup(str(len(sigslist)) + " signatures")
