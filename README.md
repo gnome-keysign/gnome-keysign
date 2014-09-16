@@ -1,5 +1,5 @@
-GNOME Keysigning
-==========
+GNOME Keysign
+=============
 
 A tool for signing OpenPGP keys.
 
@@ -30,19 +30,28 @@ Installation
 =============
 
 The list of dependencies has not yet fully been determined.
+However, this list of Ubuntu packages seems to make it work:
 
-    * python  (probably version 2, only)
-    * avahi-daemon
-    * python-avahi
-    * python-gi
-    * gir1.2-glib-2.0
-    * gir1.2-gtk-3.0
-    * python-dbus
-    * python-requests
-    * monkeysign
-    * python-qrencode
-    * gir1.2-gstreamer-1.0
-    * gir1.2-gst-plugins-base-1.0  (maybe)
+    python  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus python-requests monkeysign python-qrencode gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad
+
+
     
 
+Portability to older versions
+=============================
 
+Currently, these issues are known to pose (minor) problems
+when attempting to run with older libraries
+
+Pyton-requests 1.2.3, as shipped with Ubuntu 13.10, cannot handle IPv4
+in IPv6 URLs, i.e. http://[[1.2.3.4]]/.
+That should be easy to work around, though.
+
+The call to `set_always_show_image`, i.e. in saveButton.set_always_show_image
+is available with GTK 3.6, only.  Earlier GTK versions do not need this
+call, anyway.  So this should be easy to work around.
+
+GStreamer is more of a problem.  However, the forward-porting guides can
+probably be read "reverse", i.e. to back-port the GStreamer library.
+Example issues include "videoconvert" being available under "ffmpefcolorspace"
+and how to obtain the x-window-id.
