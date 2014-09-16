@@ -90,7 +90,7 @@ class MainWindow(Gtk.Application):
 
 
     def on_scan_image(self, *args, **kwargs):
-        print "scanimage"
+        print("scanimage")
 
     def on_activate(self, app):
         self.log.info("Activate!")

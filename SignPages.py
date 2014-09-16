@@ -20,13 +20,9 @@ from itertools import islice
 import sys
 import StringIO
 
-try:
-    from gi.repository import Gtk, GLib, GdkPixbuf
-    from monkeysign.gpg import Keyring
-    from qrencode import encode_scaled
-except ImportError, e:
-    print "A required python module is missing!\n%s" % (e,)
-    sys.exit()
+from gi.repository import Gtk, GLib, GdkPixbuf
+from monkeysign.gpg import Keyring
+from qrencode import encode_scaled
 
 from datetime import datetime
 
@@ -368,7 +364,7 @@ class ScanFingerprintPage(Gtk.HBox):
 
 
     def on_loadbutton_clicked(self, *args, **kwargs):
-        print "load"
+        print("load")
 
 
 class SignKeyPage(Gtk.VBox):

@@ -29,13 +29,9 @@ from requests.exceptions import ConnectionError
 import sys
 import re
 
-try:
-    from monkeysign.gpg import Keyring, TempKeyring
-    from monkeysign.ui import MonkeysignUi
-    from monkeysign.gpg import GpgRuntimeError
-except ImportError, e:
-    print "A required python module is missing!\n%s" % (e,)
-    sys.exit()
+from monkeysign.gpg import Keyring, TempKeyring
+from monkeysign.ui import MonkeysignUi
+from monkeysign.gpg import GpgRuntimeError
 
 import Keyserver
 from SignPages import KeysPage, KeyPresentPage, KeyDetailsPage

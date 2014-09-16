@@ -199,7 +199,6 @@ class SimpleInterface(BarcodeReader):
         pass
 
     def on_sync_message(self, bus, message):
-        print "Sync Message!"
         if message.structure is None:
             return
         if message.structure.get_name() == 'prepare-window-handle':
