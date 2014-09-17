@@ -20,7 +20,7 @@ import logging
 import avahi
 import dbus
 from dbus.mainloop.glib import DBusGMainLoop
-import gobject
+from gi.repository import GObject
 
 class AvahiPublisher:
 
@@ -125,7 +125,7 @@ if __name__ == '__main__':
     ap = AvahiPublisher()
     ap.add_service()
 
-    main_loop = gobject.MainLoop()
+    main_loop = GObject.MainLoop()
     bus = dbus.SystemBus()
 
     server = dbus.Interface(
