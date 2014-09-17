@@ -19,13 +19,16 @@
 __version__ = '0.1'
 
 
-import logging, sys, signal
-
-from gi.repository import GLib, Gtk
-
-from .MainWindow import MainWindow
-
 def main():
+    # These imports were moved here because the keysign module
+    # can be imported without wanting to run it, e.g. setup.py
+    # imports the __version__
+    import logging, sys, signal
+    
+    from gi.repository import GLib, Gtk
+    
+    from .MainWindow import MainWindow
+
     try:
         GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : Gtk.main_quit(), None)
     except AttributeError:
