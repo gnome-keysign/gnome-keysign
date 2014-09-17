@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<application>
+ <id type="desktop">gnome-keysign.desktop</id>
+ <licence>CC0</licence>
+ <description>
+   <_p>
+     GNOME-Keysign allows signing OpenPGP keys comfortably.
+  </_p>
+  <_p>
+    It can scan another key's barcode and transfer the key securely,
+    allowing for casual two-party key signing sessions.
+    It follows best practises by sending the encrypted signatures
+    to the UIDs of a key using the Email client the user configured
+    to use.
+  </_p>
+ </description>
+ <screenshots>
+    <screenshot type="default">https://wiki.gnome.org/GnomeKeysign?action=AttachFile&amp;do=get&amp;target=UI.png</screenshot>
+ </screenshots>
+ <url type="homepage">https://wiki.gnome.org/GnomeKeysign</url>
+ <updatecontact>tobiasmue@gnome.org</updatecontact>
+</application>
+
+
