@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#    Copyright 2014 Andrei Macavei <andrei.macavei89@gmail.com>
 #    Copyright 2014 Tobias Mueller <muelli@cryptobitch.de>
 #
 #    This file is part of GNOME Keysign.
@@ -104,7 +105,7 @@ def UIDExport(uid, keydata):
 
 def MinimalExport(keydata):
     '''Returns the minimised version of a key
-    
+
     For now, you must provide one key only.'''
     tmpkeyring = TempKeyring()
     ret = tmpkeyring.import_data(keydata)
@@ -122,7 +123,7 @@ def MinimalExport(keydata):
 
 class TempKeyringCopy(TempKeyring):
     """A temporary keyring which uses the secret keys of a parent keyring
-    
+
     It mainly copies the public keys from the parent keyring to this temporary
     keyring and sets this keyring up such that it uses the secret keys of the
     parent keyring.
@@ -134,7 +135,7 @@ class TempKeyringCopy(TempKeyring):
             super(TempKeyringCopy, self).__init__(*args, **kwargs)
         else:
             TempKeyring.__init__(self, *args, **kwargs)
-        
+
         self.log = logging.getLogger()
 
         tmpkeyring = self
@@ -228,7 +229,7 @@ class KeySignSection(Gtk.VBox):
 
         # this will hold a reference to the last key selected
         self.last_selected_key = None
-        
+
         # When obtaining a key is successful,
         # it will save the key data in this field
         self.received_key_data = None
@@ -464,7 +465,7 @@ class GetKeySection(Gtk.VBox):
 
         keyring = Keyring()
         keyring.context.set_option('export-options', 'export-minimal')
-        
+
         tmpkeyring = TempKeyringCopy(keyring)
 
         # 1. fetch the key into a temporary keyring
@@ -488,12 +489,12 @@ class GetKeySection(Gtk.VBox):
             assert len(keys) == 1, "We received multiple keys for fp %s: %s" % (fingerprint, keys)
             key = keys[fingerprint]
             uidlist = key.uidslist
-            
+
             # FIXME: For now, we sign all UIDs. This is bad.
             ret = tmpkeyring.sign_key(uidlist[0].uid, signall=True)
             self.log.info("Result of signing %s on key %s: %s", uidlist[0].uid, fingerprint, ret)
-    
-            
+
+
             for uid in uidlist:
                 uid_str = uid.uid
                 self.log.info("Processing uid %s %s", uid, uid_str)
@@ -505,7 +506,7 @@ class GetKeySection(Gtk.VBox):
                 # self.signui.tmpkeyring.context.set_option('armor')
                 tmpkeyring.context.set_option('always-trust')
                 encrypted_key = tmpkeyring.encrypt_data(data=signed_key, recipient=uid_str)
-    
+
                 keyid = str(key.keyid())
                 ctx = {
                     'uid' : uid_str,
@@ -513,7 +514,7 @@ class GetKeySection(Gtk.VBox):
                     'keyid': keyid,
                 }
                 # We could try to dir=tmpkeyring.dir
-                # We do not use the with ... as construct as the 
+                # We do not use the with ... as construct as the
                 # tempfile might be deleted before the MUA had the chance
                 # to get hold of it.
                 # Hence we reference the tmpfile and hope that it will be properly
@@ -528,16 +529,16 @@ class GetKeySection(Gtk.VBox):
                 tmpfile.flush()
                 # As we're done with the file, we close it.
                 #tmpfile.close()
-                
+
                 subject = Template(SUBJECT).safe_substitute(ctx)
                 body = Template(BODY).safe_substitute(ctx)
-                self.email_file (to=uid_str, subject=subject, 
+                self.email_file (to=uid_str, subject=subject,
                                  body=body, files=[filename])
-            
-            
+
+
             # FIXME: Can we get rid of self.tmpfiles here already? Even if the MUA is still running?
-            
-            
+
+
             # 3.4. optionnally (-l), create a local signature and import in
             # local keyring
             # 4. trash the temporary keyring
@@ -554,7 +555,7 @@ class GetKeySection(Gtk.VBox):
     def send_email(self, fingerprint, *data):
         self.log.exception("Sending email... NOT")
         return False
-        
+
     def email_file(self, to, from_=None, subject=None,
                    body=None,
                    ccs=None, bccs=None,
