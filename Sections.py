@@ -249,7 +249,8 @@ class KeySignSection(Gtk.VBox):
                         openPgpKey = self.keysPage.keysDict[keyid]
                     except KeyError:
                         m = "No key details can be shown for id {}".format(keyid)
-                        self.log.info(m)
+                        self.log.exception(m)
+                        raise
 
                 # display uids, exp date and signatures
                 self.keyDetailsPage.display_uids_signatures_page(openPgpKey)
