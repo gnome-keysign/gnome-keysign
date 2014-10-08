@@ -565,7 +565,7 @@ class GetKeySection(Gtk.VBox):
         for cc in ccs or []:
             cmd += ['--cc', cc]
         for bcc in bccs or []:
-            cmd += ['--cc', bcc]
+            cmd += ['--bcc', bcc]
         for file_ in files or []:
             cmd += ['--attach', file_]
 
