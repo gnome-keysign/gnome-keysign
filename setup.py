@@ -27,6 +27,7 @@ setup(
         #('share/icons/hicolor/scalable', ['data/gnome-keysign.svg']),
         ('share/icons', ['data/gnome-keysign.svg']),
     ],
+    include_package_data = True,
     #scripts = ['gnome-keysign.py'],
     install_requires=[
         # Note that the dependency on <= 2.2 is only
