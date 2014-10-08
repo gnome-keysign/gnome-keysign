@@ -243,7 +243,7 @@ class KeyDetailsPage(Gtk.VBox):
             if record[0] != "sig":
                 continue
             self.log.debug("sig record (%d) %s", len(record), record)
-            (rectype, null, null, algo, keyid, timestamp, null, null, null, uid, null, null) = record
+            keyid, timestamp, uid = record[4], record[5], record[9]
             sigslist.append((keyid, timestamp, uid))
 
         return sigslist
