@@ -48,6 +48,7 @@ class MainWindow(Gtk.Application):
     def on_startup(self, app):
         self.log.info("Startup")
         self.window = Gtk.ApplicationWindow(application=app)
+        self.window.set_title ("Keysign")
 
         self.window.set_border_width(10)
         self.window.set_position(Gtk.WindowPosition.CENTER)
