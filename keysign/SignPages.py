@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#    Copyright 2014 Andrei Macavei <andrei.macavei89@gmail.com>
 #    Copyright 2014 Tobias Mueller <muelli@cryptobitch.de>
 #
 #    This file is part of GNOME Keysign.
@@ -120,6 +121,7 @@ class KeyPresentPage(Gtk.HBox):
         leftTopLabel.set_markup('<span size="15000">' + 'Key Fingerprint' + '</span>')
 
         self.fingerprintLabel = Gtk.Label()
+        self.fingerprintLabel.set_selectable(True)
 
         # left vertical box
         leftVBox = Gtk.VBox(spacing=10)
