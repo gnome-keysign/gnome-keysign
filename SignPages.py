@@ -17,6 +17,7 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
 from itertools import islice
+import logging
 import sys
 import StringIO
 
@@ -209,6 +210,7 @@ class KeyDetailsPage(Gtk.VBox):
     def __init__(self):
         super(KeyDetailsPage, self).__init__()
         self.set_spacing(10)
+        self.log = logging.getLogger()
 
         # FIXME: this should be moved to KeySignSection
         self.keyring = Keyring()
@@ -240,7 +242,8 @@ class KeyDetailsPage(Gtk.VBox):
             record = block.split(":")
             if record[0] != "sig":
                 continue
-            (rectype, null, null, algo, keyid, timestamp, null, null, null, uid, null, null) = record
+            self.log.debug("sig record (%d) %s", len(record), record)
+            keyid, timestamp, uid = record[4], record[5], record[9]
             sigslist.append((keyid, timestamp, uid))
 
         return sigslist
