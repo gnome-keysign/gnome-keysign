@@ -33,8 +33,53 @@ from QRCode import QRImage
 from scan_barcode import BarcodeReaderGTK
 
 
-# Pages for 'Keys' Tab
+log = logging.getLogger()
 
+
+def parse_sig_list(text):
+    '''Parses GnuPG's signature list (i.e. list-sigs)
+    
+    The format is described in the GnuPG man page'''
+    sigslist = []
+    for block in text.split("\n"):
+        if block.startswith("sig"):
+            record = block.split(":")
+            log.debug("sig record (%d) %s", len(record), record)
+            keyid, timestamp, uid = record[4], record[5], record[9]
+            sigslist.append((keyid, timestamp, uid))
+
+    return sigslist
+
+# This is a cache for a keyring object, so that we do not need
+# to create a new object every single time we parse signatures
+_keyring = None
+def signatures_for_keyid(keyid, keyring=None):
+    '''Returns the list of signatures for a given key id
+    
+    This will call out to GnuPG list-sigs, using Monkeysign,
+    and parse the resulting string into a list of signatures.
+    
+    A default Keyring will be used unless you pass an instance
+    as keyring argument.
+    '''
+    # Retrieving a cached instance of a keyring,
+    # unless we were being passed a keyring
+    global _keyring
+    if keyring is not None:
+        kr = keyring
+    else:
+        if _keyring is None:
+            _keyring = Keyring()
+        kr = _keyring
+
+    # FIXME: this would be better if it was done in monkeysign
+    kr.context.call_command(['list-sigs', keyid])
+    siglist = parse_sig_list(kr.context.stdout)
+
+    return siglist
+
+
+# Pages for 'Keys' Tab
 class KeysPage(Gtk.VBox):
 
     def __init__(self, keySection):
@@ -206,17 +251,6 @@ class KeyDetailsPage(Gtk.VBox):
         self.pack_start(signaturesLabel, False, False, 0)
         self.pack_start(self.signaturesBox, True, True, 0)
 
-    def parse_sig_list(self, text):
-        sigslist = []
-        for block in text.split("\n"):
-            record = block.split(":")
-            if record[0] != "sig":
-                continue
-            self.log.debug("sig record (%d) %s", len(record), record)
-            keyid, timestamp, uid = record[4], record[5], record[9]
-            sigslist.append((keyid, timestamp, uid))
-
-        return sigslist
 
     def display_uids_signatures_page(self, openPgpKey):
 
@@ -247,9 +281,8 @@ class KeyDetailsPage(Gtk.VBox):
         
         
         ### Set up signatures
-        # FIXME: this would be better if it was done in monkeysign
-        self.keyring.context.call_command(['list-sigs', str(openPgpKey.keyid())])
-        sigslist = self.parse_sig_list(self.keyring.context.stdout)
+        keyid = str(openPgpKey.keyid())
+        sigslist = signatures_for_keyid(keyid)
 
         SHOW_SIGNATURES = False
         if not SHOW_SIGNATURES:
