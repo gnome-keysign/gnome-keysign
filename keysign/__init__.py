@@ -29,12 +29,13 @@ def main():
     
     from .MainWindow import MainWindow
 
+    app = MainWindow()
+
     try:
-        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : Gtk.main_quit(), None)
+        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : app.quit(), None)
     except AttributeError:
         pass
 
-    app = MainWindow()
     exit_status = app.run(None)
 
     return exit_status
