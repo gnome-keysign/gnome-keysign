@@ -241,12 +241,11 @@ class KeyDetailsPage(Gtk.VBox):
     def parse_sig_list(self, text):
         sigslist = []
         for block in text.split("\n"):
-            record = block.split(":")
-            if record[0] != "sig":
-                continue
-            self.log.debug("sig record (%d) %s", len(record), record)
-            keyid, timestamp, uid = record[4], record[5], record[9]
-            sigslist.append((keyid, timestamp, uid))
+            if block.startswith("sig"):
+                record = block.split(":")
+                self.log.debug("sig record (%d) %s", len(record), record)
+                keyid, timestamp, uid = record[4], record[5], record[9]
+                sigslist.append((keyid, timestamp, uid))
 
         return sigslist
 
