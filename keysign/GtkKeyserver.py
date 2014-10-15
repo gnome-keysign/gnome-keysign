@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 #    Copyright 2014 Tobias Mueller <muelli@cryptobitch.de>
+#    Copyright 2014 Andrei Macavei <andrei.macavei89@gmail.com>
 #
 #    This file is part of GNOME Keysign.
 #
@@ -36,19 +37,19 @@ class ServerWindow(Gtk.Window):
 
     def __init__(self):
         self.log = logging.getLogger()
-    
+
         Gtk.Window.__init__(self, title="Gtk and Python threads")
         self.set_border_width(10)
 
         self.connect("delete-event", Gtk.main_quit)
-        
+
         hBox = Gtk.HBox()
         self.button = Gtk.ToggleButton('Start')
         hBox.pack_start(self.button, False, False, 0)
         self.add(hBox)
-        
+
         self.button.connect('toggled', self.on_button_toggled)
-        
+
         #GLib.idle_add(self.setup_server)
 
 

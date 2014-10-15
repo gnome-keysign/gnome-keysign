@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#    Copyright 2014 Andrei Macavei <andrei.macavei89@gmail.com>
 #    Copyright 2014 Tobias Mueller <muelli@cryptobitch.de>
 #
 #    This file is part of GNOME Keysign.
@@ -48,6 +49,7 @@ class MainWindow(Gtk.Application):
     def on_startup(self, app):
         self.log.info("Startup")
         self.window = Gtk.ApplicationWindow(application=app)
+        self.window.set_title ("Keysign")
 
         self.window.set_border_width(10)
         self.window.set_position(Gtk.WindowPosition.CENTER)

@@ -4,7 +4,8 @@ import logging, sys, signal
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG, format='%(name)s (%(levelname)s): %(message)s')
 
 from gi.repository import GLib
-from MainWindow import MainWindow
+
+from keysign.MainWindow import MainWindow
 
 def main():
     try:
