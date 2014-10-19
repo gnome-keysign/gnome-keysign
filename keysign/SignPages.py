@@ -22,7 +22,7 @@ import logging
 import sys
 import StringIO
 
-from gi.repository import Gtk, GLib, GdkPixbuf
+from gi.repository import GObject, Gtk, GLib, GdkPixbuf
 from monkeysign.gpg import Keyring
 from qrencode import encode_scaled
 
@@ -81,6 +81,13 @@ def signatures_for_keyid(keyid, keyring=None):
 
 # Pages for 'Keys' Tab
 class KeysPage(Gtk.VBox):
+
+    __gsignals__ = {
+        'key-selected': (GObject.SIGNAL_RUN_LAST, None,
+                         # Hm, this is a str for now, but ideally
+                         # it'd be the full key object
+                         (str,)),
+    }
 
     def __init__(self, keySection):
         super(KeysPage, self).__init__()
