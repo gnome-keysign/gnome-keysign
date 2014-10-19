@@ -89,11 +89,9 @@ class KeysPage(Gtk.VBox):
                          (str,)),
     }
 
-    def __init__(self, keySection=None):
+    def __init__(self):
         super(KeysPage, self).__init__()
 
-        # pass a reference to KeySignSection in order to access its widgets
-        self.keySection = keySection
 
         # set up the list store to be filled up with user's gpg keys
         # Note that other functions expect a certain structure to
@@ -189,8 +187,6 @@ class KeysPage(Gtk.VBox):
         
         key = self.keysDict[keyid]
         self.emit('key-selected', keyid)
-        if self.keySection:
-            self.keySection.nextButton.set_sensitive(True)
 
 
     def on_publish_button_clicked(self, button, key, *args):
