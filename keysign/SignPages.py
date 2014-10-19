@@ -186,6 +186,15 @@ class KeysPage(Gtk.VBox):
         self.keySection.nextButton.set_sensitive(True)
 
 
+    def on_publish_button_clicked(self, button, key, *args):
+        '''Callback for when the user has expressed their wish
+        to publish a key on the network.  It will emit a "key-selected"
+        signal with the ID of the selected key.'''
+        log.debug('Clicked publish for key (%s) %s (%s)', type(key), key, args)
+        keyid = key.keyid()
+        self.emit('key-selected', keyid)
+
+
 class KeyPresentPage(Gtk.HBox):
     def __init__(self):
         super(KeyPresentPage, self).__init__()
