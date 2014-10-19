@@ -192,7 +192,8 @@ class KeySignSection(Gtk.VBox):
 
         # these are needed later when we need to get details about
         # a selected key
-        self.keysPage = KeysPage(self)
+        self.keysPage = KeysPage()
+        self.keysPage.connect('key-selected', self.on_key_selected)
         self.keyDetailsPage = KeyDetailsPage()
         self.keyPresentPage = KeyPresentPage()
 
@@ -231,6 +232,9 @@ class KeySignSection(Gtk.VBox):
         self.received_key_data = None
 
 
+    def on_key_selected(self, pane, keyid):
+        log.debug('User selected key %s', keyid)
+        self.nextButton.set_sensitive(True)
     def on_button_clicked(self, button):
 
         page_index = self.notebook.get_current_page()
