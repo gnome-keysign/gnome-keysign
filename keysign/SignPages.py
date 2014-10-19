@@ -89,6 +89,9 @@ class KeysPage(Gtk.VBox):
         self.keySection = keySection
 
         # set up the list store to be filled up with user's gpg keys
+        # Note that other functions expect a certain structure to
+        # this ListStore, e.g. when parsing the selection of the
+        # TreeView, i.e. in get_items_from_selection.
         self.store = Gtk.ListStore(str, str, str)
 
         # FIXME: this should be moved to KeySignSection
@@ -155,7 +158,24 @@ class KeysPage(Gtk.VBox):
 
         self.pack_start(self.scrolled_window, True, True, 0)
 
-    def on_selection_changed(self, *args):
+
+    # We could make it a @staticmethod, but the returned items
+    # are bound to the model, anyway.  So it probably doesn't
+    # make much sense to have a static function, anyway.
+    def get_items_from_selection(self, selection=None):
+        '''Returns the elements in the ListStore for the given selection'''
+        s = selection or self.treeView.get_selection()
+        model, paths = s.get_selected_rows()
+        name = email = keyid = None
+        for path in paths:
+            iterator = model.get_iter(path)
+            (name, email, keyid) = model.get(iterator, 0, 1, 2)
+            break
+
+        return (name, email, keyid)
+
+
+    def on_selection_changed(self, selection, *args):
         self.keySection.nextButton.set_sensitive(True)
 
 
