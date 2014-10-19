@@ -183,6 +183,12 @@ class KeysPage(Gtk.VBox):
 
 
     def on_selection_changed(self, selection, *args):
+        log.debug('Selected new TreeView item %s = %s', selection, args)
+        
+        name, email, keyid = self.get_items_from_selection(selection)
+        
+        key = self.keysDict[keyid]
+        self.emit('key-selected', keyid)
         if self.keySection:
             self.keySection.nextButton.set_sensitive(True)
 
