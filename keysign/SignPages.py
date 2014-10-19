@@ -89,7 +89,7 @@ class KeysPage(Gtk.VBox):
                          (str,)),
     }
 
-    def __init__(self, keySection):
+    def __init__(self, keySection=None):
         super(KeysPage, self).__init__()
 
         # pass a reference to KeySignSection in order to access its widgets
@@ -183,7 +183,8 @@ class KeysPage(Gtk.VBox):
 
 
     def on_selection_changed(self, selection, *args):
-        self.keySection.nextButton.set_sensitive(True)
+        if self.keySection:
+            self.keySection.nextButton.set_sensitive(True)
 
 
     def on_publish_button_clicked(self, button, key, *args):
