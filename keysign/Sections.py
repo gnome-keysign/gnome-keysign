@@ -214,16 +214,9 @@ class KeySignSection(Gtk.VBox):
         self.backButton.set_always_show_image(True)
         self.backButton.connect('clicked', self.on_button_clicked)
         self.backButton.set_sensitive(False)
-        # create next button
-        self.nextButton = Gtk.Button('Next')
-        self.nextButton.set_image(Gtk.Image.new_from_icon_name("go-next", Gtk.IconSize.BUTTON))
-        self.nextButton.set_always_show_image(True)
-        self.nextButton.connect('clicked', self.on_next_button_clicked)
-        self.nextButton.set_sensitive(False)
 
         buttonBox = Gtk.HBox()
         buttonBox.pack_start(self.backButton, False, False, 0)
-        buttonBox.pack_start(self.nextButton, False, False, 0)
         # pack up
         self.pack_start(self.notebook, True, True, 0)
         self.pack_start(buttonBox, False, False, 0)
@@ -237,11 +230,10 @@ class KeySignSection(Gtk.VBox):
 
 
     def on_key_selection_changed(self, pane, keyid):
-        '''This only makes the next button sensitive
-        Note that that button is meant to be removed in future versions.
+        '''This callback is attached to the signal which is emitted
+        when the user changes their selection in the list of keys
         '''
-        # Also, the button needs to be made sensitive
-        self.nextButton.set_sensitive(True)
+        pass
 
 
     def on_key_selected(self, pane, keyid):
@@ -272,7 +264,6 @@ class KeySignSection(Gtk.VBox):
         self.notebook.next_page()
         # FIXME: we better use set_current_page, but that requires
         # knowing which page our desired widget is on.
-        self.nextButton.set_sensitive(False)
         self.backButton.set_sensitive(True)
         
 
@@ -290,22 +281,7 @@ class KeySignSection(Gtk.VBox):
 
         page_index = self.notebook.get_current_page()
 
-        if button == self.nextButton:
-            # switch to the next page in the notebook
-            self.notebook.next_page()
-
-            if page_index+1 == 1:
-                key = self.last_selected_key
-                assert key
-                self.keyPresentPage.display_fingerprint_qr_page(key)
-
-                # FIXME: Get the number of pages from the notebook
-                # and set the sensitivity iff we are on the last page
-                self.nextButton.set_sensitive(False)
-
-            self.backButton.set_sensitive(True)
-
-        elif button == self.backButton:
+        if button == self.backButton:
 
             if page_index == 1:
                 self.log.debug("Keyserver switched off")
@@ -313,7 +289,6 @@ class KeySignSection(Gtk.VBox):
             
             if page_index-1 == 0:
                 self.backButton.set_sensitive(False)
-                self.nextButton.set_sensitive(True)
 
             self.notebook.prev_page()
 
