@@ -81,7 +81,7 @@ def signatures_for_keyid(keyid, keyring=None):
 
 
 class KeyPresentPage(Gtk.HBox):
-    def __init__(self):
+    def __init__(self, fpr=None):
         super(KeyPresentPage, self).__init__()
 
         # create left side Key labels
@@ -97,7 +97,7 @@ class KeyPresentPage(Gtk.HBox):
         leftVBox.pack_start(self.fingerprintLabel, False, False, 0)
 
         self.pixbuf = None # Hold QR code in pixbuf
-        self.fpr = None # The fpr of the key selected to sign with
+        self.fpr = fpr # The fpr of the key selected to sign with
 
         # display QR code on the right side
         qrcodeLabel = Gtk.Label()
@@ -113,15 +113,30 @@ class KeyPresentPage(Gtk.HBox):
 
         self.pack_start(leftVBox, True, True, 0)
         self.pack_start(self.rightVBox, True, True, 0)
+        
+        if self.fpr:
+            self.setup_fingerprint_widget(self.fpr)
 
-    def display_fingerprint_qr_page(self, openPgpKey):
-        rawfpr = openPgpKey.fpr
+
+    def display_fingerprint_qr_page(self, openPgpKey=None):
+        assert openPgpKey or self.fpr
+
+        rawfpr = openPgpKey.fpr if openPgpKey else self.fpr
         self.fpr = rawfpr
-        # display a clean version of the fingerprint
-        fpr = ""
-        for i in xrange(0, len(rawfpr), 4):
+        self.setup_fingerprint_widget(self.fpr)
 
-            fpr += rawfpr[i:i+4]
+        # draw qr code for this fingerprint
+        self.draw_qrcode()
+
+
+    def setup_fingerprint_widget(self, fingerprint):
+        '''The purpose of this function is to populate the label holding
+        the fingerprint with a formatted version.
+        '''
+        fpr = ""
+        for i in xrange(0, len(fingerprint), 4):
+
+            fpr += fingerprint[i:i+4]
             if i != 0 and (i+4) % 20 == 0:
                 fpr += "\n"
             else:
@@ -129,9 +144,6 @@ class KeyPresentPage(Gtk.HBox):
 
         fpr = fpr.rstrip()
         self.fingerprintLabel.set_markup('<span size="20000">' + fpr + '</span>')
-
-        # draw qr code for this fingerprint
-        self.draw_qrcode()
 
 
     def draw_qrcode(self):
