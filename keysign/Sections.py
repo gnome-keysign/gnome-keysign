@@ -36,7 +36,8 @@ from monkeysign.gpg import GpgRuntimeError
 
 import Keyserver
 from KeysPage import KeysPage
-from SignPages import KeyPresentPage, KeyDetailsPage
+from KeyPresent import KeyPresentPage
+from SignPages import KeyDetailsPage
 from SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 import MainWindow
 
