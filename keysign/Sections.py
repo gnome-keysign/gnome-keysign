@@ -235,6 +235,25 @@ class KeySignSection(Gtk.VBox):
     def on_key_selected(self, pane, keyid):
         log.debug('User selected key %s', keyid)
         self.nextButton.set_sensitive(True)
+        
+        key = self.keyring.get_keys(keyid).values()[0]
+        self.keyPresentPage.display_fingerprint_qr_page(key)
+
+        keyid = key.keyid()
+        self.keyring.export_data(fpr=str(keyid), secret=False)
+        keydata = self.keyring.context.stdout
+
+        ## FIXME: Currently, we have a second page in the self-made
+        ## wizard. We probably want to get rid of that page and thus
+        ## switch the keyserver on here.  But for now, we let the
+        ## second page do that.
+        #self.log.debug("Keyserver switched on")
+        #self.app.setup_server(keydata)
+        
+        ## FIXME: And we manually click the button to advance the wizard
+        self.nextButton.clicked()
+        
+
     def on_button_clicked(self, button):
 
         page_index = self.notebook.get_current_page()
