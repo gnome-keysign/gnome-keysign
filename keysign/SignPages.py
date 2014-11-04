@@ -96,7 +96,6 @@ class KeysPage(Gtk.VBox):
     def __init__(self):
         super(KeysPage, self).__init__()
 
-
         # set up the list store to be filled up with user's gpg keys
         # Note that other functions expect a certain structure to
         # this ListStore, e.g. when parsing the selection of the
@@ -159,10 +158,16 @@ class KeysPage(Gtk.VBox):
         # make the tree view resposive to single click selection
         self.treeView.get_selection().connect('changed', self.on_selection_changed)
 
+        self.hpane = Gtk.HPaned()
+        self.hpane.add1(self.treeView)
+        self.right_pane = Gtk.VBox()
+        right_label = Gtk.Label(label='Select key on the left')
+        self.right_pane.add(right_label)
+        self.hpane.add2(self.right_pane)
         # make the tree view scrollable
         self.scrolled_window = Gtk.ScrolledWindow()
         self.scrolled_window.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        self.scrolled_window.add(self.treeView)
+        self.scrolled_window.add(self.hpane)
         self.scrolled_window.set_min_content_height(200)
 
         self.pack_start(self.scrolled_window, True, True, 0)
@@ -191,6 +196,30 @@ class KeysPage(Gtk.VBox):
         
         key = self.keysDict[keyid]
         self.emit('key-selection-changed', keyid)
+        
+        try:
+            exp_date = datetime.fromtimestamp(float(key.expiry))
+            expiry = "{:%Y-%m-%d %H:%M:%S}".format(exp_date)
+        except ValueError, e:
+            expiry = "No expiration date"
+
+        pane = self.right_pane
+        for child in pane.get_children():
+            # Ouch, this is not very efficient.
+            # But this deals with the fact that the first
+            # label in the pane is a "Select a key on the left"
+            # text.
+            pane.remove(child)
+        ctx = {'keyid':keyid, 'expiry':expiry, 'sigs':''}
+        keyid_label = Gtk.Label(label='Key {keyid}'.format(**ctx))
+        expiration_label = Gtk.Label(label='Expires: {expiry}'.format(**ctx))
+        #signatures_label = Gtk.Label(label='{sigs} signatures'.format(**ctx))
+        publish_button = Gtk.Button(label='Go ahead!'.format(**ctx))
+        publish_button.connect('clicked', self.on_publish_button_clicked, key)
+        map(pane.add, (keyid_label, expiration_label,
+                       #signatures_label,
+                       publish_button,))
+        pane.show_all()
 
 
     def on_publish_button_clicked(self, button, key, *args):
