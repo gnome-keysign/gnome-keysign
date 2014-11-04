@@ -87,6 +87,10 @@ class KeysPage(Gtk.VBox):
                          # Hm, this is a str for now, but ideally
                          # it'd be the full key object
                          (str,)),
+        'key-selection-changed': (GObject.SIGNAL_RUN_LAST, None,
+                         # Hm, this is a str for now, but ideally
+                         # it'd be the full key object
+                         (str,)),
     }
 
     def __init__(self):
@@ -186,7 +190,7 @@ class KeysPage(Gtk.VBox):
         name, email, keyid = self.get_items_from_selection(selection)
         
         key = self.keysDict[keyid]
-        self.emit('key-selected', keyid)
+        self.emit('key-selection-changed', keyid)
 
 
     def on_publish_button_clicked(self, button, key, *args):
