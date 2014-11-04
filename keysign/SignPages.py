@@ -81,7 +81,16 @@ def signatures_for_keyid(keyid, keyring=None):
 
 # Pages for 'Keys' Tab
 class KeysPage(Gtk.VBox):
-
+    '''This represents a list of keys with the option for the user
+    to select one key to proceed.
+    
+    This class emits a `key-selection-changed' signal when the user
+    initially selects a key such that it is highlighted.
+    
+    The `key-selected' signal is emitted when the user commits
+    to a key, i.e. by pressing a designated button to make his
+    selection public.
+    '''
     __gsignals__ = {
         'key-selected': (GObject.SIGNAL_RUN_LAST, None,
                          # Hm, this is a str for now, but ideally
