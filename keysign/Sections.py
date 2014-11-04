@@ -201,25 +201,26 @@ class KeySignSection(Gtk.VBox):
         self.keyDetailsPage = KeyDetailsPage()
         self.keyPresentPage = KeyPresentPage()
 
-        # set up notebook container
-        self.notebook = Gtk.Notebook()
-        self.notebook.append_page(self.keysPage, None)
-        #self.notebook.append_page(self.keyDetailsPage, None)
-        self.notebook.append_page(self.keyPresentPage, None)
-        self.notebook.set_show_tabs(False)
 
         # create back button
         self.backButton = Gtk.Button('Back')
         self.backButton.set_image(Gtk.Image.new_from_icon_name("go-previous", Gtk.IconSize.BUTTON))
         self.backButton.set_always_show_image(True)
         self.backButton.connect('clicked', self.on_button_clicked)
-        self.backButton.set_sensitive(False)
 
-        buttonBox = Gtk.HBox()
-        buttonBox.pack_start(self.backButton, False, False, 0)
-        # pack up
+        # set up notebook container
+        self.notebook = Gtk.Notebook ()
+        self.notebook.append_page (self.keysPage, None)
+        vbox = Gtk.VBox ()
+        # We place the button at the top, but that might not be the
+        # smartest thing to do. Feel free to rearrange
+        # FIXME: Consider a GtkHeaderBar for the application
+        vbox.pack_start (self.backButton, False, False, 0)
+        vbox.pack_start (self.keyPresentPage, True, True, 10)
+        self.notebook.append_page (vbox, None)
+        self.notebook.set_show_tabs (False)
+
         self.pack_start(self.notebook, True, True, 0)
-        self.pack_start(buttonBox, False, False, 0)
 
         # this will hold a reference to the last key selected
         self.last_selected_key = None
@@ -264,7 +265,6 @@ class KeySignSection(Gtk.VBox):
         self.notebook.next_page()
         # FIXME: we better use set_current_page, but that requires
         # knowing which page our desired widget is on.
-        self.backButton.set_sensitive(True)
         
 
     def on_next_button_clicked(self, button):
@@ -287,9 +287,6 @@ class KeySignSection(Gtk.VBox):
                 self.log.debug("Keyserver switched off")
                 self.app.stop_server()
             
-            if page_index-1 == 0:
-                self.backButton.set_sensitive(False)
-
             self.notebook.prev_page()
 
 
