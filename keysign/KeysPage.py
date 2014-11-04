@@ -117,6 +117,8 @@ class KeysPage(Gtk.VBox):
         self.treeView.append_column(nameColumn)
         self.treeView.append_column(emailColumn)
         self.treeView.append_column(keyColumn)
+        
+        self.treeView.connect('row-activated', self.on_row_activated)
 
         # make the tree view resposive to single click selection
         self.treeView.get_selection().connect('changed', self.on_selection_changed)
@@ -183,6 +185,19 @@ class KeysPage(Gtk.VBox):
                        #signatures_label,
                        publish_button,))
         pane.show_all()
+
+
+    def on_row_activated(self, treeview, tree_path, column):
+        '''A callback for when the user "activated" a row,
+        e.g. by double-clicking an entry.
+        
+        It emits the key-selected signal.
+        '''
+        # We just hijack the existing function.
+        # I'm sure we could get the required information out of
+        # the tree_path and column, but I don't know how.
+        name, email, keyid = self.get_items_from_selection()
+        self.emit('key-selected', keyid)
 
 
     def on_publish_button_clicked(self, button, key, *args):
