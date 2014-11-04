@@ -47,6 +47,8 @@ class Keys(Gtk.Application):
         self.log = logging.getLogger()
 
         self.keys_page = KeysPage()
+        self.keys_page.connect('key-selection-changed',
+            self.on_key_selection_changed)
         self.keys_page.connect('key-selected', self.on_key_selected)
 
 
@@ -71,13 +73,23 @@ class Keys(Gtk.Application):
         self.window.present()
 
 
+    def on_key_selection_changed(self, button, key):
+        """This is the connected to the KeysPage's key-selection-changed
+        signal
+        
+        As a user of that widget, you would show more details
+        in the GUI or prepare for a final commitment by the user.
+        """
+        self.log.info('Selection changed to: %s', key)
+
+
     def on_key_selected(self, button, key):
         """This is the connected to the KeysPage's key-selected signal
         
         As a user of that widget, you would enable buttons or proceed
         with the GUI.
         """
-        self.log.info('Selected a key! %s', key)
+        self.log.info('User committed to a key! %s', key)
 
                                                 
 def parse_command_line(argv):
