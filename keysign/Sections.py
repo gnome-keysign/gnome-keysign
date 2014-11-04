@@ -195,6 +195,8 @@ class KeySignSection(Gtk.VBox):
         # these are needed later when we need to get details about
         # a selected key
         self.keysPage = KeysPage()
+        self.keysPage.connect('key-selection-changed',
+            self.on_key_selection_changed)
         self.keysPage.connect('key-selected', self.on_key_selected)
         self.keyDetailsPage = KeyDetailsPage()
         self.keyPresentPage = KeyPresentPage()
@@ -202,7 +204,7 @@ class KeySignSection(Gtk.VBox):
         # set up notebook container
         self.notebook = Gtk.Notebook()
         self.notebook.append_page(self.keysPage, None)
-        self.notebook.append_page(self.keyDetailsPage, None)
+        #self.notebook.append_page(self.keyDetailsPage, None)
         self.notebook.append_page(self.keyPresentPage, None)
         self.notebook.set_show_tabs(False)
 
@@ -216,7 +218,7 @@ class KeySignSection(Gtk.VBox):
         self.nextButton = Gtk.Button('Next')
         self.nextButton.set_image(Gtk.Image.new_from_icon_name("go-next", Gtk.IconSize.BUTTON))
         self.nextButton.set_always_show_image(True)
-        self.nextButton.connect('clicked', self.on_button_clicked)
+        self.nextButton.connect('clicked', self.on_next_button_clicked)
         self.nextButton.set_sensitive(False)
 
         buttonBox = Gtk.HBox()
@@ -234,26 +236,54 @@ class KeySignSection(Gtk.VBox):
         self.received_key_data = None
 
 
-    def on_key_selected(self, pane, keyid):
-        log.debug('User selected key %s', keyid)
+    def on_key_selection_changed(self, pane, keyid):
+        '''This only makes the next button sensitive
+        Note that that button is meant to be removed in future versions.
+        '''
+        # Also, the button needs to be made sensitive
         self.nextButton.set_sensitive(True)
-        
+
+
+    def on_key_selected(self, pane, keyid):
+        '''This is the callback for when the user has committed
+        to a key, i.e. the user has made a selection and wants to
+        advance the program.
+        '''
+        log.debug('User selected key %s', keyid)
+
         key = self.keyring.get_keys(keyid).values()[0]
-        self.keyPresentPage.display_fingerprint_qr_page(key)
 
         keyid = key.keyid()
         self.keyring.export_data(fpr=str(keyid), secret=False)
         keydata = self.keyring.context.stdout
 
-        ## FIXME: Currently, we have a second page in the self-made
-        ## wizard. We probably want to get rid of that page and thus
-        ## switch the keyserver on here.  But for now, we let the
-        ## second page do that.
-        #self.log.debug("Keyserver switched on")
-        #self.app.setup_server(keydata)
+        self.log.debug("Keyserver switched on")
+        self.app.setup_server(keydata)
         
-        ## FIXME: And we manually click the button to advance the wizard
-        self.nextButton.clicked()
+        self.switch_to_key_present_page(key)
+
+
+    def switch_to_key_present_page(self, key):
+        '''This switches the notebook to the page which
+        presents the information that is needed to securely
+        transfer the keydata, i.e. the fingerprint and its barcode.
+        '''
+        self.keyPresentPage.display_fingerprint_qr_page(key)
+        self.notebook.next_page()
+        # FIXME: we better use set_current_page, but that requires
+        # knowing which page our desired widget is on.
+        self.nextButton.set_sensitive(False)
+        self.backButton.set_sensitive(True)
+        
+
+    def on_next_button_clicked(self, button):
+        '''A helper for legacy reasons to enable a next button
+        
+        All it does is retrieve the selection from the TreeView and
+        call the signal handler for when the user committed to a key
+        '''
+        name, email, keyid = self.keysPage.get_items_from_selection()
+        return self.on_key_selected(button, keyid)
         
 
     def on_button_clicked(self, button):
@@ -264,44 +294,26 @@ class KeySignSection(Gtk.VBox):
             # switch to the next page in the notebook
             self.notebook.next_page()
 
-            selection = self.keysPage.treeView.get_selection()
-            model, paths = selection.get_selected_rows()
-
             if page_index+1 == 1:
-                for path in paths:
-                    iterator = model.get_iter(path)
-                    (name, email, keyid) = model.get(iterator, 0, 1, 2)
-                    try:
-                        openPgpKey = self.keysPage.keysDict[keyid]
-                    except KeyError:
-                        m = "No key details can be shown for id {}".format(keyid)
-                        self.log.exception(m)
-                        raise
+                key = self.last_selected_key
+                assert key
+                self.keyPresentPage.display_fingerprint_qr_page(key)
 
-                # display uids, exp date and signatures
-                self.keyDetailsPage.display_uids_signatures_page(openPgpKey)
-                # save a reference for later use
-                self.last_selected_key = openPgpKey
-
-            elif page_index+1 == 2:
-                self.keyPresentPage.display_fingerprint_qr_page(self.last_selected_key)
-
-                keyid = self.last_selected_key.keyid()
-                self.keyring.export_data(fpr=str(keyid), secret=False)
-                keydata = self.keyring.context.stdout
-
-                self.log.debug("Keyserver switched on")
-                self.app.setup_server(keydata)
+                # FIXME: Get the number of pages from the notebook
+                # and set the sensitivity iff we are on the last page
+                self.nextButton.set_sensitive(False)
 
             self.backButton.set_sensitive(True)
 
         elif button == self.backButton:
 
-            if page_index == 2:
+            if page_index == 1:
                 self.log.debug("Keyserver switched off")
                 self.app.stop_server()
-            elif page_index-1 == 0:
+            
+            if page_index-1 == 0:
                 self.backButton.set_sensitive(False)
+                self.nextButton.set_sensitive(True)
 
             self.notebook.prev_page()
 
