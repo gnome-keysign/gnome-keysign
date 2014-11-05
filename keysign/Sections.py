@@ -250,7 +250,8 @@ class KeySignSection(Gtk.VBox):
                         openPgpKey = self.keysPage.keysDict[keyid]
                     except KeyError:
                         m = "No key details can be shown for id {}".format(keyid)
-                        self.log.info(m)
+                        self.log.exception(m)
+                        raise
 
                 # display uids, exp date and signatures
                 self.keyDetailsPage.display_uids_signatures_page(openPgpKey)
@@ -566,7 +567,7 @@ class GetKeySection(Gtk.VBox):
         for cc in ccs or []:
             cmd += ['--cc', cc]
         for bcc in bccs or []:
-            cmd += ['--cc', bcc]
+            cmd += ['--bcc', bcc]
         for file_ in files or []:
             cmd += ['--attach', file_]
 

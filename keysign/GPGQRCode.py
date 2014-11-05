@@ -16,35 +16,35 @@
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
-__version__ = '0.1'
+"""This is a very simple QR Code generator which scans your GnuPG keyring
+for keys and selects the one matching your input
+"""
+from gi.repository import Gtk
+from monkeysign.gpg import Keyring
 
+from QRCode import QRImage
 
 def main():
-    # These imports were moved here because the keysign module
-    # can be imported without wanting to run it, e.g. setup.py
-    # imports the __version__
-    import logging, sys, signal
+    import sys
+    key = sys.argv[1]
+    keyring = Keyring()
+    keys = keyring.get_keys(key)
+    # Heh, we take the first key here. Maybe we should raise a warning
+    # or so, when there is more than one key.
+    fpr = keys.items()[0][0]
+    data = 'OPENPGP4FPR:' + fpr
     
-    from gi.repository import GLib, Gtk
-    
-    from .MainWindow import MainWindow
-
-    app = MainWindow()
-
-    try:
-        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : app.quit(), None)
-    except AttributeError:
-        pass
-
-    exit_status = app.run(None)
-
-    return exit_status
-
-
+    w = Gtk.Window()
+    w.connect("delete-event", Gtk.main_quit)
+    w.set_default_size(100,100)
+    v = Gtk.VBox()
+    label = Gtk.Label(data)
+    qr = QRImage(data)
+    v.add(label)
+    v.add(qr)
+    w.add(v)
+    w.show_all()
+    Gtk.main()
 
 if __name__ == '__main__':
-    logging.basicConfig(stream=sys.stderr,
-        level=logging.DEBUG,
-        format='%(name)s (%(levelname)s): %(message)s')
-    sys.exit(main())
-
+    main()
