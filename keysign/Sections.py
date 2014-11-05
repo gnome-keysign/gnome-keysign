@@ -263,8 +263,13 @@ class KeySignSection(Gtk.VBox):
         '''
         self.keyPresentPage.display_fingerprint_qr_page(key)
         self.notebook.next_page()
+        # This is more of a crude hack. Once the next page is presented,
+        # the back button has the focus. This is not desirable because
+        # you will go back when accidentally pressing space or enter.
+        self.keyPresentPage.fingerprintLabel.grab_focus()
         # FIXME: we better use set_current_page, but that requires
         # knowing which page our desired widget is on.
+        # FWIW: A headerbar has named pages.
         
 
     def on_next_button_clicked(self, button):
