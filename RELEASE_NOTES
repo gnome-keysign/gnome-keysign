@@ -1,0 +1,20 @@
+GNOME Keysign  is a tool to make signing OpenPGP keys as easy as possible.
+This is the v0.2 release and introduces, amongst other things, a new UI.
+
+Changes
+==========
+
+ * New, wizard-less, UI
+ * Fullscreen QR Code window
+ * (Replaced libqrcode binding with a pure python module)
+ * Separate, hopefull easier reusable widgets
+ * Bind to IPv4 and IPv6 sockets
+
+
+
+Resources
+=========
+
+Download: https://github.com/muelli/geysigning/releases/download/0.1/gnome-keysign-0.1.tar.gz
+sha256sum: 2ba547551bb8495a53105e9299ccbd9600de54e2391729f86379f2e3a3bd98e6
+Web site: https://wiki.gnome.org/GnomeKeysign
