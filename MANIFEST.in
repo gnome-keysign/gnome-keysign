@@ -1,1 +1,2 @@
 include data/gnome-keysign.desktop data/gnome-keysign.svg data/keysign.appdata.xml
+include COPYING
