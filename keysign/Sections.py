@@ -363,15 +363,13 @@ class GetKeySection(Gtk.VBox):
 
 
     def verify_fingerprint(self, input_string):
-        # Check for a fingerprint in the given string. It can be provided
-        # from the QR scanner or from the text user typed in.
-        m = re.search("((?:[0-9A-F]{4}\s*){10})", input_string, re.IGNORECASE)
-        if m != None:
-            fpr = m.group(1).replace(' ', '')
-        else:
-            fpr = None
-
-        return fpr
+        '''Check for a fingerprint in the given string. It can be provided
+        from the QR scanner or from the text user typed in.
+        '''
+        # The split removes the whitespaces in the string
+        cleaned = ''.join(input_string.split())
+        self.log.warning('Cleaned fingerprint to %s', cleaned)
+        return cleaned
 
     def on_barcode(self, sender, barcode, message=None):
         '''This is connected to the "barcode" signal.
