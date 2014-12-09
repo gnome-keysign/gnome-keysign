@@ -362,10 +362,7 @@ class ScanFingerprintPage(Gtk.HBox):
         start_iter = self.textbuffer.get_start_iter()
         end_iter = self.textbuffer.get_end_iter()
         raw_text = self.textbuffer.get_text(start_iter, end_iter, False)
-
-        self.textbuffer.delete(start_iter, end_iter)
-        # return raw input from user. It will be checked on higher
-        # level if the there was a fingerprint entered
+        
         return raw_text
 
 
