@@ -4,10 +4,9 @@ This is the v0.2 release and introduces, amongst other things, a new UI.
 Changes
 ==========
 
- * New, wizard-less, UI
+ * New, wizard-less, UI for the server side
  * Fullscreen QR Code window
- * (Replaced libqrcode binding with a pure python module)
- * Separate, hopefull easier reusable widgets
+ * Separate, hopefully easier reusable widgets
  * Bind to IPv4 and IPv6 sockets
 
 
@@ -15,6 +14,6 @@ Changes
 Resources
 =========
 
-Download: https://github.com/muelli/geysigning/releases/download/0.1/gnome-keysign-0.1.tar.gz
-sha256sum: 2ba547551bb8495a53105e9299ccbd9600de54e2391729f86379f2e3a3bd98e6
+Download: https://github.com/muelli/geysigning/releases/download/0.2/gnome-keysign-0.2.tar.gz
+sha256sum: 49551ae5e7df8037b3de7e31c0f09899247c1fa1c1eb19aebbcfcf5c01e8df3f
 Web site: https://wiki.gnome.org/GnomeKeysign
