@@ -56,7 +56,13 @@ class KeysPage(Gtk.VBox):
                          (str,)),
     }
 
-    def __init__(self):
+    def __init__(self, show_public_keys=False):
+        '''Sets the widget up.
+        
+        The show_public_keys parameter is meant for development
+        purposes only.  If set to True, the widget will show
+        the public keys, too.  Otherwise, secret keys are shown.
+        '''
         super(KeysPage, self).__init__()
 
         # set up the list store to be filled up with user's gpg keys
@@ -72,7 +78,7 @@ class KeysPage(Gtk.VBox):
 
         # FIXME: this should be a callback function to update the display
         # when a key is changed/deleted
-        for key in self.keyring.get_keys(None, True, False).values():
+        for key in self.keyring.get_keys(None, secret=True, public=show_public_keys).values():
             if key.invalid or key.disabled or key.expired or key.revoked:
                 continue
 
