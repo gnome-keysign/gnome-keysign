@@ -247,11 +247,12 @@ class KeySignSection(Gtk.VBox):
         key = self.keyring.get_keys(keyid).values()[0]
 
         keyid = key.keyid()
-        self.keyring.export_data(fpr=str(keyid), secret=False)
+        fpr = str(keyid)
+        self.keyring.export_data(fpr, secret=False)
         keydata = self.keyring.context.stdout
 
-        self.log.debug("Keyserver switched on")
-        self.app.setup_server(keydata)
+        self.log.debug("Keyserver switched on! Serving key with fpr: %s", fpr)
+        self.app.setup_server(keydata, fpr)
         
         self.switch_to_key_present_page(key)
 

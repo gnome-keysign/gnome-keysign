@@ -75,16 +75,17 @@ class ServeKeyThread(Thread):
     If you want to stop serving, call shutdown().
     '''
 
-    def __init__(self, data, port=9001, *args, **kwargs):
+    def __init__(self, data, fpr, port=9001, *args, **kwargs):
         '''Initializes the server to serve the data'''
         self.keydata = data
+        self.fpr = fpr
         self.port = port
         super(ServeKeyThread, self).__init__(*args, **kwargs)
         self.daemon = True
         self.httpd = None
 
 
-    def start(self, data=None, port=None, *args, **kwargs):
+    def start(self, data=None, fpr=None, port=None, *args, **kwargs):
         '''This is run in the same thread as the caller.
         This calls run() in a separate thread.
         In order to resolve DBus issues, most things
@@ -95,10 +96,13 @@ class ServeKeyThread(Thread):
         '''
 
         port = port or self.port or 9001
+        fpr = fpr or self.fpr
 
         tries = 10
 
         kd = data if data else self.keydata
+        fpr = fpr if fpr else "FIXME fingerprint"
+
         class KeyRequestHandler(KeyRequestHandlerBase):
             '''You will need to create this during runtime'''
             keydata = kd
@@ -117,7 +121,7 @@ class ServeKeyThread(Thread):
                 self.avahi_publisher = ap = AvahiPublisher(
                     service_port = port_i,
                     service_name = 'HTTP Keyserver',
-                    service_txt = 'FIXME fingeprint', #FIXME Fingerprint
+                    service_txt = fpr,
                     # self.keydata is too big for Avahi; it chrashes
                     service_type = '_geysign._tcp',
                 )

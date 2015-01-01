@@ -110,13 +110,13 @@ class MainWindow(Gtk.Application):
 
         return False
 
-    def setup_server(self, keydata=None):
+    def setup_server(self, keydata=None, fpr=None):
         self.log.info('Serving now')
         #self.keyserver = Thread(name='keyserver',
         #                        target=Keyserver.serve_key, args=('Foobar',))
         #self.keyserver.daemon = True
         self.log.debug('About to call %r', Keyserver.ServeKeyThread)
-        self.keyserver = Keyserver.ServeKeyThread(str(keydata))
+        self.keyserver = Keyserver.ServeKeyThread(str(keydata), str(fpr))
         self.log.info('Starting thread %r', self.keyserver)
         self.keyserver.start()
         self.log.info('Finsihed serving')
