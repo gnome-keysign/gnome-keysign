@@ -23,6 +23,7 @@ from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import Gio
 from gi.repository import GObject
 
+import logging
 
 __all__ = ["AvahiBrowser"]
 
@@ -38,6 +39,7 @@ class AvahiBrowser(GObject.GObject):
     def __init__(self, loop=None, service='_geysign._tcp'):
         GObject.GObject.__init__(self)
 
+        self.log = logging.getLogger()
         self.service = service
         # It seems that these are different loops..?!
         self.loop = loop or DBusGMainLoop()
@@ -70,10 +72,8 @@ class AvahiBrowser(GObject.GObject):
         name = args[2]
         address = args[7]
         port = args[8]
-        print 'service resolved'
-        print 'name:', name
-        print 'address:', address
-        print 'port:', port
+        self.log.info("Service resolved; name: '%s', address: '%s',"\
+                " and port: '%s'", name, address, port)
         retval = self.emit('new_service', name, address, port)
         print "emitted", retval
 
