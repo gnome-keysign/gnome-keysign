@@ -64,8 +64,8 @@ class AvahiPublisher:
 
             self.group = group
 
-        self.log.info("Adding service '%s' of type '%s'",
-            self.service_name, self.service_type)
+        self.log.info("Adding service '%s' of type '%s' with fpr '%s'",
+            self.service_name, self.service_type, self.service_txt)
 
 
         group = self.group

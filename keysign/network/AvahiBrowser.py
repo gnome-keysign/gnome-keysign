@@ -32,7 +32,7 @@ class AvahiBrowser(GObject.GObject):
     __gsignals__ = {
         'new_service': (GObject.SIGNAL_RUN_LAST, None,
             # name, address (could be an int too (for IPv4)), port
-            (str, str, int))
+            (str, str, int, str))
     }
 
 
@@ -72,9 +72,11 @@ class AvahiBrowser(GObject.GObject):
         name = args[2]
         address = args[7]
         port = args[8]
+        fpr = avahi.txt_array_to_string_array(args[9])
         self.log.info("Service resolved; name: '%s', address: '%s',"\
                 " and port: '%s'", name, address, port)
-        retval = self.emit('new_service', name, address, port)
+        self.log.info("Fpr as array: '%s'", fpr)
+        retval = self.emit('new_service', name, address, port, fpr)
         print "emitted", retval
 
     def on_error(self, *args):

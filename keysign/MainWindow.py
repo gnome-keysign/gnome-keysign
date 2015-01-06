@@ -126,9 +126,8 @@ class MainWindow(Gtk.Application):
         self.keyserver.shutdown()
 
 
-    def on_new_service(self, browser, name, address, port):
-        self.log.info("Probably discovered something, let me check; %s %s:%i",
-            name, address, port)
+    def on_new_service(self, browser, name, address, port, fprarray):
+        self.log.info("Probably discovered something, let's check; %s %s:%i:%s",             name, address, port, fprarray)
         if self.verify_service(name, address, port):
             GLib.idle_add(self.add_discovered_service, name, address, port)
         else:
