@@ -128,8 +128,12 @@ class MainWindow(Gtk.Application):
 
     def on_new_service(self, browser, name, address, port, fprarray):
         self.log.info("Probably discovered something, let's check; %s %s:%i:%s",             name, address, port, fprarray)
+        fpr = ''
+        for i in range(37, 0, -5):
+            fpr += fprarray[i]
+        self.log.info("Announcing fpr: '%s'", fpr)
         if self.verify_service(name, address, port):
-            GLib.idle_add(self.add_discovered_service, name, address, port)
+            GLib.idle_add(self.add_discovered_service, name, address, port, fpr)
         else:
             self.log.warn("Client was rejected: %s %s %i",
                         name, address, port)
@@ -139,8 +143,8 @@ class MainWindow(Gtk.Application):
         is indeed something we are interested in'''
         return True
 
-    def add_discovered_service(self, name, address, port):
-        self.discovered_services += ((name, address, port), )
+    def add_discovered_service(self, name, address, port, fpr):
+        self.discovered_services += ((name, address, port, fpr), )
 
         return False
 

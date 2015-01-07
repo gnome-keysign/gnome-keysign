@@ -308,6 +308,7 @@ class GetKeySection(Gtk.VBox):
         '''
         super(GetKeySection, self).__init__()
 
+        self.fpr = None
         self.app = app
         self.log = logging.getLogger()
 
@@ -368,22 +369,22 @@ class GetKeySection(Gtk.VBox):
         # from the QR scanner or from the text user typed in.
         m = re.search("((?:[0-9A-F]{4}\s*){10})", input_string, re.IGNORECASE)
         if m != None:
-            fpr = m.group(1).replace(' ', '')
+            self.fpr = m.group(1).replace(' ', '')
         else:
-            fpr = None
+            self.fpr = None
 
-        return fpr
+        return self.fpr
 
     def on_barcode(self, sender, barcode, message=None):
         '''This is connected to the "barcode" signal.
         The message argument is a GStreamer message that created
         the barcode.'''
 
-        fpr = self.verify_fingerprint(barcode)
+        self.fpr = self.verify_fingerprint(barcode)
 
-        if fpr != None:
+        if self.fpr != None:
             try:
-                pgpkey = key.Key(fpr)
+                pgpkey = key.Key(self.fpr)
             except key.KeyError:
                 self.log.exception("Could not create key from %s", barcode)
             else:
@@ -407,7 +408,7 @@ class GetKeySection(Gtk.VBox):
     def try_download_keys(self, clients):
         for client in clients:
             self.log.debug("Getting key from client %s", client)
-            name, address, port = client
+            name, address, port, fpr = client
             try:
                 keydata = self.download_key_http(address, port)
                 yield keydata
@@ -432,6 +433,14 @@ class GetKeySection(Gtk.VBox):
         self.log.debug("Trying to validate %s against %s: %s", downloaded_data, fingerprint, result)
         return result
 
+    def check_fpr_match(self, client):
+        selected_client_fpr = self.fpr[32:]
+        relevant_data = []
+        for matching_fpr in client:
+            if selected_client_fpr == matching_fpr[3]:
+                relevant_data.append(matching_fpr)
+        self.log.info("Found a match: '%s'", relevant_data)
+        return relevant_data
 
     def obtain_key_async(self, fingerprint, callback=None, data=None, error_cb=None):
         other_clients = self.app.discovered_services
@@ -441,7 +450,10 @@ class GetKeySection(Gtk.VBox):
         # to sign it ?
         self.tmpkeyring = TempKeyring()
 
-        for keydata in self.try_download_keys(other_clients):
+        matched_client = self.check_fpr_match(other_clients)
+        self.log.info("Passed values are: %s", matched_client)
+        
+        for keydata in self.try_download_keys(matched_client):
             if self.verify_downloaded_key(keydata, fingerprint):
                 is_valid = True
             else:
