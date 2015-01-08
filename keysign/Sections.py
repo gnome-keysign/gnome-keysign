@@ -432,13 +432,11 @@ class GetKeySection(Gtk.VBox):
         self.log.debug("Trying to validate %s against %s: %s", downloaded_data, fingerprint, result)
         return result
 
-    def check_fpr_match(self, client, selected_client_fpr):
-        relevant_data = []
-        for matching_fpr in client:
-            if selected_client_fpr == matching_fpr[3]:
-                relevant_data.append(matching_fpr)
-        self.log.info("Found a match: '%s'", relevant_data)
-        return relevant_data
+    def sort_clients(self, client, selected_client_fpr):
+        key = lambda fpr: fpr[3]==selected_client_fpr
+        client = sorted(client, key=key, reverse=True)
+        self.log.info("Check if list is sorted '%s'", client)
+        return client
 
     def obtain_key_async(self, fingerprint, callback=None, data=None, error_cb=None):
         other_clients = self.app.discovered_services
@@ -449,10 +447,9 @@ class GetKeySection(Gtk.VBox):
         self.tmpkeyring = TempKeyring()
         
         client_fpr = fingerprint[32:]
-        matched_client = self.check_fpr_match(other_clients, client_fpr)
-        self.log.info("Passed values are: %s", matched_client)
+        other_clients = self.sort_clients(other_clients, client_fpr)
 
-        for keydata in self.try_download_keys(matched_client):
+        for keydata in self.try_download_keys(other_clients):
             if self.verify_downloaded_key(keydata, fingerprint):
                 is_valid = True
             else:
