@@ -135,7 +135,11 @@ class MainWindow(Gtk.Application):
                         name, address, port)
     
     def parse_fprarray_to_string(self, published_fpr):
-        '''A small function that removes all spaces, quotations marks, and commas to return a string containing only the fpr digits'''
+        '''A small function that removes all spaces, quotations marks, and
+        commas to return a string containing only the last 8 fpr digits, ex.
+        avahi.txt_array_to_string_array outputs '['1', '2', '3']'
+        which is converted by this function to '321'.'''
+        #avahi.byte_array_to_string failed to produce fpr as a string
         fpr = ''
         for i in range(37, 0, -5):
             fpr += published_fpr[i]
