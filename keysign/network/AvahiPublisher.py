@@ -29,7 +29,7 @@ class AvahiPublisher:
             service_name='Demo Service',
             service_type='_demo._tcp',
             service_port=8899,
-            service_txt='',
+            service_txt={},
             domain='',
             host=''):
         self.log = logging.getLogger()
@@ -43,7 +43,7 @@ class AvahiPublisher:
         #See http://www.dns-sd.org/ServiceTypes.html
         self.service_type = service_type
         self.service_port = service_port
-        self.service_txt = service_txt #TXT record for the service
+        self.service_txt = avahi.dict_to_txt_array(service_txt) #TXT record for the service
         self.domain = domain # Domain to publish on, default to .local
         self.host = host # Host to publish records for, default to localhost
 
@@ -76,7 +76,7 @@ class AvahiPublisher:
                 self.service_name, self.service_type,
                 self.domain, self.host,
                 dbus.UInt16 (self.service_port),
-                avahi.string_array_to_txt_array (self.service_txt))
+                self.service_txt)
         group.Commit()
 
     def remove_service(self):
