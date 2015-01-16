@@ -23,6 +23,10 @@ import socket
 from SocketServer import ThreadingMixIn
 from threading import Thread
 
+# This is probably really bad...  But doing relative imports only
+# works for modules.  However, I want to be able to call this Keyserver.py
+# for testing purposes.
+from __init__ import __version__
 from network.AvahiPublisher import AvahiPublisher
 
 log = logging.getLogger()
@@ -117,10 +121,16 @@ class ServeKeyThread(Thread):
                 # This is a bit of a hack, it really should be
                 # in some lower layer, such as the place were
                 # the socket is created and listen()ed on.
+                service_txt = {
+                    'fingerprint': fpr,
+                    'version': __version__,
+                }
+                log.info('Requesting Avahi with txt: %s', service_txt)
+                
                 self.avahi_publisher = ap = AvahiPublisher(
                     service_port = port_i,
                     service_name = 'HTTP Keyserver',
-                    service_txt = fpr,
+                    service_txt = service_txt,
                     # self.keydata is too big for Avahi; it chrashes
                     service_type = '_geysign._tcp',
                 )
