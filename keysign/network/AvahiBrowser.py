@@ -28,11 +28,42 @@ import logging
 __all__ = ["AvahiBrowser"]
 
 
+# This should probably be upstreamed.
+# Unfortunately, upstream seems rather inactive.
+if getattr(avahi, 'txt_array_to_dict', None) is None:
+    # This has been taken from Gajim
+    # http://hg.gajim.org/gajim/file/4a3f896130ad/src/common/zeroconf/zeroconf_avahi.py
+    # it is licensed under the GPLv3.
+    def txt_array_to_dict(txt_array):
+        txt_dict = {}
+        for els in txt_array:
+            key, val = '', None
+            for c in els:
+                    #FIXME: remove when outdated, this is for avahi < 0.6.14
+                    if c < 0 or c > 255:
+                        c = '.'
+                    else:
+                        c = chr(c)
+                    if val is None:
+                        if c == '=':
+                            val = ''
+                        else:
+                            key += c
+                    else:
+                        val += c
+            if val is None: # missing '='
+                val = ''
+            txt_dict[key] = val.decode('utf-8')
+        return txt_dict
+
+    setattr(avahi, 'txt_array_to_dict', txt_array_to_dict)
+
+
 class AvahiBrowser(GObject.GObject):
     __gsignals__ = {
         'new_service': (GObject.SIGNAL_RUN_LAST, None,
-            # name, address (could be an int too (for IPv4)), port, fpr
-            (str, str, int, str))
+            # name, address (could be an int too (for IPv4)), port, txt_dict
+            (str, str, int, object))
     }
 
 
@@ -67,19 +98,21 @@ class AvahiBrowser(GObject.GObject):
             reply_handler=self.on_service_resolved,
             error_handler=self.on_error)
 
-    def on_service_resolved(self, interface, protocol, name, stype, domain,\
-        host, aprotocol, address, port, txt, flags):
-        '''called when the browser successfully found a service'''
 
-        txt = avahi.txt_array_to_string_array(txt)
+    def on_service_resolved(self, interface, protocol, name, stype, domain,\
+                                  host, aprotocol, address, port, txt, flags):
+        '''called when the browser successfully found a service'''
+        txt = avahi.txt_array_to_dict(txt)
         self.log.info("Service resolved; name: '%s', address: '%s',"\
                 "port: '%s', and txt: '%s'", name, address, port, txt)
         retval = self.emit('new_service', name, address, port, txt)
         self.log.info("emitted '%s'", retval)
 
+
     def on_error(self, *args):
         print 'error_handler'
         print args[0]
+
 
 def main():
     loop = GObject.MainLoop()

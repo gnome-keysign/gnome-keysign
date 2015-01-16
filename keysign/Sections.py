@@ -247,7 +247,7 @@ class KeySignSection(Gtk.VBox):
         key = self.keyring.get_keys(keyid).values()[0]
 
         keyid = key.keyid()
-        fpr = str(keyid)
+        fpr = key.fpr
         self.keyring.export_data(fpr, secret=False)
         keydata = self.keyring.context.stdout
 

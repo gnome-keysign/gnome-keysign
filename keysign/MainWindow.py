@@ -110,23 +110,26 @@ class MainWindow(Gtk.Application):
 
         return False
 
-    def setup_server(self, keydata=None, fpr=None):
+    def setup_server(self, keydata, fingerprint):
+        """
+        Starts the key-server which serves the provided keydata and
+        announces the fingerprint as TXT record using Avahi
+        """
         self.log.info('Serving now')
-        #self.keyserver = Thread(name='keyserver',
-        #                        target=Keyserver.serve_key, args=('Foobar',))
-        #self.keyserver.daemon = True
         self.log.debug('About to call %r', Keyserver.ServeKeyThread)
-        self.keyserver = Keyserver.ServeKeyThread(str(keydata), str(fpr))
+        self.keyserver = Keyserver.ServeKeyThread(str(keydata), fingerprint)
         self.log.info('Starting thread %r', self.keyserver)
         self.keyserver.start()
         self.log.info('Finsihed serving')
         return False
 
+
     def stop_server(self):
         self.keyserver.shutdown()
 
-    def on_new_service(self, browser, name, address, port, published_fpr):
-        published_fpr = self.parse_fprarray_to_string(published_fpr)
+
+    def on_new_service(self, browser, name, address, port, txt_dict):
+        published_fpr = txt_dict.get('fingerprint', None)
         self.log.info("Probably discovered something, let's check; %s %s:%i:%s",             name, address, port, published_fpr)
         if self.verify_service(name, address, port):
             GLib.idle_add(self.add_discovered_service, name, address, port, published_fpr)
@@ -134,21 +137,12 @@ class MainWindow(Gtk.Application):
             self.log.warn("Client was rejected: %s %s %i",
                         name, address, port)
     
-    def parse_fprarray_to_string(self, published_fpr):
-        '''A small function that removes all spaces, quotations marks, and
-        commas to return a string containing only the last 8 fpr digits, ex.
-        avahi.txt_array_to_string_array outputs '['1', '2', '3']'
-        which is converted by this function to '321'.'''
-        #avahi.byte_array_to_string failed to produce fpr as a string
-        fpr = ''
-        for i in range(37, 0, -5):
-            fpr += published_fpr[i]
-        return fpr
 
     def verify_service(self, name, address, port):
         '''A tiny function to return whether the service
         is indeed something we are interested in'''
         return True
+
 
     def add_discovered_service(self, name, address, port, published_fpr):
         self.discovered_services += ((name, address, port, published_fpr), )
