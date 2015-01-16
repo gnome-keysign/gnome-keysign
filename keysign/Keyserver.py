@@ -101,7 +101,6 @@ class ServeKeyThread(Thread):
         tries = 10
 
         kd = data if data else self.keydata
-        fpr = fpr if fpr else "FIXME fingerprint"
 
         class KeyRequestHandler(KeyRequestHandlerBase):
             '''You will need to create this during runtime'''
