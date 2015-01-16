@@ -23,6 +23,7 @@ from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import Gio
 from gi.repository import GObject
 
+import logging
 
 __all__ = ["AvahiBrowser"]
 
@@ -30,14 +31,15 @@ __all__ = ["AvahiBrowser"]
 class AvahiBrowser(GObject.GObject):
     __gsignals__ = {
         'new_service': (GObject.SIGNAL_RUN_LAST, None,
-            # name, address (could be an int too (for IPv4)), port
-            (str, str, int))
+            # name, address (could be an int too (for IPv4)), port, fpr
+            (str, str, int, str))
     }
 
 
     def __init__(self, loop=None, service='_geysign._tcp'):
         GObject.GObject.__init__(self)
 
+        self.log = logging.getLogger()
         self.service = service
         # It seems that these are different loops..?!
         self.loop = loop or DBusGMainLoop()
@@ -65,17 +67,15 @@ class AvahiBrowser(GObject.GObject):
             reply_handler=self.on_service_resolved,
             error_handler=self.on_error)
 
-    def on_service_resolved(self, *args):
+    def on_service_resolved(self, interface, protocol, name, stype, domain,\
+        host, aprotocol, address, port, txt, flags):
         '''called when the browser successfully found a service'''
-        name = args[2]
-        address = args[7]
-        port = args[8]
-        print 'service resolved'
-        print 'name:', name
-        print 'address:', address
-        print 'port:', port
-        retval = self.emit('new_service', name, address, port)
-        print "emitted", retval
+
+        txt = avahi.txt_array_to_string_array(txt)
+        self.log.info("Service resolved; name: '%s', address: '%s',"\
+                "port: '%s', and txt: '%s'", name, address, port, txt)
+        retval = self.emit('new_service', name, address, port, txt)
+        self.log.info("emitted '%s'", retval)
 
     def on_error(self, *args):
         print 'error_handler'

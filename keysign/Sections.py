@@ -35,7 +35,9 @@ from monkeysign.ui import MonkeysignUi
 from monkeysign.gpg import GpgRuntimeError
 
 import Keyserver
-from SignPages import KeysPage, KeyPresentPage, KeyDetailsPage
+from KeysPage import KeysPage
+from KeyPresent import KeyPresentPage
+from SignPages import KeyDetailsPage
 from SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 import MainWindow
 
@@ -192,36 +194,33 @@ class KeySignSection(Gtk.VBox):
 
         # these are needed later when we need to get details about
         # a selected key
-        self.keysPage = KeysPage(self)
+        self.keysPage = KeysPage()
+        self.keysPage.connect('key-selection-changed',
+            self.on_key_selection_changed)
+        self.keysPage.connect('key-selected', self.on_key_selected)
         self.keyDetailsPage = KeyDetailsPage()
         self.keyPresentPage = KeyPresentPage()
 
-        # set up notebook container
-        self.notebook = Gtk.Notebook()
-        self.notebook.append_page(self.keysPage, None)
-        self.notebook.append_page(self.keyDetailsPage, None)
-        self.notebook.append_page(self.keyPresentPage, None)
-        self.notebook.set_show_tabs(False)
 
         # create back button
         self.backButton = Gtk.Button('Back')
         self.backButton.set_image(Gtk.Image.new_from_icon_name("go-previous", Gtk.IconSize.BUTTON))
         self.backButton.set_always_show_image(True)
         self.backButton.connect('clicked', self.on_button_clicked)
-        self.backButton.set_sensitive(False)
-        # create next button
-        self.nextButton = Gtk.Button('Next')
-        self.nextButton.set_image(Gtk.Image.new_from_icon_name("go-next", Gtk.IconSize.BUTTON))
-        self.nextButton.set_always_show_image(True)
-        self.nextButton.connect('clicked', self.on_button_clicked)
-        self.nextButton.set_sensitive(False)
 
-        buttonBox = Gtk.HBox()
-        buttonBox.pack_start(self.backButton, False, False, 0)
-        buttonBox.pack_start(self.nextButton, False, False, 0)
-        # pack up
+        # set up notebook container
+        self.notebook = Gtk.Notebook ()
+        self.notebook.append_page (self.keysPage, None)
+        vbox = Gtk.VBox ()
+        # We place the button at the top, but that might not be the
+        # smartest thing to do. Feel free to rearrange
+        # FIXME: Consider a GtkHeaderBar for the application
+        vbox.pack_start (self.backButton, False, False, 0)
+        vbox.pack_start (self.keyPresentPage, True, True, 10)
+        self.notebook.append_page (vbox, None)
+        self.notebook.set_show_tabs (False)
+
         self.pack_start(self.notebook, True, True, 0)
-        self.pack_start(buttonBox, False, False, 0)
 
         # this will hold a reference to the last key selected
         self.last_selected_key = None
@@ -231,52 +230,69 @@ class KeySignSection(Gtk.VBox):
         self.received_key_data = None
 
 
+    def on_key_selection_changed(self, pane, keyid):
+        '''This callback is attached to the signal which is emitted
+        when the user changes their selection in the list of keys
+        '''
+        pass
+
+
+    def on_key_selected(self, pane, keyid):
+        '''This is the callback for when the user has committed
+        to a key, i.e. the user has made a selection and wants to
+        advance the program.
+        '''
+        log.debug('User selected key %s', keyid)
+
+        key = self.keyring.get_keys(keyid).values()[0]
+
+        keyid = key.keyid()
+        fpr = str(keyid)
+        self.keyring.export_data(fpr, secret=False)
+        keydata = self.keyring.context.stdout
+
+        self.log.debug("Keyserver switched on! Serving key with fpr: %s", fpr)
+        self.app.setup_server(keydata, fpr)
+        
+        self.switch_to_key_present_page(key)
+
+
+    def switch_to_key_present_page(self, key):
+        '''This switches the notebook to the page which
+        presents the information that is needed to securely
+        transfer the keydata, i.e. the fingerprint and its barcode.
+        '''
+        self.keyPresentPage.display_fingerprint_qr_page(key)
+        self.notebook.next_page()
+        # This is more of a crude hack. Once the next page is presented,
+        # the back button has the focus. This is not desirable because
+        # you will go back when accidentally pressing space or enter.
+        self.keyPresentPage.fingerprintLabel.grab_focus()
+        # FIXME: we better use set_current_page, but that requires
+        # knowing which page our desired widget is on.
+        # FWIW: A headerbar has named pages.
+        
+
+    def on_next_button_clicked(self, button):
+        '''A helper for legacy reasons to enable a next button
+        
+        All it does is retrieve the selection from the TreeView and
+        call the signal handler for when the user committed to a key
+        '''
+        name, email, keyid = self.keysPage.get_items_from_selection()
+        return self.on_key_selected(button, keyid)
+        
+
     def on_button_clicked(self, button):
 
         page_index = self.notebook.get_current_page()
 
-        if button == self.nextButton:
-            # switch to the next page in the notebook
-            self.notebook.next_page()
+        if button == self.backButton:
 
-            selection = self.keysPage.treeView.get_selection()
-            model, paths = selection.get_selected_rows()
-
-            if page_index+1 == 1:
-                for path in paths:
-                    iterator = model.get_iter(path)
-                    (name, email, keyid) = model.get(iterator, 0, 1, 2)
-                    try:
-                        openPgpKey = self.keysPage.keysDict[keyid]
-                    except KeyError:
-                        m = "No key details can be shown for id {}".format(keyid)
-                        self.log.info(m)
-
-                # display uids, exp date and signatures
-                self.keyDetailsPage.display_uids_signatures_page(openPgpKey)
-                # save a reference for later use
-                self.last_selected_key = openPgpKey
-
-            elif page_index+1 == 2:
-                self.keyPresentPage.display_fingerprint_qr_page(self.last_selected_key)
-
-                keyid = self.last_selected_key.keyid()
-                self.keyring.export_data(fpr=str(keyid), secret=False)
-                keydata = self.keyring.context.stdout
-
-                self.log.debug("Keyserver switched on")
-                self.app.setup_server(keydata)
-
-            self.backButton.set_sensitive(True)
-
-        elif button == self.backButton:
-
-            if page_index == 2:
+            if page_index == 1:
                 self.log.debug("Keyserver switched off")
                 self.app.stop_server()
-            elif page_index-1 == 0:
-                self.backButton.set_sensitive(False)
-
+            
             self.notebook.prev_page()
 
 
@@ -391,7 +407,7 @@ class GetKeySection(Gtk.VBox):
     def try_download_keys(self, clients):
         for client in clients:
             self.log.debug("Getting key from client %s", client)
-            name, address, port = client
+            name, address, port, fpr = client
             try:
                 keydata = self.download_key_http(address, port)
                 yield keydata
@@ -416,6 +432,11 @@ class GetKeySection(Gtk.VBox):
         self.log.debug("Trying to validate %s against %s: %s", downloaded_data, fingerprint, result)
         return result
 
+    def sort_clients(self, clients, selected_client_fpr):
+        key = lambda client: client[3]==selected_client_fpr
+        client = sorted(clients, key=key, reverse=True)
+        self.log.info("Check if list is sorted '%s'", clients)
+        return clients
 
     def obtain_key_async(self, fingerprint, callback=None, data=None, error_cb=None):
         other_clients = self.app.discovered_services
@@ -424,6 +445,10 @@ class GetKeySection(Gtk.VBox):
         #FIXME: should we create a new TempKeyring for each key we want
         # to sign it ?
         self.tmpkeyring = TempKeyring()
+        
+        client_fpr = fingerprint[32:]
+            #Truncate fingerprint to last 8 digits to matach the published fpr 
+        other_clients = self.sort_clients(other_clients, client_fpr)
 
         for keydata in self.try_download_keys(other_clients):
             if self.verify_downloaded_key(keydata, fingerprint):
@@ -566,7 +591,7 @@ class GetKeySection(Gtk.VBox):
         for cc in ccs or []:
             cmd += ['--cc', cc]
         for bcc in bccs or []:
-            cmd += ['--cc', bcc]
+            cmd += ['--bcc', bcc]
         for file_ in files or []:
             cmd += ['--attach', file_]
 

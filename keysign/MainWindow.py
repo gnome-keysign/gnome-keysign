@@ -49,6 +49,7 @@ class MainWindow(Gtk.Application):
     def on_startup(self, app):
         self.log.info("Startup")
         self.window = Gtk.ApplicationWindow(application=app)
+        self.window.set_title ("Keysign")
 
         self.window.set_border_width(10)
         self.window.set_position(Gtk.WindowPosition.CENTER)
@@ -109,13 +110,13 @@ class MainWindow(Gtk.Application):
 
         return False
 
-    def setup_server(self, keydata=None):
+    def setup_server(self, keydata=None, fpr=None):
         self.log.info('Serving now')
         #self.keyserver = Thread(name='keyserver',
         #                        target=Keyserver.serve_key, args=('Foobar',))
         #self.keyserver.daemon = True
         self.log.debug('About to call %r', Keyserver.ServeKeyThread)
-        self.keyserver = Keyserver.ServeKeyThread(str(keydata))
+        self.keyserver = Keyserver.ServeKeyThread(str(keydata), str(fpr))
         self.log.info('Starting thread %r', self.keyserver)
         self.keyserver.start()
         self.log.info('Finsihed serving')
@@ -124,35 +125,46 @@ class MainWindow(Gtk.Application):
     def stop_server(self):
         self.keyserver.shutdown()
 
-
-    def on_new_service(self, browser, name, address, port):
-        self.log.info("Probably discovered something, let me check; %s %s:%i",
-            name, address, port)
+    def on_new_service(self, browser, name, address, port, published_fpr):
+        published_fpr = self.parse_fprarray_to_string(published_fpr)
+        self.log.info("Probably discovered something, let's check; %s %s:%i:%s",             name, address, port, published_fpr)
         if self.verify_service(name, address, port):
-            GLib.idle_add(self.add_discovered_service, name, address, port)
+            GLib.idle_add(self.add_discovered_service, name, address, port, published_fpr)
         else:
             self.log.warn("Client was rejected: %s %s %i",
                         name, address, port)
+    
+    def parse_fprarray_to_string(self, published_fpr):
+        '''A small function that removes all spaces, quotations marks, and
+        commas to return a string containing only the last 8 fpr digits, ex.
+        avahi.txt_array_to_string_array outputs '['1', '2', '3']'
+        which is converted by this function to '321'.'''
+        #avahi.byte_array_to_string failed to produce fpr as a string
+        fpr = ''
+        for i in range(37, 0, -5):
+            fpr += published_fpr[i]
+        return fpr
 
     def verify_service(self, name, address, port):
         '''A tiny function to return whether the service
         is indeed something we are interested in'''
         return True
 
-    def add_discovered_service(self, name, address, port):
-        self.discovered_services += ((name, address, port), )
-
+    def add_discovered_service(self, name, address, port, published_fpr):
+        self.discovered_services += ((name, address, port, published_fpr), )
+        #List needs to be modified when server services are removed.
         return False
 
 
 
 def main():
+    app = MainWindow()
+
     try:
-        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : Gtk.main_quit(), None)
+        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : app.quit(), None)
     except AttributeError:
         pass
 
-    app = MainWindow()
     exit_status = app.run(None)
 
     return exit_status
