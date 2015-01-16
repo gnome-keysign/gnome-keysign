@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #    Copyright 2014 Andrei Macavei <andrei.macavei89@gmail.com>
 #    Copyright 2014 Tobias Mueller <muelli@cryptobitch.de>
+#    Copyright 2015 Jody Hansen <jobediah.hansen@gmail.com>
 #
 #    This file is part of GNOME Keysign.
 #
@@ -107,6 +108,7 @@ class MainWindow(Gtk.Application):
         # FIXME: place a proper service type
         self.avahi_browser = AvahiBrowser(service=self.avahi_service_type)
         self.avahi_browser.connect('new_service', self.on_new_service)
+        self.avahi_browser.connect('remove_service', self.on_remove_service)
 
         return False
 
@@ -123,32 +125,45 @@ class MainWindow(Gtk.Application):
         self.log.info('Finsihed serving')
         return False
 
-
     def stop_server(self):
         self.keyserver.shutdown()
 
-
     def on_new_service(self, browser, name, address, port, txt_dict):
         published_fpr = txt_dict.get('fingerprint', None)
+
         self.log.info("Probably discovered something, let's check; %s %s:%i:%s",             name, address, port, published_fpr)
+
         if self.verify_service(name, address, port):
             GLib.idle_add(self.add_discovered_service, name, address, port, published_fpr)
         else:
             self.log.warn("Client was rejected: %s %s %i",
                         name, address, port)
-    
+
+    def on_remove_service(self, browser, service_type, name):
+        '''Receives on_remove signal from avahibrowser.py to remove service from list and
+        transfers data to remove_discovered_service'''
+        self.log.info("Received a remove signal, let's check; %s:%s", service_type, name)
+        GLib.idle_add(self.remove_discovered_service, name)
 
     def verify_service(self, name, address, port):
         '''A tiny function to return whether the service
         is indeed something we are interested in'''
         return True
 
-
     def add_discovered_service(self, name, address, port, published_fpr):
         self.discovered_services += ((name, address, port, published_fpr), )
         #List needs to be modified when server services are removed.
+        self.log.info("Clients currently in list '%s'", self.discovered_services)
         return False
 
+    def remove_discovered_service(self, name):
+        '''Sorts and removes server-side clients from discovered_services list
+        by the matching server name which includes the fpr.'''
+        key = lambda client: client == name
+        self.discovered_services = sorted(self.discovered_services, key=key, reverse=True)
+        self.discovered_services = [self.discovered_services.pop(0)\
+            for clients in self.discovered_services if clients[3] == name]
+        self.log.info("Clients currently in list '%s'", self.discovered_services)
 
 
 def main():

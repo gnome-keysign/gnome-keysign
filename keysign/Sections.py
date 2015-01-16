@@ -292,7 +292,7 @@ class KeySignSection(Gtk.VBox):
             if page_index == 1:
                 self.log.debug("Keyserver switched off")
                 self.app.stop_server()
-            
+
             self.notebook.prev_page()
 
 

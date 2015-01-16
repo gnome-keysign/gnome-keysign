@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #    Copyright 2014 Tobias Mueller <muelli@cryptobitch.de>
 #    Copyright 2014 Andrei Macavei <andrei.macavei89@gmail.com>
+#    Copyright 2015 Jody Hansen <jobediah.hansen@gmail.com>
 #
 #    This file is part of GNOME Keysign.
 #
@@ -125,11 +126,13 @@ class ServeKeyThread(Thread):
                     'fingerprint': fpr,
                     'version': __version__,
                 }
+
+
                 log.info('Requesting Avahi with txt: %s', service_txt)
-                
+
                 self.avahi_publisher = ap = AvahiPublisher(
                     service_port = port_i,
-                    service_name = 'HTTP Keyserver',
+                    service_name = 'HTTP Keyserver %s' % fpr,
                     service_txt = service_txt,
                     # self.keydata is too big for Avahi; it chrashes
                     service_type = '_geysign._tcp',
