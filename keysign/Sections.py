@@ -446,9 +446,7 @@ class GetKeySection(Gtk.VBox):
         # to sign it ?
         self.tmpkeyring = TempKeyring()
         
-        client_fpr = fingerprint[32:]
-            #Truncate fingerprint to last 8 digits to matach the published fpr 
-        other_clients = self.sort_clients(other_clients, client_fpr)
+        other_clients = self.sort_clients(other_clients, fingerprint)
 
         for keydata in self.try_download_keys(other_clients):
             if self.verify_downloaded_key(keydata, fingerprint):
