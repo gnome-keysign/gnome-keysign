@@ -110,20 +110,23 @@ class MainWindow(Gtk.Application):
 
         return False
 
-    def setup_server(self, keydata=None, fpr=None):
+    def setup_server(self, keydata, fingerprint):
+        """
+        Starts the key-server which serves the provided keydata and
+        announces the fingerprint as TXT record using Avahi
+        """
         self.log.info('Serving now')
-        #self.keyserver = Thread(name='keyserver',
-        #                        target=Keyserver.serve_key, args=('Foobar',))
-        #self.keyserver.daemon = True
         self.log.debug('About to call %r', Keyserver.ServeKeyThread)
-        self.keyserver = Keyserver.ServeKeyThread(str(keydata), str(fpr))
+        self.keyserver = Keyserver.ServeKeyThread(str(keydata), fingerprint)
         self.log.info('Starting thread %r', self.keyserver)
         self.keyserver.start()
         self.log.info('Finsihed serving')
         return False
 
+
     def stop_server(self):
         self.keyserver.shutdown()
+
 
     def on_new_service(self, browser, name, address, port, txt_dict):
         published_fpr = txt_dict.get('fingerprint', None)
