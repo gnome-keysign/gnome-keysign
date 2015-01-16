@@ -73,6 +73,7 @@ class ServerWindow(Gtk.Window):
         self.keyserver.shutdown()
 
 def main(args):
+    log = logging.getLogger()
     log.debug('Running main with args: %s', args)
     w = ServerWindow()
     w.show_all()
