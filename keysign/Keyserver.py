@@ -23,6 +23,10 @@ import socket
 from SocketServer import ThreadingMixIn
 from threading import Thread
 
+# This is probably really bad...  But doing relative imports only
+# works for modules.  However, I want to be able to call this Keyserver.py
+# for testing purposes.
+from __init__ import __version__
 from network.AvahiPublisher import AvahiPublisher
 
 log = logging.getLogger()
@@ -75,16 +79,17 @@ class ServeKeyThread(Thread):
     If you want to stop serving, call shutdown().
     '''
 
-    def __init__(self, data, port=9001, *args, **kwargs):
+    def __init__(self, data, fpr, port=9001, *args, **kwargs):
         '''Initializes the server to serve the data'''
         self.keydata = data
+        self.fpr = fpr
         self.port = port
         super(ServeKeyThread, self).__init__(*args, **kwargs)
         self.daemon = True
         self.httpd = None
 
 
-    def start(self, data=None, port=None, *args, **kwargs):
+    def start(self, data=None, fpr=None, port=None, *args, **kwargs):
         '''This is run in the same thread as the caller.
         This calls run() in a separate thread.
         In order to resolve DBus issues, most things
@@ -95,10 +100,12 @@ class ServeKeyThread(Thread):
         '''
 
         port = port or self.port or 9001
+        fpr = fpr or self.fpr
 
         tries = 10
 
         kd = data if data else self.keydata
+
         class KeyRequestHandler(KeyRequestHandlerBase):
             '''You will need to create this during runtime'''
             keydata = kd
@@ -114,10 +121,16 @@ class ServeKeyThread(Thread):
                 # This is a bit of a hack, it really should be
                 # in some lower layer, such as the place were
                 # the socket is created and listen()ed on.
+                service_txt = {
+                    'fingerprint': fpr,
+                    'version': __version__,
+                }
+                log.info('Requesting Avahi with txt: %s', service_txt)
+                
                 self.avahi_publisher = ap = AvahiPublisher(
                     service_port = port_i,
                     service_name = 'HTTP Keyserver',
-                    service_txt = 'FIXME fingeprint', #FIXME Fingerprint
+                    service_txt = service_txt,
                     # self.keydata is too big for Avahi; it chrashes
                     service_type = '_geysign._tcp',
                 )
@@ -183,15 +196,19 @@ if __name__ == '__main__':
     if len(sys.argv) >= 2:
         fname = sys.argv[1]
         KEYDATA = open(fname, 'r').read()
+        # FIXME: Someone needs to determine the fingerprint
+        #        of the data just read
+        fpr = ''.join('F289 F7BA 977D F414 3AE9  FDFB F70A 0290 6C30 1813'.split())
     else:
         KEYDATA = 'Example data'
+        fpr = ''.join('F289 F7BA 977D F414 3AE9  FDFB F70A 0290 6C30 1813'.split())
 
     if len(sys.argv) >= 3:
         timeout = int(sys.argv[2])
     else:
         timeout = 5
 
-    t = ServeKeyThread(KEYDATA)
+    t = ServeKeyThread(KEYDATA, fpr)
     stop_t = Thread(target=stop_thread, args=(t,timeout))
     stop_t.daemon = True
     t.start()

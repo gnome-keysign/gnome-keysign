@@ -62,7 +62,7 @@ class ServerWindow(Gtk.Window):
     def setup_server(self):
         self.log.info('Serving now')
         self.log.debug('About to call %r', Keyserver.ServeKeyThread)
-        self.keyserver = Keyserver.ServeKeyThread('Keydata')
+        self.keyserver = Keyserver.ServeKeyThread('Keydata', 'fingerprint')
         self.log.info('Starting thread %r', self.keyserver)
         self.keyserver.start()
         self.log.info('Finsihed serving')
@@ -73,6 +73,7 @@ class ServerWindow(Gtk.Window):
         self.keyserver.shutdown()
 
 def main(args):
+    log = logging.getLogger()
     log.debug('Running main with args: %s', args)
     w = ServerWindow()
     w.show_all()

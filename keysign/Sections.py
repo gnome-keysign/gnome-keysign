@@ -247,11 +247,12 @@ class KeySignSection(Gtk.VBox):
         key = self.keyring.get_keys(keyid).values()[0]
 
         keyid = key.keyid()
-        self.keyring.export_data(fpr=str(keyid), secret=False)
+        fpr = key.fpr
+        self.keyring.export_data(fpr, secret=False)
         keydata = self.keyring.context.stdout
 
-        self.log.debug("Keyserver switched on")
-        self.app.setup_server(keydata)
+        self.log.debug("Keyserver switched on! Serving key with fpr: %s", fpr)
+        self.app.setup_server(keydata, fpr)
         
         self.switch_to_key_present_page(key)
 
@@ -406,7 +407,7 @@ class GetKeySection(Gtk.VBox):
     def try_download_keys(self, clients):
         for client in clients:
             self.log.debug("Getting key from client %s", client)
-            name, address, port = client
+            name, address, port, fpr = client
             try:
                 keydata = self.download_key_http(address, port)
                 yield keydata
@@ -431,6 +432,11 @@ class GetKeySection(Gtk.VBox):
         self.log.debug("Trying to validate %s against %s: %s", downloaded_data, fingerprint, result)
         return result
 
+    def sort_clients(self, clients, selected_client_fpr):
+        key = lambda client: client[3]==selected_client_fpr
+        client = sorted(clients, key=key, reverse=True)
+        self.log.info("Check if list is sorted '%s'", clients)
+        return clients
 
     def obtain_key_async(self, fingerprint, callback=None, data=None, error_cb=None):
         other_clients = self.app.discovered_services
@@ -439,6 +445,8 @@ class GetKeySection(Gtk.VBox):
         #FIXME: should we create a new TempKeyring for each key we want
         # to sign it ?
         self.tmpkeyring = TempKeyring()
+        
+        other_clients = self.sort_clients(other_clients, fingerprint)
 
         for keydata in self.try_download_keys(other_clients):
             if self.verify_downloaded_key(keydata, fingerprint):
