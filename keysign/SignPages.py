@@ -28,8 +28,8 @@ from qrencode import encode_scaled
 
 from datetime import datetime
 
+from compat import gtkbutton
 from QRCode import QRImage
-
 from scan_barcode import BarcodeReaderGTK
 
 
