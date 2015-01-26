@@ -34,6 +34,7 @@ from monkeysign.gpg import Keyring, TempKeyring
 from monkeysign.ui import MonkeysignUi
 from monkeysign.gpg import GpgRuntimeError
 
+from compat import gtkbutton
 import Keyserver
 from KeysPage import KeysPage
 from KeyPresent import KeyPresentPage
