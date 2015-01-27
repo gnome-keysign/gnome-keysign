@@ -67,7 +67,7 @@ class AvahiBrowser(GObject.GObject):
             (str, str, int, object)),
         'remove_service': (GObject.SIGNAL_RUN_LAST, None,
             # string 'remove'(placeholder: tuple element must be sequence), name
-            (str, str))
+            (str, str)),
     }
 
 
@@ -89,7 +89,8 @@ class AvahiBrowser(GObject.GObject):
             avahi.DBUS_INTERFACE_SERVICE_BROWSER)
 
         self.sbrowser.connect_to_signal("ItemNew", self.on_new_item)
-        self.sbrowser.connect_to_signal("ItemRemove", self.on_remove_item)
+        self.sbrowser.connect_to_signal("ItemRemove", self.on_service_removed)
+
 
     def on_new_item(self, interface, protocol, name, stype, domain, flags):
         self.log.info("Found service '%s' type '%s' domain '%s' ", name, stype, domain)
@@ -102,9 +103,6 @@ class AvahiBrowser(GObject.GObject):
             reply_handler=self.on_service_resolved,
             error_handler=self.on_error)
 
-    def on_remove_item(self, interface, protocol, name, stype, domain, flags):
-        '''Listens to avahipublisher services to be removed'''
-        self.on_service_removed('remove', name)
 
     def on_service_resolved(self, interface, protocol, name, stype, domain,
                                   host, aprotocol, address, port, txt, flags):
@@ -115,11 +113,13 @@ class AvahiBrowser(GObject.GObject):
         retval = self.emit('new_service', name, address, port, txt)
         self.log.info("emitted '%s'", retval)
 
-    def on_service_removed(self, service_type, name):
+
+    def on_service_removed(self, interface, protocol, name, stype, domain, flags):
         '''Emits items to be removed from list of discovered services.'''
         self.log.info("Service removed; name: '%s'", name)
-        retval = self.emit('remove_service', service_type, name)
+        retval = self.emit('remove_service', 'remove', name)
         self.log.info("emitted '%s'", retval)
+
 
     def on_error(self, *args):
         print 'error_handler'
@@ -137,7 +137,7 @@ def main():
         print "Signal ahoi", args
 
     ab.connect('new_service', print_signal)
-    ab.connect('remove_service', print_signal) #don't know if I need this
+    ab.connect('remove_service', print_signal)
     loop.run()
 
 

@@ -95,6 +95,7 @@ class MainWindow(Gtk.Application):
     def on_scan_image(self, *args, **kwargs):
         print("scanimage")
 
+
     def on_activate(self, app):
         self.log.info("Activate!")
         #self.window = Gtk.ApplicationWindow(application=app)
@@ -104,6 +105,7 @@ class MainWindow(Gtk.Application):
         # we raise the existing window.
         # self.window.present()
 
+
     def setup_avahi_browser(self):
         # FIXME: place a proper service type
         self.avahi_browser = AvahiBrowser(service=self.avahi_service_type)
@@ -111,6 +113,7 @@ class MainWindow(Gtk.Application):
         self.avahi_browser.connect('remove_service', self.on_remove_service)
 
         return False
+
 
     def setup_server(self, keydata, fingerprint):
         """
@@ -125,8 +128,10 @@ class MainWindow(Gtk.Application):
         self.log.info('Finsihed serving')
         return False
 
+
     def stop_server(self):
         self.keyserver.shutdown()
+
 
     def on_new_service(self, browser, name, address, port, txt_dict):
         published_fpr = txt_dict.get('fingerprint', None)
@@ -139,16 +144,19 @@ class MainWindow(Gtk.Application):
             self.log.warn("Client was rejected: %s %s %i",
                         name, address, port)
 
+
     def on_remove_service(self, browser, service_type, name):
         '''Receives on_remove signal from avahibrowser.py to remove service from list and
         transfers data to remove_discovered_service'''
         self.log.info("Received a remove signal, let's check; %s:%s", service_type, name)
         GLib.idle_add(self.remove_discovered_service, name)
 
+
     def verify_service(self, name, address, port):
         '''A tiny function to return whether the service
         is indeed something we are interested in'''
         return True
+
 
     def add_discovered_service(self, name, address, port, published_fpr):
         self.discovered_services += ((name, address, port, published_fpr), )
@@ -156,13 +164,12 @@ class MainWindow(Gtk.Application):
         self.log.info("Clients currently in list '%s'", self.discovered_services)
         return False
 
+
     def remove_discovered_service(self, name):
         '''Sorts and removes server-side clients from discovered_services list
         by the matching server name which includes the fpr.'''
-        key = lambda client: client == name
-        self.discovered_services = sorted(self.discovered_services, key=key, reverse=True)
-        self.discovered_services = [self.discovered_services.pop(0)\
-            for clients in self.discovered_services if clients[3] == name]
+        [self.discovered_services.remove(clients)
+        for clients in self.discovered_services if clients[0] == name]
         self.log.info("Clients currently in list '%s'", self.discovered_services)
 
 
