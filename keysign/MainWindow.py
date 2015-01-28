@@ -26,9 +26,8 @@ from network.AvahiBrowser import AvahiBrowser
 from network.AvahiPublisher import AvahiPublisher
 
 from gi.repository import Gtk, GLib, Gio
-from Sections import KeySignSection, GetKeySection
-
-import Keyserver
+from KeySignSection import KeySignSection
+from GetKeySection import GetKeySection
 
 class MainWindow(Gtk.Application):
 
@@ -57,7 +56,7 @@ class MainWindow(Gtk.Application):
 
         # create notebook container
         notebook = Gtk.Notebook()
-        notebook.append_page(KeySignSection(self), Gtk.Label('Keys'))
+        notebook.append_page(KeySignSection(), Gtk.Label('Keys'))
         notebook.append_page(GetKeySection(self), Gtk.Label('Get Key'))
         self.window.add(notebook)
 
@@ -71,9 +70,6 @@ class MainWindow(Gtk.Application):
         self.avahi_service_type = '_geysign._tcp'
         self.discovered_services = []
         GLib.idle_add(self.setup_avahi_browser)
-
-        self.keyserver = None
-        self.port = 9001
 
         ## App menus
         appmenu = Gio.Menu.new()
@@ -113,24 +109,6 @@ class MainWindow(Gtk.Application):
         self.avahi_browser.connect('remove_service', self.on_remove_service)
 
         return False
-
-
-    def setup_server(self, keydata, fingerprint):
-        """
-        Starts the key-server which serves the provided keydata and
-        announces the fingerprint as TXT record using Avahi
-        """
-        self.log.info('Serving now')
-        self.log.debug('About to call %r', Keyserver.ServeKeyThread)
-        self.keyserver = Keyserver.ServeKeyThread(str(keydata), fingerprint)
-        self.log.info('Starting thread %r', self.keyserver)
-        self.keyserver.start()
-        self.log.info('Finsihed serving')
-        return False
-
-
-    def stop_server(self):
-        self.keyserver.shutdown()
 
 
     def on_new_service(self, browser, name, address, port, txt_dict):

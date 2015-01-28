@@ -34,10 +34,6 @@ from monkeysign.gpg import Keyring, TempKeyring
 from monkeysign.ui import MonkeysignUi
 from monkeysign.gpg import GpgRuntimeError
 
-import Keyserver
-from KeysPage import KeysPage
-from KeyPresent import KeyPresentPage
-from SignPages import KeyDetailsPage
 from SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 import MainWindow
 
@@ -52,7 +48,6 @@ from gi.repository import GstVideo
 import key
 
 Gst.init([])
-
 
 progress_bar_text = ["Step 1: Scan QR Code or type fingerprint and click on 'Download' button",
                      "Step 2: Compare the received fpr with the owner's fpr and click 'Sign'",
@@ -75,11 +70,11 @@ GNOME Keysign
 '''
 
 
-
-
 # FIXME: This probably wants to go somewhere more central.
 # Maybe even into Monkeysign.
 log = logging.getLogger()
+
+
 def UIDExport(uid, keydata):
     """Export only the UID of a key.
     Unfortunately, GnuPG does not provide smth like
@@ -174,126 +169,6 @@ def build_command(*args, **kwargs):
 monkeysign.gpg.Context.build_command = build_command
 
 
-
-
-class KeySignSection(Gtk.VBox):
-
-    def __init__(self, app):
-        '''Initialises the section which lets the user
-        choose a key to be signed by other person.
-
-        ``app'' should be the "app" itself. The place
-        which holds global app data, especially the discovered
-        clients on the network.
-        '''
-        super(KeySignSection, self).__init__()
-
-        self.app = app
-        self.log = logging.getLogger()
-        self.keyring = Keyring()
-
-        # these are needed later when we need to get details about
-        # a selected key
-        self.keysPage = KeysPage()
-        self.keysPage.connect('key-selection-changed',
-            self.on_key_selection_changed)
-        self.keysPage.connect('key-selected', self.on_key_selected)
-        self.keyDetailsPage = KeyDetailsPage()
-        self.keyPresentPage = KeyPresentPage()
-
-
-        # create back button
-        self.backButton = Gtk.Button('Back')
-        self.backButton.set_image(Gtk.Image.new_from_icon_name("go-previous", Gtk.IconSize.BUTTON))
-        self.backButton.set_always_show_image(True)
-        self.backButton.connect('clicked', self.on_button_clicked)
-
-        # set up notebook container
-        self.notebook = Gtk.Notebook ()
-        self.notebook.append_page (self.keysPage, None)
-        vbox = Gtk.VBox ()
-        # We place the button at the top, but that might not be the
-        # smartest thing to do. Feel free to rearrange
-        # FIXME: Consider a GtkHeaderBar for the application
-        vbox.pack_start (self.backButton, False, False, 0)
-        vbox.pack_start (self.keyPresentPage, True, True, 10)
-        self.notebook.append_page (vbox, None)
-        self.notebook.set_show_tabs (False)
-
-        self.pack_start(self.notebook, True, True, 0)
-
-        # this will hold a reference to the last key selected
-        self.last_selected_key = None
-
-        # When obtaining a key is successful,
-        # it will save the key data in this field
-        self.received_key_data = None
-
-
-    def on_key_selection_changed(self, pane, keyid):
-        '''This callback is attached to the signal which is emitted
-        when the user changes their selection in the list of keys
-        '''
-        pass
-
-
-    def on_key_selected(self, pane, keyid):
-        '''This is the callback for when the user has committed
-        to a key, i.e. the user has made a selection and wants to
-        advance the program.
-        '''
-        log.debug('User selected key %s', keyid)
-
-        key = self.keyring.get_keys(keyid).values()[0]
-
-        keyid = key.keyid()
-        fpr = key.fpr
-        self.keyring.export_data(fpr, secret=False)
-        keydata = self.keyring.context.stdout
-
-        self.log.debug("Keyserver switched on! Serving key with fpr: %s", fpr)
-        self.app.setup_server(keydata, fpr)
-        
-        self.switch_to_key_present_page(key)
-
-
-    def switch_to_key_present_page(self, key):
-        '''This switches the notebook to the page which
-        presents the information that is needed to securely
-        transfer the keydata, i.e. the fingerprint and its barcode.
-        '''
-        self.keyPresentPage.display_fingerprint_qr_page(key)
-        self.notebook.next_page()
-        # This is more of a crude hack. Once the next page is presented,
-        # the back button has the focus. This is not desirable because
-        # you will go back when accidentally pressing space or enter.
-        self.keyPresentPage.fingerprintLabel.grab_focus()
-        # FIXME: we better use set_current_page, but that requires
-        # knowing which page our desired widget is on.
-        # FWIW: A headerbar has named pages.
-        
-
-    def on_next_button_clicked(self, button):
-        '''A helper for legacy reasons to enable a next button
-        
-        All it does is retrieve the selection from the TreeView and
-        call the signal handler for when the user committed to a key
-        '''
-        name, email, keyid = self.keysPage.get_items_from_selection()
-        return self.on_key_selected(button, keyid)
-        
-
-    def on_button_clicked(self, button):
-
-        page_index = self.notebook.get_current_page()
-
-        if button == self.backButton:
-
-            if page_index == 1:
-                self.log.debug("Keyserver switched off")
-                self.app.stop_server()
-
-            self.notebook.prev_page()
 
 
 class GetKeySection(Gtk.VBox):
@@ -445,7 +320,7 @@ class GetKeySection(Gtk.VBox):
         #FIXME: should we create a new TempKeyring for each key we want
         # to sign it ?
         self.tmpkeyring = TempKeyring()
-        
+
         other_clients = self.sort_clients(other_clients, fingerprint)
 
         for keydata in self.try_download_keys(other_clients):
@@ -657,7 +532,6 @@ class GetKeySection(Gtk.VBox):
 
 
 
-
 class SignUi(MonkeysignUi):
     """sign a key in a safe fashion.
 
@@ -718,3 +592,5 @@ passwords."""
         # dialog.destroy()
         # return label
         return None
+
+
