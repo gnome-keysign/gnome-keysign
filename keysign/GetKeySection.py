@@ -156,6 +156,20 @@ class TempKeyringCopy(TempKeyring):
 
 
 
+def fingerprint_for_key(keydata):
+    '''Return the OpenPGP Fingerprint for a given key'''
+    keyring = TempKeyring()
+    keyring.import_data(keydata)
+    keys = keyring.get_keys()
+    if len(keys) > 1:
+        log.debug('Operation on keydata "%s" failed', keydata)
+        raise ValueError("Cannot give the fingerprint for more than "
+            "one key: %s", keys)
+    else:
+        fpr = keys.items()[0][0]
+        log.debug('Returning fingerprint %s', fpr)
+        return fpr
+
 ## Monkeypatching to get more debug output
 import monkeysign.gpg
 bc = monkeysign.gpg.Context.build_command
@@ -367,6 +381,17 @@ class GetKeySection(Gtk.VBox):
 
         if keydata:
             stripped_key = MinimalExport(keydata)
+            fpr = fingerprint_for_key(stripped_key)
+            if fingerprint is None:
+                # The user hasn't provided any data to operate on
+                fingerprint = fpr
+
+            if not fingerprint == fpr:
+                self.log.warning('Something strange is going on. '
+                    'We wanted to sign fingerprint "%s", received '
+                    'keydata to operate on, but the key has fpr "%s".',
+                    fingerprint, fpr)
+                
         else: # Do we need this branch at all?
             self.log.debug("looking for key %s in your keyring", fingerprint)
             keyring.context.set_option('export-options', 'export-minimal')
