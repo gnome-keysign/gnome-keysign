@@ -366,7 +366,7 @@ class GetKeySection(Gtk.VBox):
 
 
 
-    def sign_key_async(self, fingerprint, callback=None, data=None, error_cb=None):
+    def sign_key_async(self, fingerprint=None, callback=None, data=None, error_cb=None):
         self.log.debug("I will sign key with fpr {}".format(fingerprint))
 
         keyring = Keyring()
@@ -393,6 +393,8 @@ class GetKeySection(Gtk.VBox):
                     fingerprint, fpr)
                 
         else: # Do we need this branch at all?
+            if fingerprint is None:
+                raise ValueError('You need to provide either keydata or a fpr')
             self.log.debug("looking for key %s in your keyring", fingerprint)
             keyring.context.set_option('export-options', 'export-minimal')
             stripped_key = keyring.export_data(fingerprint)
