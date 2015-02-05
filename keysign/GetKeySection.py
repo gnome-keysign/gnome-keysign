@@ -31,7 +31,6 @@ import sys
 import re
 
 from monkeysign.gpg import Keyring, TempKeyring
-from monkeysign.ui import MonkeysignUi
 from monkeysign.gpg import GpgRuntimeError
 
 from SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
@@ -528,68 +527,3 @@ class GetKeySection(Gtk.VBox):
         self.received_key_data = keydata
         openpgpkey = self.tmpkeyring.get_keys(fingerprint).values()[0]
         self.signPage.display_downloaded_key(openpgpkey, fingerprint)
-
-
-
-class SignUi(MonkeysignUi):
-    """sign a key in a safe fashion.
-
-This program assumes you have gpg-agent configured to prompt for
-passwords."""
-
-    def __init__(self, app, args = None):
-        super(SignUi, self).__init__(args)
-
-        self.app = app
-
-
-    def main(self):
-
-        MonkeysignUi.main(self)
-
-    def yes_no(self, prompt, default = None):
-        # dialog = Gtk.MessageDialog(self.app.window, 0, Gtk.MessageType.INFO,
-        #             Gtk.ButtonsType.YES_NO, prompt)
-        # response = dialog.run()
-        # dialog.destroy()
-
-        # return response == Gtk.ResponseType.YES
-        # Simply return True for now
-        return True
-
-    def choose_uid(self, prompt, key):
-        # dialog = Gtk.Dialog(prompt, self.app.window, 0,
-        #         (Gtk.STOCK_CANCEL, Gtk.ResponseType.REJECT,
-        #          Gtk.STOCK_OK, Gtk.ResponseType.ACCEPT))
-
-        # label = Gtk.Label(prompt)
-        # dialog.vbox.pack_start(label, False, False, 0)
-        # label.show()
-
-        # self.uid_radios = None
-        # for uid in key.uidslist:
-        #     r = Gtk.RadioButton.new_with_label_from_widget(
-        #                 self.uid_radios, uid.uid)
-        #     r.show()
-        #     dialog.vbox.pack_start(r, False, False, 0)
-
-        #     if self.uid_radios is None:
-        #         self.uid_radios = r
-        #         self.uid_radios.set_active(True)
-        #     else:
-        #         self.uid_radios.set_active(False)
-
-        # response = dialog.run()
-
-        # label = None
-        # if response == Gtk.ResponseType.ACCEPT:
-        #     self.app.log.info("okay signing")
-        #     label = [ r for r in self.uid_radios.get_group() if r.get_active()][0].get_label()
-        # else:
-        #     self.app.log.info('user denied signature')
-
-        # dialog.destroy()
-        # return label
-        return None
-
-
