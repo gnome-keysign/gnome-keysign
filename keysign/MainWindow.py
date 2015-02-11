@@ -166,10 +166,11 @@ class MainWindow(Gtk.Application):
 
 
     def remove_discovered_service(self, name):
-        '''Sorts and removes server-side clients from discovered_services list
-        by the matching server name which includes the fpr.'''
-        [self.discovered_services.remove(clients)
-        for clients in self.discovered_services if clients[0] == name]
+        '''Removes server-side clients from discovered_services list
+        when the server name with fpr is a match.'''
+        for client in self.discovered_services:
+            if client[0] == name:
+                self.discovered_services.remove(client)
         self.log.info("Clients currently in list '%s'", self.discovered_services)
 
 
