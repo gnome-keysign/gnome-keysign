@@ -35,7 +35,6 @@ from monkeysign.ui import MonkeysignUi
 from monkeysign.gpg import GpgRuntimeError
 
 from SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
-import MainWindow
 
 import key
 
