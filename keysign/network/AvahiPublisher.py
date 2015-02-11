@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #    Copyright 2014 Tobias Mueller <muelli@cryptobitch.de>
 #    Copyright 2014 Andrei Macavei <andrei.macavei89@gmail.com>
+#    Copyright 2015 Jody Hansen <jobediah.hansen@gmail.com>
 #
 #    This file is part of GNOME Keysign.
 #
@@ -52,7 +53,6 @@ class AvahiPublisher:
         self.rename_count = 12
 
 
-
     def add_service(self):
         if self.group is None:
             group = dbus.Interface(
@@ -67,7 +67,6 @@ class AvahiPublisher:
         self.log.info("Adding service '%s' of type '%s' with fpr '%s'",
             self.service_name, self.service_type, self.service_txt)
 
-
         group = self.group
         group.AddService(
                 avahi.IF_UNSPEC,    #interface
@@ -80,9 +79,10 @@ class AvahiPublisher:
         group.Commit()
 
     def remove_service(self):
+        '''Publishes services to be removed with name, stype, and domain.'''
+        self.log.info("Removing with fpr '%s'", self.service_txt)
         if not self.group is None:
             self.group.Reset()
-
 
     def server_state_changed(self, state):
         if state == avahi.SERVER_COLLISION:

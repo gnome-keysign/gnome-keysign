@@ -5,6 +5,7 @@ Changes
 ==========
 
  * Optimised finding the correct key to download
+ * Removed once discovered clients if they disappear
  * Experimental compatibility for older Gtk versions (set_always_show_image)
 
 

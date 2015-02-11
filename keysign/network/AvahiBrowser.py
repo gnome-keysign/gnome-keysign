@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #    Copyright 2014 Tobias Mueller <muelli@cryptobitch.de>
 #    Copyright 2014 Andrei Macavei <andrei.macavei89@gmail.com>
+#    Copyright 2015 Jody Hansen <jobediah.hansen@gmail.com>
 #
 #    This file is part of GNOME Keysign.
 #
@@ -63,7 +64,10 @@ class AvahiBrowser(GObject.GObject):
     __gsignals__ = {
         'new_service': (GObject.SIGNAL_RUN_LAST, None,
             # name, address (could be an int too (for IPv4)), port, txt_dict
-            (str, str, int, object))
+            (str, str, int, object)),
+        'remove_service': (GObject.SIGNAL_RUN_LAST, None,
+            # string 'remove'(placeholder: tuple element must be sequence), name
+            (str, str)),
     }
 
 
@@ -85,27 +89,35 @@ class AvahiBrowser(GObject.GObject):
             avahi.DBUS_INTERFACE_SERVICE_BROWSER)
 
         self.sbrowser.connect_to_signal("ItemNew", self.on_new_item)
+        self.sbrowser.connect_to_signal("ItemRemove", self.on_service_removed)
+
 
     def on_new_item(self, interface, protocol, name, stype, domain, flags):
-        print "Found service '%s' type '%s' domain '%s' " % (name, stype, domain)
+        self.log.info("Found service '%s' type '%s' domain '%s' ", name, stype, domain)
 
         if flags & avahi.LOOKUP_RESULT_LOCAL:
             # FIXME skip local services
             pass
-
         self.server.ResolveService(interface, protocol, name, stype,
             domain, avahi.PROTO_UNSPEC, dbus.UInt32(0),
             reply_handler=self.on_service_resolved,
             error_handler=self.on_error)
 
 
-    def on_service_resolved(self, interface, protocol, name, stype, domain,\
+    def on_service_resolved(self, interface, protocol, name, stype, domain,
                                   host, aprotocol, address, port, txt, flags):
         '''called when the browser successfully found a service'''
         txt = avahi.txt_array_to_dict(txt)
-        self.log.info("Service resolved; name: '%s', address: '%s',"\
+        self.log.info("Service resolved; name: '%s', address: '%s',"
                 "port: '%s', and txt: '%s'", name, address, port, txt)
         retval = self.emit('new_service', name, address, port, txt)
+        self.log.info("emitted '%s'", retval)
+
+
+    def on_service_removed(self, interface, protocol, name, stype, domain, flags):
+        '''Emits items to be removed from list of discovered services.'''
+        self.log.info("Service removed; name: '%s'", name)
+        retval = self.emit('remove_service', 'remove', name)
         self.log.info("emitted '%s'", retval)
 
 
@@ -125,6 +137,7 @@ def main():
         print "Signal ahoi", args
 
     ab.connect('new_service', print_signal)
+    ab.connect('remove_service', print_signal)
     loop.run()
 
 
