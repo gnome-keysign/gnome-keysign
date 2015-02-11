@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 #    Copyright 2014 Tobias Mueller <muelli@cryptobitch.de>
+#    Copyright 2015 Benjamin Berg <benjamin@sipsolutions.de>
 #
 #    This file is part of GNOME Keysign.
 #
@@ -18,8 +19,9 @@
 import logging
 import StringIO
 
-from gi.repository import Gdk, Gtk, GdkPixbuf
-from qrencode import encode_scaled
+from gi.repository import Gdk, Gtk, GObject
+import qrcode
+import cairo
 
 log = logging.getLogger()
 
@@ -43,8 +45,8 @@ class QRImage(Gtk.DrawingArea):
         super(QRImage, self).__init__(*args, **kwargs)
         self.log = logging.getLogger()
         # The data to be rendered
+        self._surface = None
         self.data = data
-        self.last_allocation = self.get_allocation()
         self.set_app_paintable(True)
 
         self.handle_events = handle_events
@@ -65,11 +67,9 @@ class QRImage(Gtk.DrawingArea):
         when window is resized. We then want to regenerate the QR code.
         """
         allocation = self.get_allocation()
-        if allocation != self.last_allocation:
-            self.last_allocation = allocation
+        if allocation != event:
             self.queue_draw()
         Gtk.DrawingArea.do_size_allocate(self, event)
-
 
     def do_draw(self, cr):
         """This scales the QR Code up to the widget's
@@ -81,35 +81,69 @@ class QRImage(Gtk.DrawingArea):
         data = self.data
         box = self.get_allocation()
         width, height = box.width, box.height
-        size = min(width, height) - 10
-        if data is not None:
-            pixbuf = self.image_to_pixbuf(self.create_qrcode(data, size))
-            Gdk.cairo_set_source_pixbuf(cr, pixbuf, width//2 - size//2, height//2 - size//2)
-            cr.paint()
+        size = min(width, height)
 
+        qrcode = self.qrcode
+        img_size = qrcode.get_width()
+
+        cr.save()
+        cr.set_source_rgb(1, 1, 1)
+        cr.paint()
+        cr.set_source_rgb(0, 0, 0)
+        cr.translate(width / 2, height / 2)
+        scale = max(1, size / img_size)
+        cr.scale(scale, scale)
+        cr.translate(-img_size / 2, -img_size / 2)
+
+        pattern = cairo.SurfacePattern(qrcode)
+        pattern.set_filter(cairo.FILTER_NEAREST)
+        cr.mask(pattern)
+
+        cr.restore()
 
     @staticmethod
-    def create_qrcode(data, size):
-        '''Creates a PIL image for the data given'''
+    def create_qrcode(data):
         log.debug('Encoding %s', data)
-        version, width, image = encode_scaled(data,size,0,1,2,True)
-        return image
+        code = qrcode.QRCode()
 
+        code.add_data(data)
 
-    @staticmethod
-    def image_to_pixbuf(image):
-        '''Converts a PIL image instance to Pixbuf'''
-        fd = StringIO.StringIO()
-        image.save(fd, "ppm")
-        contents = fd.getvalue()
-        fd.close()
-        loader = GdkPixbuf.PixbufLoader.new_with_type('pnm')
-        loader.write(contents)
-        pixbuf = loader.get_pixbuf()
-        loader.close()
-        return pixbuf
+        matrix = code.get_matrix()
+        size = len(matrix)
+        stride = (size + 3) / 4 * 4
+        data = bytearray(stride * size)
 
+        for x in xrange(size):
+            for y in xrange(size):
+                if matrix[x][y]:
+                    data[x + y * stride] = 0xff
 
+        surface = cairo.ImageSurface.create_for_data(data, cairo.FORMAT_A8, size, size, stride)
+
+        return surface
+
+    @property
+    def qrcode(self):
+        if self._surface is not None:
+            return self._surface
+
+        self._surface = self.create_qrcode(self.data)
+        return self._surface
+
+    def set_data(self, data):
+        # FIXME: Full screen window is not updated in here ...
+        self._data = data
+        self._surface = None
+
+        size = self.qrcode.get_width()
+        self.set_size_request(size, size)
+
+        self.queue_draw()
+
+    def get_data(self):
+        return self._data
+
+    data = GObject.property(getter=get_data, setter=set_data)
 
 class FullscreenQRImageWindow(Gtk.Window):
     '''Displays a QRImage in a fullscreen window
