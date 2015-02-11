@@ -11,8 +11,8 @@ pylint
 pep8
 
 # Distribution packages
-python2
-python2-gobject
-qrencode
-avahi
-dbus
+# python2
+# python2-gobject
+# qrencode
+# avahi
+# dbus
