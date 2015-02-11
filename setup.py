@@ -35,7 +35,7 @@ setup(
         # seems incompatible with a newer requests library.
         # https://bugs.launchpad.net/ubuntu/+source/python-pip/+bug/1306991
         'requests<=2.2', 
-        'qrencode',
+        'qrcode',
         #'monkeysign', # Apparently not in the cheeseshop
         # avahi # Also no entry in the cheeseshop
         # dbus # dbus-python is in the cheeseshop but not pip-able
