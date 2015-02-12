@@ -28,7 +28,6 @@ import requests
 from requests.exceptions import ConnectionError
 
 import sys
-import re
 
 from monkeysign.gpg import Keyring, TempKeyring
 from monkeysign.ui import MonkeysignUi
