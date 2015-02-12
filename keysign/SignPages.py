@@ -22,14 +22,14 @@ import logging
 import sys
 import StringIO
 
-from gi.repository import Gtk, GLib, GdkPixbuf
+from gi.repository import GObject, Gtk, GLib, GdkPixbuf
 from monkeysign.gpg import Keyring
 from qrencode import encode_scaled
 
 from datetime import datetime
 
+from compat import gtkbutton
 from QRCode import QRImage
-
 from scan_barcode import BarcodeReaderGTK
 
 
@@ -79,88 +79,9 @@ def signatures_for_keyid(keyid, keyring=None):
     return siglist
 
 
-# Pages for 'Keys' Tab
-class KeysPage(Gtk.VBox):
-
-    def __init__(self, keySection):
-        super(KeysPage, self).__init__()
-
-        # pass a reference to KeySignSection in order to access its widgets
-        self.keySection = keySection
-
-        # set up the list store to be filled up with user's gpg keys
-        self.store = Gtk.ListStore(str, str, str)
-
-        # FIXME: this should be moved to KeySignSection
-        self.keyring = Keyring() # the user's keyring
-
-        self.keysDict = {}
-
-        # FIXME: this should be a callback function to update the display
-        # when a key is changed/deleted
-        for key in self.keyring.get_keys(None, True, False).values():
-            if key.invalid or key.disabled or key.expired or key.revoked:
-                continue
-
-            uidslist = key.uidslist #UIDs: Real Name (Comment) <email@address>
-            keyid = str(key.keyid()) # the key's short id
-
-            if not keyid in self.keysDict:
-                self.keysDict[keyid] = key
-
-            for e in uidslist:
-                uid = str(e.uid)
-                # remove the comment from UID (if it exists)
-                com_start = uid.find('(')
-                if com_start != -1:
-                    com_end = uid.find(')')
-                    uid = uid[:com_start].strip() + uid[com_end+1:].strip()
-
-                # split into user's name and email
-                tokens = uid.split('<')
-                name = tokens[0].strip()
-                email = 'unknown'
-                if len(tokens) > 1:
-                    email = tokens[1].replace('>','').strip()
-
-                self.store.append((name, email, keyid))
-
-        # create the tree view
-        self.treeView = Gtk.TreeView(model=self.store)
-
-        # setup 'Name' column
-        nameRenderer = Gtk.CellRendererText()
-        nameColumn = Gtk.TreeViewColumn("Name", nameRenderer, text=0)
-
-        # setup 'Email' column
-        emailRenderer = Gtk.CellRendererText()
-        emailColumn = Gtk.TreeViewColumn("Email", emailRenderer, text=1)
-
-        # setup 'Key' column
-        keyRenderer = Gtk.CellRendererText()
-        keyColumn = Gtk.TreeViewColumn("Key", keyRenderer, text=2)
-
-        self.treeView.append_column(nameColumn)
-        self.treeView.append_column(emailColumn)
-        self.treeView.append_column(keyColumn)
-
-        # make the tree view resposive to single click selection
-        self.treeView.get_selection().connect('changed', self.on_selection_changed)
-
-        # make the tree view scrollable
-        self.scrolled_window = Gtk.ScrolledWindow()
-        self.scrolled_window.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        self.scrolled_window.add(self.treeView)
-        self.scrolled_window.set_min_content_height(200)
-
-        self.pack_start(self.scrolled_window, True, True, 0)
-
-    def on_selection_changed(self, *args):
-        self.keySection.nextButton.set_sensitive(True)
-
 
 class KeyPresentPage(Gtk.HBox):
-    def __init__(self):
+    def __init__(self, fpr=None):
         super(KeyPresentPage, self).__init__()
 
         # create left side Key labels
@@ -176,7 +97,7 @@ class KeyPresentPage(Gtk.HBox):
         leftVBox.pack_start(self.fingerprintLabel, False, False, 0)
 
         self.pixbuf = None # Hold QR code in pixbuf
-        self.fpr = None # The fpr of the key selected to sign with
+        self.fpr = fpr # The fpr of the key selected to sign with
 
         # display QR code on the right side
         qrcodeLabel = Gtk.Label()
@@ -192,15 +113,30 @@ class KeyPresentPage(Gtk.HBox):
 
         self.pack_start(leftVBox, True, True, 0)
         self.pack_start(self.rightVBox, True, True, 0)
+        
+        if self.fpr:
+            self.setup_fingerprint_widget(self.fpr)
 
-    def display_fingerprint_qr_page(self, openPgpKey):
-        rawfpr = openPgpKey.fpr
+
+    def display_fingerprint_qr_page(self, openPgpKey=None):
+        assert openPgpKey or self.fpr
+
+        rawfpr = openPgpKey.fpr if openPgpKey else self.fpr
         self.fpr = rawfpr
-        # display a clean version of the fingerprint
-        fpr = ""
-        for i in xrange(0, len(rawfpr), 4):
+        self.setup_fingerprint_widget(self.fpr)
 
-            fpr += rawfpr[i:i+4]
+        # draw qr code for this fingerprint
+        self.draw_qrcode()
+
+
+    def setup_fingerprint_widget(self, fingerprint):
+        '''The purpose of this function is to populate the label holding
+        the fingerprint with a formatted version.
+        '''
+        fpr = ""
+        for i in xrange(0, len(fingerprint), 4):
+
+            fpr += fingerprint[i:i+4]
             if i != 0 and (i+4) % 20 == 0:
                 fpr += "\n"
             else:
@@ -208,9 +144,6 @@ class KeyPresentPage(Gtk.HBox):
 
         fpr = fpr.rstrip()
         self.fingerprintLabel.set_markup('<span size="20000">' + fpr + '</span>')
-
-        # draw qr code for this fingerprint
-        self.draw_qrcode()
 
 
     def draw_qrcode(self):
