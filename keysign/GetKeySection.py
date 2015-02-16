@@ -107,7 +107,7 @@ def MinimalExport(keydata):
     For now, you must provide one key only.'''
     tmpkeyring = TempKeyring()
     ret = tmpkeyring.import_data(keydata)
-    log.debug("Returned %s after importing %s", ret, keydata)
+    log.debug("Returned %s after importing %r", ret, keydata)
     assert ret
     tmpkeyring.context.set_option('export-options', 'export-minimal')
     keys = tmpkeyring.get_keys()
