@@ -33,6 +33,11 @@ import re
 from monkeysign.gpg import Keyring, TempKeyring
 from monkeysign.gpg import GpgRuntimeError
 
+from compat import gtkbutton
+import Keyserver
+from KeysPage import KeysPage
+from KeyPresent import KeyPresentPage
+from SignPages import KeyDetailsPage
 from SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 
 import key
@@ -43,7 +48,9 @@ from gi.repository import GdkX11
 # Needed for window.get_xid(), xvimagesink.set_window_handle(), respectively:
 from gi.repository import GstVideo
 
+from compat import monkeysign_expired_keys
 import key
+
 
 Gst.init([])
 

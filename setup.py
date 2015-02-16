@@ -18,6 +18,7 @@ setup(
     url = 'http://wiki.gnome.org/GnomeKeysign',
     packages = [
         'keysign',
+        'keysign.compat',
         'keysign.network'],
     #package_dir={'keysign': 'keysign'},
     #package_data={'keysign': ['data/']},
