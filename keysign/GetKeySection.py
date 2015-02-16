@@ -157,9 +157,8 @@ class TempKeyringCopy(TempKeyring):
         # Copy the public parts of the secret keys to the tmpkeyring
         signing_keys = []
         for fpr, key in keyring.get_keys(None, secret=True, public=False).items():
-            if not key.invalid and not key.disabled and not key.expired and not key.revoked:
-                signing_keys.append(key)
-                tmpkeyring.import_data (keyring.export_data (fpr))
+            signing_keys.append(key)
+            tmpkeyring.import_data (keyring.export_data (fpr))
 
 
 
