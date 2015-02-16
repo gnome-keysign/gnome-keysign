@@ -48,7 +48,7 @@ from gi.repository import GdkX11
 # Needed for window.get_xid(), xvimagesink.set_window_handle(), respectively:
 from gi.repository import GstVideo
 
-from compat import monkeysign_expired_keys
+from compat import monkeysign_expired_keys, monkeysign_revoked_keys
 import key
 
 
