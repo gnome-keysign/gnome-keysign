@@ -415,12 +415,12 @@ class GetKeySection(Gtk.VBox):
         keyring.context.set_option('export-options', 'export-minimal')
 
         tmpkeyring = TempKeyringCopy(keyring)
+        # Eventually, we want to let the user select their keys to sign with
+        # For now, we just take whatever is there.
+        secret_keys = get_usable_secret_keys(tmpkeyring)
+        self.log.info('Signing with these keys: %s', secret_keys)
 
-        # 1. fetch the key into a temporary keyring
-        # 1.a) from the local keyring
-        # FIXME: WTF?! How would the ring enter the keyring in first place?!
         keydata = data or self.received_key_data
-
         if keydata:
             stripped_key = MinimalExport(keydata)
             fpr = fingerprint_for_key(stripped_key)
@@ -450,10 +450,19 @@ class GetKeySection(Gtk.VBox):
             assert len(keys) == 1, "We received multiple keys for fp %s: %s" % (fingerprint, keys)
             key = keys[fingerprint]
             uidlist = key.uidslist
-
-            # FIXME: For now, we sign all UIDs. This is bad.
-            ret = tmpkeyring.sign_key(uidlist[0].uid, signall=True)
-            self.log.info("Result of signing %s on key %s: %s", uidlist[0].uid, fingerprint, ret)
+            
+            for secret_key in secret_keys:
+                secret_fpr = secret_key.fpr
+                self.log.info('Setting up to sign with %s', secret_fpr)
+                # We need to --always-trust, because GnuPG would print
+                # warning about the trustdb.  I think this is because
+                # we have a newly signed key whose trust GnuPG wants to
+                # incorporate into the trust decision.
+                tmpkeyring.context.set_option('always-trust')
+                tmpkeyring.context.set_option('local-user', secret_fpr)
+                # FIXME: For now, we sign all UIDs. This is bad.
+                ret = tmpkeyring.sign_key(uidlist[0].uid, signall=True)
+                self.log.info("Result of signing %s on key %s: %s", uidlist[0].uid, fingerprint, ret)
 
 
             for uid in uidlist:
