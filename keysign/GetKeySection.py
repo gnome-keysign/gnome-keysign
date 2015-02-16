@@ -176,6 +176,42 @@ def fingerprint_for_key(keydata):
         log.debug('Returning fingerprint %s', fpr)
         return fpr
 
+
+def get_usable_keys(keyring, *args, **kwargs):
+    '''Uses get_keys on the keyring and filters for
+    non revoked, expired, disabled, or invalid keys'''
+    log.debug('Retrieving keys for %s, %s', args, kwargs)
+    keys_dict = keyring.get_keys(*args, **kwargs)
+    assert keys_dict is not None, keyring.context.stderr
+    def is_usable(key):
+        unusable =    key.invalid or key.disabled \
+                   or key.expired or key.revoked
+        log.debug('Key %s is invalid: %s (i:%s, d:%s, e:%s, r:%s)', key, unusable,
+            key.invalid, key.disabled, key.expired, key.revoked)
+        return not unusable
+    keys_fpr = keys_dict.items()
+    keys = keys_dict.values()
+    usable_keys = filter(is_usable, keys)
+
+    log.debug('Identified usable keys: %s', usable_keys)
+    return usable_keys
+
+
+def get_usable_secret_keys(keyring, pattern=None):
+    '''Returns all secret keys which can be used to sign a key
+    
+    Uses get_keys on the keyring and filters for
+    non revoked, expired, disabled, or invalid keys'''
+    secret_keys_dict = keyring.get_keys(pattern=pattern, public=False, secret=True)
+    secret_key_fprs = secret_keys_dict.keys()
+    log.debug('Detected secret keys: %s', secret_key_fprs)
+    usable_keys_fprs = filter(lambda fpr: get_usable_keys(keyring, pattern=fpr, public=True), secret_key_fprs)
+    usable_keys = [secret_keys_dict[fpr] for fpr in usable_keys_fprs]
+
+    log.info('Returning usable private keys: %s', usable_keys)
+    return usable_keys
+
+
 ## Monkeypatching to get more debug output
 import monkeysign.gpg
 bc = monkeysign.gpg.Context.build_command
