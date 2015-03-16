@@ -105,52 +105,54 @@ class KeysPage(Gtk.VBox):
 
                 self.store.append((name, email, keyid))
 
-        # create the tree view
-        self.treeView = Gtk.TreeView(model=self.store)
+        if len(self.store) == 0:
+            self.pack_start(Gtk.Label("You don't have a private key"), True, True, 0)
+        else:
+            # create the tree view
+            self.treeView = Gtk.TreeView(model=self.store)
+            # setup 'Name' column
+            nameRenderer = Gtk.CellRendererText()
+            nameColumn = Gtk.TreeViewColumn("Name", nameRenderer, text=0)
 
-        # setup 'Name' column
-        nameRenderer = Gtk.CellRendererText()
-        nameColumn = Gtk.TreeViewColumn("Name", nameRenderer, text=0)
+            # setup 'Email' column
+            emailRenderer = Gtk.CellRendererText()
+            emailColumn = Gtk.TreeViewColumn("Email", emailRenderer, text=1)
 
-        # setup 'Email' column
-        emailRenderer = Gtk.CellRendererText()
-        emailColumn = Gtk.TreeViewColumn("Email", emailRenderer, text=1)
+            # setup 'Key' column
+            keyRenderer = Gtk.CellRendererText()
+            keyColumn = Gtk.TreeViewColumn("Key", keyRenderer, text=2)
 
-        # setup 'Key' column
-        keyRenderer = Gtk.CellRendererText()
-        keyColumn = Gtk.TreeViewColumn("Key", keyRenderer, text=2)
+            self.treeView.append_column(nameColumn)
+            self.treeView.append_column(emailColumn)
+            self.treeView.append_column(keyColumn)
+            
+            self.treeView.connect('row-activated', self.on_row_activated)
 
-        self.treeView.append_column(nameColumn)
-        self.treeView.append_column(emailColumn)
-        self.treeView.append_column(keyColumn)
-        
-        self.treeView.connect('row-activated', self.on_row_activated)
+            # make the tree view resposive to single click selection
+            self.treeView.get_selection().connect('changed', self.on_selection_changed)
 
-        # make the tree view resposive to single click selection
-        self.treeView.get_selection().connect('changed', self.on_selection_changed)
+            # make the tree view scrollable
+            self.scrolled_window = Gtk.ScrolledWindow()
+            self.scrolled_window.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+            self.scrolled_window.add(self.treeView)
+            self.scrolled_window.set_min_content_height(200)
 
-        # make the tree view scrollable
-        self.scrolled_window = Gtk.ScrolledWindow()
-        self.scrolled_window.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        self.scrolled_window.add(self.treeView)
-        self.scrolled_window.set_min_content_height(200)
+            #self.pack_start(self.scrolled_window, True, True, 0)
 
-        #self.pack_start(self.scrolled_window, True, True, 0)
+            self.hpane = Gtk.HPaned()
+            self.hpane.pack1(self.scrolled_window, False, False)
+            self.right_pane = Gtk.VBox()
+            right_label = Gtk.Label(label='Select key on the left')
+            self.right_pane.add(right_label)
+            # Hm, right now, the width of the right pane changes, when
+            # a key is selected, because the right pane's content will be
+            # wider when it displays expiration et al.
+            # Can we hint at that fact and make the VBox a bit wider than necessary?
+            #padded_label = Gtk.Label(label='Select key on the left'*3)
+            #self.right_pane.add(padded_label)
+            self.hpane.pack2(self.right_pane, True, False)
 
-        self.hpane = Gtk.HPaned()
-        self.hpane.pack1(self.scrolled_window, False, False)
-        self.right_pane = Gtk.VBox()
-        right_label = Gtk.Label(label='Select key on the left')
-        self.right_pane.add(right_label)
-        # Hm, right now, the width of the right pane changes, when
-        # a key is selected, because the right pane's content will be
-        # wider when it displays expiration et al.
-        # Can we hint at that fact and make the VBox a bit wider than necessary?
-        #padded_label = Gtk.Label(label='Select key on the left'*3)
-        #self.right_pane.add(padded_label)
-        self.hpane.pack2(self.right_pane, True, False)
-
-        self.pack_start(self.hpane, True, True, 0)
+            self.pack_start(self.hpane, True, True, 0)
 
 
     # We could make it a @staticmethod, but the returned items
