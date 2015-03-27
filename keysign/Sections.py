@@ -362,25 +362,26 @@ class GetKeySection(Gtk.VBox):
         self.progressBar.set_fraction((page_index+1)/3.0)
 
 
-    def format_fingerprint(self, input_string):
+    def strip_fingerprint(self, input_string):
         '''Strips a fingerprint of any whitespaces and returns
         a clean version. It also drops the "OPENPGP4FPR:" prefix
         from the scanned QR-encoded fingerprints'''
-
-        if input_string.upper().startswith(FPR_PREFIX):
-            input_string = input_string[len(FPR_PREFIX):]
-
         # The split removes the whitespaces in the string
         cleaned = ''.join(input_string.split())
+
+        if cleaned.upper().startswith(FPR_PREFIX.upper()):
+            cleaned = cleaned[len(FPR_PREFIX):]
+
         self.log.warning('Cleaned fingerprint to %s', cleaned)
         return cleaned
+
 
     def on_barcode(self, sender, barcode, message=None):
         '''This is connected to the "barcode" signal.
         The message argument is a GStreamer message that created
         the barcode.'''
 
-        fpr = self.format_fingerprint(barcode)
+        fpr = self.strip_fingerprint(barcode)
 
         if fpr != None:
             try:
@@ -610,7 +611,7 @@ class GetKeySection(Gtk.VBox):
                     fingerprint = pgpkey.fingerprint
                 else:
                     raw_text = self.scanPage.get_text_from_textview()
-                    fingerprint = self.format_fingerprint(raw_text)
+                    fingerprint = self.strip_fingerprint(raw_text)
 
                     if fingerprint == None:
                         self.log.error("The fingerprint typed was wrong."
