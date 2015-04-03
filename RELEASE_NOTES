@@ -9,6 +9,7 @@ Changes
  * Experimental compatibility for older Gtk versions (set_always_show_image)
  * Minor UI improvement: Do not delete the manually typed fingerprint when going back
  * Also accept more correctly typed fingerprint with a more relaxed verification routine
+ * Display a message when the user does not have any private keys
 
 
 
