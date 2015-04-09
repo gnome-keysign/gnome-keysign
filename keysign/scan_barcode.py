@@ -86,6 +86,7 @@ class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
     def __init__(self, *args, **kwargs):
         super(BarcodeReaderGTK, self).__init__(*args, **kwargs)
 
+
     @property
     def x_window_id(self, *args, **kwargs):
         window = self.get_property('window')
@@ -148,72 +149,6 @@ class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
         log.debug("About to emit barcode signal: %s", barcode)
         self.emit('barcode', barcode, message)
 
-class SimpleInterface(BarcodeReader):
-    def __init__(self, *args, **kwargs):
-        super(SimpleInterface, self).__init__(*args, **kwargs)
-
-        self.playing = False
-
-        # GTK window and widgets
-        self.window = Gtk.Window()
-        self.window.set_size_request(300,350)
-        self.window.connect('delete-event', Gtk.main_quit)
-
-        vbox = Gtk.Box(Gtk.Orientation.HORIZONTAL, 0)
-        vbox.set_margin_top(3)
-        vbox.set_margin_bottom(3)
-        self.window.add(vbox)
-
-        self.da = Gtk.DrawingArea()
-        self.da.set_size_request (250, 200)
-        self.da.show()
-        #self.window.add(self.da)
-        #vbox.add(self.da)
-        vbox.pack_start(self.da, False, False, 0)
-
-
-        self.playButtonImage = Gtk.Image()
-        self.playButtonImage.set_from_stock("gtk-media-play", Gtk.IconSize.BUTTON)
-        self.playButton = Gtk.Button.new()
-        self.playButton.add(self.playButtonImage)
-        self.playButton.connect("clicked", self.playToggled)
-        vbox.pack_start(self.playButton, False, False, 1)
-
-        self.window.show_all()
-
-
-        da_win = self.da.get_property('window')
-        assert da_win
-        self.xid = da_win.get_xid()
-
-
-    def playToggled(self, w):
-        print("Play!")
-        self.run()
-        pass
-
-    def on_sync_message(self, bus, message):
-        if message.structure is None:
-            return
-        if message.structure.get_name() == 'prepare-window-handle':
-            #self.videoslot.set_sink(message.src)
-            message.src.set_window_handle(self.xid)
-
-
-    def on_message(self, bus, message):
-        log.debug("Message: %s", message)
-        struct = message.get_structure()
-        assert struct
-        name = struct.get_name()
-        log.debug("Name: %s", name)
-        if name == "prepare-window-handle":
-            log.debug('XWindow ID')
-            #self.videoslot.set_sink(message.src)
-            message.src.set_window_handle(self.xid)
-        else:
-            return super(SimpleInterface, self).on_message(bus, message)
-
-
 
 
 class ReaderApp(Gtk.Application):
@@ -246,13 +181,72 @@ class ReaderApp(Gtk.Application):
         logging.info('Barcode decoded: %s', barcode)
 
 
+
+class SimpleInterface(ReaderApp):
+    '''We tweak the UI of the demo ReaderApp a little'''
+    def on_activate(self, *args, **kwargs):
+        window = Gtk.ApplicationWindow()
+        window.set_title("Simple Barcode Reader")
+        window.set_default_size(400, 300)
+
+        vbox = Gtk.Box(Gtk.Orientation.HORIZONTAL, 0)
+        vbox.set_margin_top(3)
+        vbox.set_margin_bottom(3)
+        window.add(vbox)
+
+        reader = BarcodeReaderGTK()
+        reader.connect('barcode', self.on_barcode)
+        vbox.pack_start(reader, True, True, 0)
+        self.playing = False
+
+
+        self.playButtonImage = Gtk.Image()
+        self.playButtonImage.set_from_stock("gtk-media-play", Gtk.IconSize.BUTTON)
+        self.playButton = Gtk.Button.new()
+        self.playButton.add(self.playButtonImage)
+        self.playButton.connect("clicked", self.playToggled)
+        vbox.pack_end(self.playButton, False, False, 0)
+
+        window.show_all()
+        self.add_window(window)
+
+
+    def playToggled(self, w):
+        self.run()
+
+
+    def on_sync_message(self, bus, message):
+        if message.structure is None:
+            return
+        if message.structure.get_name() == 'prepare-window-handle':
+            #self.videoslot.set_sink(message.src)
+            message.src.set_window_handle(self.xid)
+
+
+    def on_message(self, bus, message):
+        log.debug("Message: %s", message)
+        struct = message.get_structure()
+        assert struct
+        name = struct.get_name()
+        log.debug("Name: %s", name)
+        if name == "prepare-window-handle":
+            log.debug('XWindow ID')
+            #self.videoslot.set_sink(message.src)
+            message.src.set_window_handle(self.xid)
+        else:
+            return super(SimpleInterface, self).on_message(bus, message)
+
+
+
+
+
 def main():
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG,
                         format='%(name)s (%(levelname)s): %(message)s')
 
     # We need to have GStreamer initialised before creating a BarcodeReader
     Gst.init(sys.argv)
-    app = ReaderApp()
+    app = SimpleInterface()
 
     try:
         # Exit the mainloop if Ctrl+C is pressed in the terminal.
