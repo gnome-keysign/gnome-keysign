@@ -223,25 +223,52 @@ class SimpleInterface(BarcodeReader):
 
 
 
+class ReaderApp(Gtk.Application):
+    '''A simple application for scanning a bar code
+    
+    It makes use of the BarcodeReaderGTK class and connects to
+    its on_barcode signal.
+    
+    You need to have called Gst.init() before creating a
+    BarcodeReaderGTK.
+    '''
+    def __init__(self, *args, **kwargs):
+        super(ReaderApp, self).__init__(*args, **kwargs)
+        self.connect('activate', self.on_activate)
+
+    
+    def on_activate(self, data=None):
+        window = Gtk.ApplicationWindow()
+        window.set_title("Gtk Gst Barcode Reader")
+        reader = BarcodeReaderGTK()
+        reader.connect('barcode', self.on_barcode)
+        window.add(reader)
+
+        window.show_all()
+        self.add_window(window)
+
+
+    def on_barcode(self, reader, barcode, message):
+        '''All we do is logging the decoded barcode'''
+        logging.info('Barcode decoded: %s', barcode)
 
 
 def main():
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG,
                         format='%(name)s (%(levelname)s): %(message)s')
-    br = BarcodeReader()
+
+    # We need to have GStreamer initialised before creating a BarcodeReader
     Gst.init(sys.argv)
+    app = ReaderApp()
 
     try:
         # Exit the mainloop if Ctrl+C is pressed in the terminal.
-        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : Gtk.main_quit(), None)
+        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : app.quit(), None)
     except AttributeError:
         # Whatever, it is only to enable Ctrl+C anyways
         pass
 
-    #GLib.idle_add(br.run)
-
-    SimpleInterface()
-    Gtk.main()
+    app.run()
 
 
 if __name__ == '__main__':
