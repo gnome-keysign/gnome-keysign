@@ -34,13 +34,6 @@ log = logging.getLogger()
 
 
 
-def test():
-    print("hello")
-    # exist mainloop
-    Gtk.main_quit()
-    # Do not run again.
-    return False
-
 
 
 class BarcodeReader(object):
