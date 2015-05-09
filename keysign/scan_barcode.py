@@ -38,7 +38,7 @@ log = logging.getLogger()
 
 class BarcodeReader(object):
 
-    def on_barcode(self, barcode, message):
+    def on_barcode(self, barcode, message, image):
         '''This is called when a barcode is available
         with barcode being the decoded barcode.
         Message is the GStreamer message containing
@@ -53,7 +53,8 @@ class BarcodeReader(object):
                 assert struct.has_field('symbol')
                 barcode = struct.get_string('symbol')
                 log.info("Read Barcode: {}".format(barcode))
-                self.on_barcode(barcode, message)
+                image = ''
+                self.on_barcode(barcode, message, image)
 
     def run(self):
         p = "v4l2src ! tee name=t ! queue ! videoconvert "
@@ -83,7 +84,11 @@ class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
 
     __gsignals__ = {
         'barcode': (GObject.SIGNAL_RUN_LAST, None,
-                    (str, Gst.Message.__gtype__))
+                    (str, # The barcode string
+                     Gst.Message.__gtype__, # The GStreamer message itself
+                     str, # The image data containing the barcode
+                    ),
+                   )
     }
 
 
@@ -140,18 +145,18 @@ class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
         self.a.set_state(Gst.State.NULL)
 
 
-    def do_barcode(self, barcode, message):
+    def do_barcode(self, barcode, message, image):
         "This is called by GObject, I think"
         log.debug("Emitting a barcode signal %s, %s", barcode, message)
 
 
-    def on_barcode(self, barcode, message):
+    def on_barcode(self, barcode, message, image):
         '''You can implement this function to
         get notified when a new barcode has been read.
         If you do, you will not get the GObject "barcode" signal
         as it is emitted from here.'''
         log.debug("About to emit barcode signal: %s", barcode)
-        self.emit('barcode', barcode, message)
+        self.emit('barcode', barcode, message, image)
 
 
 
@@ -180,7 +185,7 @@ class ReaderApp(Gtk.Application):
         self.add_window(window)
 
 
-    def on_barcode(self, reader, barcode, message):
+    def on_barcode(self, reader, barcode, message, image):
         '''All we do is logging the decoded barcode'''
         logging.info('Barcode decoded: %s', barcode)
 
@@ -202,6 +207,9 @@ class SimpleInterface(ReaderApp):
         reader.connect('barcode', self.on_barcode)
         vbox.pack_start(reader, True, True, 0)
         self.playing = False
+
+        self.image = Gtk.Image()
+        vbox.pack_end(self.image, True, True, 0)
 
 
         self.playButtonImage = Gtk.Image()
@@ -241,7 +249,17 @@ class SimpleInterface(ReaderApp):
             return super(SimpleInterface, self).on_message(bus, message)
 
 
-
+    def on_barcode(self, reader, barcode, message, image):
+        colorspace = GdkPixbuf.Colorspace.RGB
+        alpha = False
+        bps = 8
+        width = 800
+        height = 600
+        rowstride = 30
+        pixbuf = GdkPixbuf.Pixbuf.new_from_bytes(
+            GLib.Bytes.new_take(image),
+            colorspace, alpha, bps, width, height, rowstride)
+        self.image.set_from_pixbuf(pixbuf)
 
 
 def main():
