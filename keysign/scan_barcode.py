@@ -322,14 +322,15 @@ class SimpleInterface(ReaderApp):
 
 class ScalingImage(Gtk.DrawingArea):
 
-    def __init__(self, pixbuf=None, width=None, height=None):
+    def __init__(self, pixbuf=None, width=None, height=None, rowstride=None):
         self.pixbuf = pixbuf
         self.width = width or None
         self.height = height or None
+        self.rowstride = rowstride or None
         super(ScalingImage, self).__init__()
     
     
-    def set_from_pixbuf(self, pixbuf, width=None, height=None):
+    def set_from_pixbuf(self, pixbuf, width=None, height=None, rowstride=None):
         log.debug('Setting Image from Pixbuf (%r x %r)', width, height)
         self.pixbuf = pixbuf
 
@@ -339,8 +340,12 @@ class ScalingImage(Gtk.DrawingArea):
         if height:
             self.height = height
 
+        if rowstride:
+            self.rowstride = rowstride
+
 
     def do_draw(self, cr, pixbuf=None):
+        log.debug('Drawing ScalingImage! %r', self)
         pixbuf = pixbuf or self.pixbuf
         #log.info('Drawing Pixbuf: %r', pixbuf)
 
