@@ -294,9 +294,13 @@ class SimpleInterface(ReaderApp):
         original_width = width_struct[1]
         original_height = height_struct[1]
 
-        self.image.set_from_pixbuf(pixbuf, original_width, original_height)
-        return False
-        rowstride = bps / 8 * 4 * original_width
+        rowstride_struct = struct.get_int("stride")
+        if rowstride_struct[0] == True:
+            # The stride information might be hidden in the struct.
+            # For now it doesn't work. I think it's the name of the field.
+            rowstride = rowstride_struct[1]
+        else:
+            rowstride = bps / 8 * 4 * original_width
 
         log.debug("bytes: %r, colorspace: %r, aplah %r, bps: %r, w: %r, h: %r, r: %r",
             GLib.Bytes.new_take(pixbuf),
