@@ -22,6 +22,7 @@ import logging
 import signal
 import sys
 
+import cairo
 from gi.repository import GObject
 from gi.repository import Gst
 from gi.repository import Gtk, GLib
@@ -234,7 +235,8 @@ class SimpleInterface(ReaderApp):
         vbox.pack_start(reader, True, True, 0)
         self.playing = False
 
-        self.image = Gtk.Image()
+        #self.image = Gtk.Image()
+        self.image = ScalingImage()
         vbox.pack_end(self.image, True, True, 0)
 
 
@@ -291,6 +293,9 @@ class SimpleInterface(ReaderApp):
         assert height_struct[0]
         original_width = width_struct[1]
         original_height = height_struct[1]
+
+        self.image.set_from_pixbuf(pixbuf, original_width, original_height)
+        return False
         rowstride = bps / 8 * 4 * original_width
 
         log.debug("bytes: %r, colorspace: %r, aplah %r, bps: %r, w: %r, h: %r, r: %r",
@@ -305,11 +310,77 @@ class SimpleInterface(ReaderApp):
         self.original_pixbuf = gdkpixbuf
 
 
+
+class ScalingImage(Gtk.DrawingArea):
+
+    def __init__(self, pixbuf=None, width=None, height=None):
+        self.pixbuf = pixbuf
+        self.width = width or None
+        self.height = height or None
+        super(ScalingImage, self).__init__()
+    
+    
+    def set_from_pixbuf(self, pixbuf, width=None, height=None):
+        log.debug('Setting Image from Pixbuf (%r x %r)', width, height)
+        self.pixbuf = pixbuf
+
+        if width:
+            self.width = width
+
+        if height:
+            self.height = height
+
+
+    def do_draw(self, cr, pixbuf=None):
+        pixbuf = pixbuf or self.pixbuf
+        #log.info('Drawing Pixbuf: %r', pixbuf)
+
+        #caps = sample.get_caps()
+        #struct = caps.get_structure(0)
+        
+        #width_struct = struct.get_int("width")
+        #assert width_struct[0]
+        #height_struct = struct.get_int("height")
+        #assert height_struct[0]
+        #original_width = width_struct[1]
+        #original_height = height_struct[1]
+        original_width = self.width
+        original_height = self.height
+        if not original_width or not original_height:
+            log.info('No width in the picture. w: %r, h: %r', original_width, original_height)
+            return False
+        assert original_width
+        assert original_height
+
+
         # Scale the pixbuf down to whatever space we have
-        allocation = self.image.get_allocation()
-        width = allocation.width
-        height = allocation.height
-        log.info('Allocated size: %s, %s', width, height)
+        allocation = self.get_allocation()
+        widget_width = allocation.width
+        widget_height = allocation.height
+        # I think we might not need this calculation
+        widget_size = min(widget_width, widget_height)
+        log.info('Allocated size: %s, %s', widget_width, widget_height)
+        
+        cr.save()
+        cr.set_source_rgb(1, 1, 1)
+        cr.paint()
+        cr.set_source_rgb(0, 0, 0)
+        cr.translate(widget_width / 2, widget_height / 2)
+        # Not sure taking the width here is good
+        scale = max(1, widget_width / original_width)
+        cr.scale(scale, scale)
+        cr.translate(-original_width / 2, -original_width / 2)
+        
+        pattern = cairo.SurfacePattern(pixbuf)
+        pattern.set_filter(cairo.FILTER_NEAREST)
+        cr.mask(pattern)
+        
+        
+        cr.restore()
+        
+        return False
+        
+
         #new_pixbuf = GdkPixbuf.Pixbuf(width=width, height=height)
         new_pixbuf = GdkPixbuf.Pixbuf.new_from_bytes(
             GLib.Bytes.new_take(pixbuf),
@@ -331,7 +402,7 @@ class SimpleInterface(ReaderApp):
             #1.0 * width / original_width,  1.0 * height / original_height,
             GdkPixbuf.InterpType.NEAREST)
         
-        self.image.set_from_pixbuf(scaled_pixbuf)
+        self.set_from_pixbuf(scaled_pixbuf)
 
 
 def main():
