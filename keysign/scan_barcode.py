@@ -71,13 +71,16 @@ class BarcodeReader(object):
                 
 
     def run(self):
-        p = "v4l2src ! tee name=t ! queue ! videoconvert "
+        p = "v4l2src "
+        #p = "uridecodebin file:///tmp/qr.png "
+        p += " ! tee name=t ! queue ! videoconvert "
         p += " ! identity name=ident signal-handoffs=true"
         p += " ! zbar "
         p += " ! fakesink t. ! queue ! videoconvert "
         p += " ! xvimagesink name=imagesink"
         #p += " ! gdkpixbufsink"
-        #p = 'uridecodebin file:///tmp/image.jpg ! tee name=t ! queue ! videoconvert ! zbar ! fakesink t. ! queue ! videoconvert ! xvimagesink'
+        #p = "uridecodebin file:///tmp/qr.png "
+        #p += "! tee name=t ! queue ! videoconvert ! zbar ! fakesink t. ! queue ! videoconvert ! xvimagesink name=imagesink'
         self.a = a = Gst.parse_launch(p)
         self.bus = bus = a.get_bus()
         self.imagesink = self.a.get_by_name('imagesink')
