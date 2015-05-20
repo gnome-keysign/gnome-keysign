@@ -293,6 +293,11 @@ class SimpleInterface(ReaderApp):
         assert height_struct[0]
         original_width = width_struct[1]
         original_height = height_struct[1]
+        
+
+
+        for i in range(struct.n_fields()):
+            log.debug("Struct field %d name: %s", i, struct.nth_field_name(i))
 
         rowstride_struct = struct.get_int("stride")
         if rowstride_struct[0] == True:
