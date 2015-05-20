@@ -316,7 +316,10 @@ class SimpleInterface(ReaderApp):
             GLib.Bytes.new_take(pixbuf),
             colorspace, alpha, bps, original_width,
             original_height, rowstride)
-        self.original_pixbuf = gdkpixbuf
+
+
+        self.image.set_from_pixbuf(gdkpixbuf, original_width, original_height, rowstride)
+        return False
 
 
 
