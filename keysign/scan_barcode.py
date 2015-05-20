@@ -395,7 +395,7 @@ class ScalingImage(Gtk.DrawingArea):
         
         cr.restore()
         
-        return False
+        return super(ScalingImage, self).do_draw(cr)
         
 
         #new_pixbuf = GdkPixbuf.Pixbuf(width=width, height=height)
