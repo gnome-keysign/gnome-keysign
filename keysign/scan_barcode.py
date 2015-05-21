@@ -360,46 +360,48 @@ class ScalingImage(Gtk.DrawingArea):
     def do_draw(self, cr, pixbuf=None):
         log.debug('Drawing ScalingImage! %r', self)
         pixbuf = pixbuf or self.pixbuf
-
-        original_width = pixbuf.get_width()
-        original_height = pixbuf.get_height()
-
-        assert original_width > 0
-        assert original_height > 0
-
-
-        # Scale the pixbuf down to whatever space we have
-        allocation = self.get_allocation()
-        widget_width = allocation.width
-        widget_height = allocation.height
-        
-        
-        # I think we might not need this calculation
-        #widget_size = min(widget_width, widget_height)
-        #log.info('Allocated size: %s, %s', widget_width, widget_height)
-        
-        # Fill in background
-        cr.save()
-        cr.set_source_rgb(1, 1, 1)
-        cr.paint()
-        
-        # Centering and scaling the image to fit the widget
-        cr.translate(widget_width / 2.0, widget_height / 2.0)
-        scale = min(widget_width / float(original_width), widget_width / float(original_width))
-        cr.scale(scale, scale)
-        
-        cr.translate(-original_width / 2.0, -original_height / 2.0)
-        # Note: This function is very inefficient
-        # (one could cache the resulting pattern or image surface)!
-        Gdk.cairo_set_source_pixbuf(cr, pixbuf, 0, 0)
-        # Should anyone want to set filters, this is the way to do it.
-        #pattern = cr.get_source()
-        #pattern.set_filter(cairo.FILTER_NEAREST)
-        cr.paint()
-        cr.restore()
-        
-        return
-        #super(ScalingImage, self).do_draw(cr)
+        if not pixbuf:
+            log.info('No pixbuf to draw! %r', pixbuf)
+        else:
+            original_width = pixbuf.get_width()
+            original_height = pixbuf.get_height()
+    
+            assert original_width > 0
+            assert original_height > 0
+    
+    
+            # Scale the pixbuf down to whatever space we have
+            allocation = self.get_allocation()
+            widget_width = allocation.width
+            widget_height = allocation.height
+            
+            
+            # I think we might not need this calculation
+            #widget_size = min(widget_width, widget_height)
+            #log.info('Allocated size: %s, %s', widget_width, widget_height)
+            
+            # Fill in background
+            cr.save()
+            cr.set_source_rgb(1, 1, 1)
+            cr.paint()
+            
+            # Centering and scaling the image to fit the widget
+            cr.translate(widget_width / 2.0, widget_height / 2.0)
+            scale = min(widget_width / float(original_width), widget_width / float(original_width))
+            cr.scale(scale, scale)
+            
+            cr.translate(-original_width / 2.0, -original_height / 2.0)
+            # Note: This function is very inefficient
+            # (one could cache the resulting pattern or image surface)!
+            Gdk.cairo_set_source_pixbuf(cr, pixbuf, 0, 0)
+            # Should anyone want to set filters, this is the way to do it.
+            #pattern = cr.get_source()
+            #pattern.set_filter(cairo.FILTER_NEAREST)
+            cr.paint()
+            cr.restore()
+            
+            return
+            #super(ScalingImage, self).do_draw(cr)
 
 
 
