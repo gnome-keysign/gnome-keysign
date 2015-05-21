@@ -81,7 +81,7 @@ class BarcodeReader(object):
         ##        greenish.  I think we need to investigate that at some stage.
         #p = "uridecodebin uri=file:///tmp/qr.png "
         p += " ! tee name=t ! queue ! videoconvert "
-        p += " ! identity name=ident signal-handoffs=true"
+        #p += " ! identity name=ident signal-handoffs=true"
         p += " ! zbar "
         p += " ! fakesink t. ! queue ! videoconvert "
         p += " ! xvimagesink name=imagesink"
@@ -91,13 +91,13 @@ class BarcodeReader(object):
         self.a = a = Gst.parse_launch(p)
         self.bus = bus = a.get_bus()
         self.imagesink = self.a.get_by_name('imagesink')
-        self.ident = self.a.get_by_name('ident')
+        #self.ident = self.a.get_by_name('ident')
 
         bus.connect('message', self.on_message)
         bus.connect('sync-message::element', self.on_sync_message)
         bus.add_signal_watch()
         
-        self.ident.connect('handoff', self.on_handoff)
+        #self.ident.connect('handoff', self.on_handoff)
 
         a.set_state(Gst.State.PLAYING)
         self.running = True
