@@ -18,6 +18,7 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
+from collections import deque
 import logging
 import signal
 import sys
@@ -39,6 +40,12 @@ log = logging.getLogger()
 
 
 class BarcodeReader(object):
+
+    def __init__(self, *args, **kwargs):
+        self.deque = deque('', maxlen=1<<10)
+
+        return super(BarcodeReader, self).__init__(*args, **kwargs)
+
 
     def on_barcode(self, barcode, message, image):
         '''This is called when a barcode is available
@@ -68,13 +75,42 @@ class BarcodeReader(object):
                         target_caps = Gst.Caps.from_string('video/x-raw,format=RGBA')
                         converted_sample = GstVideo.video_convert_sample(
                             sample, target_caps, Gst.CLOCK_TIME_NONE)
-                                            
+                    else:
+                        timestamp = struct.get_clock_time("timestamp")[1]
+                        log.debug ("at %s", timestamp)
+                        
+                        for buffer in self.deque:
+                            if buffer.pts == timestamp:
+                                # Let's assume there is only one srcpad.
+                                # Actually.. Could it be that, theoretically,
+                                # the caps have changed by now?  Because the signal
+                                # is potentially very old and the caps might have changed
+                                # already.
+                                ident_caps = self.ident.srcpads[0].get_current_caps()
+                                log.debug('Ident caps: %r', ident_caps)
+                                sample = Gst.Sample.new(buffer=buffer, caps=ident_caps)
+                                break
+                        else:
+                            log.error('Weird. Could not find the frame belonging to %r '
+                                      'in the deque %r', timestamp, self.deque)
+                            # We now try to get the frame which caused
+                            # zbar to generate the barcode signal.
+                            # This is only an approximation, though,
+                            # as several threads are involved and
+                            # the imagesink might have advanced.
+                            # So this must be regarded as prototype.
+                            # There is https://bugzilla.gnome.org/show_bug.cgi?id=747557
+                            sample = self.imagesink.get_last_sample()
+                        log.info('last sample: %s', sample)
+                        caps = Gst.Caps.from_string("video/x-raw,format=RGBA")
+                        converted_sample = GstVideo.video_convert_sample(sample, caps, Gst.CLOCK_TIME_NONE)
+                                               
                     assert struct.has_field('symbol')
                     barcode = struct.get_string('symbol')
                     log.info("Read Barcode: {}".format(barcode)) 
-    
+                    
                     self.on_barcode(barcode, message, converted_sample)
-                
+
 
     def run(self):
         p = "v4l2src "
@@ -82,7 +118,14 @@ class BarcodeReader(object):
         ##        greenish.  I think we need to investigate that at some stage.
         #p = "uridecodebin uri=file:///tmp/qr.png "
         p += " ! tee name=t ! queue ! videoconvert "
-        #p += " ! identity name=ident signal-handoffs=true"
+        # FIXME: Ideally, we could detect whether the zbar element fires
+        #        with the sample https://bugzilla.gnome.org/show_bug.cgi?id=747557
+        #        but that may take a while still to arrive for the users.
+        #        So we try to outsmart the user and use the rather expensive
+        #        handoff mechanism of the identity element.  If we knew
+        #        whether zbar is new enough to fire with the GstSample, then
+        #        we could skip adding the identity element.
+        p += " ! identity name=ident signal-handoffs=true"
         p += " ! zbar "
         p += " ! fakesink t. ! queue ! videoconvert "
         p += " ! xvimagesink name=imagesink"
@@ -92,13 +135,13 @@ class BarcodeReader(object):
         self.a = a = Gst.parse_launch(p)
         self.bus = bus = a.get_bus()
         self.imagesink = self.a.get_by_name('imagesink')
-        #self.ident = self.a.get_by_name('ident')
+        self.ident = self.a.get_by_name('ident')
 
         bus.connect('message', self.on_message)
         bus.connect('sync-message::element', self.on_sync_message)
         bus.add_signal_watch()
         
-        #self.ident.connect('handoff', self.on_handoff)
+        self.ident.connect('handoff', self.on_handoff)
 
         a.set_state(Gst.State.PLAYING)
         self.running = True
@@ -113,9 +156,10 @@ class BarcodeReader(object):
     
     def on_handoff(self, element, buffer, *args):
         log.debug('Handing of %r', buffer)
-        dec_timestamp = buffer.dts
-        p_timestamp = buffer.pts
-        log.debug("ts: %s", p_timestamp)
+        #dec_timestamp = buffer.dts
+        #p_timestamp = buffer.pts
+        #log.debug("ts: %s", p_timestamp)
+        self.deque.append(buffer)
 
 
 #class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
