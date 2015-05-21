@@ -52,6 +52,10 @@ class BarcodeReader(object):
             struct = message.get_structure()
             struct_name = struct.get_name()
             log.debug('Message name: %s', struct_name)
+            if struct_name == 'GstMessageError':
+                err, debug = message.parse_error()
+                log.error('GstError: %s, %s', err, debug)
+
             converted_sample = None
             if struct_name == 'barcode':
                 pixbuf = None
