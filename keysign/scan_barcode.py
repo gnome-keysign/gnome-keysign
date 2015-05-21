@@ -328,7 +328,7 @@ class SimpleInterface(ReaderApp):
             original_height, rowstride)
 
 
-        self.image.set_from_pixbuf(gdkpixbuf, original_width, original_height, rowstride)
+        self.image.set_from_pixbuf(gdkpixbuf)
         return False
 
 
@@ -343,19 +343,8 @@ class ScalingImage(Gtk.DrawingArea):
         super(ScalingImage, self).__init__()
     
     
-    def set_from_pixbuf(self, pixbuf, width=None, height=None, rowstride=None):
-        log.debug('Setting Image from Pixbuf (%r x %r)', width, height)
+    def set_from_pixbuf(self, pixbuf):
         self.pixbuf = pixbuf
-
-        if width:
-            self.width = width
-
-        if height:
-            self.height = height
-
-        if rowstride:
-            self.rowstride = rowstride
-            
         self.queue_draw()
 
 
