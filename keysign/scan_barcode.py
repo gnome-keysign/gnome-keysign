@@ -77,7 +77,9 @@ class BarcodeReader(object):
 
     def run(self):
         p = "v4l2src "
-        #p = "uridecodebin file:///tmp/qr.png "
+        ## FIXME: When using an image, the recorded frame is somewhat
+        ##        greenish.  I think we need to investigate that at some stage.
+        #p = "uridecodebin uri=file:///tmp/qr.png "
         p += " ! tee name=t ! queue ! videoconvert "
         p += " ! identity name=ident signal-handoffs=true"
         p += " ! zbar "
