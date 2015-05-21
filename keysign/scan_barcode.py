@@ -118,7 +118,8 @@ class BarcodeReader(object):
         log.debug("ts: %s", p_timestamp)
 
 
-class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
+#class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
+class BarcodeReaderGTK(BarcodeReader, Gtk.DrawingArea):
 
     __gsignals__ = {
         'barcode': (GObject.SIGNAL_RUN_LAST, None,
