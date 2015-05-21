@@ -51,28 +51,29 @@ class BarcodeReader(object):
         log.debug("Message: %s", message)
         if message:
             struct = message.get_structure()
-            struct_name = struct.get_name()
-            log.debug('Message name: %s', struct_name)
-            if struct_name == 'GstMessageError':
-                err, debug = message.parse_error()
-                log.error('GstError: %s, %s', err, debug)
-
-            converted_sample = None
-            if struct_name == 'barcode':
-                pixbuf = None
-                if struct.has_field ("frame"):
-                    sample = struct.get_value ("frame")
-                    log.info ("uuhh,  found image %s", sample)
-                    
-                    target_caps = Gst.Caps.from_string('video/x-raw,format=RGBA')
-                    converted_sample = GstVideo.video_convert_sample(
-                        sample, target_caps, Gst.CLOCK_TIME_NONE)
-                                        
-                assert struct.has_field('symbol')
-                barcode = struct.get_string('symbol')
-                log.info("Read Barcode: {}".format(barcode)) 
-
-                self.on_barcode(barcode, message, converted_sample)
+            if struct:
+                struct_name = struct.get_name()
+                log.debug('Message name: %s', struct_name)
+                if struct_name == 'GstMessageError':
+                    err, debug = message.parse_error()
+                    log.error('GstError: %s, %s', err, debug)
+    
+                converted_sample = None
+                if struct_name == 'barcode':
+                    pixbuf = None
+                    if struct.has_field ("frame"):
+                        sample = struct.get_value ("frame")
+                        log.info ("uuhh,  found image %s", sample)
+                        
+                        target_caps = Gst.Caps.from_string('video/x-raw,format=RGBA')
+                        converted_sample = GstVideo.video_convert_sample(
+                            sample, target_caps, Gst.CLOCK_TIME_NONE)
+                                            
+                    assert struct.has_field('symbol')
+                    barcode = struct.get_string('symbol')
+                    log.info("Read Barcode: {}".format(barcode)) 
+    
+                    self.on_barcode(barcode, message, converted_sample)
                 
 
     def run(self):
@@ -142,16 +143,21 @@ class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
         return xid
 
     def on_message(self, bus, message):
-        log.debug("Message: %s", message)
+        log.debug("Message: %s %r", message, message.type)
         struct = message.get_structure()
-        assert struct
-        name = struct.get_name()
-        log.debug("Name: %s", name)
-        if name == "prepare-window-handle":
-            log.debug('XWindow ID')
-            message.src.set_window_handle(self.x_window_id)
+        if not struct:
+            log.debug('Message has no struct')
         else:
-            return super(BarcodeReaderGTK, self).on_message(bus, message)
+            name = struct.get_name()
+            log.debug("Name: %s", name)
+            if name == "prepare-window-handle":
+                log.debug('XWindow ID')
+                message.src.set_window_handle(self.x_window_id)
+
+                return
+
+        return super(BarcodeReaderGTK, self).on_message(bus, message)
+
 
     def do_realize(self, *args, **kwargs):
         #super(BarcodeReaderGTK, self).do_realize(*args, **kwargs)
