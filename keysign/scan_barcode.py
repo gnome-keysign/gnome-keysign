@@ -30,6 +30,7 @@ from gi.repository import Gtk, GLib
 from gi.repository import Gtk, GdkX11, GdkPixbuf
 # Needed for window.get_xid(), xvimagesink.set_window_handle(), respectively:
 from gi.repository import GdkX11, GstVideo
+from gi.repository import Gdk
 
 log = logging.getLogger()
 
@@ -352,81 +353,54 @@ class ScalingImage(Gtk.DrawingArea):
 
         if rowstride:
             self.rowstride = rowstride
+            
+        self.queue_draw()
 
 
     def do_draw(self, cr, pixbuf=None):
         log.debug('Drawing ScalingImage! %r', self)
         pixbuf = pixbuf or self.pixbuf
-        #log.info('Drawing Pixbuf: %r', pixbuf)
 
-        #caps = sample.get_caps()
-        #struct = caps.get_structure(0)
-        
-        #width_struct = struct.get_int("width")
-        #assert width_struct[0]
-        #height_struct = struct.get_int("height")
-        #assert height_struct[0]
-        #original_width = width_struct[1]
-        #original_height = height_struct[1]
-        original_width = self.width
-        original_height = self.height
-        if not original_width or not original_height:
-            log.info('No width in the picture. w: %r, h: %r', original_width, original_height)
-            return False
-        assert original_width
-        assert original_height
+        original_width = pixbuf.get_width()
+        original_height = pixbuf.get_height()
+
+        assert original_width > 0
+        assert original_height > 0
 
 
         # Scale the pixbuf down to whatever space we have
         allocation = self.get_allocation()
         widget_width = allocation.width
         widget_height = allocation.height
-        # I think we might not need this calculation
-        widget_size = min(widget_width, widget_height)
-        log.info('Allocated size: %s, %s', widget_width, widget_height)
         
+        
+        # I think we might not need this calculation
+        #widget_size = min(widget_width, widget_height)
+        #log.info('Allocated size: %s, %s', widget_width, widget_height)
+        
+        # Fill in background
         cr.save()
         cr.set_source_rgb(1, 1, 1)
         cr.paint()
-        cr.set_source_rgb(0, 0, 0)
-        cr.translate(widget_width / 2, widget_height / 2)
-        # Not sure taking the width here is good
-        scale = max(1, widget_width / original_width)
+        
+        # Centering and scaling the image to fit the widget
+        cr.translate(widget_width / 2.0, widget_height / 2.0)
+        scale = min(widget_width / float(original_width), widget_width / float(original_width))
         cr.scale(scale, scale)
-        cr.translate(-original_width / 2, -original_width / 2)
         
-        pattern = cairo.SurfacePattern(pixbuf)
-        pattern.set_filter(cairo.FILTER_NEAREST)
-        cr.mask(pattern)
-        
-        
+        cr.translate(-original_width / 2.0, -original_height / 2.0)
+        # Note: This function is very inefficient
+        # (one could cache the resulting pattern or image surface)!
+        Gdk.cairo_set_source_pixbuf(cr, pixbuf, 0, 0)
+        # Should anyone want to set filters, this is the way to do it.
+        #pattern = cr.get_source()
+        #pattern.set_filter(cairo.FILTER_NEAREST)
+        cr.paint()
         cr.restore()
         
-        return super(ScalingImage, self).do_draw(cr)
-        
+        return
+        #super(ScalingImage, self).do_draw(cr)
 
-        #new_pixbuf = GdkPixbuf.Pixbuf(width=width, height=height)
-        new_pixbuf = GdkPixbuf.Pixbuf.new_from_bytes(
-            GLib.Bytes.new_take(pixbuf),
-            colorspace, alpha, bps,
-            width, height,
-            width * 4)
-        # No idea what all these arguments are...
-        ratio = min (1.0 * width / original_width,  1.0 * height / original_height)
-        new_width = width * ratio
-        new_height = height * ratio
-        log.debug("w: %r h: %r (from: %r)", new_width, new_height, ratio)
-        assert new_width > 0
-        assert new_height > 0
-        scaled_pixbuf = gdkpixbuf.scale_simple(
-            #0, 0,
-            #new_width,  new_height,
-            width,  height,
-            #0, 0,
-            #1.0 * width / original_width,  1.0 * height / original_height,
-            GdkPixbuf.InterpType.NEAREST)
-        
-        self.set_from_pixbuf(scaled_pixbuf)
 
 
 def main():
