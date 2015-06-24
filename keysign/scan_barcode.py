@@ -69,13 +69,11 @@ class BarcodeReader(object):
                 if struct_name == 'barcode':
                     pixbuf = None
                     if struct.has_field ("frame"):
+                        # This is the new zbar, which posts the frame along
+                        # with the barcode.  It might be too new for users.
                         sample = struct.get_value ("frame")
-                        log.info ("uuhh,  found image %s", sample)
-                        
-                        target_caps = Gst.Caps.from_string('video/x-raw,format=RGBA')
-                        converted_sample = GstVideo.video_convert_sample(
-                            sample, target_caps, Gst.CLOCK_TIME_NONE)
                     else:
+                        # So here is an alternative, albeit slow, implementation.
                         timestamp = struct.get_clock_time("timestamp")[1]
                         log.debug ("at %s", timestamp)
                         
@@ -99,11 +97,10 @@ class BarcodeReader(object):
                             # as several threads are involved and
                             # the imagesink might have advanced.
                             # So this must be regarded as prototype.
-                            # There is https://bugzilla.gnome.org/show_bug.cgi?id=747557
                             sample = self.imagesink.get_last_sample()
-                        log.info('last sample: %s', sample)
-                        caps = Gst.Caps.from_string("video/x-raw,format=RGBA")
-                        converted_sample = GstVideo.video_convert_sample(sample, caps, Gst.CLOCK_TIME_NONE)
+
+                    caps = Gst.Caps.from_string("video/x-raw,format=RGBA")
+                    converted_sample = GstVideo.video_convert_sample(sample, caps, Gst.CLOCK_TIME_NONE)
                                                
                     assert struct.has_field('symbol')
                     barcode = struct.get_string('symbol')
