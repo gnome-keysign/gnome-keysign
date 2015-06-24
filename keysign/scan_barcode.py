@@ -123,13 +123,39 @@ class BarcodeReader(object):
         #        whether zbar is new enough to fire with the GstSample, then
         #        we could skip adding the identity element.
         p += " ! identity name=ident signal-handoffs=true"
-        p += " ! zbar "
+        p += " ! zbar %(attach_frame)s "
         p += " ! fakesink t. ! queue ! videoconvert "
         p += " ! xvimagesink name=imagesink"
         #p += " ! gdkpixbufsink"
         #p = "uridecodebin file:///tmp/qr.png "
         #p += "! tee name=t ! queue ! videoconvert ! zbar ! fakesink t. ! queue ! videoconvert ! xvimagesink name=imagesink'
-        self.a = a = Gst.parse_launch(p)
+
+        # It's getting ugly down here.  What these lines do is trying to
+        # detect whether we have a new enough GStreamer, i.e. 1.6+, where
+        # the zbar element has the required "attach-frame" property.
+        # If the element does not have such a property, parse_launch will
+        # fail.  We try to detect our special case to not break other
+        # error messages.  If we detect an old GStreamer version,
+        # we simply discard "attach-frame" and work around the limitation
+        # of the zbar element.
+        try:
+            self.a = a = Gst.parse_launch(p % {
+                'attach_frame':'attach-frame=true'})
+        except GLib.Error as e:
+            if 'no property "attach-frame" in element' in e.message:
+                # We assume that the zbar element has no attach-frame
+                # property, because GStramer is too old.
+                # The property was introduced with GStreamer 1.6 with
+                # 1246d93f3e32a13c95c70cf3ba0f26b224de5e58
+                # https://bugzilla.gnome.org/show_bug.cgi?id=747557
+                try:
+                    self.a = a = Gst.parse_launch(p % {
+                        'attach_frame':''})
+                except:
+                    raise
+            else:
+                raise
+            
         self.bus = bus = a.get_bus()
         self.imagesink = self.a.get_by_name('imagesink')
         self.ident = self.a.get_by_name('ident')
