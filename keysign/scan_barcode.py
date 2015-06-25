@@ -365,6 +365,32 @@ class SimpleInterface(ReaderApp):
 
 
     def on_barcode(self, reader, barcode, message, sample):
+        self.image.set_from_gst_sample(sample)
+        return False
+
+
+
+class ScalingImage(Gtk.DrawingArea):
+
+    def __init__(self, pixbuf=None, width=None, height=None, rowstride=None):
+        self.pixbuf = pixbuf
+        self.width = width or None
+        self.height = height or None
+        self.rowstride = rowstride or None
+        super(ScalingImage, self).__init__()
+    
+    
+    def set_from_pixbuf(self, pixbuf):
+        self.pixbuf = pixbuf
+        self.queue_draw()
+
+
+    def set_from_gst_sample(self, sample):
+        '''Set the image from a given GstSample
+        
+        The sample should probably contain a RGB(A)
+        image already.
+        '''
         buffer = sample.get_buffer()
         pixbuf = buffer.extract_dup(0, buffer.get_size())
         
@@ -380,11 +406,9 @@ class SimpleInterface(ReaderApp):
         assert height_struct[0]
         original_width = width_struct[1]
         original_height = height_struct[1]
-        
 
-
-        for i in range(struct.n_fields()):
-            log.debug("Struct field %d name: %s", i, struct.nth_field_name(i))
+        #for i in range(struct.n_fields()):
+        #    log.debug("Struct field %d name: %s", i, struct.nth_field_name(i))
 
         rowstride_struct = struct.get_int("stride")
         if rowstride_struct[0] == True:
@@ -405,23 +429,7 @@ class SimpleInterface(ReaderApp):
             original_height, rowstride)
 
 
-        self.image.set_from_pixbuf(gdkpixbuf)
-        return False
-
-
-
-class ScalingImage(Gtk.DrawingArea):
-
-    def __init__(self, pixbuf=None, width=None, height=None, rowstride=None):
-        self.pixbuf = pixbuf
-        self.width = width or None
-        self.height = height or None
-        self.rowstride = rowstride or None
-        super(ScalingImage, self).__init__()
-    
-    
-    def set_from_pixbuf(self, pixbuf):
-        self.pixbuf = pixbuf
+        self.set_from_pixbuf(gdkpixbuf)
         self.queue_draw()
 
 
