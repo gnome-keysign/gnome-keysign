@@ -115,14 +115,11 @@ class BarcodeReader(object):
         ##        greenish.  I think we need to investigate that at some stage.
         #p = "uridecodebin uri=file:///tmp/qr.png "
         p += " ! tee name=t ! queue ! videoconvert "
-        # FIXME: Ideally, we could detect whether the zbar element fires
-        #        with the sample https://bugzilla.gnome.org/show_bug.cgi?id=747557
-        #        but that may take a while still to arrive for the users.
-        #        So we try to outsmart the user and use the rather expensive
-        #        handoff mechanism of the identity element.  If we knew
-        #        whether zbar is new enough to fire with the GstSample, then
-        #        we could skip adding the identity element.
-        p += " ! identity name=ident signal-handoffs=true"
+        
+        # We're using the identity element's handoff function only if
+        # the zbar element's attach-frame property does not exist.
+        # See below.
+        p += " ! identity name=ident %(handoffs)s "
         p += " ! zbar %(attach_frame)s "
         p += " ! fakesink t. ! queue ! videoconvert "
         p += " ! xvimagesink name=imagesink"
@@ -140,7 +137,9 @@ class BarcodeReader(object):
         # of the zbar element.
         try:
             self.a = a = Gst.parse_launch(p % {
-                'attach_frame':'attach-frame=true'})
+                  'attach_frame':'attach-frame=true'
+                , 'handoffs': 'signal-handoffs=false'
+                })
         except GLib.Error as e:
             if 'no property "attach-frame" in element' in e.message:
                 # We assume that the zbar element has no attach-frame
@@ -148,9 +147,13 @@ class BarcodeReader(object):
                 # The property was introduced with GStreamer 1.6 with
                 # 1246d93f3e32a13c95c70cf3ba0f26b224de5e58
                 # https://bugzilla.gnome.org/show_bug.cgi?id=747557
+                log.info('Running with GStreamer <1.5.1, '
+                         ' working around zbar frame handoff')
                 try:
                     self.a = a = Gst.parse_launch(p % {
-                        'attach_frame':''})
+                        'attach_frame':''
+                      , 'handoffs': 'signal-handoffs=true'
+                    })
                 except:
                     raise
             else:
@@ -178,7 +181,7 @@ class BarcodeReader(object):
 
     
     def on_handoff(self, element, buffer, *args):
-        log.debug('Handing of %r', buffer)
+        log.debug('Handing off %r', buffer)
         #dec_timestamp = buffer.dts
         #p_timestamp = buffer.pts
         #log.debug("ts: %s", p_timestamp)
