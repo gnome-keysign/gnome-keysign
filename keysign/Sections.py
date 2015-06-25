@@ -358,7 +358,7 @@ class GetKeySection(Gtk.VBox):
 
         return fpr
 
-    def on_barcode(self, sender, barcode, message=None):
+    def on_barcode(self, sender, barcode, message, image):
         '''This is connected to the "barcode" signal.
         The message argument is a GStreamer message that created
         the barcode.'''
