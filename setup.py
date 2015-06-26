@@ -18,6 +18,7 @@ setup(
     url = 'http://wiki.gnome.org/GnomeKeysign',
     packages = [
         'keysign',
+        'keysign.compat',
         'keysign.network'],
     #package_dir={'keysign': 'keysign'},
     #package_data={'keysign': ['data/']},
@@ -27,6 +28,7 @@ setup(
         #('share/icons/hicolor/scalable', ['data/gnome-keysign.svg']),
         ('share/icons', ['data/gnome-keysign.svg']),
     ],
+    include_package_data = True,
     #scripts = ['gnome-keysign.py'],
     install_requires=[
         # Note that the dependency on <= 2.2 is only
@@ -47,7 +49,8 @@ setup(
         #    'keysign = keysign.main'
         #],
         'gui_scripts': [
-            'gnome-keysign = keysign:main'
+            'gnome-keysign = keysign:main',
+            'gks-qrcode = keysign.GPGQRCode:main',
         ],
     },
     

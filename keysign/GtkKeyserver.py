@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #    Copyright 2014 Tobias Mueller <muelli@cryptobitch.de>
 #    Copyright 2014 Andrei Macavei <andrei.macavei89@gmail.com>
+#    Copyright 2014 Srdjan Grubor <sgnn7@sgnn7.org>
 #
 #    This file is part of GNOME Keysign.
 #
@@ -16,25 +17,22 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
+
 '''This is an exercise to see how we can combine Python threads
 with the Gtk mainloop
 '''
 
 import logging
 import sys
-#from multiprocessing import Process as Thread
+
 from threading import Thread
-
-
 from gi.repository import GLib
 from gi.repository import Gtk
+from dbus.mainloop.glib import DBusGMainLoop
 
 import Keyserver
 
-log = logging.getLogger()
-
 class ServerWindow(Gtk.Window):
-
     def __init__(self):
         self.log = logging.getLogger()
 
@@ -52,7 +50,6 @@ class ServerWindow(Gtk.Window):
 
         #GLib.idle_add(self.setup_server)
 
-
     def on_button_toggled(self, button):
         self.log.debug('toggled button')
         if button.get_active():
@@ -64,31 +61,26 @@ class ServerWindow(Gtk.Window):
 
     def setup_server(self):
         self.log.info('Serving now')
-        #self.keyserver = Thread(name='keyserver',
-        #                        target=Keyserver.serve_key, args=('Foobar',))
-        #self.keyserver.daemon = True
         self.log.debug('About to call %r', Keyserver.ServeKeyThread)
-        self.keyserver = Keyserver.ServeKeyThread('Keydata')
+        self.keyserver = Keyserver.ServeKeyThread('Keydata', 'fingerprint')
         self.log.info('Starting thread %r', self.keyserver)
         self.keyserver.start()
         self.log.info('Finsihed serving')
+
         return False
 
     def stop_server(self):
         self.keyserver.shutdown()
 
 def main(args):
+    log = logging.getLogger()
     log.debug('Running main with args: %s', args)
     w = ServerWindow()
     w.show_all()
     log.debug('Starting main')
-    from dbus.mainloop.glib import DBusGMainLoop
-    # Hm. I actually don't know why I have to do this.
-    # It feels a bit strange. Anyway, this is needed to make
-    # dbus work.
-    DBusGMainLoop( set_as_default=True )
-    Gtk.main()
 
+    DBusGMainLoop(set_as_default = True)
+    Gtk.main()
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG,
