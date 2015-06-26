@@ -42,7 +42,9 @@ log = logging.getLogger()
 class BarcodeReader(object):
 
     def __init__(self, *args, **kwargs):
-        self.deque = deque('', maxlen=1<<10)
+        self.timestamp = None
+        self.scanned_barcode = None
+        self.zbar_message = None
 
         return super(BarcodeReader, self).__init__(*args, **kwargs)
 
@@ -66,47 +68,59 @@ class BarcodeReader(object):
                     log.error('GstError: %s, %s', err, debug)
     
                 converted_sample = None
+
                 if struct_name == 'barcode':
+                    self.timestamp = struct.get_clock_time("timestamp")[1]
+                    log.debug ("at %s", self.timestamp)
+
+                    assert struct.has_field('symbol')
+                    barcode = struct.get_string('symbol')
+                    log.info("Read Barcode: {}".format(barcode)) 
+
                     pixbuf = None
                     if struct.has_field ("frame"):
                         # This is the new zbar, which posts the frame along
                         # with the barcode.  It might be too new for users.
                         sample = struct.get_value ("frame")
+                        pixbuf = gst_sample_to_pixbuf(sample)
+                        self.on_barcode(barcode, message, pixbuf)
                     else:
-                        # So here is an alternative, albeit slow, implementation.
-                        timestamp = struct.get_clock_time("timestamp")[1]
-                        log.debug ("at %s", timestamp)
+                        # If we do not see the newer zbar, we save the
+                        # barcode symbol now along with its timestamp.
+                        # There should be a pixbuf on the bus with
+                        # the same timestamp which we will then collect.
+                        self.timestamp = struct.get_clock_time("timestamp")[1]
+                        self.scanned_barcode = barcode
+                        self.zbar_message = message
                         
-                        for buffer in self.deque:
-                            if buffer.pts == timestamp:
-                                # Let's assume there is only one srcpad.
-                                # Actually.. Could it be that, theoretically,
-                                # the caps have changed by now?  Because the signal
-                                # is potentially very old and the caps might have changed
-                                # already.
-                                ident_caps = self.ident.srcpads[0].get_current_caps()
-                                log.debug('Ident caps: %r', ident_caps)
-                                sample = Gst.Sample.new(buffer=buffer, caps=ident_caps)
-                                break
-                        else:
-                            log.error('Weird. Could not find the frame belonging to %r '
-                                      'in the deque %r', timestamp, self.deque)
-                            # We now try to get the frame which caused
-                            # zbar to generate the barcode signal.
-                            # This is only an approximation, though,
-                            # as several threads are involved and
-                            # the imagesink might have advanced.
-                            # So this must be regarded as prototype.
-                            sample = self.imagesink.get_last_sample()
+                elif struct_name == 'pixbuf':
+                    # Here we check whether the pixbuf is unsolicitated,
+                    # e.g. a "regular" pixbuf or the one belonging to the
+                    # barcode we have just scanned.  Note that if we
+                    # haven't scanned a barcode yet, self.timestamp
+                    # should be None.  We also use None instead of just
+                    # if self.timestamp because the timestamp might be 0.
+                    if self.timestamp is not None:
+                        pixbuf_timestamp = struct.get_clock_time("timestamp")[1]
+                        if pixbuf_timestamp == self.timestamp:
+                            log.debug('Pixbuf %r matches barcode seen at %r',
+                                      struct, pixbuf_timestamp)
 
-                    caps = Gst.Caps.from_string("video/x-raw,format=RGBA")
-                    converted_sample = GstVideo.video_convert_sample(sample, caps, Gst.CLOCK_TIME_NONE)
-                                               
-                    assert struct.has_field('symbol')
-                    barcode = struct.get_string('symbol')
-                    log.info("Read Barcode: {}".format(barcode)) 
+                            if not struct.has_field("pixbuf"):
+                                log.error("Why does the pixbuf message not "
+                                          "contain a pixbuf field? %r", struct)
+                                for i in range(struct.n_fields()):
+                                    log.debug("Struct field %d name: %s",
+                                              i, struct.nth_field_name(i))
+                            else:
+                                pixbuf = struct.get_value("pixbuf")
+                                barcode = self.scanned_barcode
+                                message = self.zbar_message
+                                self.timestamp = None
+                                self.scanned_barcode = None
+                                self.zbar_message = None
+                                self.on_barcode(barcode, message, pixbuf)
                     
-                    self.on_barcode(barcode, message, converted_sample)
 
 
     def run(self):
@@ -114,18 +128,10 @@ class BarcodeReader(object):
         ## FIXME: When using an image, the recorded frame is somewhat
         ##        greenish.  I think we need to investigate that at some stage.
         #p = "uridecodebin uri=file:///tmp/qr.png "
-        p += " ! tee name=t ! queue ! videoconvert "
-        
-        # We're using the identity element's handoff function only if
-        # the zbar element's attach-frame property does not exist.
-        # See below.
-        p += " ! identity name=ident %(handoffs)s "
-        p += " ! zbar %(attach_frame)s "
-        p += " ! fakesink t. ! queue ! videoconvert "
-        p += " ! xvimagesink name=imagesink"
-        #p += " ! gdkpixbufsink"
-        #p = "uridecodebin file:///tmp/qr.png "
-        #p += "! tee name=t ! queue ! videoconvert ! zbar ! fakesink t. ! queue ! videoconvert ! xvimagesink name=imagesink'
+        p += " ! tee name=t "
+        p += "       t. ! queue ! videoconvert ! zbar %(attach_frame)s "
+        p += "          ! videoconvert ! gdkpixbufsink "
+        p += "       t. ! queue ! videoconvert ! xvimagesink name=imagesink"
 
         # It's getting ugly down here.  What these lines do is trying to
         # detect whether we have a new enough GStreamer, i.e. 1.6+, where
@@ -161,32 +167,20 @@ class BarcodeReader(object):
             
         self.bus = bus = a.get_bus()
         self.imagesink = self.a.get_by_name('imagesink')
-        self.ident = self.a.get_by_name('ident')
 
         bus.connect('message', self.on_message)
         bus.connect('sync-message::element', self.on_sync_message)
         bus.add_signal_watch()
         
-        self.ident.connect('handoff', self.on_handoff)
-
         a.set_state(Gst.State.PLAYING)
         self.running = True
-        while self.running and False:
-            pass
-        #a.set_state(Gst.State.NULL)
+
 
     def on_sync_message(self, bus, message):
         log.debug("Sync Message!")
         pass
 
     
-    def on_handoff(self, element, buffer, *args):
-        log.debug('Handing off %r', buffer)
-        #dec_timestamp = buffer.dts
-        #p_timestamp = buffer.pts
-        #log.debug("ts: %s", p_timestamp)
-        self.deque.append(buffer)
-
 
 #class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
 class BarcodeReaderGTK(BarcodeReader, Gtk.DrawingArea):
@@ -195,7 +189,8 @@ class BarcodeReaderGTK(BarcodeReader, Gtk.DrawingArea):
         'barcode': (GObject.SIGNAL_RUN_LAST, None,
                     (str, # The barcode string
                      Gst.Message.__gtype__, # The GStreamer message itself
-                     Gst.Sample.__gtype__, # The image data containing the barcode
+                     GdkPixbuf.Pixbuf.__gtype__, # The pixbuf which caused the
+                                                 # above string to be decoded
                     ),
                    )
     }
@@ -261,7 +256,8 @@ class BarcodeReaderGTK(BarcodeReader, Gtk.DrawingArea):
 
     def do_barcode(self, barcode, message, image):
         "This is called by GObject, I think"
-        log.debug("Emitting a barcode signal %s, %s", barcode, message)
+        log.debug("Emitting a barcode signal %s, %s, %r",
+                  barcode, message, image)
 
 
     def on_barcode(self, barcode, message, image):
@@ -364,8 +360,8 @@ class SimpleInterface(ReaderApp):
             return super(SimpleInterface, self).on_message(bus, message)
 
 
-    def on_barcode(self, reader, barcode, message, sample):
-        self.image.set_from_gst_sample(sample)
+    def on_barcode(self, reader, barcode, message, pixbuf):
+        self.image.set_from_pixbuf(pixbuf)
         return False
 
 
