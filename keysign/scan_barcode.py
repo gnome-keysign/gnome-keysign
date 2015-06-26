@@ -18,7 +18,6 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
-from collections import deque
 import logging
 import signal
 import sys
