@@ -138,12 +138,12 @@ class BarcodeReader(object):
         # error messages.  If we detect an old GStreamer version,
         # we simply discard "attach-frame" and work around the limitation
         # of the zbar element.
+        pipeline_s = p % {
+              # Without the fakesink the zbar element seems to not work
+              'attach_frame':'attach-frame=true !  fakesink'
+        }
         try:
-            pipeline_s = p % {
-                  # Without the fakesink the zbar element seems to not work
-                  'attach_frame':'attach-frame=true !  fakesink'
-            }
-            self.a = pipeline = Gst.parse_launch(pipeline_s)
+            pipeline = Gst.parse_launch(pipeline_s)
         except GLib.Error as e:
             if 'no property "attach-frame" in element' in e.message:
                 # We assume that the zbar element has no attach-frame
@@ -153,11 +153,11 @@ class BarcodeReader(object):
                 # https://bugzilla.gnome.org/show_bug.cgi?id=747557
                 log.info('Running with GStreamer <1.5.1, '
                          ' working around zbar frame handoff')
+                pipeline_s = p % {
+                    'attach_frame':'  ! videoconvert ! gdkpixbufsink  '
+                }
                 try:
-                    pipeline_s = p % {
-                        'attach_frame':'  ! videoconvert ! gdkpixbufsink  '
-                    }
-                    self.a = pipeline = Gst.parse_launch(pipeline_s)
+                    pipeline = Gst.parse_launch(pipeline_s)
                 except:
                     raise
             else:
@@ -165,6 +165,7 @@ class BarcodeReader(object):
             
         self.bus = bus = pipeline.get_bus()
         self.imagesink = pipeline.get_by_name('imagesink')
+        self.pipeline = pipeline
 
         bus.connect('message', self.on_message)
         bus.connect('sync-message::element', self.on_sync_message)
@@ -240,16 +241,16 @@ class BarcodeReaderGTK(BarcodeReader, Gtk.DrawingArea):
     def do_unrealize(self, *args, **kwargs):
         '''This appears to be called when the app is destroyed,
         not when a tab is hidden.'''
-        self.a.set_state(Gst.State.NULL)
+        self.pipeline.set_state(Gst.State.NULL)
         Gtk.DrawingArea.do_unrealize(self)
 
 
     def on_unmap(self, *args, **kwargs):
         '''Hopefully called when this widget is hidden,
         e.g. when the tab of a notebook has changed'''
-        self.a.set_state(Gst.State.PAUSED)
+        self.pipeline.set_state(Gst.State.PAUSED)
         # Actually, we stop the thing for real
-        self.a.set_state(Gst.State.NULL)
+        self.pipeline.set_state(Gst.State.NULL)
 
 
     def do_barcode(self, barcode, message, image):
