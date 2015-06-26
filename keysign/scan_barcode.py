@@ -370,6 +370,45 @@ class SimpleInterface(ReaderApp):
 
 
 
+def gst_sample_to_pixbuf(sample):
+    '''Converts the image from a given GstSample to a GdkPixbuf'''
+    caps = Gst.Caps.from_string("video/x-raw,format=RGBA")
+    converted_sample = GstVideo.video_convert_sample(sample, caps, Gst.CLOCK_TIME_NONE)
+
+    buffer = converted_sample.get_buffer()
+    pixbuf = buffer.extract_dup(0, buffer.get_size())
+    
+    caps = converted_sample.get_caps()
+    struct = caps.get_structure(0)
+    
+    colorspace = GdkPixbuf.Colorspace.RGB
+    alpha = True
+    bps = 8
+    width_struct = struct.get_int("width")
+    assert width_struct[0]
+    height_struct = struct.get_int("height")
+    assert height_struct[0]
+    original_width = width_struct[1]
+    original_height = height_struct[1]
+
+    rowstride_struct = struct.get_int("stride")
+    if rowstride_struct[0] == True:
+        # The stride information might be hidden in the struct.
+        # For now it doesn't work. I think it's the name of the field.
+        rowstride = rowstride_struct[1]
+    else:
+        rowstride = bps / 8 * 4 * original_width
+
+    gdkpixbuf = GdkPixbuf.Pixbuf.new_from_bytes(
+        GLib.Bytes.new_take(pixbuf),
+        colorspace, alpha, bps, original_width,
+        original_height, rowstride)
+        
+    return gdkpixbuf
+
+
+
+
 class ScalingImage(Gtk.DrawingArea):
 
     def __init__(self, pixbuf=None, width=None, height=None, rowstride=None):
@@ -382,54 +421,6 @@ class ScalingImage(Gtk.DrawingArea):
     
     def set_from_pixbuf(self, pixbuf):
         self.pixbuf = pixbuf
-        self.queue_draw()
-
-
-    def set_from_gst_sample(self, sample):
-        '''Set the image from a given GstSample
-        
-        The sample should probably contain a RGB(A)
-        image already.
-        '''
-        buffer = sample.get_buffer()
-        pixbuf = buffer.extract_dup(0, buffer.get_size())
-        
-        caps = sample.get_caps()
-        struct = caps.get_structure(0)
-        
-        colorspace = GdkPixbuf.Colorspace.RGB
-        alpha = True
-        bps = 8
-        width_struct = struct.get_int("width")
-        assert width_struct[0]
-        height_struct = struct.get_int("height")
-        assert height_struct[0]
-        original_width = width_struct[1]
-        original_height = height_struct[1]
-
-        #for i in range(struct.n_fields()):
-        #    log.debug("Struct field %d name: %s", i, struct.nth_field_name(i))
-
-        rowstride_struct = struct.get_int("stride")
-        if rowstride_struct[0] == True:
-            # The stride information might be hidden in the struct.
-            # For now it doesn't work. I think it's the name of the field.
-            rowstride = rowstride_struct[1]
-        else:
-            rowstride = bps / 8 * 4 * original_width
-
-        log.debug("bytes: %r, colorspace: %r, aplah %r, bps: %r, w: %r, h: %r, r: %r",
-            GLib.Bytes.new_take(pixbuf),
-            colorspace, alpha, bps, original_width,
-            original_height, rowstride,
-        )
-        gdkpixbuf = GdkPixbuf.Pixbuf.new_from_bytes(
-            GLib.Bytes.new_take(pixbuf),
-            colorspace, alpha, bps, original_width,
-            original_height, rowstride)
-
-
-        self.set_from_pixbuf(gdkpixbuf)
         self.queue_draw()
 
 
