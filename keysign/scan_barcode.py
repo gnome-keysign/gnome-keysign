@@ -143,7 +143,7 @@ class BarcodeReader(object):
                   # Without the fakesink the zbar element seems to not work
                   'attach_frame':'attach-frame=true !  fakesink'
             }
-            self.a = a = Gst.parse_launch(pipeline_s)
+            self.a = pipeline = Gst.parse_launch(pipeline_s)
         except GLib.Error as e:
             if 'no property "attach-frame" in element' in e.message:
                 # We assume that the zbar element has no attach-frame
@@ -157,20 +157,20 @@ class BarcodeReader(object):
                     pipeline_s = p % {
                         'attach_frame':'  ! videoconvert ! gdkpixbufsink  '
                     }
-                    self.a = a = Gst.parse_launch(pipeline_s)
+                    self.a = pipeline = Gst.parse_launch(pipeline_s)
                 except:
                     raise
             else:
                 raise
             
-        self.bus = bus = a.get_bus()
-        self.imagesink = self.a.get_by_name('imagesink')
+        self.bus = bus = pipeline.get_bus()
+        self.imagesink = pipeline.get_by_name('imagesink')
 
         bus.connect('message', self.on_message)
         bus.connect('sync-message::element', self.on_sync_message)
         bus.add_signal_watch()
         
-        a.set_state(Gst.State.PLAYING)
+        pipeline.set_state(Gst.State.PLAYING)
         self.running = True
 
 
