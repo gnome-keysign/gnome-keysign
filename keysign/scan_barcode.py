@@ -117,9 +117,7 @@ class BarcodeReader(object):
                                 self.timestamp = None
                                 self.scanned_barcode = None
                                 self.zbar_message = None
-                                pixbufsink = self.pipeline.get_by_name('pixbufsink')
-                                assert(pixbufsink is not None)
-                                pixbufsink.set_property('post-messages', False)
+                                self.set_pixbuf_post_messages(False)
                                 self.on_barcode(barcode, message, pixbuf)
                     
 
@@ -201,9 +199,7 @@ class BarcodeReader(object):
             if struct:
                 struct_name = struct.get_name()
                 if struct_name == 'barcode':
-                    pixbufsink = self.pipeline.get_by_name('pixbufsink')
-                    if pixbufsink is not None:
-                        pixbufsink.set_property('post-messages', True)
+                    self.set_pixbuf_post_messages(True)
 
         return Gst.BusSyncReply.PASS
 
@@ -212,7 +208,13 @@ class BarcodeReader(object):
         log.debug("Sync Message!")
         pass
 
-    
+
+    def set_pixbuf_post_messages(self, value):
+        'Locates the element with the name "pixbufsink" and sets post-messages'
+        pixbufsink = self.pipeline.get_by_name('pixbufsink')
+        assert(pixbufsink is not None)
+        return pixbufsink.set_property('post-messages', value)
+
 
 #class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
 class BarcodeReaderGTK(BarcodeReader, Gtk.DrawingArea):
