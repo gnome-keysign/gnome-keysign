@@ -117,6 +117,9 @@ class BarcodeReader(object):
                                 self.timestamp = None
                                 self.scanned_barcode = None
                                 self.zbar_message = None
+                                pixbufsink = self.pipeline.get_by_name('pixbufsink')
+                                assert(pixbufsink is not None)
+                                pixbufsink.set_property('post-messages', False)
                                 self.on_barcode(barcode, message, pixbuf)
                     
 
@@ -152,14 +155,20 @@ class BarcodeReader(object):
                 # 1246d93f3e32a13c95c70cf3ba0f26b224de5e58
                 # https://bugzilla.gnome.org/show_bug.cgi?id=747557
                 log.info('Running with GStreamer <1.5.1, '
-                         ' working around zbar frame handoff')
+                         'using a (slow) pixbufsink')
                 pipeline_s = p % {
-                    'attach_frame':'  ! videoconvert ! gdkpixbufsink  '
+                    'attach_frame':'  ! videoconvert  '
+                                     '! gdkpixbufsink name=pixbufsink '
+                                     '                post-messages=false '
                 }
                 try:
                     pipeline = Gst.parse_launch(pipeline_s)
                 except:
                     raise
+                else:
+                    # We install this handler only if we do not
+                    # have the newer GStreamer version
+                    pipeline.get_bus().set_sync_handler(self.bus_sync_handler)
             else:
                 raise
             
@@ -173,6 +182,30 @@ class BarcodeReader(object):
         
         pipeline.set_state(Gst.State.PLAYING)
         self.running = True
+
+
+    def bus_sync_handler(self, bus, message, data=None):
+        '''A simple handler which only checks for the message being
+        from the zbar element and then makes the pixbufsink post messages
+        
+        This is to save some computing costs for the pixbuf conversion.
+        Some performance impact is measurable, but only a couple of
+        percent CPU usage.
+        
+        Always returns Gst.BusSyncReply.PASS so that messages
+        will be dispatched as usual.
+        '''
+        log.info('Sync handler for message %r', message)
+        if message:
+            struct = message.get_structure()
+            if struct:
+                struct_name = struct.get_name()
+                if struct_name == 'barcode':
+                    pixbufsink = self.pipeline.get_by_name('pixbufsink')
+                    if pixbufsink is not None:
+                        pixbufsink.set_property('post-messages', True)
+
+        return Gst.BusSyncReply.PASS
 
 
     def on_sync_message(self, bus, message):
