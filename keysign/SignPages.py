@@ -27,7 +27,7 @@ from qrencode import encode_scaled
 
 from datetime import datetime
 
-from scan_barcode import BarcodeReaderGTK
+from scan_barcode import BarcodeReaderGTK, ScalingImage
 
 
 # Pages for 'Keys' Tab
@@ -369,7 +369,7 @@ class ScanFingerprintPage(Gtk.HBox):
         print("load")
 
 
-class SignKeyPage(Gtk.VBox):
+class SignKeyPage(Gtk.HBox):
 
     def __init__(self):
         super(SignKeyPage, self).__init__()
@@ -378,10 +378,13 @@ class SignKeyPage(Gtk.VBox):
         self.mainLabel = Gtk.Label()
         self.mainLabel.set_line_wrap(True)
 
-        self.pack_start(self.mainLabel, False, False, 0)
+        self.pack_start(self.mainLabel, False, True, 0)
+        
+        self.barcode_image = ScalingImage()
+        self.pack_start(self.barcode_image, True, True, 0)
 
 
-    def display_downloaded_key(self, key, scanned_fpr):
+    def display_downloaded_key(self, key, scanned_fpr, image):
 
         # FIXME: If the two fingerprints don't match, the button
         # should be disabled
@@ -399,6 +402,11 @@ and you want to sign all UIDs on this key.""".format(key_text)
 
         self.mainLabel.set_markup(markup)
         self.mainLabel.show()
+        
+        # The image *can* be None, if the user typed the fingerprint manually,
+        # e.g. did not use Web cam to scan a QR-code
+        if image:
+            self.barcode_image.set_from_gst_sample(image)
 
 
 class PostSignPage(Gtk.VBox):

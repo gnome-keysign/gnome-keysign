@@ -372,7 +372,7 @@ class GetKeySection(Gtk.VBox):
                 self.log.exception("Could not create key from %s", barcode)
             else:
                 self.log.info("Barcode signal %s %s" %( pgpkey.fingerprint, message))
-                self.on_button_clicked(self.nextButton, pgpkey, message)
+                self.on_button_clicked(self.nextButton, pgpkey, message, image)
         else:
             self.log.error("data found in barcode does not match a OpenPGP fingerprint pattern: %s", barcode)
 
@@ -590,8 +590,10 @@ class GetKeySection(Gtk.VBox):
                     # then we get extra arguments
                     pgpkey = args[0]
                     message = args[1]
+                    image = args[2]
                     fingerprint = pgpkey.fingerprint
                 else:
+                    image = None
                     raw_text = self.scanPage.get_text_from_textview()
                     fingerprint = self.verify_fingerprint(raw_text)
 
@@ -603,6 +605,11 @@ class GetKeySection(Gtk.VBox):
 
                 # save a reference to the last received fingerprint
                 self.last_received_fingerprint = fingerprint
+                
+                # Okay, this is weird.  If I don't copy() here,
+                # the GstSample will get invalid.  As if it is
+                # free()d although I keep a reference here.
+                self.scanned_image = image.copy() if image else None
 
                 # error callback function
                 err = lambda x: self.signPage.mainLabel.set_markup('<span size="15000">'
@@ -629,8 +636,9 @@ class GetKeySection(Gtk.VBox):
 
     def recieved_key(self, fingerprint, keydata, *data):
         self.received_key_data = keydata
+        image = self.scanned_image
         openpgpkey = self.tmpkeyring.get_keys(fingerprint).values()[0]
-        self.signPage.display_downloaded_key(openpgpkey, fingerprint)
+        self.signPage.display_downloaded_key(openpgpkey, fingerprint, image)
 
 
 
