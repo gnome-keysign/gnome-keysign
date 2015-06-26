@@ -406,7 +406,7 @@ and you want to sign all UIDs on this key.""".format(key_text)
         # The image *can* be None, if the user typed the fingerprint manually,
         # e.g. did not use Web cam to scan a QR-code
         if image:
-            self.barcode_image.set_from_gst_sample(image)
+            self.barcode_image.set_from_pixbuf(image)
 
 
 class PostSignPage(Gtk.VBox):
