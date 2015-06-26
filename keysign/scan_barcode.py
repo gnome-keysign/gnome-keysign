@@ -128,7 +128,6 @@ class BarcodeReader(object):
         #p = "uridecodebin uri=file:///tmp/qr.png "
         p += " ! tee name=t "
         p += "       t. ! queue ! videoconvert ! zbar %(attach_frame)s "
-        p += "          ! videoconvert ! gdkpixbufsink "
         p += "       t. ! queue ! videoconvert ! xvimagesink name=imagesink"
 
         # It's getting ugly down here.  What these lines do is trying to
@@ -140,10 +139,11 @@ class BarcodeReader(object):
         # we simply discard "attach-frame" and work around the limitation
         # of the zbar element.
         try:
-            self.a = a = Gst.parse_launch(p % {
-                  'attach_frame':'attach-frame=true'
-                , 'handoffs': 'signal-handoffs=false'
-                })
+            pipeline_s = p % {
+                  # Without the fakesink the zbar element seems to not work
+                  'attach_frame':'attach-frame=true !  fakesink'
+            }
+            self.a = a = Gst.parse_launch(pipeline_s)
         except GLib.Error as e:
             if 'no property "attach-frame" in element' in e.message:
                 # We assume that the zbar element has no attach-frame
@@ -154,10 +154,10 @@ class BarcodeReader(object):
                 log.info('Running with GStreamer <1.5.1, '
                          ' working around zbar frame handoff')
                 try:
-                    self.a = a = Gst.parse_launch(p % {
-                        'attach_frame':''
-                      , 'handoffs': 'signal-handoffs=true'
-                    })
+                    pipeline_s = p % {
+                        'attach_frame':'  ! videoconvert ! gdkpixbufsink  '
+                    }
+                    self.a = a = Gst.parse_launch(pipeline_s)
                 except:
                     raise
             else:
