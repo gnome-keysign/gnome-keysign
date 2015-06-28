@@ -58,9 +58,6 @@ Pyton-requests 1.2.3, as shipped with Ubuntu 13.10, cannot handle IPv4
 in IPv6 URLs, i.e. http://[[1.2.3.4]]/.
 That should be easy to work around, though.
 
-The call to `set_always_show_image`, i.e. in saveButton.set_always_show_image
-is available with GTK 3.6, only.  Earlier GTK versions do not need this
-call, anyway.  So this should be easy to work around.
 
 GStreamer is more of a problem.  However, the forward-porting guides can
 probably be read "reverse", i.e. to back-port the GStreamer library.
