@@ -24,7 +24,9 @@ from monkeysign.gpg import Keyring
 
 from QRCode import QRImage
 
-def main(key):
+def main():
+    import sys
+    key = sys.argv[1]
     keyring = Keyring()
     keys = keyring.get_keys(key)
     # Heh, we take the first key here. Maybe we should raise a warning
@@ -45,6 +47,4 @@ def main(key):
     Gtk.main()
 
 if __name__ == '__main__':
-    import sys
-    key = sys.argv[1]
-    main(key)
+    main()

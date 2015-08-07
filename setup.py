@@ -18,6 +18,7 @@ setup(
     url = 'http://wiki.gnome.org/GnomeKeysign',
     packages = [
         'keysign',
+        'keysign.compat',
         'keysign.network'],
     #package_dir={'keysign': 'keysign'},
     #package_data={'keysign': ['data/']},
@@ -48,7 +49,8 @@ setup(
         #    'keysign = keysign.main'
         #],
         'gui_scripts': [
-            'gnome-keysign = keysign:main'
+            'gnome-keysign = keysign:main',
+            'gks-qrcode = keysign.GPGQRCode:main',
         ],
     },
     

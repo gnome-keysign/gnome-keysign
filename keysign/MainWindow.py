@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #    Copyright 2014 Andrei Macavei <andrei.macavei89@gmail.com>
 #    Copyright 2014 Tobias Mueller <muelli@cryptobitch.de>
+#    Copyright 2015 Jody Hansen <jobediah.hansen@gmail.com>
 #
 #    This file is part of GNOME Keysign.
 #
@@ -94,6 +95,7 @@ class MainWindow(Gtk.Application):
     def on_scan_image(self, *args, **kwargs):
         print("scanimage")
 
+
     def on_activate(self, app):
         self.log.info("Activate!")
         #self.window = Gtk.ApplicationWindow(application=app)
@@ -103,57 +105,83 @@ class MainWindow(Gtk.Application):
         # we raise the existing window.
         # self.window.present()
 
+
     def setup_avahi_browser(self):
         # FIXME: place a proper service type
         self.avahi_browser = AvahiBrowser(service=self.avahi_service_type)
         self.avahi_browser.connect('new_service', self.on_new_service)
+        self.avahi_browser.connect('remove_service', self.on_remove_service)
 
         return False
 
-    def setup_server(self, keydata=None):
+
+    def setup_server(self, keydata, fingerprint):
+        """
+        Starts the key-server which serves the provided keydata and
+        announces the fingerprint as TXT record using Avahi
+        """
         self.log.info('Serving now')
-        #self.keyserver = Thread(name='keyserver',
-        #                        target=Keyserver.serve_key, args=('Foobar',))
-        #self.keyserver.daemon = True
         self.log.debug('About to call %r', Keyserver.ServeKeyThread)
-        self.keyserver = Keyserver.ServeKeyThread(str(keydata))
+        self.keyserver = Keyserver.ServeKeyThread(str(keydata), fingerprint)
         self.log.info('Starting thread %r', self.keyserver)
         self.keyserver.start()
         self.log.info('Finsihed serving')
         return False
 
+
     def stop_server(self):
         self.keyserver.shutdown()
 
 
-    def on_new_service(self, browser, name, address, port):
-        self.log.info("Probably discovered something, let me check; %s %s:%i",
-            name, address, port)
+    def on_new_service(self, browser, name, address, port, txt_dict):
+        published_fpr = txt_dict.get('fingerprint', None)
+
+        self.log.info("Probably discovered something, let's check; %s %s:%i:%s",             name, address, port, published_fpr)
+
         if self.verify_service(name, address, port):
-            GLib.idle_add(self.add_discovered_service, name, address, port)
+            GLib.idle_add(self.add_discovered_service, name, address, port, published_fpr)
         else:
             self.log.warn("Client was rejected: %s %s %i",
                         name, address, port)
+
+
+    def on_remove_service(self, browser, service_type, name):
+        '''Receives on_remove signal from avahibrowser.py to remove service from list and
+        transfers data to remove_discovered_service'''
+        self.log.info("Received a remove signal, let's check; %s:%s", service_type, name)
+        GLib.idle_add(self.remove_discovered_service, name)
+
 
     def verify_service(self, name, address, port):
         '''A tiny function to return whether the service
         is indeed something we are interested in'''
         return True
 
-    def add_discovered_service(self, name, address, port):
-        self.discovered_services += ((name, address, port), )
 
+    def add_discovered_service(self, name, address, port, published_fpr):
+        self.discovered_services += ((name, address, port, published_fpr), )
+        #List needs to be modified when server services are removed.
+        self.log.info("Clients currently in list '%s'", self.discovered_services)
         return False
 
 
+    def remove_discovered_service(self, name):
+        '''Removes server-side clients from discovered_services list
+        when the server name with fpr is a match.'''
+        for client in self.discovered_services:
+            if client[0] == name:
+                self.discovered_services.remove(client)
+        self.log.info("Clients currently in list '%s'", self.discovered_services)
+
 
 def main():
+    app = MainWindow()
+
     try:
-        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : Gtk.main_quit(), None)
+        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : app.quit(), None)
     except AttributeError:
         pass
 
-    app = MainWindow()
     exit_status = app.run(None)
 
     return exit_status
