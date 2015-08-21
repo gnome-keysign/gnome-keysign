@@ -1,21 +1,19 @@
 GNOME Keysign  is a tool to make signing OpenPGP keys as easy as possible.
-This is the v0.3 release and brings a few tiny fixes all over the program.
+This is the v0.4 release and brings a few tiny fixes all over the program.
 
 Changes
 ==========
 
- * Optimised finding the correct key to download
- * Removed once discovered clients if they disappear
- * Experimental compatibility for older Gtk versions (set_always_show_image)
- * Minor UI improvement: Do not delete the manually typed fingerprint when going back
- * Also accept more correctly typed fingerprint with a more relaxed verification routine
- * Display a message when the user does not have any private keys
+ * Signing keys with all usable secret keys
+ * monkeypatching monkeysign for revoked and expired keys
+ * Standalone non-UI key signing application (e.g. a key file)
+ * 
 
 
 
 Resources
 =========
 
-Download: https://github.com/muelli/geysigning/releases/download/0.3/gnome-keysign-0.3.tar.gz
-sha256sum: b75f8963f1c9a49edf8fe5fd82a67c91eba018679250468b2f40281d4d817c6c
+Download: https://github.com/muelli/geysigning/releases/download/0.4/gnome-keysign-0.4.tar.gz
+sha256sum:
 Web site: https://wiki.gnome.org/GnomeKeysign
