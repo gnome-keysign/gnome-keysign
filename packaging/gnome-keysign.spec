@@ -1,8 +1,8 @@
-%global commit 55f95bd5bdf352a4423122d135a4b9baf167348f
+%global commit 901247227887a1e5d34a8c8c2da33e98da694000
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:          gnome-keysign
-Version:       0.1
+Version:       0.3
 Release:       0.git.%{shortcommit}%{?dist}
 Summary:       GNOME OpenGPG key signing helper
 
