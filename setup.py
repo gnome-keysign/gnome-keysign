@@ -24,9 +24,7 @@ setup(
     #package_data={'keysign': ['data/']},
     data_files=[
         ('share/applications', ['data/gnome-keysign.desktop']),
-        # Hm, hicolor/scalable doesn't seem to work so well
-        #('share/icons/hicolor/scalable', ['data/gnome-keysign.svg']),
-        ('share/icons', ['data/gnome-keysign.svg']),
+        ('share/icons/hicolor/scalable/apps', ['data/gnome-keysign.svg']),
     ],
     include_package_data = True,
     #scripts = ['gnome-keysign.py'],
