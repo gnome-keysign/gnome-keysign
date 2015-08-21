@@ -1,3 +1,18 @@
-# Debian packages
-monkeysign==1.1
+# FIXME: gobject?
+
+# Python packages
+requests
 qrencode
+
+# Additional Development packages
+pytest
+pytest-xdist
+pylint
+pep8
+
+# Distribution packages
+# python2
+# python2-gobject
+# qrencode
+# avahi
+# dbus
