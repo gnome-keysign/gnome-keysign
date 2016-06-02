@@ -7,7 +7,6 @@ Changes
  * Signing keys with all usable secret keys
  * monkeypatching monkeysign for revoked and expired keys
  * Standalone non-UI key signing application (e.g. a key file)
- * 
 
 
 
@@ -15,5 +14,5 @@ Resources
 =========
 
 Download: https://github.com/muelli/geysigning/releases/download/0.4/gnome-keysign-0.4.tar.gz
-sha256sum:
+sha256sum: 6073624ae4dce5397e908b73ffd3488f30a213582c016d148fa270d16787739f
 Web site: https://wiki.gnome.org/GnomeKeysign
