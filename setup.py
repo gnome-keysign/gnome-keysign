@@ -33,7 +33,12 @@ setup(
         # to not confuse Ubuntu 14.04's pip as that
         # seems incompatible with a newer requests library.
         # https://bugs.launchpad.net/ubuntu/+source/python-pip/+bug/1306991
-        'requests<=2.2', 
+        # 'requests<=2.2',
+        # But this version seems to be requiring an old pyopenssl
+        # with SSLv3 support which doesn't work with Ubuntu's 16.04.
+        # So let's require a more modern requests.
+        'requests>=2.6',
+        
         'qrcode',
         #'monkeysign', # Apparently not in the cheeseshop
         # avahi # Also no entry in the cheeseshop
