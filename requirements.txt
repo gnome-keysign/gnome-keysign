@@ -1,8 +1,11 @@
+# Debian packages
+monkeysign==1.1
 # FIXME: gobject?
 
 # Python packages
 requests
-qrencode
+qrcode
+
 
 # Additional Development packages
 pytest

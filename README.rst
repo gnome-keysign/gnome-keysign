@@ -32,7 +32,7 @@ Installation
 The list of dependencies has not yet fully been determined.
 However, this list of Ubuntu packages seems to make it work:
 
-    python  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus python-requests monkeysign python-qrencode gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad
+    python  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus python-requests monkeysign python-qrcode gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad
 
 
 Once you have the dependencies installed, a
