@@ -19,8 +19,15 @@ setup(
     packages = [
         'keysign',
         'keysign.compat',
-        'keysign.network'],
+        'keysign.network',
+        ],
+    py_modules = [
+        'monkeysign.msgfmt',
+        'monkeysign.translation',
+        'monkeysign.gpg',
+    ],
     #package_dir={'keysign': 'keysign'},
+    package_dir={'monkeysign': 'monkeysign/monkeysign'},
     #package_data={'keysign': ['data/']},
     data_files=[
         ('share/applications', ['data/gnome-keysign.desktop']),
