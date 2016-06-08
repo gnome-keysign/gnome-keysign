@@ -633,5 +633,7 @@ class GetKeySection(Gtk.VBox):
     def recieved_key(self, fingerprint, keydata, *data):
         self.received_key_data = keydata
         image = self.scanned_image
-        openpgpkey = self.tmpkeyring.get_keys(fingerprint).values()[0]
+        tmpkeyring = TempKeyring()
+        tmpkeyring.import_data(keydata)
+        openpgpkey = tmpkeyring.get_keys(fingerprint).values()[0]
         self.signPage.display_downloaded_key(openpgpkey, fingerprint, image)
