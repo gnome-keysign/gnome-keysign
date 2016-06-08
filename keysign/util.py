@@ -16,6 +16,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
+import hmac
 import logging
 
 from monkeysign.gpg import Keyring
@@ -24,14 +25,13 @@ log = logging.getLogger()
 
 
 def mac_generate(key, data):
-    mac = key + data[:10]
+    mac = hmac.new(key, data).hexdigest()
     log.info("MAC of %r is %r", data[:20], mac[:20])
     return mac
 
 def mac_verify(key, data, mac):
-    # this is, of course, only a toy example.
     computed_mac = mac_generate(key, data)
-    result = computed_mac == mac
+    result = hmac.compare_digest(mac, computed_mac)
     log.info("MAC of %r seems to be %r. Expected %r (%r)",
              data[:20], computed_mac[:20], mac[:20], result)
     return result
