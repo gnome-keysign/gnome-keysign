@@ -33,30 +33,13 @@ from QRCode import QRImage
 from scan_barcode import BarcodeReaderGTK, ScalingImage
 
 
+from .util import mac_verify, mac_generate
+from .util import get_public_key_data
+
+
 log = logging.getLogger()
 
 
-
-# FIXME: These need to be moved to a place more cryptographic
-# than this UI related module
-def mac_generate(key, data):
-    mac = key + data[:10]
-    log.info("MAC of %r is %r", data[:20], mac[:20])
-    return mac
-
-def mac_verify(key, data, mac):
-    # this is, of course, only a toy example.
-    computed_mac = mac_generate(key, data)
-    result = computed_mac == mac
-    log.info("MAC of %r seems to be %r. Expected %r (%r)",
-             data[:20], computed_mac[:20], mac[:20], result)
-    return result
-
-
-
-def get_public_key_data(fpr):
-    keydata = Keyring().export_data(fpr)
-    return keydata
 
 
 def parse_sig_list(text):
