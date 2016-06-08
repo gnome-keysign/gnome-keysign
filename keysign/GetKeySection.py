@@ -35,6 +35,7 @@ from monkeysign.gpg import GpgRuntimeError
 from compat import gtkbutton
 import Keyserver
 from SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
+from SignPages import mac_verify
 
 import key
 
@@ -336,7 +337,7 @@ class GetKeySection(Gtk.VBox):
                 self.log.exception("Could not create key from %s", barcode)
             else:
                 self.log.info("Barcode signal %s %s" %( pgpkey.fingerprint, message))
-                self.on_button_clicked(self.nextButton, pgpkey, message, image)
+                self.on_button_clicked(self.nextButton, pgpkey, message, image, parsed_barcode=parsed)
         else:
             self.log.error("data found in barcode does not match a OpenPGP fingerprint pattern: %s", barcode)
 
@@ -603,6 +604,12 @@ class GetKeySection(Gtk.VBox):
                 # the GstSample will get invalid.  As if it is
                 # free()d although I keep a reference here.
                 self.scanned_image = image.copy() if image else None
+
+                # We also may have received a parsed_barcode" argument
+                # with more information about the key to be retrieved
+                barcode_information = kwargs.get("parsed_barcode", {})
+                mac = barcode_information.get('mac', [None])[0] # This is a hack while the list is not flattened
+                self.log.info("Transferred MAC via barcode: %r", mac)
 
                 # error callback function
                 err = lambda x: self.signPage.mainLabel.set_markup('<span size="15000">'
