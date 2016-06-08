@@ -237,9 +237,6 @@ class GetKeySection(Gtk.VBox):
         self.app = app
         self.log = logging.getLogger()
 
-        # the temporary keyring we operate in
-        self.tmpkeyring = None
-
         self.scanPage = ScanFingerprintPage()
         self.signPage = SignKeyPage()
         # set up notebook container
@@ -396,10 +393,6 @@ class GetKeySection(Gtk.VBox):
     def obtain_key_async(self, fingerprint, callback=None, data=None, error_cb=None):
         other_clients = self.app.discovered_services
         self.log.debug("The clients found on the network: %s", other_clients)
-
-        #FIXME: should we create a new TempKeyring for each key we want
-        # to sign it ?
-        self.tmpkeyring = TempKeyring()
 
         other_clients = self.sort_clients(other_clients, fingerprint)
 
