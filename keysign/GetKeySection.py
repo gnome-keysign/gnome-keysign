@@ -391,14 +391,15 @@ class GetKeySection(Gtk.VBox):
         self.log.info("Check if list is sorted '%s'", clients)
         return clients
 
-    def obtain_key_async(self, fingerprint, callback=None, data=None, error_cb=None):
+    def obtain_key_async(self, fingerprint, callback=None, data=None, mac=None, error_cb=None):
+        self.log.debug("Obtaining key %r with mac %r", fingerprint, mac)
         other_clients = self.app.discovered_services
         self.log.debug("The clients found on the network: %s", other_clients)
 
         other_clients = self.sort_clients(other_clients, fingerprint)
 
         for keydata in self.try_download_keys(other_clients):
-            if self.verify_downloaded_key(keydata, fingerprint):
+            if self.verify_downloaded_key(keydata, fingerprint, mac):
                 is_valid = True
             else:
                 is_valid = False
@@ -616,9 +617,11 @@ class GetKeySection(Gtk.VBox):
                         'Error downloading key with fpr\n{}</span>'
                         .format(fingerprint))
                 # use GLib.idle_add to use a separate thread for the downloading of
-                # the keydata
-                GLib.idle_add(self.obtain_key_async, fingerprint, self.recieved_key,
-                        fingerprint, err)
+                # the keydata.
+                # Note that idle_add does not seem to take kwargs...
+                # So we work around by cosntructing an anonymous function
+                GLib.idle_add(lambda: self.obtain_key_async(fingerprint, self.recieved_key,
+                        fingerprint, mac=mac, error_cb=err))
 
 
             if page_index == 2:
