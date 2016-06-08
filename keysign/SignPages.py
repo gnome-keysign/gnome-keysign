@@ -36,6 +36,23 @@ from scan_barcode import BarcodeReaderGTK, ScalingImage
 log = logging.getLogger()
 
 
+
+# FIXME: These need to be moved to a place more cryptographic
+# than this UI related module
+def mac_generate(data):
+    mac = data[:10]
+    log.info("MAC of %r is %r", data[:20], mac[:20])
+    return mac
+
+def mac_verify(data, mac):
+    # this is, of course, only a toy example.
+    computed_mac = mac_generate(data)
+    result = computed_mac == mac
+    log.info("MAC of %r seems to be %r. Expected %r (%r)",
+             data[:20], computed_mac[:20], mac[:20], result)
+    return result
+
+
 def parse_sig_list(text):
     '''Parses GnuPG's signature list (i.e. list-sigs)
     
