@@ -367,18 +367,22 @@ class GetKeySection(Gtk.VBox):
                 self.log.exception("While downloading key from %s %i",
                                     address, port)
 
-    def verify_downloaded_key(self, downloaded_data, fingerprint):
-        # FIXME: implement a better and more secure way to verify the key
-        if self.tmpkeyring.import_data(downloaded_data):
-            imported_key_fpr = self.tmpkeyring.get_keys().keys()[0]
-            if imported_key_fpr == fingerprint:
-                result = True
-            else:
-                self.log.info("Key does not have equal fp: %s != %s", imported_key_fpr, fingerprint)
-                result = False
+    def verify_downloaded_key(self, downloaded_data, fingerprint, mac=None):
+        log.info("Verifying key %r with mac %r", fingerprint, mac)
+        if mac:
+            result = mac_verify(downloaded_data, mac)
         else:
-            self.log.info("Failed to import downloaded data")
-            result = False
+            tmpkeyring = TemporaryKeyring()
+            if tmpkeyring.import_data(downloaded_data):
+                imported_key_fpr = tmpkeyring.get_keys().keys()[0]
+                if imported_key_fpr == fingerprint:
+                    result = True
+                else:
+                    self.log.info("Key does not have equal fp: %s != %s", imported_key_fpr, fingerprint)
+                    result = False
+            else:
+                self.log.info("Failed to import downloaded data")
+                result = False
 
         self.log.debug("Trying to validate %s against %s: %s", downloaded_data, fingerprint, result)
         return result
