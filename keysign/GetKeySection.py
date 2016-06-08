@@ -18,7 +18,7 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from urlparse import ParseResult
+from urlparse import urlparse, parse_qs, ParseResult
 from string import Template
 import shutil
 from subprocess import call
@@ -306,12 +306,34 @@ class GetKeySection(Gtk.VBox):
         return cleaned
 
 
+    def parse_barcode(self, barcode_string):
+        """Parses information contained in a barcode
+
+        It returns a dict with the parsed attributes.
+        We expect the dict to contain at least a 'fingerprint'
+        entry. Others might be added in the future.
+        """
+        # The string, currently, is of the form
+        # openpgp4fpr:foobar?baz=qux
+        # Which urlparse handles perfectly fine.
+        p = urlparse(barcode_string)
+        fpr = p.path
+        q = p.query
+        rest = parse_qs(q)
+        # We should probably ensure that we have only one
+        # item for each parameter and flatten them accordingly.
+        rest['fingerprint'] = fpr
+
+        return rest
+
+
     def on_barcode(self, sender, barcode, message, image):
         '''This is connected to the "barcode" signal.
         The message argument is a GStreamer message that created
         the barcode.'''
 
-        fpr = self.strip_fingerprint(barcode)
+        parsed = self.parse_barcode(barcode)
+        fpr = parsed['fingerprint']
 
         if fpr != None:
             try:
