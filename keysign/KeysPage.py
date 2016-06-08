@@ -181,9 +181,17 @@ class KeysPage(Gtk.VBox):
         
         try:
             exp_date = datetime.fromtimestamp(float(key.expiry))
-            expiry = "{:%Y-%m-%d %H:%M:%S}".format(exp_date)
-        except ValueError, e:
+        except TypeError as e:
+            # This might be the case when the key.expiry is already a timedate
+            exp_date = key.expiry
+        except ValueError as e:
+            # This happens when converting an empty string to a datetime.
+            exp_date = None
+
+        if exp_date is None:
             expiry = "No expiration date"
+        else:
+            expiry = "{:%Y-%m-%d %H:%M:%S}".format(exp_date)
 
         pane = self.right_pane
         for child in pane.get_children():
