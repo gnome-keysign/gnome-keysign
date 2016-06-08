@@ -368,7 +368,7 @@ class GetKeySection(Gtk.VBox):
     def verify_downloaded_key(self, downloaded_data, fingerprint, mac=None):
         log.info("Verifying key %r with mac %r", fingerprint, mac)
         if mac:
-            result = mac_verify(downloaded_data, mac)
+            result = mac_verify(fingerprint, downloaded_data, mac)
         else:
             tmpkeyring = TemporaryKeyring()
             if tmpkeyring.import_data(downloaded_data):

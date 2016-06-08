@@ -39,14 +39,14 @@ log = logging.getLogger()
 
 # FIXME: These need to be moved to a place more cryptographic
 # than this UI related module
-def mac_generate(data):
-    mac = data[:10]
+def mac_generate(key, data):
+    mac = key + data[:10]
     log.info("MAC of %r is %r", data[:20], mac[:20])
     return mac
 
-def mac_verify(data, mac):
+def mac_verify(key, data, mac):
     # this is, of course, only a toy example.
-    computed_mac = mac_generate(data)
+    computed_mac = mac_generate(key, data)
     result = computed_mac == mac
     log.info("MAC of %r seems to be %r. Expected %r (%r)",
              data[:20], computed_mac[:20], mac[:20], result)
@@ -176,7 +176,7 @@ class KeyPresentPage(Gtk.HBox):
         # We should really try to get the keydata from another
         # channel. There is key-selected signal. Maybe we can use that.
         keydata = get_public_key_data(self.fpr)
-        mac = mac_generate(keydata)
+        mac = mac_generate(self.fpr, keydata)
         # FIXME: We probably want to urlencode the thing...
         data += '?mac=%s' % mac
         log.info("Shoving %r to the QRCode", data)
