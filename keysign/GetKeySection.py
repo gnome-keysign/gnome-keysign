@@ -34,9 +34,6 @@ from monkeysign.gpg import GpgRuntimeError
 
 from compat import gtkbutton
 import Keyserver
-from KeysPage import KeysPage
-from KeyPresent import KeyPresentPage
-from SignPages import KeyDetailsPage
 from SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 
 import key
