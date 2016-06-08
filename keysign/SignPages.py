@@ -24,7 +24,6 @@ import StringIO
 
 from gi.repository import GObject, Gtk, GLib, GdkPixbuf
 from monkeysign.gpg import Keyring
-from qrencode import encode_scaled
 
 from datetime import datetime
 
