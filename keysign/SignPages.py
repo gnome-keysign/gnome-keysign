@@ -32,7 +32,13 @@ from QRCode import QRImage
 from scan_barcode import BarcodeReaderGTK, ScalingImage
 
 
+from .util import mac_verify, mac_generate
+from .util import get_public_key_data
+
+
 log = logging.getLogger()
+
+
 
 
 def parse_sig_list(text):
@@ -148,6 +154,14 @@ class KeyPresentPage(Gtk.HBox):
     def draw_qrcode(self):
         assert self.fpr
         data = 'OPENPGP4FPR:' + self.fpr
+        # FIXME: okay, this is really bad.
+        # We should really try to get the keydata from another
+        # channel. There is key-selected signal. Maybe we can use that.
+        keydata = get_public_key_data(self.fpr)
+        mac = mac_generate(self.fpr, keydata)
+        # FIXME: We probably want to urlencode the thing...
+        data += '?mac=%s' % mac
+        log.info("Shoving %r to the QRCode", data)
         self.qrcode.data = data
 
 

@@ -23,7 +23,6 @@ import signal
 import sys
 
 from network.AvahiBrowser import AvahiBrowser
-from network.AvahiPublisher import AvahiPublisher
 
 from gi.repository import Gtk, GLib, Gio
 from KeySignSection import KeySignSection

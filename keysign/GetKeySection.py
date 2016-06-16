@@ -18,7 +18,7 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from urlparse import ParseResult
+from urlparse import urlparse, parse_qs, ParseResult
 from string import Template
 import shutil
 from subprocess import call
@@ -34,9 +34,6 @@ from monkeysign.gpg import GpgRuntimeError
 
 from compat import gtkbutton
 import Keyserver
-from KeysPage import KeysPage
-from KeyPresent import KeyPresentPage
-from SignPages import KeyDetailsPage
 from SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 
 import key
@@ -48,7 +45,8 @@ from gi.repository import GdkX11
 from gi.repository import GstVideo
 
 from compat import monkeysign_expired_keys, monkeysign_revoked_keys
-import key
+
+from .util import mac_verify
 
 
 Gst.init([])
@@ -240,9 +238,6 @@ class GetKeySection(Gtk.VBox):
         self.app = app
         self.log = logging.getLogger()
 
-        # the temporary keyring we operate in
-        self.tmpkeyring = None
-
         self.scanPage = ScanFingerprintPage()
         self.signPage = SignKeyPage()
         # set up notebook container
@@ -306,12 +301,34 @@ class GetKeySection(Gtk.VBox):
         return cleaned
 
 
+    def parse_barcode(self, barcode_string):
+        """Parses information contained in a barcode
+
+        It returns a dict with the parsed attributes.
+        We expect the dict to contain at least a 'fingerprint'
+        entry. Others might be added in the future.
+        """
+        # The string, currently, is of the form
+        # openpgp4fpr:foobar?baz=qux
+        # Which urlparse handles perfectly fine.
+        p = urlparse(barcode_string)
+        fpr = p.path
+        q = p.query
+        rest = parse_qs(q)
+        # We should probably ensure that we have only one
+        # item for each parameter and flatten them accordingly.
+        rest['fingerprint'] = fpr
+
+        return rest
+
+
     def on_barcode(self, sender, barcode, message, image):
         '''This is connected to the "barcode" signal.
         The message argument is a GStreamer message that created
         the barcode.'''
 
-        fpr = self.strip_fingerprint(barcode)
+        parsed = self.parse_barcode(barcode)
+        fpr = parsed['fingerprint']
 
         if fpr != None:
             try:
@@ -320,7 +337,7 @@ class GetKeySection(Gtk.VBox):
                 self.log.exception("Could not create key from %s", barcode)
             else:
                 self.log.info("Barcode signal %s %s" %( pgpkey.fingerprint, message))
-                self.on_button_clicked(self.nextButton, pgpkey, message, image)
+                self.on_button_clicked(self.nextButton, pgpkey, message, image, parsed_barcode=parsed)
         else:
             self.log.error("data found in barcode does not match a OpenPGP fingerprint pattern: %s", barcode)
 
@@ -348,18 +365,22 @@ class GetKeySection(Gtk.VBox):
                 self.log.exception("While downloading key from %s %i",
                                     address, port)
 
-    def verify_downloaded_key(self, downloaded_data, fingerprint):
-        # FIXME: implement a better and more secure way to verify the key
-        if self.tmpkeyring.import_data(downloaded_data):
-            imported_key_fpr = self.tmpkeyring.get_keys().keys()[0]
-            if imported_key_fpr == fingerprint:
-                result = True
-            else:
-                self.log.info("Key does not have equal fp: %s != %s", imported_key_fpr, fingerprint)
-                result = False
+    def verify_downloaded_key(self, downloaded_data, fingerprint, mac=None):
+        log.info("Verifying key %r with mac %r", fingerprint, mac)
+        if mac:
+            result = mac_verify(fingerprint, downloaded_data, mac)
         else:
-            self.log.info("Failed to import downloaded data")
-            result = False
+            tmpkeyring = TemporaryKeyring()
+            if tmpkeyring.import_data(downloaded_data):
+                imported_key_fpr = tmpkeyring.get_keys().keys()[0]
+                if imported_key_fpr == fingerprint:
+                    result = True
+                else:
+                    self.log.info("Key does not have equal fp: %s != %s", imported_key_fpr, fingerprint)
+                    result = False
+            else:
+                self.log.info("Failed to import downloaded data")
+                result = False
 
         self.log.debug("Trying to validate %s against %s: %s", downloaded_data, fingerprint, result)
         return result
@@ -370,18 +391,15 @@ class GetKeySection(Gtk.VBox):
         self.log.info("Check if list is sorted '%s'", clients)
         return clients
 
-    def obtain_key_async(self, fingerprint, callback=None, data=None, error_cb=None):
+    def obtain_key_async(self, fingerprint, callback=None, data=None, mac=None, error_cb=None):
+        self.log.debug("Obtaining key %r with mac %r", fingerprint, mac)
         other_clients = self.app.discovered_services
         self.log.debug("The clients found on the network: %s", other_clients)
-
-        #FIXME: should we create a new TempKeyring for each key we want
-        # to sign it ?
-        self.tmpkeyring = TempKeyring()
 
         other_clients = self.sort_clients(other_clients, fingerprint)
 
         for keydata in self.try_download_keys(other_clients):
-            if self.verify_downloaded_key(keydata, fingerprint):
+            if self.verify_downloaded_key(keydata, fingerprint, mac):
                 is_valid = True
             else:
                 is_valid = False
@@ -588,14 +606,22 @@ class GetKeySection(Gtk.VBox):
                 # free()d although I keep a reference here.
                 self.scanned_image = image.copy() if image else None
 
+                # We also may have received a parsed_barcode" argument
+                # with more information about the key to be retrieved
+                barcode_information = kwargs.get("parsed_barcode", {})
+                mac = barcode_information.get('mac', [None])[0] # This is a hack while the list is not flattened
+                self.log.info("Transferred MAC via barcode: %r", mac)
+
                 # error callback function
                 err = lambda x: self.signPage.mainLabel.set_markup('<span size="15000">'
                         'Error downloading key with fpr\n{}</span>'
                         .format(fingerprint))
                 # use GLib.idle_add to use a separate thread for the downloading of
-                # the keydata
-                GLib.idle_add(self.obtain_key_async, fingerprint, self.recieved_key,
-                        fingerprint, err)
+                # the keydata.
+                # Note that idle_add does not seem to take kwargs...
+                # So we work around by cosntructing an anonymous function
+                GLib.idle_add(lambda: self.obtain_key_async(fingerprint, self.recieved_key,
+                        fingerprint, mac=mac, error_cb=err))
 
 
             if page_index == 2:
@@ -614,5 +640,7 @@ class GetKeySection(Gtk.VBox):
     def recieved_key(self, fingerprint, keydata, *data):
         self.received_key_data = keydata
         image = self.scanned_image
-        openpgpkey = self.tmpkeyring.get_keys(fingerprint).values()[0]
+        tmpkeyring = TempKeyring()
+        tmpkeyring.import_data(keydata)
+        openpgpkey = tmpkeyring.get_keys(fingerprint).values()[0]
         self.signPage.display_downloaded_key(openpgpkey, fingerprint, image)
