@@ -29,6 +29,10 @@ def main():
     
     from .MainWindow import MainWindow
 
+    logging.basicConfig(stream=sys.stderr,
+        level=logging.DEBUG,
+        format='%(name)s (%(levelname)s): %(message)s')
+
     app = MainWindow()
 
     try:
@@ -43,8 +47,5 @@ def main():
 
 
 if __name__ == '__main__':
-    logging.basicConfig(stream=sys.stderr,
-        level=logging.DEBUG,
-        format='%(name)s (%(levelname)s): %(message)s')
     sys.exit(main())
 
