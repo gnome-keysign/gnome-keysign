@@ -56,7 +56,7 @@ Gst.init([])
 FPR_PREFIX = "OPENPGP4FPR:"
 progress_bar_text = ["Step 1: Scan QR Code or type fingerprint and click on 'Download' button",
                      "Step 2: Compare the received fpr with the owner's fpr and click 'Sign'",
-                     "Step 3: Key was succesfully signed and an email was send to owner."]
+                     "Step 3: Key was succesfully signed and an email was sent to the owner."]
 
 
 SUBJECT = 'Your signed key $fingerprint'
