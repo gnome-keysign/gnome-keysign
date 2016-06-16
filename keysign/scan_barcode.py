@@ -239,7 +239,17 @@ class BarcodeReaderGTK(BarcodeReader, Gtk.DrawingArea):
         window = self.get_property('window')
         # If you have not requested a size, the window might not exist
         assert window, "Window is %s (%s), but not a window" % (window, type(window))
-        self._x_window_id = xid = window.get_xid()
+        if "X11" in window.__format__(""):
+            xid = window.get_xid()
+        elif "Wayland" in window.__format__(""):
+            self.window_xid = 0
+        else:
+            log.warning("Don't know how to handle windowing system %r",
+                        window.__format__(""))
+            self.window_xid = 0
+
+
+        self._x_window_id = xid
         return xid
 
     def on_message(self, bus, message):
