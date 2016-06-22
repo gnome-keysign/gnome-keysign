@@ -1,2 +1,6 @@
 *.swp
 *.pyc
+*.bak
+/build
+/dist
+/gnome_keysign.egg-info
