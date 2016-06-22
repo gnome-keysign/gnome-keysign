@@ -370,7 +370,7 @@ class GetKeySection(Gtk.VBox):
         if mac:
             result = mac_verify(fingerprint, downloaded_data, mac)
         else:
-            tmpkeyring = TemporaryKeyring()
+            tmpkeyring = TempKeyring()
             if tmpkeyring.import_data(downloaded_data):
                 imported_key_fpr = tmpkeyring.get_keys().keys()[0]
                 if imported_key_fpr == fingerprint:
