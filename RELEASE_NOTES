@@ -1,20 +1,18 @@
 GNOME Keysign is a tool to make signing OpenPGP keys as easy as possible.
-This is the v0.5 release which 
+This is the v0.6 release which fixes a few bugs and increases py3k
+compatibilty.
 
 Changes
 ==========
 
- * Replace qrencode with python-qrcode
- * Defend against a network attacker by MACing
-   the data to be transferred
- * Defend against someone who could inject just
-   one frame by displaying the image which caused
-   a barcode to be decoded.
+ * Fixed manually typing the fingerprint
+ * Made gsignal definitions use str() for names
+ * Got rid of warning from gi when importing
 
 
 Resources
 =========
 
-Download: https://github.com/muelli/geysigning/releases/download/0.5/gnome-keysign-0.5.tar.gz
+Download: https://github.com/muelli/geysigning/releases/download/0.5/gnome-keysign-0.6.tar.gz
 sha256sum:
 Web site: https://wiki.gnome.org/GnomeKeysign
