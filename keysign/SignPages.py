@@ -206,7 +206,7 @@ class KeyDetailsPage(Gtk.VBox):
         try:
             exp_date = datetime.fromtimestamp(float(openPgpKey.expiry))
             expiry = "Expires {:%Y-%m-%d %H:%M:%S}".format(exp_date)
-        except ValueError, e:
+        except ValueError as e:
             expiry = "No expiration date"
 
         self.expireLabel.set_markup(expiry)
