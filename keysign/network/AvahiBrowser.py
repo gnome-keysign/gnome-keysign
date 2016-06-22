@@ -17,6 +17,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
+from __future__ import print_function
 import avahi, dbus
 from dbus import DBusException
 from dbus.mainloop.glib import DBusGMainLoop
@@ -122,8 +123,8 @@ class AvahiBrowser(GObject.GObject):
 
 
     def on_error(self, *args):
-        print 'error_handler'
-        print args[0]
+        print('error_handler')
+        print(args[0])
 
 
 def main():
@@ -134,7 +135,7 @@ def main():
     ab = AvahiBrowser()
 
     def print_signal(*args):
-        print "Signal ahoi", args
+        print("Signal ahoi", args)
 
     ab.connect('new_service', print_signal)
     ab.connect('remove_service', print_signal)
