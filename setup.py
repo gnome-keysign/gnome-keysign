@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 #
 
-from keysign import __version__ as version
-
 from setuptools import setup
 from setuptools.command.install import install
 #import py2exe
 import sys
 
+# This should define __version__
+with open('keysign/_version.py') as f: exec(f.read())
+
 
 setup(
     name = 'gnome-keysign',
-    version = version,
+    version = __version__,
     description = 'OpenPGP key signing helper',
     author = 'Tobias Mueller',
     author_email = 'tobiasmue@gnome.org',

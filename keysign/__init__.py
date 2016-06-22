@@ -16,8 +16,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
-__version__ = '0.5'
-
+from ._version import __version__
 
 def main():
     # These imports were moved here because the keysign module
