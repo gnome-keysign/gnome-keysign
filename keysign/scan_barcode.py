@@ -23,6 +23,9 @@ import signal
 import sys
 
 import cairo
+import gi
+gi.require_version('Gst', '1.0')
+gi.require_version('GstVideo', '1.0')
 from gi.repository import GObject
 from gi.repository import Gst
 from gi.repository import Gtk, GLib
@@ -220,11 +223,11 @@ class BarcodeReader(object):
 class BarcodeReaderGTK(BarcodeReader, Gtk.DrawingArea):
 
     __gsignals__ = {
-        'barcode': (GObject.SIGNAL_RUN_LAST, None,
-                    (str, # The barcode string
-                     Gst.Message.__gtype__, # The GStreamer message itself
-                     GdkPixbuf.Pixbuf.__gtype__, # The pixbuf which caused the
-                                                 # above string to be decoded
+        str('barcode'): (GObject.SIGNAL_RUN_LAST, None,
+                        (str, # The barcode string
+                         Gst.Message.__gtype__, # The GStreamer message itself
+                         GdkPixbuf.Pixbuf.__gtype__, # The pixbuf which caused
+                                              # the above string to be decoded
                     ),
                    )
     }

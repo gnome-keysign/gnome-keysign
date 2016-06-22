@@ -25,6 +25,8 @@ def main():
     # imports the __version__
     import logging, sys, signal
     
+    import gi
+    gi.require_version('Gtk', '3.0')
     from gi.repository import GLib, Gtk
     
     from .MainWindow import MainWindow

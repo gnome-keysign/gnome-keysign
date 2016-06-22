@@ -113,8 +113,8 @@ class QRImage(Gtk.DrawingArea):
         stride = (size + 3) / 4 * 4
         data = bytearray(stride * size)
 
-        for x in xrange(size):
-            for y in xrange(size):
+        for x in range(size):
+            for y in range(size):
                 if matrix[x][y]:
                     data[x + y * stride] = 0xff
 
