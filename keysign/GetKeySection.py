@@ -343,7 +343,7 @@ class GetKeySection(Gtk.VBox):
             try:
                 keydata = self.download_key_http(address, port)
                 yield keydata
-            except ConnectionError, e:
+            except ConnectionError as e:
                 # FIXME : We probably have other errors to catch
                 self.log.exception("While downloading key from %s %i",
                                     address, port)
