@@ -140,7 +140,7 @@ class ServeKeyThread(Thread):
                 log.info('Trying to add Avahi Service')
                 ap.add_service()
 
-            except socket.error, value:
+            except socket.error as value:
                 errno = value.errno
                 if errno == 10054 or errno == 32:
                     # This seems to be harmless
