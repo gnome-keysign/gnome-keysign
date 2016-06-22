@@ -133,7 +133,7 @@ class KeyPresentPage(Gtk.HBox):
         the fingerprint with a formatted version.
         '''
         fpr = ""
-        for i in xrange(0, len(fingerprint), 4):
+        for i in range(0, len(fingerprint), 4):
 
             fpr += fingerprint[i:i+4]
             if i != 0 and (i+4) % 20 == 0:
