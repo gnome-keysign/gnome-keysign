@@ -63,10 +63,10 @@ if getattr(avahi, 'txt_array_to_dict', None) is None:
 
 class AvahiBrowser(GObject.GObject):
     __gsignals__ = {
-        'new_service': (GObject.SIGNAL_RUN_LAST, None,
+        str('new_service'): (GObject.SIGNAL_RUN_LAST, None,
             # name, address (could be an int too (for IPv4)), port, txt_dict
             (str, str, int, object)),
-        'remove_service': (GObject.SIGNAL_RUN_LAST, None,
+        str('remove_service'): (GObject.SIGNAL_RUN_LAST, None,
             # string 'remove'(placeholder: tuple element must be sequence), name
             (str, str)),
     }

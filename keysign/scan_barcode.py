@@ -220,11 +220,11 @@ class BarcodeReader(object):
 class BarcodeReaderGTK(BarcodeReader, Gtk.DrawingArea):
 
     __gsignals__ = {
-        'barcode': (GObject.SIGNAL_RUN_LAST, None,
-                    (str, # The barcode string
-                     Gst.Message.__gtype__, # The GStreamer message itself
-                     GdkPixbuf.Pixbuf.__gtype__, # The pixbuf which caused the
-                                                 # above string to be decoded
+        str('barcode'): (GObject.SIGNAL_RUN_LAST, None,
+                        (str, # The barcode string
+                         Gst.Message.__gtype__, # The GStreamer message itself
+                         GdkPixbuf.Pixbuf.__gtype__, # The pixbuf which caused
+                                              # the above string to be decoded
                     ),
                    )
     }
