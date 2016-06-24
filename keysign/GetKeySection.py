@@ -164,7 +164,8 @@ class TempKeyringCopy(TempKeyring):
 def fingerprint_for_key(keydata):
     '''Return the OpenPGP Fingerprint for a given key'''
     keyring = TempKeyring()
-    keyring.import_data(keydata)
+    if not keyring.import_data(keydata):
+        raise ValueError("Could not import %r", keydata)
     # As we have imported only one key, we should also
     # only have one key at our hands now.
     keys = keyring.get_keys()
