@@ -161,8 +161,8 @@ class TempKeyringCopy(TempKeyring):
 
 
 
-def fingerprint_for_key(keydata):
-    '''Return the OpenPGP Fingerprint for a given key'''
+def openpgpkey_from_data(keydata):
+    "Creates an OpenPGP object from given data"
     keyring = TempKeyring()
     if not keyring.import_data(keydata):
         raise ValueError("Could not import %r", keydata)
@@ -181,9 +181,17 @@ def fingerprint_for_key(keydata):
         # more legible.
         fpr_key = list(keys.items())[0]
         # is composed of the fpr as key and an OpenPGP key as value
-        fpr = fpr_key[0]
-        log.debug('Returning fingerprint %s', fpr)
-        return fpr
+        key = fpr_key[1]
+        return key
+
+
+# FIXME: We should rename that to "from_data"
+#        otherwise someone might think we operate on
+#        a key rather than bytes.
+def fingerprint_for_key(keydata):
+    '''Returns the OpenPGP Fingerprint for a given key'''
+    openpgpkey = openpgpkey_from_data(keydata)
+    return openpgpkey.fpr
 
 
 def get_usable_keys(keyring, *args, **kwargs):
@@ -219,6 +227,8 @@ def get_usable_secret_keys(keyring, pattern=None):
 
     log.info('Returning usable private keys: %s', usable_keys)
     return usable_keys
+
+
 
 
 ## Monkeypatching to get more debug output
