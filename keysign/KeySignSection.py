@@ -98,7 +98,7 @@ class KeySignSection(Gtk.VBox):
         '''
         log.debug('User selected key %s', keyid)
 
-        key = self.keyring.get_keys(keyid).values()[0]
+        key = list(self.keyring.get_keys(keyid).values())[0]
 
         keyid = key.keyid()
         fpr = key.fpr
