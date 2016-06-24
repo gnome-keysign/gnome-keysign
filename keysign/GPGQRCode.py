@@ -19,6 +19,9 @@
 """This is a very simple QR Code generator which scans your GnuPG keyring
 for keys and selects the one matching your input
 """
+
+import gi
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 from monkeysign.gpg import Keyring
 
