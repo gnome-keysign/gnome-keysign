@@ -198,9 +198,12 @@ class KeysPage(Gtk.VBox):
         #signatures_label = Gtk.Label(label='{sigs} signatures'.format(**ctx))
         publish_button = Gtk.Button(label='Go ahead!'.format(**ctx))
         publish_button.connect('clicked', self.on_publish_button_clicked, key)
-        map(pane.add, (keyid_label, expiration_label,
-                       #signatures_label,
-                       publish_button,))
+        for w in (keyid_label
+                  , expiration_label
+                  #, signatures_label
+                  , publish_button
+                  ):
+            pane.add(w)
         pane.show_all()
 
 
