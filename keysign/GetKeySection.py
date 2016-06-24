@@ -108,10 +108,11 @@ def MinimalExport(keydata):
     log.debug("Returned %s after importing %r", ret, keydata)
     assert ret
     tmpkeyring.context.set_option('export-options', 'export-minimal')
-    keys = tmpkeyring.get_keys()
-    log.debug("Keys after importing: %s (%s)", keys, keys.items())
+    keys_dict = tmpkeyring.get_keys()
     # We assume the keydata to contain one key only
-    fingerprint, key = keys.items()[0]
+    keys = list(keys_dict.items())
+    log.debug("Keys after importing: %s (%s)", keys, keys)
+    fingerprint, key = keys[0]
     stripped_key = tmpkeyring.export_data(fingerprint)
     return stripped_key
 
@@ -164,13 +165,22 @@ def fingerprint_for_key(keydata):
     '''Return the OpenPGP Fingerprint for a given key'''
     keyring = TempKeyring()
     keyring.import_data(keydata)
+    # As we have imported only one key, we should also
+    # only have one key at our hands now.
     keys = keyring.get_keys()
     if len(keys) > 1:
         log.debug('Operation on keydata "%s" failed', keydata)
         raise ValueError("Cannot give the fingerprint for more than "
             "one key: %s", keys)
     else:
-        fpr = keys.items()[0][0]
+        # The first (key, value) pair in the keys dict
+        # next(iter(keys.items()))[0] might be semantically
+        # more correct than list(d.items()) as we don't care
+        # much about having a list created, but I think it's
+        # more legible.
+        fpr_key = list(keys.items())[0]
+        # is composed of the fpr as key and an OpenPGP key as value
+        fpr = fpr_key[0]
         log.debug('Returning fingerprint %s', fpr)
         return fpr
 
@@ -189,7 +199,7 @@ def get_usable_keys(keyring, *args, **kwargs):
         return not unusable
     keys_fpr = keys_dict.items()
     keys = keys_dict.values()
-    usable_keys = filter(is_usable, keys)
+    usable_keys = [key for key in keys if is_usable(key)]
 
     log.debug('Identified usable keys: %s', usable_keys)
     return usable_keys
