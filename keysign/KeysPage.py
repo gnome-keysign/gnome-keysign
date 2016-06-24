@@ -46,11 +46,11 @@ class KeysPage(Gtk.VBox):
     selection public.
     '''
     __gsignals__ = {
-        'key-selected': (GObject.SIGNAL_RUN_LAST, None,
+        str('key-selected'): (GObject.SIGNAL_RUN_LAST, None,
                          # Hm, this is a str for now, but ideally
                          # it'd be the full key object
                          (str,)),
-        'key-selection-changed': (GObject.SIGNAL_RUN_LAST, None,
+        str('key-selection-changed'): (GObject.SIGNAL_RUN_LAST, None,
                          # Hm, this is a str for now, but ideally
                          # it'd be the full key object
                          (str,)),
