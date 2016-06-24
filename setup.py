@@ -4,10 +4,15 @@
 from setuptools import setup
 from setuptools.command.install import install
 #import py2exe
+import os
 import sys
 
-# This should define __version__
-with open('keysign/_version.py') as f: exec(f.read())
+# Just in case we're attempting to execute this setup.py
+# when cwd != thisdir...
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
+with open(os.path.join('keysign', '_version.py')) as f:
+    # This should define __version__
+    exec(f.read())
 
 
 setup(
