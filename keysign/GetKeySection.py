@@ -381,17 +381,17 @@ class GetKeySection(Gtk.VBox):
         if mac:
             result = mac_verify(fingerprint, downloaded_data, mac)
         else:
-            tmpkeyring = TempKeyring()
-            if tmpkeyring.import_data(downloaded_data):
-                imported_key_fpr = tmpkeyring.get_keys().keys()[0]
+            try:
+                imported_key_fpr = fingerprint_for_key(downloaded_data)
+            except ValueError:
+                self.log.exception("Failed to import downloaded data")
+                result = False
+            else:
                 if imported_key_fpr == fingerprint:
                     result = True
                 else:
                     self.log.info("Key does not have equal fp: %s != %s", imported_key_fpr, fingerprint)
                     result = False
-            else:
-                self.log.info("Failed to import downloaded data")
-                result = False
 
         self.log.debug("Trying to validate %s against %s: %s", downloaded_data, fingerprint, result)
         return result
