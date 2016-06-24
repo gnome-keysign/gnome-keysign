@@ -18,10 +18,14 @@
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
-import BaseHTTPServer
+try:
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+    from socketserver import ThreadingMixIn
+except ImportError:
+    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+    from SocketServer import ThreadingMixIn
 import logging
 import socket
-from SocketServer import ThreadingMixIn
 from threading import Thread
 
 # This is probably really bad...  But doing relative imports only
@@ -32,7 +36,7 @@ from network.AvahiPublisher import AvahiPublisher
 
 log = logging.getLogger()
 
-class KeyRequestHandlerBase(BaseHTTPServer.BaseHTTPRequestHandler):
+class KeyRequestHandlerBase(BaseHTTPRequestHandler):
     '''This is the "base class" which needs to be given access
     to the key to be served. So you will not use this class,
     but create a use one inheriting from this class. The subclass
@@ -54,7 +58,7 @@ class KeyRequestHandlerBase(BaseHTTPServer.BaseHTTPRequestHandler):
         self.end_headers()
         return kd
 
-class ThreadedKeyserver(ThreadingMixIn, BaseHTTPServer.HTTPServer):
+class ThreadedKeyserver(ThreadingMixIn, HTTPServer):
     '''The keyserver in a threaded fashion'''
     address_family = socket.AF_INET6
 
@@ -62,7 +66,7 @@ class ThreadedKeyserver(ThreadingMixIn, BaseHTTPServer.HTTPServer):
         if issubclass(self.__class__, object):
             super(ThreadedKeyserver, self).__init__(*args, **kwargs)
         else:
-            BaseHTTPServer.HTTPServer.__init__(self, server_address, *args, **kwargs)
+            HTTPServer.__init__(self, server_address, *args, **kwargs)
             # WTF? There is no __init__..?
             # ThreadingMixIn.__init__(self, server_address, *args, **kwargs)
 
@@ -70,7 +74,7 @@ class ThreadedKeyserver(ThreadingMixIn, BaseHTTPServer.HTTPServer):
             # Override this method to be sure v6only is false: we want to
             # listen to both IPv4 and IPv6!
             self.socket.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_V6ONLY, False)
-            BaseHTTPServer.HTTPServer.server_bind(self)
+            HTTPServer.server_bind(self)
 
 
 
