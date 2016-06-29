@@ -20,7 +20,6 @@
 from itertools import islice
 import logging
 import sys
-import StringIO
 
 from gi.repository import GObject, Gtk, GLib, GdkPixbuf
 from monkeysign.gpg import Keyring
