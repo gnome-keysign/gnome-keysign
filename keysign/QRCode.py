@@ -86,16 +86,21 @@ class QRImage(Gtk.DrawingArea):
         img_size = qrcode.get_width()
 
         cr.save()
-        # This seems to set a black background
-        # cr.set_source_rgb(0, 0, 0)
-        cr.set_source_rgb(1, 1, 1)
+        
+        # If background = 0xff then we have a white background.
+        # 0x00 is black.
+        background = 0xff
+        # We invert the background
+        foreground = 0xff ^ background
+        # This seems to set tje background,
+        # but I'm not sure...
+        cr.set_source_rgb(background, background, background)
         #cr.fill()
         # And have it painted
         cr.paint()
         # Now, I think we set the colour of the turtle
         # paint whatever is coming next.
-        #cr.set_source_rgb(1, 1, 1)
-        cr.set_source_rgb(0, 0, 0)
+        cr.set_source_rgb(foreground, foreground, foreground)
         # All of the rest I do not really understand,
         # but it seems to work reasonably well, without
         # weird PIL to Pixbuf hacks.
@@ -122,6 +127,10 @@ class QRImage(Gtk.DrawingArea):
         stride = (size + 3) / 4 * 4
         data = bytearray(stride * size)
 
+        background = 0xff
+        # We invert the background
+        foreground = 0xff ^ background
+
         for x in range(size):
             for y in range(size):
                 # Here we seem to be defining what
@@ -134,9 +143,9 @@ class QRImage(Gtk.DrawingArea):
                 # otherwise the generated code is diagonally
                 # mirrored.
                 if matrix[y][x]:
-                    data[x + y * stride] = 0xff
+                    data[x + y * stride] = background
                 else:
-                    data[x + y * stride] = 0x00
+                    data[x + y * stride] = foreground
 
         surface = cairo.ImageSurface.create_for_data(data, cairo.FORMAT_A8, size, size, stride)
 
