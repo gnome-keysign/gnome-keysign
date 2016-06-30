@@ -30,7 +30,7 @@ class QRImage(Gtk.DrawingArea):
     """
     
     def __init__(self, data='Default String', handle_events=True,
-                       *args, **kwargs):
+                       background=0xff, *args, **kwargs):
         """The QRImage widget inherits from Gtk.Image,
         but it probably cannot be used as one, as there
         is an event handler for resizing events which will
@@ -40,9 +40,17 @@ class QRImage(Gtk.DrawingArea):
         
         handle_events can be set to False if the fullscreen
         window should not be created on click.
+        
+        The background can be set to 0x00 (or 0xff) creating a
+        black (or white) background onto which the code is rendered.
         """
         super(QRImage, self).__init__(*args, **kwargs)
         self.log = logging.getLogger()
+
+        self.background = background
+        # We invert the background
+        self.foreground = 0xff ^ background
+
         # The data to be rendered
         self._surface = None
         self.data = data
@@ -86,12 +94,10 @@ class QRImage(Gtk.DrawingArea):
         img_size = qrcode.get_width()
 
         cr.save()
-        
-        # If background = 0xff then we have a white background.
-        # 0x00 is black.
-        background = 0xff
-        # We invert the background
-        foreground = 0xff ^ background
+
+        background = self.background
+        foreground = self.foreground
+
         # This seems to set tje background,
         # but I'm not sure...
         cr.set_source_rgb(background, background, background)
@@ -115,8 +121,7 @@ class QRImage(Gtk.DrawingArea):
 
         cr.restore()
 
-    @staticmethod
-    def create_qrcode(data):
+    def create_qrcode(self, data):
         log.debug('Encoding %s', data)
         code = qrcode.QRCode()
 
@@ -127,9 +132,8 @@ class QRImage(Gtk.DrawingArea):
         stride = (size + 3) / 4 * 4
         data = bytearray(stride * size)
 
-        background = 0xff
-        # We invert the background
-        foreground = 0xff ^ background
+        background = self.background
+        foreground = self.foreground
 
         for x in range(size):
             for y in range(size):
