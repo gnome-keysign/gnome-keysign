@@ -126,13 +126,13 @@ class BarcodeReader(object):
 
 
     def run(self):
-        p = "v4l2src "
+        p = "v4l2src \n"
         ## FIXME: When using an image, the recorded frame is somewhat
         ##        greenish.  I think we need to investigate that at some stage.
         #p = "uridecodebin uri=file:///tmp/qr.png "
-        p += " ! tee name=t "
-        p += "       t. ! queue ! videoconvert ! zbar %(attach_frame)s "
-        p += "       t. ! queue ! videoconvert ! xvimagesink name=imagesink"
+        p += " ! tee name=t \n"
+        p += "       t. ! queue ! videoconvert ! zbar %(attach_frame)s \n"
+        p += "       t. ! queue ! videoconvert ! xvimagesink name=imagesink \n"
 
         # It's getting ugly down here.  What these lines do is trying to
         # detect whether we have a new enough GStreamer, i.e. 1.6+, where
@@ -144,7 +144,7 @@ class BarcodeReader(object):
         # of the zbar element.
         pipeline_s = p % {
               # Without the fakesink the zbar element seems to not work
-              'attach_frame':'attach-frame=true !  fakesink'
+              'attach_frame':'attach-frame=true !  fakesink \n'
         }
         try:
             pipeline = Gst.parse_launch(pipeline_s)
@@ -158,9 +158,9 @@ class BarcodeReader(object):
                 log.info('Running with GStreamer <1.5.1, '
                          'using a (slow) pixbufsink')
                 pipeline_s = p % {
-                    'attach_frame':'  ! videoconvert  '
-                                     '! gdkpixbufsink name=pixbufsink '
-                                     '                post-messages=false '
+                    'attach_frame':'  ! videoconvert  \n'
+                                   '  ! gdkpixbufsink name=pixbufsink \n'
+                                   '                  post-messages=false \n'
                 }
                 try:
                     pipeline = Gst.parse_launch(pipeline_s)
