@@ -132,7 +132,7 @@ class BarcodeReader(object):
         #p = "uridecodebin uri=file:///tmp/qr.png "
         p += " ! tee name=t \n"
         p += "       t. ! queue ! videoconvert \n"
-        p += "                  ! zbar %(attach_frame)s \n"
+        p += "                  ! zbar cache=true %(attach_frame)s \n"
         p += "       t. ! queue ! videoconvert \n"
         p += "                  ! xvimagesink name=imagesink \n"
 
