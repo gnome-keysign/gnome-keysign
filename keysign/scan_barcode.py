@@ -131,8 +131,10 @@ class BarcodeReader(object):
         ##        greenish.  I think we need to investigate that at some stage.
         #p = "uridecodebin uri=file:///tmp/qr.png "
         p += " ! tee name=t \n"
-        p += "       t. ! queue ! videoconvert ! zbar %(attach_frame)s \n"
-        p += "       t. ! queue ! videoconvert ! xvimagesink name=imagesink \n"
+        p += "       t. ! queue ! videoconvert \n"
+        p += "                  ! zbar %(attach_frame)s \n"
+        p += "       t. ! queue ! videoconvert \n"
+        p += "                  ! xvimagesink name=imagesink \n"
 
         # It's getting ugly down here.  What these lines do is trying to
         # detect whether we have a new enough GStreamer, i.e. 1.6+, where
