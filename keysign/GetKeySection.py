@@ -122,7 +122,7 @@ class SplitKeyring(Keyring):
     def __init__(self, primary_keyring_fname, *args, **kwargs):
         # I don't think Keyring is inheriting from object,
         # so we can't use super()
-        Keyring.__init__(self, *args, **kwargs)
+        Keyring.__init__(self)   #  *args, **kwargs)
 
         self.context.set_option('primary-keyring', primary_keyring_fname)
         self.context.set_option('no-default-keyring')
