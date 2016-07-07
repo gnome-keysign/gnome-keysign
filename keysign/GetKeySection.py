@@ -18,6 +18,7 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+import os
 from urlparse import urlparse, parse_qs, ParseResult
 from string import Template
 import shutil
@@ -29,7 +30,7 @@ from requests.exceptions import ConnectionError
 
 import sys
 
-from monkeysign.gpg import Keyring, TempKeyring
+from monkeysign.gpg import Keyring
 from monkeysign.gpg import GpgRuntimeError
 
 from compat import gtkbutton
@@ -128,46 +129,60 @@ class SplitKeyring(Keyring):
         self.context.set_option('no-default-keyring')
 
 
-class TempKeyringCopy(TempKeyring):
-    """A temporary keyring which uses the secret keys of a parent keyring
-
-    It mainly copies the public keys from the parent keyring to this temporary
-    keyring and sets this keyring up such that it uses the secret keys of the
-    parent keyring.
+class TempKeyring(SplitKeyring):
+    """A temporary keyring which will be discarded after use
+    
+    It creates a temporary file which will be used for a SplitKeyring.
+    You may not necessarily be able to use this Keyring as is, because
+    gpg1.4 does not like using secret keys which is does not have the
+    public keys of in its pubkeyring.
+    
+    So you may not necessarily be able to perform operations with
+    the user's secret keys (like creating signatures).
     """
-    def __init__(self, keyring, *args, **kwargs):
-        self.keyring = keyring
+    def __init__(self, *args, **kwargs):
+        self.tempfile = NamedTemporaryFile(prefix='gpgpy')
+        self.fname = self.tempfile.name
+
+        SplitKeyring.__init__(self, primary_keyring_fname=self.fname,
+                                    *args, **kwargs)
+
+    def __del__(self):
+        try:
+            os.unlink(self.fname)
+        except:
+            # We could handle FileNotFoundError (=IOError) here,
+            # but we handle any exception while deleting gracefully
+            # as we're dealing with a temporary file which should
+            # be disposed by the system anyway relatively soon.
+            # Also, we don't have the guarantee of this function
+            # being called, anyway.
+            log.exception("Error when deleting %r", self.fname)
+
+
+class TempSigningKeyring(TempKeyring):
+    """A temporary keyring which uses the secret keys of a parent keyring
+    
+    Creates a temporary keyring which can use the orignal keyring's
+    secret keys.
+
+    In fact, this is not much different from a TempKeyring,
+    but gpg1.4 does not see the public keys for the secret keys when run with
+    --no-default-keyring and --primary-keyring.
+    So we copy the public parts of the secret keys into the primary keyring.
+    """
+    def __init__(self, base_keyring, *args, **kwargs):
         # Not a new style class...
         if issubclass(self.__class__, object):
-            super(TempKeyringCopy, self).__init__(*args, **kwargs)
+            super(TempSplitKeyring, self).__init__(*args, **kwargs)
         else:
             TempKeyring.__init__(self, *args, **kwargs)
 
-        self.log = logging.getLogger()
-
-        tmpkeyring = self
-        # Copy and paste job from monkeysign.ui.prepare
-        tmpkeyring.context.set_option('secret-keyring', keyring.homedir + '/secring.gpg')
-
-        # copy the gpg.conf from the real keyring
-        try:
-            from_ = keyring.homedir + '/gpg.conf'
-            to_ = tmpkeyring.homedir
-            shutil.copy(from_, to_)
-            self.log.debug('copied your gpg.conf from %s to %s', from_, to_)
-        except IOError as e:
-            # no such file or directory is alright: it means the use
-            # has no gpg.conf (because we are certain the temp homedir
-            # exists at this point)
-            if e.errno != 2:
-                pass
-
-
         # Copy the public parts of the secret keys to the tmpkeyring
-        signing_keys = []
-        for fpr, key in keyring.get_keys(None, secret=True, public=False).items():
-            signing_keys.append(key)
-            tmpkeyring.import_data (keyring.export_data (fpr))
+        for fpr, key in base_keyring.get_keys(None,
+                                              secret=True,
+                                              public=False).items():
+            self.import_data (base_keyring.export_data (fpr))
 
 
 
@@ -466,7 +481,7 @@ class GetKeySection(Gtk.VBox):
         keyring = Keyring()
         keyring.context.set_option('export-options', 'export-minimal')
 
-        tmpkeyring = TempKeyringCopy(keyring)
+        tmpkeyring = TempSigningKeyring(keyring)
         # Eventually, we want to let the user select their keys to sign with
         # For now, we just take whatever is there.
         secret_keys = get_usable_secret_keys(tmpkeyring)

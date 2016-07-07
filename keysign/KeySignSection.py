@@ -20,7 +20,7 @@
 import logging
 import sys
 
-from monkeysign.gpg import Keyring, TempKeyring
+from monkeysign.gpg import Keyring
 
 from KeysPage import KeysPage
 from KeyPresent import KeyPresentPage
@@ -32,6 +32,8 @@ from gi.repository import Gst, Gtk, GLib
 log = logging.getLogger()
 
 import key
+
+from .GetKeySection import TempKeyring
 
 class KeySignSection(Gtk.VBox):
 
