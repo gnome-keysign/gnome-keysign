@@ -244,7 +244,9 @@ def get_usable_secret_keys(keyring, pattern=None):
     
     Uses get_keys on the keyring and filters for
     non revoked, expired, disabled, or invalid keys'''
-    secret_keys_dict = keyring.get_keys(pattern=pattern, public=False, secret=True)
+    secret_keys_dict = keyring.get_keys(pattern=pattern,
+                                        public=False,
+                                        secret=True)
     secret_key_fprs = secret_keys_dict.keys()
     log.debug('Detected secret keys: %s', secret_key_fprs)
     usable_keys_fprs = filter(lambda fpr: get_usable_keys(keyring, pattern=fpr, public=True), secret_key_fprs)
