@@ -78,7 +78,9 @@ class KeysPage(Gtk.VBox):
 
         # FIXME: this should be a callback function to update the display
         # when a key is changed/deleted
-        for key in self.keyring.get_keys(None, secret=True, public=show_public_keys).values():
+        keys = self.keyring.get_keys(None, secret=True,
+                                           public=show_public_keys)
+        for fpr, key in keys.items():
             if key.invalid or key.disabled or key.expired or key.revoked:
                 continue
 
