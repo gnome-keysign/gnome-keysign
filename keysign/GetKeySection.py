@@ -141,23 +141,12 @@ class TempKeyring(SplitKeyring):
     the user's secret keys (like creating signatures).
     """
     def __init__(self, *args, **kwargs):
+        # A NamedTemporaryFile deletes the backing file
         self.tempfile = NamedTemporaryFile(prefix='gpgpy')
         self.fname = self.tempfile.name
 
         SplitKeyring.__init__(self, primary_keyring_fname=self.fname,
                                     *args, **kwargs)
-
-    def __del__(self):
-        try:
-            os.unlink(self.fname)
-        except:
-            # We could handle FileNotFoundError (=IOError) here,
-            # but we handle any exception while deleting gracefully
-            # as we're dealing with a temporary file which should
-            # be disposed by the system anyway relatively soon.
-            # Also, we don't have the guarantee of this function
-            # being called, anyway.
-            log.exception("Error when deleting %r", self.fname)
 
 
 class TempSigningKeyring(TempKeyring):
