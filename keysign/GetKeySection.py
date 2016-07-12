@@ -33,11 +33,15 @@ import sys
 from monkeysign.gpg import Keyring
 from monkeysign.gpg import GpgRuntimeError
 
-from compat import gtkbutton
-import Keyserver
-from SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
-
-import key
+from .compat import gtkbutton
+from .compat import monkeysign_expired_keys, monkeysign_revoked_keys
+from . import Keyserver
+from .KeysPage import KeysPage
+from .KeyPresent import KeyPresentPage
+from .SignPages import KeyDetailsPage
+from .SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
+from .util import mac_verify
+from . import key
 
 from gi.repository import Gst, Gtk, GLib
 # Because of https://bugzilla.gnome.org/show_bug.cgi?id=698005
@@ -45,9 +49,6 @@ from gi.repository import GdkX11
 # Needed for window.get_xid(), xvimagesink.set_window_handle(), respectively:
 from gi.repository import GstVideo
 
-from compat import monkeysign_expired_keys, monkeysign_revoked_keys
-
-from .util import mac_verify
 
 
 Gst.init([])

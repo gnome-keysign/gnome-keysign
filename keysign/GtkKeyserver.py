@@ -23,6 +23,7 @@ with the Gtk mainloop
 '''
 
 import logging
+import os
 import sys
 
 from threading import Thread
@@ -30,7 +31,18 @@ from gi.repository import GLib
 from gi.repository import Gtk
 from dbus.mainloop.glib import DBusGMainLoop
 
-import Keyserver
+if  __name__ == "__main__" and __package__ is None:
+    logging.getLogger().error("You seem to be trying to execute " +
+                              "this script directly which is discouraged. " +
+                              "Try python -m instead.")
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    os.sys.path.insert(0, parent_dir)
+    import keysign
+    #mod = __import__('keysign')
+    #sys.modules["keysign"] = mod
+    __package__ = str('keysign')
+
+from . import Keyserver
 
 class ServerWindow(Gtk.Window):
     def __init__(self):
