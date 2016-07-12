@@ -20,18 +20,19 @@
 import logging
 import sys
 
+from gi.repository import Gst, Gtk, GLib
+
 from monkeysign.gpg import Keyring, TempKeyring
 
-from KeysPage import KeysPage
-from KeyPresent import KeyPresentPage
-import Keyserver
-from SignPages import KeyDetailsPage
+from . import key
+from .KeyPresent import KeyPresentPage
+from . import Keyserver
+from .KeysPage import KeysPage
+from .SignPages import KeyDetailsPage
 
-from gi.repository import Gst, Gtk, GLib
 
 log = logging.getLogger()
 
-import key
 
 class KeySignSection(Gtk.VBox):
 
