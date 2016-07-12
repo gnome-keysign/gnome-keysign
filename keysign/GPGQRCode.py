@@ -21,6 +21,7 @@ for keys and selects the one matching your input
 """
 import logging
 import os
+import sys
 
 import gi
 gi.require_version("Gtk", "3.0")
@@ -66,4 +67,6 @@ def main():
     Gtk.main()
 
 if __name__ == '__main__':
+    logging.basicConfig(stream=sys.stderr, level=logging.DEBUG,
+                        format='%(name)s (%(levelname)s): %(message)s')
     main()
