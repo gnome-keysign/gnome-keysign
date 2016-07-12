@@ -31,7 +31,7 @@ from monkeysign.gpg import Keyring
 # These are relative imports
 from __init__ import __version__
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 
 class KeysPage(Gtk.VBox):
@@ -244,7 +244,7 @@ class Keys(Gtk.Application):
         self.connect("activate", self.on_activate)
         self.connect("startup", self.on_startup)
 
-        self.log = logging.getLogger()
+        self.log = logging.getLogger(__name__)
 
         self.keys_page = KeysPage()
         self.keys_page.connect('key-selection-changed',
