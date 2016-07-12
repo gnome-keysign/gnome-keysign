@@ -44,7 +44,7 @@ from .__init__ import __version__
 # FIXME: We should probably move KeyPresentPage to this file here
 from .SignPages import KeyPresentPage
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 
 
@@ -63,7 +63,7 @@ class KeyPresent(Gtk.Application):
         self.connect("activate", self.on_activate)
         self.connect("startup", self.on_startup)
 
-        self.log = logging.getLogger()
+        self.log = logging.getLogger(__name__)
 
         self.key_present_page = None
 

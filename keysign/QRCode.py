@@ -24,7 +24,7 @@ from gi.repository import Gdk, Gtk, GObject
 import qrcode
 import cairo
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 class QRImage(Gtk.DrawingArea):
     """An Image encoding data as a QR Code.
@@ -47,7 +47,7 @@ class QRImage(Gtk.DrawingArea):
         black (or white) background onto which the code is rendered.
         """
         super(QRImage, self).__init__(*args, **kwargs)
-        self.log = logging.getLogger()
+        self.log = logging.getLogger(__name__)
 
         self.background = background
         # We invert the background
@@ -188,7 +188,7 @@ class FullscreenQRImageWindow(Gtk.Window):
 
     def __init__(self, data, *args, **kwargs):
         '''The data will be passed to the QRImage'''
-        self.log = logging.getLogger()
+        self.log = logging.getLogger(__name__)
         if issubclass(self.__class__, object):
             super(FullscreenQRImageWindow, self).__init__(*args, **kwargs)
         else:

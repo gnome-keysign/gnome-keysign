@@ -77,7 +77,7 @@ GNOME Keysign
 
 # FIXME: This probably wants to go somewhere more central.
 # Maybe even into Monkeysign.
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 
 def UIDExport(uid, keydata):
@@ -274,7 +274,7 @@ class GetKeySection(Gtk.VBox):
         super(GetKeySection, self).__init__()
 
         self.app = app
-        self.log = logging.getLogger()
+        self.log = logging.getLogger(__name__)
 
         self.scanPage = ScanFingerprintPage()
         self.signPage = SignKeyPage()

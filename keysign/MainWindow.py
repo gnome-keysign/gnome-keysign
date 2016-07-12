@@ -36,9 +36,7 @@ class MainWindow(Gtk.Application):
         self.connect("activate", self.on_activate)
         self.connect("startup", self.on_startup)
 
-        self.log = logging.getLogger()
-        self.log = logging
-
+        self.log = logging.getLogger(__name__)
 
 
     def on_quit(self, app, param=None):

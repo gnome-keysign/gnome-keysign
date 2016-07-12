@@ -33,7 +33,7 @@ class AvahiPublisher:
             service_txt={},
             domain='',
             host=''):
-        self.log = logging.getLogger()
+        self.log = logging.getLogger(__name__)
         #self.loop = loop or DBusGMainLoop()
         self.bus = dbus.SystemBus()
         self.server = dbus.Interface(

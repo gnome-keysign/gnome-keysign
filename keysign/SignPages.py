@@ -35,7 +35,7 @@ from .util import mac_verify, mac_generate
 from .util import get_public_key_data
 
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 
 
@@ -170,7 +170,7 @@ class KeyDetailsPage(Gtk.VBox):
     def __init__(self):
         super(KeyDetailsPage, self).__init__()
         self.set_spacing(10)
-        self.log = logging.getLogger()
+        self.log = logging.getLogger(__name__)
 
         # FIXME: this should be moved to KeySignSection
         self.keyring = Keyring()
