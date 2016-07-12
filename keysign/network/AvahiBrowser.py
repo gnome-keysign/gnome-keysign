@@ -75,7 +75,7 @@ class AvahiBrowser(GObject.GObject):
     def __init__(self, loop=None, service='_geysign._tcp'):
         GObject.GObject.__init__(self)
 
-        self.log = logging.getLogger()
+        self.log = logging.getLogger(__name__)
         self.service = service
         # It seems that these are different loops..?!
         self.loop = loop or DBusGMainLoop()
