@@ -77,7 +77,7 @@ GNOME Keysign
 
 # FIXME: This probably wants to go somewhere more central.
 # Maybe even into Monkeysign.
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 
 def UIDExport(uid, keydata):
@@ -134,7 +134,7 @@ class TempKeyringCopy(TempKeyring):
         else:
             TempKeyring.__init__(self, *args, **kwargs)
 
-        self.log = logging.getLogger()
+        self.log = logging.getLogger(__name__)
 
         tmpkeyring = self
         # Copy and paste job from monkeysign.ui.prepare
@@ -238,7 +238,7 @@ class GetKeySection(Gtk.VBox):
         super(GetKeySection, self).__init__()
 
         self.app = app
-        self.log = logging.getLogger()
+        self.log = logging.getLogger(__name__)
 
         # the temporary keyring we operate in
         self.tmpkeyring = None
