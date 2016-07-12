@@ -35,7 +35,7 @@ from gi.repository import Gtk, GdkX11, GdkPixbuf
 from gi.repository import GdkX11, GstVideo
 from gi.repository import Gdk
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 
 
