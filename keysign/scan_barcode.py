@@ -149,6 +149,7 @@ class BarcodeReader(object):
               'attach_frame':'attach-frame=true !  fakesink \n'
         }
         try:
+            log.info("Launching pipeline %s", pipeline_s)
             pipeline = Gst.parse_launch(pipeline_s)
         except GLib.Error as e:
             if 'no property "attach-frame" in element' in e.message:
@@ -165,6 +166,7 @@ class BarcodeReader(object):
                                    '                  post-messages=false \n'
                 }
                 try:
+                    log.info("Launching pipeline %s", pipeline_s)
                     pipeline = Gst.parse_launch(pipeline_s)
                 except:
                     raise

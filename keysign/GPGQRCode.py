@@ -19,6 +19,9 @@
 """This is a very simple QR Code generator which scans your GnuPG keyring
 for keys and selects the one matching your input
 """
+
+import gi
+gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 from monkeysign.gpg import Keyring
 
@@ -31,7 +34,8 @@ def main():
     keys = keyring.get_keys(key)
     # Heh, we take the first key here. Maybe we should raise a warning
     # or so, when there is more than one key.
-    fpr = keys.items()[0][0]
+    key = next(iter(keys.items()))[1]
+    fpr = key.fpr
     data = 'OPENPGP4FPR:' + fpr
     
     w = Gtk.Window()
