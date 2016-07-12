@@ -32,7 +32,7 @@ from QRCode import QRImage
 from scan_barcode import BarcodeReaderGTK, ScalingImage
 
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 
 def parse_sig_list(text):
@@ -157,7 +157,7 @@ class KeyDetailsPage(Gtk.VBox):
     def __init__(self):
         super(KeyDetailsPage, self).__init__()
         self.set_spacing(10)
-        self.log = logging.getLogger()
+        self.log = logging.getLogger(__name__)
 
         # FIXME: this should be moved to KeySignSection
         self.keyring = Keyring()
