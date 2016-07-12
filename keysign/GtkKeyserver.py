@@ -46,7 +46,7 @@ from . import Keyserver
 
 class ServerWindow(Gtk.Window):
     def __init__(self):
-        self.log = logging.getLogger()
+        self.log = logging.getLogger(__name__)
 
         Gtk.Window.__init__(self, title="Gtk and Python threads")
         self.set_border_width(10)
@@ -85,7 +85,7 @@ class ServerWindow(Gtk.Window):
         self.keyserver.shutdown()
 
 def main(args):
-    log = logging.getLogger()
+    log = logging.getLogger(__name__)
     log.debug('Running main with args: %s', args)
     w = ServerWindow()
     w.show_all()
