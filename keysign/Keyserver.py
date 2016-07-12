@@ -30,7 +30,7 @@ from threading import Thread
 from __init__ import __version__
 from network.AvahiPublisher import AvahiPublisher
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 class KeyRequestHandlerBase(BaseHTTPServer.BaseHTTPRequestHandler):
     '''This is the "base class" which needs to be given access
