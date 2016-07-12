@@ -31,7 +31,7 @@ from .KeysPage import KeysPage
 from .SignPages import KeyDetailsPage
 
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 
 class KeySignSection(Gtk.VBox):
@@ -42,7 +42,7 @@ class KeySignSection(Gtk.VBox):
         '''
         super(KeySignSection, self).__init__()
 
-        self.log = logging.getLogger()
+        self.log = logging.getLogger(__name__)
         self.keyring = Keyring()
 
         # these are needed later when we need to get details about
