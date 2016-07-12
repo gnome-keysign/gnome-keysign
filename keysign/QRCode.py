@@ -25,7 +25,7 @@ from gi.repository import Gdk, Gtk, GObject
 import qrcode
 import cairo
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 class QRImage(Gtk.DrawingArea):
     """An Image encoding data as a QR Code.
@@ -45,7 +45,7 @@ class QRImage(Gtk.DrawingArea):
         window should not be created on click.
         """
         super(QRImage, self).__init__(*args, **kwargs)
-        self.log = logging.getLogger()
+        self.log = logging.getLogger(__name__)
         # The data to be rendered
         self._surface = None
         self.data = data
@@ -155,7 +155,7 @@ class FullscreenQRImageWindow(Gtk.Window):
 
     def __init__(self, data, *args, **kwargs):
         '''The data will be passed to the QRImage'''
-        self.log = logging.getLogger()
+        self.log = logging.getLogger(__name__)
         if issubclass(self.__class__, object):
             super(FullscreenQRImageWindow, self).__init__(*args, **kwargs)
         else:
