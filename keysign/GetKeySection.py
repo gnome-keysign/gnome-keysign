@@ -121,12 +121,13 @@ def MinimalExport(keydata):
 
 
 class SplitKeyring(Keyring):
-    def __init__(self, primary_keyring_fname, *args, **kwargs):
+    def __init__(self, primary_keyring_fname, trustdb_fname, *args, **kwargs):
         # I don't think Keyring is inheriting from object,
         # so we can't use super()
         Keyring.__init__(self)   #  *args, **kwargs)
 
         self.context.set_option('primary-keyring', primary_keyring_fname)
+        self.context.set_option('trustdb-name', trustdb_fname)
         self.context.set_option('no-default-keyring')
 
 
@@ -143,11 +144,26 @@ class TempKeyring(SplitKeyring):
     """
     def __init__(self, *args, **kwargs):
         # A NamedTemporaryFile deletes the backing file
-        self.tempfile = NamedTemporaryFile(prefix='gpgpy')
-        self.fname = self.tempfile.name
+        self.kr_tempfile = NamedTemporaryFile(prefix='gpgpy-')
+        self.kr_fname = self.kr_tempfile.name
+        self.tdb_tempfile = NamedTemporaryFile(prefix='gpgpy-tdb-',
+                                               delete=True)
+        self.tdb_fname = self.tdb_tempfile.name
+        # This should delete the file.
+        # Why are we doing it?  Well...
+        # Turns out that if you run gpg --trustdb-name with an
+        # empty file, it complains about an invalid trustdb.
+        # If, however, you give it a non-existent filename,
+        # it'll happily create a new trustdb.
+        # FWIW: Am empty trustdb file seems to be 40 bytes long,
+        # but the contents seems to be non-deterministic.
+        # Anyway, we'll leak the file :-/
+        self.tdb_tempfile.close()
 
-        SplitKeyring.__init__(self, primary_keyring_fname=self.fname,
+        SplitKeyring.__init__(self, primary_keyring_fname=self.kr_fname,
+                                    trustdb_fname=self.tdb_fname,
                                     *args, **kwargs)
+
 
 
 class TempSigningKeyring(TempKeyring):
@@ -180,7 +196,9 @@ def openpgpkey_from_data(keydata):
     "Creates an OpenPGP object from given data"
     keyring = TempKeyring()
     if not keyring.import_data(keydata):
-        raise ValueError("Could not import %r", keydata)
+        raise ValueError("Could not import %r  -  stdout: %r, stderr: %r",
+                         keydata,
+                         keyring.context.stdout, keyring.context.stderr)
     # As we have imported only one key, we should also
     # only have one key at our hands now.
     keys = keyring.get_keys()
