@@ -159,7 +159,7 @@ class KeyPresentPage(Gtk.HBox):
         keydata = get_public_key_data(self.fpr)
         mac = mac_generate(self.fpr, keydata)
         # FIXME: We probably want to urlencode the thing...
-        data += '?MAC=%s' % mac
+        data += '#MAC=%s' % mac
         # we call upper to made the barcode more efficient
         data = data.upper()
         log.info("Shoving %r to the QRCode", data)
