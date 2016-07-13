@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #    Copyright 2014 Andrei Macavei <andrei.macavei89@gmail.com>
-#    Copyright 2014 Tobias Mueller <muelli@cryptobitch.de>
 #    Copyright 2015 Jody Hansen <jobediah.hansen@gmail.com>
+#    Copyright 2016 Tobias Mueller <muelli@cryptobitch.de>
 #
 #    This file is part of GNOME Keysign.
 #
