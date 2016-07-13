@@ -25,13 +25,13 @@ log = logging.getLogger()
 
 
 def mac_generate(key, data):
-    mac = hmac.new(key, data).hexdigest()
+    mac = hmac.new(key, data).hexdigest().upper()
     log.info("MAC of %r is %r", data[:20], mac[:20])
     return mac
 
 def mac_verify(key, data, mac):
     computed_mac = mac_generate(key, data)
-    result = hmac.compare_digest(mac, computed_mac)
+    result = hmac.compare_digest(mac.upper(), computed_mac.upper())
     log.info("MAC of %r seems to be %r. Expected %r (%r)",
              data[:20], computed_mac[:20], mac[:20], result)
     return result
