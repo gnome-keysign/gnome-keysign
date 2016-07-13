@@ -647,7 +647,8 @@ class GetKeySection(Gtk.VBox):
                 # We also may have received a parsed_barcode" argument
                 # with more information about the key to be retrieved
                 barcode_information = kwargs.get("parsed_barcode", {})
-                mac = barcode_information.get('mac', [None])[0] # This is a hack while the list is not flattened
+                # FIXME: This is a hack while the list is not flattened
+                mac = barcode_information.get('MAC', [None])[0]
                 self.log.info("Transferred MAC via barcode: %r", mac)
 
                 # error callback function
