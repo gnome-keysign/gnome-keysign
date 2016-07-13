@@ -179,7 +179,9 @@ def openpgpkey_from_data(keydata):
     "Creates an OpenPGP object from given data"
     keyring = TempKeyring()
     if not keyring.import_data(keydata):
-        raise ValueError("Could not import %r", keydata)
+        raise ValueError("Could not import %r  -  stdout: %r, stderr: %r",
+                         keydata,
+                         keyring.context.stdout, keyring.context.stderr)
     # As we have imported only one key, we should also
     # only have one key at our hands now.
     keys = keyring.get_keys()
