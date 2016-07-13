@@ -22,11 +22,11 @@ import logging
 import signal
 import sys
 
-from network.AvahiBrowser import AvahiBrowser
-
 from gi.repository import Gtk, GLib, Gio
-from KeySignSection import KeySignSection
-from GetKeySection import GetKeySection
+
+from .network.AvahiBrowser import AvahiBrowser
+from .KeySignSection import KeySignSection
+from .GetKeySection import GetKeySection
 
 class MainWindow(Gtk.Application):
 
