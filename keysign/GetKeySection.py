@@ -347,16 +347,21 @@ class GetKeySection(Gtk.VBox):
         entry. Others might be added in the future.
         """
         # The string, currently, is of the form
-        # openpgp4fpr:foobar?baz=qux
+        # openpgp4fpr:foobar?baz=qux#frag=val
         # Which urlparse handles perfectly fine.
         p = urlparse(barcode_string)
+        self.log.debug("Parsed %r into %r", barcode_string, p)
         fpr = p.path
-        q = p.query
-        rest = parse_qs(q)
+        query = parse_qs(p.query)
+        fragments = parse_qs(p.fragment)
+        rest = {}
+        rest.update(query)
+        rest.update(fragments)
         # We should probably ensure that we have only one
         # item for each parameter and flatten them accordingly.
         rest['fingerprint'] = fpr
 
+        self.log.debug('Parsed barcode into %r', rest)
         return rest
 
 
