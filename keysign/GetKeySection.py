@@ -302,6 +302,7 @@ class GetKeySection(Gtk.VBox):
         self.notebook.append_page(self.signPage, None)
         self.notebook.append_page(PostSignPage(), None)
         self.notebook.set_show_tabs(False)
+        self.notebook.connect('switch_page', self.switch_page)
 
         # set up the progress bar
         self.progressBar = Gtk.ProgressBar()
@@ -336,6 +337,17 @@ class GetKeySection(Gtk.VBox):
         # A list holding references to temporary files which should probably
         # be cleaned up on exit...
         self.tmpfiles = []
+
+    def switch_page(self, notebook, page, page_num):
+        if page_num == 0:
+            self.backButton.set_sensitive(False)
+            self.nextButton.set_sensitive(True)
+        elif page_num == 2:
+            self.nextButton.set_sensitive(False)
+            self.backButton.set_sensitive(True)
+        elif page_num > 0 and page_num < 2:
+            self.backButton.set_sensitive(True)
+            self.nextButton.set_sensitive(True)
 
     def set_progress_bar(self):
         page_index = self.notebook.get_current_page()
