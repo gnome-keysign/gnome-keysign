@@ -511,8 +511,11 @@ class GetKeySection(Gtk.VBox):
                 # self.received_key_data will be set by the callback of the
                 # obtain_key function. At least it should...
                 # The data flow isn't very nice. It probably needs to be redone...
-                GLib.idle_add(self.sign_key_async, self.last_received_fingerprint,
-                    self.send_email, self.received_key_data)
+                f = lambda: self.sign_key_async(
+                                    fingerprint=self.last_received_fingerprint,
+                                    callback=self.send_email,
+                                    data=self.received_key_data)
+                GLib.idle_add(f)
 
 
         elif button == self.backButton:
