@@ -336,13 +336,6 @@ class GetKeySection(Gtk.VBox):
                     'We wanted to sign fingerprint "%s", received '
                     'keydata to operate on, but the key has fpr "%s".',
                     fingerprint, fpr)
-                
-        else: # Do we need this branch at all?
-            if fingerprint is None:
-                raise ValueError('You need to provide either keydata or a fpr')
-            self.log.debug("looking for key %s in your keyring", fingerprint)
-            keyring.context.set_option('export-options', 'export-minimal')
-            stripped_key = keyring.export_data(fingerprint)
 
         self.log.debug('Trying to import key\n%s', stripped_key)
         if tmpkeyring.import_data(stripped_key):
