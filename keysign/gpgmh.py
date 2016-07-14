@@ -177,10 +177,12 @@ def fingerprint_for_key(keydata):
     return openpgpkey.fpr
 
 
-def get_usable_keys(keyring, *args, **kwargs):
+def get_usable_keys(keyring=None, *args, **kwargs):
     '''Uses get_keys on the keyring and filters for
     non revoked, expired, disabled, or invalid keys'''
     log.debug('Retrieving keys for %s, %s', args, kwargs)
+    if keyring is None:
+        keyring = Keyring()
     keys_dict = keyring.get_keys(*args, **kwargs)
     assert keys_dict is not None, keyring.context.stderr
     def is_usable(key):
