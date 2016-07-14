@@ -326,16 +326,7 @@ class GetKeySection(Gtk.VBox):
         keydata = data or self.received_key_data
         if keydata:
             stripped_key = MinimalExport(keydata)
-            fpr = fingerprint_for_key(stripped_key)
-            if fingerprint is None:
-                # The user hasn't provided any data to operate on
-                fingerprint = fpr
-
-            if not fingerprint == fpr:
-                self.log.warning('Something strange is going on. '
-                    'We wanted to sign fingerprint "%s", received '
-                    'keydata to operate on, but the key has fpr "%s".',
-                    fingerprint, fpr)
+            fingerprint = fingerprint_for_key(stripped_key)
 
         self.log.debug('Trying to import key\n%s', stripped_key)
         if tmpkeyring.import_data(stripped_key):
