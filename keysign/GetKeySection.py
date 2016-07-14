@@ -311,8 +311,8 @@ class GetKeySection(Gtk.VBox):
 
 
 
-    def sign_key_async(self, fingerprint=None, callback=None, data=None, error_cb=None):
-        self.log.debug("I will sign key with fpr {}".format(fingerprint))
+    def sign_keydata(self, data, callback=None, error_cb=None):
+        "Signs OpenPGP keydata with your regular GnuPG secret keys"
 
         keyring = Keyring()
         keyring.context.set_option('export-options', 'export-minimal')
@@ -495,10 +495,9 @@ class GetKeySection(Gtk.VBox):
                 # self.received_key_data will be set by the callback of the
                 # obtain_key function. At least it should...
                 # The data flow isn't very nice. It probably needs to be redone...
-                f = lambda: self.sign_key_async(
-                                    fingerprint=self.last_received_fingerprint,
-                                    callback=self.send_email,
-                                    data=self.received_key_data)
+                f = lambda: self.sign_keydata(
+                                    data=self.received_key_data,
+                                    callback=self.send_email)
                 GLib.idle_add(f)
 
 
