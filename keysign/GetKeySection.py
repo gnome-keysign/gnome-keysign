@@ -230,7 +230,10 @@ class GetKeySection(Gtk.VBox):
             params='',
             query='',
             fragment='')
-        return requests.get(url.geturl()).text
+        self.log.debug("Starting HTTP request")
+        data = requests.get(url.geturl(), timeout=5).text
+        self.log.debug("finished downloading %d bytes", len(data))
+        return data
 
     def try_download_keys(self, clients):
         for client in clients:
