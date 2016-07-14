@@ -311,7 +311,7 @@ class GetKeySection(Gtk.VBox):
 
 
 
-    def sign_keydata(self, data, callback=None, error_cb=None):
+    def sign_keydata(self, data, callback=None):
         "Signs OpenPGP keydata with your regular GnuPG secret keys"
 
         keyring = Keyring()
@@ -399,12 +399,6 @@ class GetKeySection(Gtk.VBox):
             # 3.4. optionnally (-l), create a local signature and import in
             # local keyring
             # 4. trash the temporary keyring
-
-
-        else:
-            self.log.error('data found in barcode does not match a OpenPGP fingerprint pattern: %s', fingerprint)
-            if error_cb:
-                GLib.idle_add(error_cb, data)
 
         return False
 
