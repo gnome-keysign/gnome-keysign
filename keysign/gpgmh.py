@@ -199,11 +199,14 @@ def get_usable_keys(keyring=None, *args, **kwargs):
     return usable_keys
 
 
-def get_usable_secret_keys(keyring, pattern=None):
+
+def get_usable_secret_keys(keyring=None, pattern=None):
     '''Returns all secret keys which can be used to sign a key
     
     Uses get_keys on the keyring and filters for
     non revoked, expired, disabled, or invalid keys'''
+    if keyring is None:
+        keyring = Keyring()
     secret_keys_dict = keyring.get_keys(pattern=pattern,
                                         public=False,
                                         secret=True)
