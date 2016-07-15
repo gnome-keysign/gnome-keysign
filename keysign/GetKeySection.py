@@ -321,10 +321,9 @@ class GetKeySection(Gtk.VBox):
         secret_keys = get_usable_secret_keys(tmpkeyring)
         self.log.info('Signing with these keys: %s', secret_keys)
 
-        keydata = data or self.received_key_data
-        if keydata:
-            stripped_key = MinimalExport(keydata)
-            fingerprint = fingerprint_for_key(stripped_key)
+        keydata = data
+        stripped_key = MinimalExport(keydata)
+        fingerprint = fingerprint_for_key(stripped_key)
 
         self.log.debug('Trying to import key\n%s', stripped_key)
         if tmpkeyring.import_data(stripped_key):
