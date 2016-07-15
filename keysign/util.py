@@ -45,26 +45,26 @@ def get_public_key_data(fpr):
 
 
 def email_file(to, from_=None, subject=None,
-                   body=None,
-                   ccs=None, bccs=None,
-                   files=None, utf8=True):
-        cmd = ['xdg-email']
-        if utf8:
-            cmd += ['--utf8']
-        if subject:
-            cmd += ['--subject', subject]
-        if body:
-            cmd += ['--body', body]
-        for cc in ccs or []:
-            cmd += ['--cc', cc]
-        for bcc in bccs or []:
-            cmd += ['--bcc', bcc]
-        for file_ in files or []:
-            cmd += ['--attach', file_]
+               body=None,
+               ccs=None, bccs=None,
+               files=None, utf8=True):
+    cmd = ['xdg-email']
+    if utf8:
+        cmd += ['--utf8']
+    if subject:
+        cmd += ['--subject', subject]
+    if body:
+        cmd += ['--body', body]
+    for cc in ccs or []:
+        cmd += ['--cc', cc]
+    for bcc in bccs or []:
+        cmd += ['--bcc', bcc]
+    for file_ in files or []:
+        cmd += ['--attach', file_]
 
-        cmd += [to]
+    cmd += [to]
 
-        self.log.info("Running %s", cmd)
-        retval = call(cmd)
-        return retval
+    self.log.info("Running %s", cmd)
+    retval = call(cmd)
+    return retval
 
