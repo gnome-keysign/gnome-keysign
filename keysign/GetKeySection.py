@@ -22,7 +22,6 @@ import os
 from urlparse import urlparse, parse_qs, ParseResult
 from string import Template
 import shutil
-from subprocess import call
 from tempfile import NamedTemporaryFile
 
 import requests
