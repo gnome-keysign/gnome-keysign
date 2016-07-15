@@ -314,30 +314,32 @@ class GetKeySection(Gtk.VBox):
     def sign_keydata(self, data, callback=None):
         "Signs OpenPGP keydata with your regular GnuPG secret keys"
 
+        log = logging.getLogger(__name__ + ':sign_keydata')
+
         tmpkeyring = TempSigningKeyring()
         tmpkeyring.context.set_option('export-options', 'export-minimal')
         # Eventually, we want to let the user select their keys to sign with
         # For now, we just take whatever is there.
         secret_keys = get_usable_secret_keys(tmpkeyring)
-        self.log.info('Signing with these keys: %s', secret_keys)
+        log.info('Signing with these keys: %s', secret_keys)
 
         keydata = data
         stripped_key = MinimalExport(keydata)
         fingerprint = fingerprint_for_key(stripped_key)
 
-        self.log.debug('Trying to import key\n%s', stripped_key)
+        log.debug('Trying to import key\n%s', stripped_key)
         if tmpkeyring.import_data(stripped_key):
             # 3. for every user id (or all, if -a is specified)
             # 3.1. sign the uid, using gpg-agent
             keys = tmpkeyring.get_keys(fingerprint)
-            self.log.info("Found keys %s for fp %s", keys, fingerprint)
+            log.info("Found keys %s for fp %s", keys, fingerprint)
             assert len(keys) == 1, "We received multiple keys for fp %s: %s" % (fingerprint, keys)
             key = keys[fingerprint]
             uidlist = key.uidslist
             
             for secret_key in secret_keys:
                 secret_fpr = secret_key.fpr
-                self.log.info('Setting up to sign with %s', secret_fpr)
+                log.info('Setting up to sign with %s', secret_fpr)
                 # We need to --always-trust, because GnuPG would print
                 # warning about the trustdb.  I think this is because
                 # we have a newly signed key whose trust GnuPG wants to
@@ -346,17 +348,17 @@ class GetKeySection(Gtk.VBox):
                 tmpkeyring.context.set_option('local-user', secret_fpr)
                 # FIXME: For now, we sign all UIDs. This is bad.
                 ret = tmpkeyring.sign_key(uidlist[0].uid, signall=True)
-                self.log.info("Result of signing %s on key %s: %s", uidlist[0].uid, fingerprint, ret)
+                log.info("Result of signing %s on key %s: %s", uidlist[0].uid, fingerprint, ret)
 
 
             for uid in uidlist:
                 uid_str = uid.uid
-                self.log.info("Processing uid %s %s", uid, uid_str)
+                log.info("Processing uid %s %s", uid, uid_str)
 
                 # 3.2. export and encrypt the signature
                 # 3.3. mail the key to the user
                 signed_key = UIDExport(uid_str, tmpkeyring.export_data(uid_str))
-                self.log.info("Exported %d bytes of signed key", len(signed_key))
+                log.info("Exported %d bytes of signed key", len(signed_key))
                 # self.signui.tmpkeyring.context.set_option('armor')
                 tmpkeyring.context.set_option('always-trust')
                 encrypted_key = tmpkeyring.encrypt_data(data=signed_key, recipient=uid_str)
@@ -376,7 +378,7 @@ class GetKeySection(Gtk.VBox):
                 tmpfile = NamedTemporaryFile(prefix='gnome-keysign-', suffix='.asc')
                 self.tmpfiles.append(tmpfile)
                 filename = tmpfile.name
-                self.log.info('Writing keydata to %s', filename)
+                log.info('Writing keydata to %s', filename)
                 tmpfile.write(encrypted_key)
                 # Interesting, sometimes it would not write the whole thing out,
                 # so we better flush here
