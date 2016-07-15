@@ -314,10 +314,8 @@ class GetKeySection(Gtk.VBox):
     def sign_keydata(self, data, callback=None):
         "Signs OpenPGP keydata with your regular GnuPG secret keys"
 
-        keyring = Keyring()
-        keyring.context.set_option('export-options', 'export-minimal')
-
-        tmpkeyring = TempSigningKeyring(keyring)
+        tmpkeyring = TempSigningKeyring()
+        tmpkeyring.context.set_option('export-options', 'export-minimal')
         # Eventually, we want to let the user select their keys to sign with
         # For now, we just take whatever is there.
         secret_keys = get_usable_secret_keys(tmpkeyring)
