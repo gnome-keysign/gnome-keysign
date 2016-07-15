@@ -34,8 +34,6 @@ from .SignPages import KeyDetailsPage
 log = logging.getLogger(__name__)
 
 
-from .GetKeySection import TempKeyring
-
 class KeySignSection(Gtk.VBox):
 
     def __init__(self):
