@@ -64,7 +64,7 @@ def email_file(to, from_=None, subject=None,
 
     cmd += [to]
 
-    self.log.info("Running %s", cmd)
+    log.info("Running %s", cmd)
     retval = call(cmd)
     return retval
 
