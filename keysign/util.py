@@ -18,6 +18,7 @@
 
 import hmac
 import logging
+from subprocess import call
 
 from monkeysign.gpg import Keyring
 
