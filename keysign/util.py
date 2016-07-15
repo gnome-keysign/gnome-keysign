@@ -21,7 +21,7 @@ import logging
 
 from monkeysign.gpg import Keyring
 
-log = logging.getLogger()
+log = logging.getLogger(__name__)
 
 
 def mac_generate(key, data):
