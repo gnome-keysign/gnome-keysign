@@ -308,7 +308,7 @@ class GetKeySection(Gtk.VBox):
         return False
 
 
-    def sign_keydata(self, keydata, callback=None):
+    def sign_keydata_and_send(self, keydata, callback=None):
         log = logging.getLogger(__name__ + ':sign_keydata')
         fingerprint = fingerprint_for_key(keydata)
         # FIXME: We should rather use whatever GnuPG tells us
@@ -443,7 +443,7 @@ class GetKeySection(Gtk.VBox):
                 # self.received_key_data will be set by the callback of the
                 # obtain_key function. At least it should...
                 # The data flow isn't very nice. It probably needs to be redone...
-                f = lambda: self.sign_keydata(
+                f = lambda: self.sign_keydata_and_send(
                                     keydata=self.received_key_data,
                                     callback=self.send_email)
                 GLib.idle_add(f)

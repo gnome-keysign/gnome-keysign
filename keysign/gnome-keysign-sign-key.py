@@ -29,7 +29,7 @@ def main(args):
         raise ValueError("You need to give filesnames as args: %s" % args)
     for fname in args:
         data = open(fname, 'r').read()
-        w.sign_keydata(keydata=data)
+        w.sign_keydata_and_send(keydata=data)
 
 
 if __name__ == '__main__':
