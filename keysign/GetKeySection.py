@@ -77,10 +77,7 @@ GNOME Keysign
 log = logging.getLogger(__name__)
 
 
-from .gpgmh import UIDExport, MinimalExport
-from .gpgmh import Keyring, SplitKeyring, TempKeyring, TempSigningKeyring
 from .gpgmh import openpgpkey_from_data, fingerprint_for_key
-from .gpgmh import get_usable_secret_keys
 from .gpgmh import sign_keydata_and_encrypt
 
 
