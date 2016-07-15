@@ -309,6 +309,14 @@ class GetKeySection(Gtk.VBox):
 
 
     def sign_keydata_and_send(self, keydata, callback=None):
+        """Creates, encrypts, and send signatures for each UID on the key
+        
+        You are supposed to give OpenPGP data which will be passed
+        onto sign_keydata_and_encrypt.
+        
+        For the resulting signatures, emails are created and
+        sent via email_file.
+        """
         log = logging.getLogger(__name__ + ':sign_keydata')
         fingerprint = fingerprint_for_key(keydata)
         # FIXME: We should rather use whatever GnuPG tells us
