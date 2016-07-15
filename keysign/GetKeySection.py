@@ -309,12 +309,10 @@ class GetKeySection(Gtk.VBox):
         # keep adding this function to the loop until this func ret False
         return False
 
-
-
-    def sign_keydata(self, keydata, callback=None):
+    def sign_keydata_and_encrypt(self, keydata):
         "Signs OpenPGP keydata with your regular GnuPG secret keys"
 
-        log = logging.getLogger(__name__ + ':sign_keydata')
+        log = logging.getLogger(__name__ + ':sign_keydata_encrypt')
 
         tmpkeyring = TempSigningKeyring()
         tmpkeyring.context.set_option('export-options', 'export-minimal')
@@ -358,11 +356,24 @@ class GetKeySection(Gtk.VBox):
                 # 3.3. mail the key to the user
                 signed_key = UIDExport(uid_str, tmpkeyring.export_data(uid_str))
                 log.info("Exported %d bytes of signed key", len(signed_key))
+
                 # self.signui.tmpkeyring.context.set_option('armor')
                 tmpkeyring.context.set_option('always-trust')
                 encrypted_key = tmpkeyring.encrypt_data(data=signed_key, recipient=uid_str)
+                yield (uid.uid, encrypted_key)
 
-                keyid = str(key.keyid())
+
+    def sign_keydata(self, keydata, callback=None):
+        log = logging.getLogger(__name__ + ':sign_keydata')
+        fingerprint = fingerprint_for_key(keydata)
+        # FIXME: We should rather use whatever GnuPG tells us
+        keyid = fingerprint[-8:]
+        # We list() the signatures, because we believe that it's more
+        # acceptable if all key operations are done before we go ahead
+        # and spawn an email client.
+        for uid, encrypted_key in list(self.sign_keydata_and_encrypt(keydata)):
+                # FIXME: get rid of this redundant assignment
+                uid_str = uid
                 ctx = {
                     'uid' : uid_str,
                     'fingerprint': fingerprint,
