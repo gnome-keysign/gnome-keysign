@@ -81,6 +81,7 @@ from .gpgmh import UIDExport, MinimalExport
 from .gpgmh import Keyring, SplitKeyring, TempKeyring, TempSigningKeyring
 from .gpgmh import openpgpkey_from_data, fingerprint_for_key
 from .gpgmh import get_usable_secret_keys
+from .gpgmh import sign_keydata_and_encrypt
 
 
 
@@ -309,59 +310,6 @@ class GetKeySection(Gtk.VBox):
         # keep adding this function to the loop until this func ret False
         return False
 
-    def sign_keydata_and_encrypt(self, keydata):
-        "Signs OpenPGP keydata with your regular GnuPG secret keys"
-
-        log = logging.getLogger(__name__ + ':sign_keydata_encrypt')
-
-        tmpkeyring = TempSigningKeyring()
-        tmpkeyring.context.set_option('export-options', 'export-minimal')
-        # Eventually, we want to let the user select their keys to sign with
-        # For now, we just take whatever is there.
-        secret_keys = get_usable_secret_keys(tmpkeyring)
-        log.info('Signing with these keys: %s', secret_keys)
-
-        stripped_key = MinimalExport(keydata)
-        fingerprint = fingerprint_for_key(stripped_key)
-
-        log.debug('Trying to import key\n%s', stripped_key)
-        if tmpkeyring.import_data(stripped_key):
-            # 3. for every user id (or all, if -a is specified)
-            # 3.1. sign the uid, using gpg-agent
-            keys = tmpkeyring.get_keys(fingerprint)
-            log.info("Found keys %s for fp %s", keys, fingerprint)
-            assert len(keys) == 1, "We received multiple keys for fp %s: %s" % (fingerprint, keys)
-            key = keys[fingerprint]
-            uidlist = key.uidslist
-            
-            for secret_key in secret_keys:
-                secret_fpr = secret_key.fpr
-                log.info('Setting up to sign with %s', secret_fpr)
-                # We need to --always-trust, because GnuPG would print
-                # warning about the trustdb.  I think this is because
-                # we have a newly signed key whose trust GnuPG wants to
-                # incorporate into the trust decision.
-                tmpkeyring.context.set_option('always-trust')
-                tmpkeyring.context.set_option('local-user', secret_fpr)
-                # FIXME: For now, we sign all UIDs. This is bad.
-                ret = tmpkeyring.sign_key(uidlist[0].uid, signall=True)
-                log.info("Result of signing %s on key %s: %s", uidlist[0].uid, fingerprint, ret)
-
-
-            for uid in uidlist:
-                uid_str = uid.uid
-                log.info("Processing uid %s %s", uid, uid_str)
-
-                # 3.2. export and encrypt the signature
-                # 3.3. mail the key to the user
-                signed_key = UIDExport(uid_str, tmpkeyring.export_data(uid_str))
-                log.info("Exported %d bytes of signed key", len(signed_key))
-
-                # self.signui.tmpkeyring.context.set_option('armor')
-                tmpkeyring.context.set_option('always-trust')
-                encrypted_key = tmpkeyring.encrypt_data(data=signed_key, recipient=uid_str)
-                yield (uid.uid, encrypted_key)
-
 
     def sign_keydata(self, keydata, callback=None):
         log = logging.getLogger(__name__ + ':sign_keydata')
@@ -371,7 +319,7 @@ class GetKeySection(Gtk.VBox):
         # We list() the signatures, because we believe that it's more
         # acceptable if all key operations are done before we go ahead
         # and spawn an email client.
-        for uid, encrypted_key in list(self.sign_keydata_and_encrypt(keydata)):
+        for uid, encrypted_key in list(sign_keydata_and_encrypt(keydata)):
                 # FIXME: get rid of this redundant assignment
                 uid_str = uid
                 ctx = {
