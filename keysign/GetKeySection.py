@@ -38,6 +38,7 @@ from .KeyPresent import KeyPresentPage
 from .SignPages import KeyDetailsPage
 from .SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 from .util import mac_verify
+from .util import email_file
 from . import key
 
 from gi.repository import Gst, Gtk, GLib
@@ -343,8 +344,8 @@ class GetKeySection(Gtk.VBox):
 
                 subject = Template(SUBJECT).safe_substitute(ctx)
                 body = Template(BODY).safe_substitute(ctx)
-                self.email_file (to=uid_str, subject=subject,
-                                 body=body, files=[filename])
+                email_file (to=uid_str, subject=subject,
+                            body=body, files=[filename])
 
 
             # FIXME: Can we get rid of self.tmpfiles here already? Even if the MUA is still running?
@@ -360,30 +361,6 @@ class GetKeySection(Gtk.VBox):
     def send_email(self, fingerprint, *data):
         self.log.exception("Sending email... NOT")
         return False
-
-    def email_file(self, to, from_=None, subject=None,
-                   body=None,
-                   ccs=None, bccs=None,
-                   files=None, utf8=True):
-        cmd = ['xdg-email']
-        if utf8:
-            cmd += ['--utf8']
-        if subject:
-            cmd += ['--subject', subject]
-        if body:
-            cmd += ['--body', body]
-        for cc in ccs or []:
-            cmd += ['--cc', cc]
-        for bcc in bccs or []:
-            cmd += ['--bcc', bcc]
-        for file_ in files or []:
-            cmd += ['--attach', file_]
-
-        cmd += [to]
-
-        self.log.info("Running %s", cmd)
-        retval = call(cmd)
-        return retval
 
 
     def on_button_clicked(self, button, *args, **kwargs):
