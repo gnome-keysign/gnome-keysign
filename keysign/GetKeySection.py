@@ -311,7 +311,7 @@ class GetKeySection(Gtk.VBox):
 
 
 
-    def sign_keydata(self, data, callback=None):
+    def sign_keydata(self, keydata, callback=None):
         "Signs OpenPGP keydata with your regular GnuPG secret keys"
 
         log = logging.getLogger(__name__ + ':sign_keydata')
@@ -323,7 +323,6 @@ class GetKeySection(Gtk.VBox):
         secret_keys = get_usable_secret_keys(tmpkeyring)
         log.info('Signing with these keys: %s', secret_keys)
 
-        keydata = data
         stripped_key = MinimalExport(keydata)
         fingerprint = fingerprint_for_key(stripped_key)
 
@@ -489,7 +488,7 @@ class GetKeySection(Gtk.VBox):
                 # obtain_key function. At least it should...
                 # The data flow isn't very nice. It probably needs to be redone...
                 f = lambda: self.sign_keydata(
-                                    data=self.received_key_data,
+                                    keydata=self.received_key_data,
                                     callback=self.send_email)
                 GLib.idle_add(f)
 
