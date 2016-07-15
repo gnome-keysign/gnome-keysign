@@ -120,20 +120,24 @@ class TempSigningKeyring(TempKeyring):
     """A temporary keyring which uses the secret keys of a parent keyring
     
     Creates a temporary keyring which can use the orignal keyring's
-    secret keys.
+    secret keys.  If you don't provide a keyring as argument (i.e. None),
+    a default Keyring() will be taken which represents the user's
+    regular keyring.
 
     In fact, this is not much different from a TempKeyring,
     but gpg1.4 does not see the public keys for the secret keys when run with
     --no-default-keyring and --primary-keyring.
     So we copy the public parts of the secret keys into the primary keyring.
     """
-    def __init__(self, base_keyring, *args, **kwargs):
+    def __init__(self, base_keyring=None, *args, **kwargs):
         # Not a new style class...
         if issubclass(self.__class__, object):
             super(TempSplitKeyring, self).__init__(*args, **kwargs)
         else:
             TempKeyring.__init__(self, *args, **kwargs)
 
+        if base_keyring is None:
+            base_keyring = Keyring()
         # Copy the public parts of the secret keys to the tmpkeyring
         for fpr, key in base_keyring.get_keys(None,
                                               secret=True,
