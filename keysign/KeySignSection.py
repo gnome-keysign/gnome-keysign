@@ -22,7 +22,6 @@ import sys
 
 from gi.repository import Gtk
 
-from . import key
 from .KeyPresent import KeyPresentPage
 from . import Keyserver
 from .KeysPage import KeysPage
