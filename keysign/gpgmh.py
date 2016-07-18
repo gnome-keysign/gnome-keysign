@@ -171,6 +171,20 @@ def openpgpkey_from_data(keydata):
         return key
 
 
+
+def get_public_key_data(fpr, keyring=None):
+    """Returns keydata for a given fingerprint
+    
+    In fact, fpr could be anything that gpg happily exports.
+    """
+    if not keyring:
+        keyring = Keyring()
+    keydata = keyring.export_data(fpr)
+    return keydata
+
+
+
+
 # FIXME: We should rename that to "from_data"
 #        otherwise someone might think we operate on
 #        a key rather than bytes.

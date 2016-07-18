@@ -27,7 +27,7 @@ from .KeyPresent import KeyPresentPage
 from . import Keyserver
 from .KeysPage import KeysPage
 from .SignPages import KeyDetailsPage
-from .util import get_public_key_data
+from .gpgmh import get_public_key_data
 
 log = logging.getLogger(__name__)
 

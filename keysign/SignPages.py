@@ -31,8 +31,8 @@ from scan_barcode import BarcodeReaderGTK, ScalingImage
 
 
 from .util import mac_verify, mac_generate
-from .util import get_public_key_data
 
+from .gpgmh import get_public_key_data
 from .gpgmh import signatures_for_keyid
 
 

@@ -22,8 +22,6 @@ from subprocess import call
 from string import Template
 from tempfile import NamedTemporaryFile
 
-from monkeysign.gpg import Keyring
-
 from .gpgmh import fingerprint_for_key
 from .gpgmh import sign_keydata_and_encrypt
 
@@ -41,12 +39,6 @@ def mac_verify(key, data, mac):
     log.info("MAC of %r seems to be %r. Expected %r (%r)",
              data[:20], computed_mac[:20], mac[:20], result)
     return result
-
-
-
-def get_public_key_data(fpr):
-    keydata = Keyring().export_data(fpr)
-    return keydata
 
 
 
