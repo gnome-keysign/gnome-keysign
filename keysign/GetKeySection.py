@@ -308,7 +308,7 @@ class GetKeySection(Gtk.VBox):
         return False
 
 
-    def sign_keydata_and_send(self, keydata, callback=None):
+    def _sign_keydata_and_send(self, keydata):
         """Creates, encrypts, and send signatures for each UID on the key
         
         You are supposed to give OpenPGP data which will be passed
@@ -316,8 +316,13 @@ class GetKeySection(Gtk.VBox):
         
         For the resulting signatures, emails are created and
         sent via email_file.
+        
+        Return value:  NamedTemporaryFiles used for saving the signatures.
+        If you let them go out of scope they should get deleted.
+        But don't delete too early as the MUA needs to pick them up.
         """
         log = logging.getLogger(__name__ + ':sign_keydata')
+
         fingerprint = fingerprint_for_key(keydata)
         # FIXME: We should rather use whatever GnuPG tells us
         keyid = fingerprint[-8:]
@@ -332,36 +337,36 @@ class GetKeySection(Gtk.VBox):
                     'fingerprint': fingerprint,
                     'keyid': keyid,
                 }
-                # We could try to dir=tmpkeyring.dir
-                # We do not use the with ... as construct as the
-                # tempfile might be deleted before the MUA had the chance
-                # to get hold of it.
-                # Hence we reference the tmpfile and hope that it will be properly
-                # cleaned up when this object will be destroyed...
-                tmpfile = NamedTemporaryFile(prefix='gnome-keysign-', suffix='.asc')
-                self.tmpfiles.append(tmpfile)
+                tmpfile = NamedTemporaryFile(prefix='gnome-keysign-',
+                                             suffix='.asc',
+                                             delete=True)
                 filename = tmpfile.name
                 log.info('Writing keydata to %s', filename)
                 tmpfile.write(encrypted_key)
-                # Interesting, sometimes it would not write the whole thing out,
-                # so we better flush here
+                # Interesting, sometimes it would not write the
+                # whole thing out, so we better flush here
                 tmpfile.flush()
-                # As we're done with the file, we close it.
-                #tmpfile.close()
+                # If we close the actual file descriptor to free
+                # resources. Calling tmpfile.close would get the file deleted.
+                tmpfile.file.close()
 
                 subject = Template(SUBJECT).safe_substitute(ctx)
                 body = Template(BODY).safe_substitute(ctx)
                 email_file (to=uid_str, subject=subject,
                             body=body, files=[filename])
+                yield tmpfile
 
 
-            # FIXME: Can we get rid of self.tmpfiles here already? Even if the MUA is still running?
 
-
-            # 3.4. optionnally (-l), create a local signature and import in
-            # local keyring
-            # 4. trash the temporary keyring
-
+    def sign_keydata_and_send(self, keydata, callback=None):
+        """This is a thin (GLib) wrapper around _sign_keydata_and_send
+        
+        it only returns False to make GLib not constantly add this function
+        to the main loop. It also saves the TemporaryFiles created
+        during the signature creation process so that the MUA
+        can pick them up and s.t. they will be deleted on close.
+        """
+        self.tmpfiles = list(self._sign_keydata_and_send(keydata))
         return False
 
 
