@@ -54,9 +54,7 @@ def parse_sig_list(text):
 
     return sigslist
 
-# This is a cache for a keyring object, so that we do not need
-# to create a new object every single time we parse signatures
-_keyring = None
+
 def signatures_for_keyid(keyid, keyring=None):
     '''Returns the list of signatures for a given key id
     
@@ -66,15 +64,10 @@ def signatures_for_keyid(keyid, keyring=None):
     A default Keyring will be used unless you pass an instance
     as keyring argument.
     '''
-    # Retrieving a cached instance of a keyring,
-    # unless we were being passed a keyring
-    global _keyring
-    if keyring is not None:
-        kr = keyring
+    if keyring is None:
+        kr = Keyring()
     else:
-        if _keyring is None:
-            _keyring = Keyring()
-        kr = _keyring
+        kr = keyring
 
     # FIXME: this would be better if it was done in monkeysign
     kr.context.call_command(['list-sigs', keyid])
