@@ -26,7 +26,7 @@ import logging
 from gi.repository import Gtk, GLib
 from gi.repository import GObject
 
-from monkeysign.gpg import Keyring
+from .gpgmh import get_usable_secret_keys, get_usable_keys
 
 # These are relative imports
 from __init__ import __version__
@@ -71,19 +71,11 @@ class KeysPage(Gtk.VBox):
         # TreeView, i.e. in get_items_from_selection.
         self.store = Gtk.ListStore(str, str, str)
 
-        # FIXME: this should be moved to KeySignSection
-        self.keyring = Keyring() # the user's keyring
-
         self.keysDict = {}
 
-        # FIXME: this should be a callback function to update the display
-        # when a key is changed/deleted
-        keys = self.keyring.get_keys(None, secret=True,
-                                           public=show_public_keys)
-        for fpr, key in keys.items():
-            if key.invalid or key.disabled or key.expired or key.revoked:
-                continue
-
+        keys = get_usable_secret_keys()
+        keys += get_usable_keys() if show_public_keys else []
+        for key in keys:
             uidslist = key.uidslist #UIDs: Real Name (Comment) <email@address>
             keyid = str(key.keyid()) # the key's short id
 
