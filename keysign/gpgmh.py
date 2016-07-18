@@ -132,7 +132,7 @@ class TempSigningKeyring(TempKeyring):
     def __init__(self, base_keyring=None, *args, **kwargs):
         # Not a new style class...
         if issubclass(self.__class__, object):
-            super(TempSplitKeyring, self).__init__(*args, **kwargs)
+            super(TempSigningKeyring, self).__init__(*args, **kwargs)
         else:
             TempKeyring.__init__(self, *args, **kwargs)
 
