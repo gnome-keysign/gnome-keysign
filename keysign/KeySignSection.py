@@ -92,14 +92,14 @@ class KeySignSection(Gtk.VBox):
         pass
 
 
-    def on_key_selected(self, pane, keyid):
+    def on_key_selected(self, pane, fingerprint):
         '''This is the callback for when the user has committed
         to a key, i.e. the user has made a selection and wants to
         advance the program.
         '''
-        log.debug('User selected key %s', keyid)
+        log.debug('User selected key %s', fingerprint)
 
-        key = list(self.keyring.get_keys(keyid).values())[0]
+        key = list(self.keyring.get_keys(fingerprint).values())[0]
 
         keyid = key.keyid()
         fpr = key.fpr
