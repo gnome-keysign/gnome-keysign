@@ -110,12 +110,13 @@ class KeyPresentPage(Gtk.HBox):
 
     def draw_qrcode(self):
         assert self.fpr
-        data = 'OPENPGP4FPR:' + self.fpr
+        fingerprint = self.fpr
+        data = 'OPENPGP4FPR:' + fingerprint
         # FIXME: okay, this is really bad.
         # We should really try to get the keydata from another
         # channel. There is key-selected signal. Maybe we can use that.
-        keydata = get_public_key_data(self.fpr)
-        mac = mac_generate(self.fpr, keydata)
+        keydata = get_public_key_data(fingerprint)
+        mac = mac_generate(fingerprint, keydata)
         # FIXME: We probably want to urlencode the thing...
         data += '#MAC=%s' % mac
         # we call upper to made the barcode more efficient
