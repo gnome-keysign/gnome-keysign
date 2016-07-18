@@ -174,9 +174,6 @@ class KeyDetailsPage(Gtk.VBox):
         self.set_spacing(10)
         self.log = logging.getLogger(__name__)
 
-        # FIXME: this should be moved to KeySignSection
-        self.keyring = Keyring()
-
         uidsLabel = Gtk.Label()
         uidsLabel.set_text("UIDs")
 
