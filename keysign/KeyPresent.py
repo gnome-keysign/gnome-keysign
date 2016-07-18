@@ -27,8 +27,6 @@ import os
 from gi.repository import Gtk, GLib
 from gi.repository import GObject
 
-from monkeysign.gpg import Keyring
-
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
                               "this script directly which is discouraged. " +
@@ -139,14 +137,7 @@ def main(args=sys.argv):
         arguments = parse_command_line(args)
         
         #if arguments.gpg:
-        #    keyid = arguments.file
-        #    keyring = Keyring()
-        #    # this is a dict {fpr: key-instance}
-        #    found_keys = keyring.get_keys(keyid)
-        #    # We take the first item we found and export the actual keydata
-        #    fpr = found_keys.items()[0][0]
-        #    keyring.export_data(fpr=fpr, secret=False)
-        #    keydata = keyring.context.stdout
+        #    keydata = export_keydata(next(get_usable_keys(keyid)))
         #else:
         #    keydata = open(arguments.file, 'r').read()
         fpr = arguments.fpr
