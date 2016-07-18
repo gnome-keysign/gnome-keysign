@@ -22,14 +22,12 @@ import sys
 
 from gi.repository import Gtk
 
-from monkeysign.gpg import Keyring
-
 from . import key
 from .KeyPresent import KeyPresentPage
 from . import Keyserver
 from .KeysPage import KeysPage
 from .SignPages import KeyDetailsPage
-
+from .util import get_public_key_data
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +41,6 @@ class KeySignSection(Gtk.VBox):
         super(KeySignSection, self).__init__()
 
         self.log = logging.getLogger(__name__)
-        self.keyring = Keyring()
 
         # these are needed later when we need to get details about
         # a selected key
@@ -111,26 +108,19 @@ class KeySignSection(Gtk.VBox):
         advance the program.
         '''
         log.debug('User selected key %s', fingerprint)
+        keydata = get_public_key_data(fingerprint)
+        self.log.debug("Keyserver switched on! Serving key with fpr: %s",
+                       fingerprint)
+        self.setup_server(keydata, fingerprint)
 
-        key = list(self.keyring.get_keys(fingerprint).values())[0]
-
-        keyid = key.keyid()
-        fpr = key.fpr
-        self.keyring.export_data(fpr, secret=False)
-        keydata = self.keyring.context.stdout
-
-        self.log.debug("Keyserver switched on! Serving key with fpr: %s", fpr)
-        self.setup_server(keydata, fpr)
-        
-        self.switch_to_key_present_page(key)
+        self.switch_to_key_present_page(fingerprint)
 
 
-    def switch_to_key_present_page(self, key):
+    def switch_to_key_present_page(self, fingerprint):
         '''This switches the notebook to the page which
         presents the information that is needed to securely
         transfer the keydata, i.e. the fingerprint and its barcode.
         '''
-        fingerprint = key.fpr
         key_present_page = self.construct_key_present_page(fingerprint)
         self.notebook.next_page()
         # This is more of a crude hack. Once the next page is presented,
