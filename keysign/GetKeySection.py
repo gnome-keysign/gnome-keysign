@@ -18,21 +18,13 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import os
 from urlparse import urlparse, parse_qs, ParseResult
-import shutil
 
 import requests
 from requests.exceptions import ConnectionError
 
-import sys
-
 from .compat import gtkbutton
 from .compat import monkeysign_expired_keys, monkeysign_revoked_keys
-from . import Keyserver
-from .KeysPage import KeysPage
-from .KeyPresent import KeyPresentPage
-from .SignPages import KeyDetailsPage
 from .SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 from .util import mac_verify
 from .util import sign_keydata_and_send as _sign_keydata_and_send
