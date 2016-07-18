@@ -20,9 +20,7 @@
 import logging
 import os
 from urlparse import urlparse, parse_qs, ParseResult
-from string import Template
 import shutil
-from tempfile import NamedTemporaryFile
 
 import requests
 from requests.exceptions import ConnectionError
@@ -37,7 +35,7 @@ from .KeyPresent import KeyPresentPage
 from .SignPages import KeyDetailsPage
 from .SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 from .util import mac_verify
-from .util import email_file
+from .util import sign_keydata_and_send as _sign_keydata_and_send
 from . import key
 
 from gi.repository import Gst, Gtk, GLib
@@ -56,29 +54,12 @@ progress_bar_text = ["Step 1: Scan QR Code or type fingerprint and click on 'Dow
                      "Step 3: Key was succesfully signed and an email was sent to the owner."]
 
 
-SUBJECT = 'Your signed key $fingerprint'
-BODY = '''Hi $uid,
-
-
-I have just signed your key
-
-      $fingerprint
-
-
-Thanks for letting me sign your key!
-
---
-GNOME Keysign
-'''
-
-
 # FIXME: This probably wants to go somewhere more central.
 # Maybe even into Monkeysign.
 log = logging.getLogger(__name__)
 
 
 from .gpgmh import openpgpkey_from_data, fingerprint_for_key
-from .gpgmh import sign_keydata_and_encrypt
 
 
 
@@ -308,55 +289,6 @@ class GetKeySection(Gtk.VBox):
         return False
 
 
-    def _sign_keydata_and_send(self, keydata):
-        """Creates, encrypts, and send signatures for each UID on the key
-        
-        You are supposed to give OpenPGP data which will be passed
-        onto sign_keydata_and_encrypt.
-        
-        For the resulting signatures, emails are created and
-        sent via email_file.
-        
-        Return value:  NamedTemporaryFiles used for saving the signatures.
-        If you let them go out of scope they should get deleted.
-        But don't delete too early as the MUA needs to pick them up.
-        """
-        log = logging.getLogger(__name__ + ':sign_keydata')
-
-        fingerprint = fingerprint_for_key(keydata)
-        # FIXME: We should rather use whatever GnuPG tells us
-        keyid = fingerprint[-8:]
-        # We list() the signatures, because we believe that it's more
-        # acceptable if all key operations are done before we go ahead
-        # and spawn an email client.
-        for uid, encrypted_key in list(sign_keydata_and_encrypt(keydata)):
-                # FIXME: get rid of this redundant assignment
-                uid_str = uid
-                ctx = {
-                    'uid' : uid_str,
-                    'fingerprint': fingerprint,
-                    'keyid': keyid,
-                }
-                tmpfile = NamedTemporaryFile(prefix='gnome-keysign-',
-                                             suffix='.asc',
-                                             delete=True)
-                filename = tmpfile.name
-                log.info('Writing keydata to %s', filename)
-                tmpfile.write(encrypted_key)
-                # Interesting, sometimes it would not write the
-                # whole thing out, so we better flush here
-                tmpfile.flush()
-                # If we close the actual file descriptor to free
-                # resources. Calling tmpfile.close would get the file deleted.
-                tmpfile.file.close()
-
-                subject = Template(SUBJECT).safe_substitute(ctx)
-                body = Template(BODY).safe_substitute(ctx)
-                email_file (to=uid_str, subject=subject,
-                            body=body, files=[filename])
-                yield tmpfile
-
-
 
     def sign_keydata_and_send(self, keydata, callback=None):
         """This is a thin (GLib) wrapper around _sign_keydata_and_send
@@ -366,7 +298,7 @@ class GetKeySection(Gtk.VBox):
         during the signature creation process so that the MUA
         can pick them up and s.t. they will be deleted on close.
         """
-        self.tmpfiles = list(self._sign_keydata_and_send(keydata))
+        self.tmpfiles = list(_sign_keydata_and_send(keydata))
         return False
 
 

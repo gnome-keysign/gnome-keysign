@@ -18,19 +18,23 @@
 
 import logging
 import sys
+from time import sleep
 
-from GetKeySection import GetKeySection
+from .util import sign_keydata_and_send
 
 def main(args):
-    log = logging.getLogger()
+    log = logging.getLogger(__name__)
     log.debug('Running main with args: %s', args)
-    w = GetKeySection(None)
     if not args:
         raise ValueError("You need to give filesnames as args: %s" % args)
     for fname in args:
         data = open(fname, 'r').read()
-        w.sign_keydata_and_send(keydata=data)
-
+        log.info("Calling %r to sign %s", sign_keydata_and_send, fname)
+        tmpfiles = list(sign_keydata_and_send(keydata=data))
+    log.info("Finished signing. Feel free to Quit the application. " +
+             "We're only waiting for a few seconds for the signature " +
+             "files to be picked up")
+    sleep(3)
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG,
