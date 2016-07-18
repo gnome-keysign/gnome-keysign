@@ -21,7 +21,7 @@ from itertools import islice
 import logging
 import sys
 
-from gi.repository import GObject, Gtk, GLib, GdkPixbuf
+from gi.repository import GObject, Gtk, GLib
 
 from datetime import datetime
 
