@@ -78,6 +78,7 @@ class KeyPresentPage(Gtk.HBox):
         
         if self.fpr:
             self.setup_fingerprint_widget(self.fpr)
+            self.draw_qrcode()
 
 
     def display_fingerprint_qr_page(self, openPgpKey=None):

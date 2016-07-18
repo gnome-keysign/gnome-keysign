@@ -52,25 +52,14 @@ class KeySignSection(Gtk.VBox):
             self.on_key_selection_changed)
         self.keysPage.connect('key-selected', self.on_key_selected)
         self.keyDetailsPage = KeyDetailsPage()
-        self.keyPresentPage = KeyPresentPage()
 
-
-        # create back button
-        self.backButton = Gtk.Button('Back')
-        self.backButton.set_image(Gtk.Image.new_from_icon_name("go-previous", Gtk.IconSize.BUTTON))
-        self.backButton.set_always_show_image(True)
-        self.backButton.connect('clicked', self.on_button_clicked)
 
         # set up notebook container
         self.notebook = Gtk.Notebook ()
         self.notebook.append_page (self.keysPage, None)
-        vbox = Gtk.VBox ()
-        # We place the button at the top, but that might not be the
-        # smartest thing to do. Feel free to rearrange
-        # FIXME: Consider a GtkHeaderBar for the application
-        vbox.pack_start (self.backButton, False, False, 0)
-        vbox.pack_start (self.keyPresentPage, True, True, 10)
-        self.notebook.append_page (vbox, None)
+
+        self.key_present_page_index = None
+
         self.notebook.set_show_tabs (False)
 
         self.pack_start(self.notebook, True, True, 0)
@@ -83,6 +72,30 @@ class KeySignSection(Gtk.VBox):
         self.received_key_data = None
 
         self.keyserver = None
+
+
+    def construct_key_present_page(self, fingerprint):
+        kpp = KeyPresentPage(fingerprint)
+        vbox = Gtk.VBox ()
+
+        # create back button
+        self.backButton = Gtk.Button('Back')
+        self.backButton.set_image(Gtk.Image.new_from_icon_name("go-previous", Gtk.IconSize.BUTTON))
+        self.backButton.set_always_show_image(True)
+        self.backButton.connect('clicked', self.on_button_clicked)
+
+        # We place the button at the top, but that might not be the
+        # smartest thing to do. Feel free to rearrange
+        # FIXME: Consider a GtkHeaderBar for the application
+        vbox.pack_start (self.backButton, False, False, 0)
+        vbox.pack_start (kpp, True, True, 10)
+        self.key_present_page_index = self.notebook.append_page (vbox, None)
+        vbox.show_all()
+        return kpp
+
+
+    def destruct_key_present_page(self):
+        self.notebook.remove_page(self.key_present_page_index)
 
 
     def on_key_selection_changed(self, pane, keyid):
@@ -117,12 +130,13 @@ class KeySignSection(Gtk.VBox):
         presents the information that is needed to securely
         transfer the keydata, i.e. the fingerprint and its barcode.
         '''
-        self.keyPresentPage.display_fingerprint_qr_page(key)
+        fingerprint = key.fpr
+        key_present_page = self.construct_key_present_page(fingerprint)
         self.notebook.next_page()
         # This is more of a crude hack. Once the next page is presented,
         # the back button has the focus. This is not desirable because
         # you will go back when accidentally pressing space or enter.
-        self.keyPresentPage.fingerprintLabel.grab_focus()
+        key_present_page.fingerprintLabel.grab_focus()
         # FIXME: we better use set_current_page, but that requires
         # knowing which page our desired widget is on.
         # FWIW: A headerbar has named pages.
@@ -147,6 +161,7 @@ class KeySignSection(Gtk.VBox):
             if page_index == 1:
                 self.log.debug("Keyserver switched off")
                 self.stop_server()
+                self.destruct_key_present_page()
 
             self.notebook.prev_page()
 
