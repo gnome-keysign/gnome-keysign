@@ -22,7 +22,6 @@ import logging
 import sys
 
 from gi.repository import GObject, Gtk, GLib, GdkPixbuf
-from monkeysign.gpg import Keyring
 
 from datetime import datetime
 
@@ -34,46 +33,12 @@ from scan_barcode import BarcodeReaderGTK, ScalingImage
 from .util import mac_verify, mac_generate
 from .util import get_public_key_data
 
+from .gpgmh import signatures_for_keyid
+
 
 log = logging.getLogger(__name__)
 
 
-
-
-def parse_sig_list(text):
-    '''Parses GnuPG's signature list (i.e. list-sigs)
-    
-    The format is described in the GnuPG man page'''
-    sigslist = []
-    for block in text.split("\n"):
-        if block.startswith("sig"):
-            record = block.split(":")
-            log.debug("sig record (%d) %s", len(record), record)
-            keyid, timestamp, uid = record[4], record[5], record[9]
-            sigslist.append((keyid, timestamp, uid))
-
-    return sigslist
-
-
-def signatures_for_keyid(keyid, keyring=None):
-    '''Returns the list of signatures for a given key id
-    
-    This will call out to GnuPG list-sigs, using Monkeysign,
-    and parse the resulting string into a list of signatures.
-    
-    A default Keyring will be used unless you pass an instance
-    as keyring argument.
-    '''
-    if keyring is None:
-        kr = Keyring()
-    else:
-        kr = keyring
-
-    # FIXME: this would be better if it was done in monkeysign
-    kr.context.call_command(['list-sigs', keyid])
-    siglist = parse_sig_list(kr.context.stdout)
-
-    return siglist
 
 
 
