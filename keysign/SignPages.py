@@ -43,7 +43,7 @@ log = logging.getLogger(__name__)
 
 
 class KeyPresentPage(Gtk.HBox):
-    def __init__(self, fpr=None):
+    def __init__(self, fpr):
         super(KeyPresentPage, self).__init__()
 
         # create left side Key labels
@@ -75,11 +75,9 @@ class KeyPresentPage(Gtk.HBox):
 
         self.pack_start(leftVBox, True, True, 0)
         self.pack_start(self.rightVBox, True, True, 0)
-        
-        if self.fpr:
-            self.setup_fingerprint_widget(self.fpr)
-            self.draw_qrcode()
 
+        self.setup_fingerprint_widget(self.fpr)
+        self.draw_qrcode()
 
     def display_fingerprint_qr_page(self, openPgpKey=None):
         assert openPgpKey or self.fpr
@@ -90,6 +88,8 @@ class KeyPresentPage(Gtk.HBox):
 
         # draw qr code for this fingerprint
         self.draw_qrcode()
+
+
 
 
     def setup_fingerprint_widget(self, fingerprint):
