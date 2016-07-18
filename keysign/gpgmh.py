@@ -17,7 +17,6 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import os
 from tempfile import NamedTemporaryFile
 
 
@@ -195,7 +194,7 @@ def get_usable_keys(keyring=None, *args, **kwargs):
         log.debug('Key %s is invalid: %s (i:%s, d:%s, e:%s, r:%s)', key, unusable,
             key.invalid, key.disabled, key.expired, key.revoked)
         return not unusable
-    keys_fpr = keys_dict.items()
+    # keys_fpr = keys_dict.items()
     keys = keys_dict.values()
     usable_keys = [key for key in keys if is_usable(key)]
 
