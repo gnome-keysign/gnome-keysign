@@ -79,18 +79,6 @@ class KeyPresentPage(Gtk.HBox):
         self.setup_fingerprint_widget(self.fpr)
         self.draw_qrcode()
 
-    def display_fingerprint_qr_page(self, openPgpKey=None):
-        assert openPgpKey or self.fpr
-
-        rawfpr = openPgpKey.fpr if openPgpKey else self.fpr
-        self.fpr = rawfpr
-        self.setup_fingerprint_widget(self.fpr)
-
-        # draw qr code for this fingerprint
-        self.draw_qrcode()
-
-
-
 
     def setup_fingerprint_widget(self, fingerprint):
         '''The purpose of this function is to populate the label holding
