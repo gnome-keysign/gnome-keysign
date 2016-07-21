@@ -27,6 +27,7 @@ from gi.repository import Gtk, GLib
 from gi.repository import GObject
 
 from .gpgmh import get_usable_secret_keys, get_usable_keys
+from .gpgmh import parse_uid
 
 # These are relative imports
 from __init__ import __version__
@@ -85,20 +86,8 @@ class KeysPage(Gtk.VBox):
                 self.keysDict[keyid] = key
 
             for e in uidslist:
-                uid = str(e.uid)
-                # remove the comment from UID (if it exists)
-                com_start = uid.find('(')
-                if com_start != -1:
-                    com_end = uid.find(')')
-                    uid = uid[:com_start].strip() + uid[com_end+1:].strip()
-
-                # split into user's name and email
-                tokens = uid.split('<')
-                name = tokens[0].strip()
-                email = 'unknown'
-                if len(tokens) > 1:
-                    email = tokens[1].replace('>','').strip()
-
+                uid_str = e.uid
+                (name, comment, email) = parse_uid(uid_str)
                 self.store.append((name, email, keyid, fingerprint))
 
         if len(self.store) == 0:

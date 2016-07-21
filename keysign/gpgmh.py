@@ -331,6 +331,25 @@ def signatures_for_keyid(keyid, keyring=None):
 
 
 
+def parse_uid(uid):
+    "Parses a GnuPG UID into it's name, comment, and email component"
+    # remove the comment from UID (if it exists)
+    com_start = uid.find('(')
+    if com_start != -1:
+        com_end = uid.find(')')
+        uid = uid[:com_start].strip() + uid[com_end+1:].strip()
+
+    # FIXME: Actually parse the comment...
+    comment = ""
+    # split into user's name and email
+    tokens = uid.split('<')
+    name = tokens[0].strip()
+    email = 'unknown'
+    if len(tokens) > 1:
+        email = tokens[1].replace('>','').strip()
+    
+    return (name, comment, email)
+
 
 ## Monkeypatching to get more debug output
 import monkeysign.gpg
