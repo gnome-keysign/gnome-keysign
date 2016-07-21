@@ -73,17 +73,12 @@ class KeysPage(Gtk.VBox):
         self.store = Gtk.ListStore(str, str, str, str)
         #                    name, email, keyid, fingerprint
 
-        self.keysDict = {}
-
         keys = get_usable_secret_keys()
         keys += get_usable_keys() if show_public_keys else []
         for key in keys:
             uidslist = key.uidslist #UIDs: Real Name (Comment) <email@address>
             keyid = str(key.keyid()) # the key's short id
             fingerprint = key.fpr
-
-            if not keyid in self.keysDict:
-                self.keysDict[keyid] = key
 
             for e in uidslist:
                 uid_str = e.uid
