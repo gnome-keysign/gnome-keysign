@@ -70,8 +70,8 @@ class KeysPage(Gtk.VBox):
         # Note that other functions expect a certain structure to
         # this ListStore, e.g. when parsing the selection of the
         # TreeView, i.e. in get_items_from_selection.
-        self.store = Gtk.ListStore(str, str, str, str)
-        #                    name, email, keyid, fingerprint
+        self.store = Gtk.ListStore(str, str, str)
+        #                       name, email, fingerprint
 
         keys = get_usable_secret_keys()
         keys += get_usable_keys() if show_public_keys else []
@@ -82,7 +82,7 @@ class KeysPage(Gtk.VBox):
             for e in uidslist:
                 uid_str = e.uid
                 (name, comment, email) = parse_uid(uid_str)
-                self.store.append((name, email, fingerprint[-8:], fingerprint))
+                self.store.append((name, email, fingerprint))
 
         if len(self.store) == 0:
             self.pack_start(Gtk.Label("You don't have a private key"), True, True, 0)
@@ -141,10 +141,10 @@ class KeysPage(Gtk.VBox):
         '''Returns the elements in the ListStore for the given selection'''
         s = selection or self.treeView.get_selection()
         model, paths = s.get_selected_rows()
-        name = email = keyid = fingerprint = None
+        name = email = fingerprint = None
         for path in paths:
             iterator = model.get_iter(path)
-            (name, email, fingerprint) = model.get(iterator, 0, 1, 3)
+            (name, email, fingerprint) = model.get(iterator, 0, 1, 2)
             break
 
         return (name, email, fingerprint)
