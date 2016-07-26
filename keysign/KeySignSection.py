@@ -25,7 +25,6 @@ from gi.repository import Gtk
 from .KeyPresent import KeyPresentPage
 from . import Keyserver
 from .KeysPage import KeysPage
-from .SignPages import KeyDetailsPage
 from .gpgmh import get_public_key_data
 
 log = logging.getLogger(__name__)
@@ -47,7 +46,6 @@ class KeySignSection(Gtk.VBox):
         self.keysPage.connect('key-selection-changed',
             self.on_key_selection_changed)
         self.keysPage.connect('key-selected', self.on_key_selected)
-        self.keyDetailsPage = KeyDetailsPage()
 
 
         # set up notebook container
