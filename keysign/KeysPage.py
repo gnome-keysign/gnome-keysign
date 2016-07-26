@@ -97,14 +97,14 @@ class KeysPage(Gtk.VBox):
             emailRenderer = Gtk.CellRendererText()
             emailColumn = Gtk.TreeViewColumn("Email", emailRenderer, text=1)
 
-            # setup 'Key' column
-            keyRenderer = Gtk.CellRendererText()
-            keyColumn = Gtk.TreeViewColumn("Key", keyRenderer, text=2)
+            ## setup 'Fingerprint' column
+            # keyRenderer = Gtk.CellRendererText()
+            # keyColumn = Gtk.TreeViewColumn("Fingerprint", keyRenderer, text=2)
 
             self.treeView.append_column(nameColumn)
             self.treeView.append_column(emailColumn)
-            self.treeView.append_column(keyColumn)
-            
+            # self.treeView.append_column(keyColumn)
+
             self.treeView.connect('row-activated', self.on_row_activated)
 
             # make the tree view resposive to single click selection
