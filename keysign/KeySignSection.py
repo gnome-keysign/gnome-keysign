@@ -92,7 +92,7 @@ class KeySignSection(Gtk.VBox):
         self.notebook.remove_page(self.key_present_page_index)
 
 
-    def on_key_selection_changed(self, pane, keyid):
+    def on_key_selection_changed(self, pane, fingerprint):
         '''This callback is attached to the signal which is emitted
         when the user changes their selection in the list of keys
         '''
