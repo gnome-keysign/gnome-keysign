@@ -162,7 +162,6 @@ class KeysPage(Gtk.VBox):
         # FIXME: We'd rather want to get the key object
         # (or its representation) from the model, not by querying again
         key = next(iter(get_usable_keys(pattern=fingerprint)))
-        keyid = key.keyid()
         try:
             exp_date = datetime.fromtimestamp(float(key.expiry))
         except TypeError as e:
@@ -184,7 +183,7 @@ class KeysPage(Gtk.VBox):
             # label in the pane is a "Select a key on the left"
             # text.
             pane.remove(child)
-        ctx = {'keyid':keyid, 'expiry':expiry,
+        ctx = {'keyid':fingerprint[-8:], 'expiry':expiry,
                'sigs':'', 'fingerprint':fingerprint}
         keyid_label = Gtk.Label(label='Key {keyid}'.format(**ctx))
         expiration_label = Gtk.Label(label='Expires: {expiry}'.format(**ctx))
