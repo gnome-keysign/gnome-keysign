@@ -135,8 +135,8 @@ class KeySignSection(Gtk.VBox):
         All it does is retrieve the selection from the TreeView and
         call the signal handler for when the user committed to a key
         '''
-        name, email, keyid = self.keysPage.get_items_from_selection()[:3]
-        return self.on_key_selected(button, keyid)
+        name, email, fingerprint = self.keysPage.get_items_from_selection()[:3]
+        return self.on_key_selected(button, fingerprint)
         
 
     def on_button_clicked(self, button):
