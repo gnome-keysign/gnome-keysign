@@ -77,13 +77,12 @@ class KeysPage(Gtk.VBox):
         keys += get_usable_keys() if show_public_keys else []
         for key in keys:
             uidslist = key.uidslist #UIDs: Real Name (Comment) <email@address>
-            keyid = str(key.keyid()) # the key's short id
             fingerprint = key.fpr
 
             for e in uidslist:
                 uid_str = e.uid
                 (name, comment, email) = parse_uid(uid_str)
-                self.store.append((name, email, keyid, fingerprint))
+                self.store.append((name, email, fingerprint[-8:], fingerprint))
 
         if len(self.store) == 0:
             self.pack_start(Gtk.Label("You don't have a private key"), True, True, 0)
