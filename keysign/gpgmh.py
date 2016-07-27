@@ -170,7 +170,7 @@ def openpgpkey_from_data(keydata):
         fpr_key = list(keys.items())[0]
         # is composed of the fpr as key and an OpenPGP key as value
         key = fpr_key[1]
-        return key
+        return Key.from_monkeysign(key)
 
 
 
@@ -212,7 +212,7 @@ def get_usable_keys(keyring=None, *args, **kwargs):
         return not unusable
     # keys_fpr = keys_dict.items()
     keys = keys_dict.values()
-    usable_keys = [key for key in keys if is_usable(key)]
+    usable_keys = [Key.from_monkeysign(key) for key in keys if is_usable(key)]
 
     log.debug('Identified usable keys: %s', usable_keys)
     return usable_keys
@@ -232,7 +232,8 @@ def get_usable_secret_keys(keyring=None, pattern=None):
     secret_key_fprs = secret_keys_dict.keys()
     log.debug('Detected secret keys: %s', secret_key_fprs)
     usable_keys_fprs = filter(lambda fpr: get_usable_keys(keyring, pattern=fpr, public=True), secret_key_fprs)
-    usable_keys = [secret_keys_dict[fpr] for fpr in usable_keys_fprs]
+    usable_keys = [Key.from_monkeysign(secret_keys_dict[fpr])
+                   for fpr in usable_keys_fprs]
 
     log.info('Returning usable private keys: %s', usable_keys)
     return usable_keys
