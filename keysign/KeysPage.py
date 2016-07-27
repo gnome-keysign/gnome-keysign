@@ -27,7 +27,6 @@ from gi.repository import Gtk, GLib
 from gi.repository import GObject
 
 from .gpgmh import get_usable_secret_keys, get_usable_keys
-from .gpgmh import parse_uid
 
 # These are relative imports
 from __init__ import __version__
@@ -77,12 +76,10 @@ class KeysPage(Gtk.VBox):
         keys += get_usable_keys() if show_public_keys else []
         for key in keys:
             uidslist = key.uidslist #UIDs: Real Name (Comment) <email@address>
-            fingerprint = key.fpr
+            fingerprint = key.fingerprint
 
-            for e in uidslist:
-                uid_str = e.uid
-                (name, comment, email) = parse_uid(uid_str)
-                self.store.append((name, email, fingerprint))
+            for uid in uidslist:
+                self.store.append((uid.name, uid.email, fingerprint))
 
         if len(self.store) == 0:
             self.pack_start(Gtk.Label("You don't have a private key"), True, True, 0)
@@ -217,7 +214,7 @@ class KeysPage(Gtk.VBox):
         to publish a key on the network.  It will emit a "key-selected"
         signal with the ID of the selected key.'''
         log.debug('Clicked publish for key (%s) %s (%s)', type(key), key, args)
-        fingerprint = key.fpr
+        fingerprint = key.fingerprint
         self.emit('key-selected', fingerprint)
 
 
