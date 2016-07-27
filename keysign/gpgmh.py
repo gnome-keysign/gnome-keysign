@@ -17,6 +17,7 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import namedtuple
+from datetime import datetime
 import logging
 from tempfile import NamedTemporaryFile
 import warnings
@@ -388,7 +389,16 @@ class Key(namedtuple("Key", "expiry fingerprint uidslist")):
 
     def __init__(self, expiry, fingerprint, uidslist,
                        *args, **kwargs):
-        super(Key, self).__init__(expiry, fingerprint, uidslist)
+        try:
+            exp_date = datetime.fromtimestamp(float(expiry))
+        except TypeError as e:
+            # This might be the case when the key.expiry is already a timedate
+            exp_date = expiry
+        except ValueError as e:
+            # This happens when converting an empty string to a datetime.
+            exp_date = None
+
+        super(Key, self).__init__(exp_date, fingerprint, uidslist)
 
     def __format__(self, arg):
         s  = "{fingerprint}\r\n"
