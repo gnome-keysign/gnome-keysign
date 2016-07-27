@@ -200,7 +200,7 @@ class SignKeyPage(Gtk.HBox):
 
         # FIXME: If the two fingerprints don't match, the button
         # should be disabled
-        key_text = GLib.markup_escape_text(str(key))
+        key_text = GLib.markup_escape_text("{}".format(key))
 
         markup = """\
 
