@@ -370,5 +370,5 @@ class GetKeySection(Gtk.VBox):
         self.received_key_data = keydata
         image = self.scanned_image
         openpgpkey = openpgpkey_from_data(keydata)
-        assert openpgpkey.fpr == fingerprint
+        assert openpgpkey.fingerprint == fingerprint
         self.signPage.display_downloaded_key(openpgpkey, fingerprint, image)
