@@ -158,14 +158,7 @@ class KeysPage(Gtk.VBox):
         # FIXME: We'd rather want to get the key object
         # (or its representation) from the model, not by querying again
         key = next(iter(get_usable_keys(pattern=fingerprint)))
-        try:
-            exp_date = datetime.fromtimestamp(float(key.expiry))
-        except TypeError as e:
-            # This might be the case when the key.expiry is already a timedate
-            exp_date = key.expiry
-        except ValueError as e:
-            # This happens when converting an empty string to a datetime.
-            exp_date = None
+        exp_date = key.expiry
 
         if exp_date is None:
             expiry = "No expiration date"
