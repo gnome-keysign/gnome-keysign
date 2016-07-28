@@ -24,7 +24,6 @@ import requests
 from requests.exceptions import ConnectionError
 
 from .compat import gtkbutton
-from .compat import monkeysign_expired_keys, monkeysign_revoked_keys
 from .SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 from .util import mac_verify
 from .util import sign_keydata_and_send as _sign_keydata_and_send

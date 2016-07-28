@@ -23,6 +23,8 @@ from tempfile import NamedTemporaryFile
 import warnings
 
 
+from .compat import monkeysign_expired_keys, monkeysign_revoked_keys
+
 from monkeysign.gpg import Keyring
 from monkeysign.gpg import GpgRuntimeError
 
