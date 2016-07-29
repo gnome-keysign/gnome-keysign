@@ -1,0 +1,224 @@
+{
+    "id": "org.gnome.Keysign",
+    "branch": "master",
+    "runtime": "org.gnome.Platform",
+    "runtime-version": "3.20",
+    "sdk": "org.gnome.Sdk",
+    "command": "gnome-keysign",
+    "rename-desktop-file": "gnome-keysign.desktop",
+    "rename-appdata-file": "gnome-keysign.appdata.xml",
+    "rename-icon": "gnome-keysign",
+    "copy-icon": true,
+    "finish-args": ["--share=ipc", "--socket=x11", "--filesystem=host" ],
+    "appstream-compose": false,
+    "tags": ["nightly"],
+    "desktop-file-name-prefix": "(Nightly) ",
+    "build-options" : {
+        "cflags": "-O2 -g",
+        "cxxflags": "-O2 -g",
+        "env": {
+            "V": "1"
+        }
+    },
+    "cleanup": ["/include", "/lib/pkgconfig", "/share/pkgconfig", "/share/aclocal", "/man", "/share/man", "/share/gtk-doc", "/share/vala", "*.la", "*.a"],
+    "modules": [
+        {
+            "name": "setuptools",
+            "_rm-configure": true,
+            "build-options": {
+                "env": {
+                    "PYTHONUSERBASE" : "/app"
+                }
+            },
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://pypi.python.org/packages/4c/02/3cb39568f0946b29826f068f7a717f7ab24fd32f79d2cbc0ba044ed568e6/setuptools-25.1.4.tar.gz",
+                    "md5": "2d4788cd34a4fb6b6c8dd99645e9650a",
+                    "sha256": "94caad360857e3512c476e0f871a87c44794ef537d829c1c82325266c8251705"
+                },
+                {
+                    "type": "script",
+                    "dest-filename": "configure",
+                    "commands": [
+                        "echo python2 setup.py install --prefix=/app",
+                        "echo all: > dMakefile",
+                        "echo install: >> dMakefile"
+                    ]
+                },
+                {
+                    "type": "file",
+                    "path": "pip-Makefile",
+                    "dest-filename": "Makefile"
+                }
+            ]
+        },
+        {
+            "name": "pip",
+            "_rm-configure": true,
+            "build-options": {
+                "env": {
+                    "PYTHONUSERBASE" : "/app"
+                }
+            },
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://pypi.python.org/packages/e7/a8/7556133689add8d1a54c0b14aeff0acb03c64707ce100ecd53934da1aa13/pip-8.1.2.tar.gz",
+                    "sha256": "4d24b03ffa67638a3fa931c09fd9e0273ffa904e95ebebe7d4b1a54c93d7b732"
+                },
+                {
+                    "type": "script",
+                    "dest-filename": "configure",
+                    "commands": [
+                        "echo python2 setup.py install --prefix=/app",
+                        "echo all: > dMakefile",
+                        "echo install: >> dMakefile"
+                    ]
+                },
+                {
+                    "type": "file",
+                    "path": "pip-Makefile",
+                    "dest-filename": "Makefile"
+                }
+            ]
+        },
+        {
+            "name": "py2cairo",
+            "rm-configure": true,
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "http://cairographics.org/releases/py2cairo-1.10.0.tar.bz2",
+                    "sha256": "d30439f06c2ec1a39e27464c6c828b6eface3b22ee17b2de05dc409e429a7431"
+                },
+                {
+                    "type": "script",
+                    "commands": [
+                        "libtoolize --force",
+                        "aclocal",
+                        "autoheader",
+                        "automake --force-missing --add-missing --foreign",
+                        "autoconf"
+                    ],
+                    "dest-filename": "autogen.sh"
+                }
+            ]
+        },
+        {
+            "name": "pygobject",
+            "build-options" : {
+                "env": {
+                    "PYTHON": "python2"
+                }
+            },
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "http://ftp.gnome.org/pub/GNOME/sources/pygobject/3.18/pygobject-3.18.2.tar.xz",
+                    "sha256": "2a3cad1517916b74e131e6002c3824361aee0671ffb0d55ded119477fc1c2c5f"
+                }
+            ]
+        },
+        {
+            "name": "swig",
+            "config-opts": ["--without-boost", "--without-pcre"],
+            "_cleanup": [ "*" ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "http://prdownloads.sourceforge.net/swig/swig-3.0.7.tar.gz",
+                    "sha256": "06dc8816a225667ce1eee545af3caf87e1bbaa379c32838d4cea53152514348d"
+                }
+            ]
+        },
+        {
+            "name": "dbus-python",
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://dbus.freedesktop.org/releases/dbus-python/dbus-python-1.2.4.tar.gz",
+                    "sha256": "e2f1d6871f74fba23652e51d10873e54f71adab0525833c19bad9e99b1b2f9cc"
+                }
+            ]
+        },
+        {
+            "name": "avahi",
+            "_comment": "hrm, I don't want to install this, but we need the python module",
+            "disabled": true,
+            "config-opts": ["--enable-python",
+                "--disable-static",
+                "--disable-mono",
+                "--disable-monodoc",
+                "--disable-qt3",
+                "--disable-qt4",
+                "--disable-gtk",
+                "--disable-gtk3",
+                "--enable-core-docs",
+                "--with-distro=none",
+                "--with-systemdsystemunitdir=no",
+                "--disable-libdaemon",
+                "--disable-pygtk",
+                "--disable-gdbm"
+            ],
+            "_cleanup": [ "*" ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "http://avahi.org/download/avahi-0.6.31.tar.gz",
+                    "sha256": "8372719b24e2dd75de6f59bb1315e600db4fd092805bd1201ed0cb651a2dab48"
+                }
+            ]
+        },
+        {
+        {
+            "name": "pip2",
+            "disabled": true,
+            "no-autogen": true,
+            "build-options": {
+                "_commit":"damnit, I don't know why it requires network...",
+                "build-args" : ["--share=network"],
+                "env": {
+                    "PYTHONUSERBASE" : "/app"
+                }
+            },
+            "sources": [
+                {
+                    "type": "file",
+                    "path": "get-pip.py",
+                    "_sha256": "23",
+                    "_dest-filename": "get-pip.py"
+                },
+                {
+                    "type": "file",
+                    "path": "pip-Makefile",
+                    "dest-filename": "Makefile"
+                }
+            ]
+        },
+        {
+            "name": "gnome-keysign",
+            "no-autogen": true,
+            "build-options": {
+                "build-args" : ["--share=network"],
+                "env": {
+                    "PYTHONUSERBASE" : "/app"
+                }
+            },
+            "sources": [
+                {
+                    "type": "git",
+                    "branch": "flatpak",
+                    "_branch": "HEAD",
+                    "url": "https://github.com/muelli/geysigning.git"
+                    , "url": "file:///home/muelli/vcs/geysigning"
+                },
+                {
+                    "type": "file",
+                    "path": "mypaint-Makefile",
+                    "dest-filename": "Makefile"
+                }
+            ]
+        }
+    ]
+}
