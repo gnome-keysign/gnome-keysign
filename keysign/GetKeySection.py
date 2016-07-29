@@ -172,22 +172,30 @@ class GetKeySection(Gtk.VBox):
 
     def on_barcode(self, sender, barcode, message, image):
         '''This is connected to the "barcode" signal.
+        
+        The function will advance the application if a reasonable
+        barcode has been provided.
+        
+        Sender is the emitter of the signal and should be the scanning
+        widget.
+        
+        Barcode is the actual barcode that got decoded.
+        
         The message argument is a GStreamer message that created
-        the barcode.'''
-
+        the barcode.
+        
+        When image is set, it should be the frame as pixbuf that
+        caused a barcode to be decoded.
+        '''
+        self.log.info("Barcode signal %r %r", barcode, message)
         parsed = self.parse_barcode(barcode)
-        fpr = parsed['fingerprint']
-
-        if fpr != None:
-            try:
-                pgpkey = key.Key(fpr)
-            except key.KeyError:
-                self.log.exception("Could not create key from %s", barcode)
-            else:
-                self.log.info("Barcode signal %s %s" %( pgpkey.fingerprint, message))
-                self.on_button_clicked(self.nextButton, pgpkey, message, image, parsed_barcode=parsed)
+        fingerprint = parsed['fingerprint']
+        if not fingerprint:
+            self.log.error("Expected fingerprint in %r to evaluate to True, "
+                           "but is %r", parsed, fingerprint)
         else:
-            self.log.error("data found in barcode does not match a OpenPGP fingerprint pattern: %s", barcode)
+            self.on_button_clicked(self.nextButton,
+                fingerprint, message, image, parsed_barcode=parsed)
 
 
     def download_key_http(self, address, port):
@@ -308,10 +316,9 @@ class GetKeySection(Gtk.VBox):
                 if args:
                     # If we call on_button_clicked() from on_barcode()
                     # then we get extra arguments
-                    pgpkey = args[0]
+                    fingerprint = args[0]
                     message = args[1]
                     image = args[2]
-                    fingerprint = pgpkey.fingerprint
                 else:
                     image = None
                     raw_text = self.scanPage.get_text_from_textview()
