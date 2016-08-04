@@ -171,34 +171,6 @@
             ]
         },
         {
-            "name": "ImageMagick",
-            "sources": [
-                {
-                    "type": "archive",
-                    "url": "http://mirror.checkdomain.de/imagemagick/ImageMagick-6.9.5-4.tar.xz",
-                    "sha256": "00549fb8588673bb510e9dc952d9937b2cd1186e9322f5265dd96803e592eed8",
-                    "_url": "http://mirror.checkdomain.de/imagemagick/ImageMagick-7.0.2-6.tar.xz",
-                    "_sha256": "1e173314ddcf1508f9f4c20ddd650883e089dea6acbedd8f2c54d02109104cf9"
-                }
-            ]
-        },
-        {
-            "name": "zbar",
-            "build-options": {
-                "config-opts": ["--disable-video",
-                    "--without-python",
-                    "--without-qt"
-                    ]
-            },
-            "sources": [
-                {
-                    "type": "archive",
-                    "url": "http://downloads.sourceforge.net/project/zbar/zbar/0.10/zbar-0.10.tar.bz2",
-                    "sha256": "234efb39dbbe5cef4189cc76f37afbe3cfcfb45ae52493bfe8e191318bdbadc6"
-                }
-            ]
-        },
-        {
             "name": "gstreamer",
             "sources": [
                 {
@@ -243,6 +215,38 @@
                 {
                     "type": "git",
                     "url": "git://anongit.freedesktop.org/gstreamer/gst-plugins-bad"
+                }
+            ],
+            "modules" : [
+                {
+                    "name": "zbar",
+                    "build-options": {
+                        "config-opts": ["--disable-video",
+                            "--without-python",
+                            "--without-qt"
+                            ]
+                    },
+                    "sources": [
+                        {
+                            "type": "archive",
+                            "url": "http://downloads.sourceforge.net/project/zbar/zbar/0.10/zbar-0.10.tar.bz2",
+                            "sha256": "234efb39dbbe5cef4189cc76f37afbe3cfcfb45ae52493bfe8e191318bdbadc6"
+                        }
+                    ],
+                    "modules" : [
+                        {
+                            "name": "ImageMagick",
+                            "sources": [
+                                {
+                                    "type": "archive",
+                                    "url": "http://mirror.checkdomain.de/imagemagick/ImageMagick-6.9.5-4.tar.xz",
+                                    "sha256": "00549fb8588673bb510e9dc952d9937b2cd1186e9322f5265dd96803e592eed8",
+                                    "_url": "http://mirror.checkdomain.de/imagemagick/ImageMagick-7.0.2-6.tar.xz",
+                                    "_sha256": "1e173314ddcf1508f9f4c20ddd650883e089dea6acbedd8f2c54d02109104cf9"
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         },
