@@ -1,0 +1,12 @@
+all:
+
+install:
+	#python setup.py install --prefix=/app
+	#pip install -v --target=/app .
+	#pip install -v --target=/app/lib/python2.7/site-packages -install-option='--prefix=/app'  .
+	# Fails with permissino error on /usr:  pip2 install -v  .
+	#python2 get-pip.py
+	pip2 install -v --prefix=/app  -rrequirements.txt .
+	find /app -name '*.xml' || echo wtf
+	find /app -name '*.svg' || echo no svg file
+	#gtk-update-icon-cache --ignore-theme-index /app/share/icons/hicolor
