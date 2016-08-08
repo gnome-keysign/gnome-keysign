@@ -263,7 +263,9 @@ def sign_keydata_and_encrypt(keydata):
         # 3.1. sign the uid, using gpg-agent
         keys = tmpkeyring.get_keys(fingerprint)
         log.info("Found keys %s for fp %s", keys, fingerprint)
-        assert len(keys) == 1, "We received multiple keys for fp %s: %s" % (fingerprint, keys)
+        if len(keys) != 1:
+            raise ValueError("We received multiple keys for fp %s: %s"
+                             % (fingerprint, keys))
         key = keys[fingerprint]
         uidlist = key.uidslist
         
