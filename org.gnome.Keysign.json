@@ -146,7 +146,8 @@
         {
             "name": "avahi",
             "_comment": "hrm, I don't want to install this, but we need the python module",
-            "disabled": true,
+            "disabled": false,
+            "rm-configure": true,
             "config-opts": ["--enable-python",
                 "--disable-static",
                 "--disable-mono",
@@ -168,6 +169,13 @@
                     "type": "archive",
                     "url": "http://avahi.org/download/avahi-0.6.31.tar.gz",
                     "sha256": "8372719b24e2dd75de6f59bb1315e600db4fd092805bd1201ed0cb651a2dab48"
+                },
+                {
+                    "type": "script",
+                    "commands": [
+                        "autoreconf -fi"
+                    ],
+                    "dest-filename": "autogen.sh"
                 }
             ]
         },
