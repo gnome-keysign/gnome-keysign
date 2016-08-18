@@ -9,7 +9,10 @@
     "rename-appdata-file": "gnome-keysign.appdata.xml",
     "rename-icon": "gnome-keysign",
     "copy-icon": true,
-    "finish-args": ["--share=ipc", "--socket=x11", "--filesystem=~/.gnupg:ro"],
+    "finish-args": [
+        "--share=ipc", "--socket=x11",
+        "--socket=system-bus",
+        "--filesystem=~/.gnupg:ro"],
     "_comment": "We're waiting for webcam support: https://github.com/flatpak/xdg-desktop-portal/issues/38",
     "appstream-compose": false,
     "tags": ["nightly"],
