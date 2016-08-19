@@ -186,8 +186,12 @@
             "name": "gstreamer",
             "sources": [
                 {
-                    "type": "git",
-                    "url": "git://anongit.freedesktop.org/gstreamer/gstreamer"
+                    "_type": "git",
+                    "_url": "git://anongit.freedesktop.org/gstreamer/gstreamer",
+
+                    "type": "archive",
+                    "url": "https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.9.1.tar.xz",
+                    "sha256": "55304a9e1e8fb5ef82b5b246fef2d9a164eeb0466976a3ad19cfae05b8a94159"
                 }
             ]
         },
@@ -195,8 +199,11 @@
             "name": "gst-plugins-base",
             "sources": [
                 {
-                    "type": "git",
-                    "url": "git://anongit.freedesktop.org/gstreamer/gst-plugins-base"
+                    "_type": "git",
+                    "_url": "git://anongit.freedesktop.org/gstreamer/gst-plugins-base",
+                    "type": "archive",
+                    "url": "https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-1.9.1.tar.xz",
+                    "sha256": "8309d1660406274a94bd056f8d805fb35b902208fbb76ff8ca705b37d950fdc9"
                 }
             ]
         },
@@ -204,8 +211,11 @@
             "name": "gst-plugins-good",
             "sources": [
                 {
-                    "type": "git",
-                    "url": "git://anongit.freedesktop.org/gstreamer/gst-plugins-good"
+                    "_type": "git",
+                    "_url": "git://anongit.freedesktop.org/gstreamer/gst-plugins-good",
+                    "type": "archive",
+                    "url": "https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-1.9.1.tar.xz",
+                    "sha256": "ee79071c8ec28e2f237ca20ff42f16e2e96c0671377d612c918e7309fa953764"
                 }
             ]
         },
@@ -213,8 +223,11 @@
             "name": "gst-plugins-ugly",
             "sources": [
                 {
-                    "type": "git",
-                    "url": "git://anongit.freedesktop.org/gstreamer/gst-plugins-ugly"
+                    "_type": "git",
+                    "_url": "git://anongit.freedesktop.org/gstreamer/gst-plugins-ugly",
+                    "type": "archive",
+                    "url": "https://gstreamer.freedesktop.org/src/gst-plugins-ugly/gst-plugins-ugly-1.9.1.tar.xz",
+                    "sha256": "541b2cc3f36b2c19f2afe9dcac1802109e6b092109ac1e09bc9b5c29cf608abc"
                 }
             ]
         },
@@ -225,8 +238,11 @@
             },
             "sources": [
                 {
-                    "type": "git",
-                    "url": "git://anongit.freedesktop.org/gstreamer/gst-plugins-bad"
+                    "_type": "git",
+                    "_url": "git://anongit.freedesktop.org/gstreamer/gst-plugins-bad",
+                    "type": "archive",
+                    "url": "https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-1.9.1.tar.xz",
+                    "sha256": "65ec284c2df3e2ff746e44d6e8ca08627235f410bf3d2cfa9ca5ce113a0a770a"
                 }
             ],
             "modules" : [
@@ -278,8 +294,11 @@
             "config-opts": ["--with-pygi-overrides-dir=/app/lib/python3.4/site-packages/gi/overrides/"],
             "sources": [
                 {
-                    "type": "git",
-                    "url": "git://anongit.freedesktop.org/gstreamer/gst-python"
+                    "_type": "git",
+                    "_url": "git://anongit.freedesktop.org/gstreamer/gst-python",
+                    "type": "archive",
+                    "url": "https://gstreamer.freedesktop.org/src/gst-python/gst-python-1.9.1.tar.xz",
+                    "sha256": "2ab16a84efbabacfcf8f7920ab6c6725c577f08a82bf4cee45edf415a917015f"
                 }
             ]
         },
