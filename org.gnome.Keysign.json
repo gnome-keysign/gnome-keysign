@@ -126,6 +126,7 @@
         },
         {
             "name": "swig",
+            "disabled": true,
             "config-opts": ["--without-boost", "--without-pcre"],
             "_cleanup": [ "*" ],
             "sources": [
