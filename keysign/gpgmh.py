@@ -359,6 +359,24 @@ def parse_uid(uid):
     return (name, comment, email)
 
 
+def parse_expiry(value):
+    """Takes either a string, an epoch, or a datetime and converts
+    it to a datetime.
+    If the string is empty (or otherwise evaluates to False)
+    then this function returns None, meaning that no expiry has been set.
+    An edge case is the epoch value "0".
+    """
+    if not value:
+        expiry = None
+    else:
+        try:
+            expiry = datetime.fromtimestamp(int(value))
+        except TypeError:
+            expiry = value
+
+    return expiry
+
+
 class UID(namedtuple("UID", "expiry name comment email")):
     "Represents an OpenPGP UID - at least to the extent we care about it"
 
@@ -367,8 +385,10 @@ class UID(namedtuple("UID", "expiry name comment email")):
         "Creates a new UID from a monkeysign key"
         uidstr = uid.uid
         name, comment, email = parse_uid(uidstr)
-        expiry = uid.expire
+        expiry = parse_expiry(uid.expire)
+
         return cls(expiry, name, comment, email)
+
 
     def __format__(self, arg):
         if self.comment:
@@ -393,15 +413,7 @@ class Key(namedtuple("Key", "expiry fingerprint uidslist")):
 
     def __init__(self, expiry, fingerprint, uidslist,
                        *args, **kwargs):
-        try:
-            exp_date = datetime.fromtimestamp(float(expiry))
-        except TypeError as e:
-            # This might be the case when the key.expiry is already a timedate
-            exp_date = expiry
-        except ValueError as e:
-            # This happens when converting an empty string to a datetime.
-            exp_date = None
-
+        exp_date = parse_expiry(expiry)
         super(Key, self).__init__(exp_date, fingerprint, uidslist)
 
     def __format__(self, arg):
@@ -426,7 +438,7 @@ class Key(namedtuple("Key", "expiry fingerprint uidslist")):
     def from_monkeysign(cls, key):
         "Creates a new Key from an existing monkeysign key"
         uids = [UID.from_monkeysign(uid) for uid in  key.uidslist]
-        expiry = key.expiry
+        expiry = parse_expiry(key.expiry)
         fingerprint = key.fpr
         return cls(expiry, fingerprint, uids)
 
