@@ -135,3 +135,17 @@ def sign_keydata_and_send(keydata):
             yield tmpfile
 
 
+def format_fingerprint(fpr):
+    """Formats a given fingerprint (160bit, so 20 characters) in the
+    GnuPG typical way
+    """
+    s = ''
+    for i in range(10):
+        # output 4 chars
+        s += ''.join(fpr[4*i:4*i+4])
+        # add extra space between the block
+        if i == 4: s += '\n'
+        # except at the end
+        elif i < 9: s += ' '
+    return s
+
