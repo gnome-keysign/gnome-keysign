@@ -70,12 +70,10 @@ class KeyPresentPage(Gtk.HBox):
         qrcodeLabel = Gtk.Label()
         qrcodeLabel.set_markup('<span size="15000">' + 'Fingerprint QR code' + '</span>')
 
-        self.qrcode = QRImage()
-        self.qrcode.props.margin = 10
-
         if not qrcodedata:
             qrcodedata = self.generate_qrcode_data()
-        self.qrcode.data = qrcodedata
+        self.qrcode = QRImage(qrcodedata)
+        self.qrcode.props.margin = 10
 
 
         # right vertical box
