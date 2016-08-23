@@ -246,9 +246,9 @@ class GetKeySection(Gtk.VBox):
 
     def sort_clients(self, clients, selected_client_fpr):
         key = lambda client: client[3]==selected_client_fpr
-        client = sorted(clients, key=key, reverse=True)
-        self.log.info("Check if list is sorted '%s'", clients)
-        return clients
+        sorted_clients = sorted(clients, key=key, reverse=True)
+        self.log.info("Check if list is sorted '%s'", sorted_clients)
+        return sorted_clients
 
     def obtain_key_async(self, fingerprint, callback=None, data=None, mac=None, error_cb=None):
         self.log.debug("Obtaining key %r with mac %r", fingerprint, mac)

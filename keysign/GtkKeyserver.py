@@ -97,4 +97,7 @@ def main(args):
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG,
             format='%(name)s (%(levelname)s): %(message)s')
+    # From http://stackoverflow.com/a/16486080/2015768
+    import signal
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
     sys.exit(main(sys.argv))
