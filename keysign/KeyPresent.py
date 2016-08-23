@@ -48,7 +48,7 @@ log = logging.getLogger(__name__)
 
 
 class KeyPresentPage(Gtk.HBox):
-    def __init__(self, fpr):
+    def __init__(self, fpr, qrcodedata = None):
         super(KeyPresentPage, self).__init__()
 
         # create left side Key labels
@@ -73,6 +73,12 @@ class KeyPresentPage(Gtk.HBox):
         self.qrcode = QRImage()
         self.qrcode.props.margin = 10
 
+        if qrcodedata:
+            self.qrcode.data = qrcodedata
+        else:
+            self.draw_qrcode()
+
+
         # right vertical box
         self.rightVBox = Gtk.VBox(spacing=10)
         self.rightVBox.pack_start(qrcodeLabel, False, False, 0)
@@ -82,7 +88,6 @@ class KeyPresentPage(Gtk.HBox):
         self.pack_start(self.rightVBox, True, True, 0)
 
         self.setup_fingerprint_widget(self.fpr)
-        self.draw_qrcode()
 
 
     def setup_fingerprint_widget(self, fingerprint):
