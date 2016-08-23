@@ -73,10 +73,9 @@ class KeyPresentPage(Gtk.HBox):
         self.qrcode = QRImage()
         self.qrcode.props.margin = 10
 
-        if qrcodedata:
-            self.qrcode.data = qrcodedata
-        else:
-            self.draw_qrcode()
+        if not qrcodedata:
+            qrcodedata = self.generate_qrcode_data()
+        self.qrcode.data = qrcodedata
 
 
         # right vertical box
@@ -98,7 +97,7 @@ class KeyPresentPage(Gtk.HBox):
         self.fingerprintLabel.set_markup('<span size="20000">' + fpr + '</span>')
 
 
-    def draw_qrcode(self):
+    def generate_qrcode_data(self):
         assert self.fpr
         fingerprint = self.fpr
         data = 'OPENPGP4FPR:' + fingerprint
@@ -112,7 +111,7 @@ class KeyPresentPage(Gtk.HBox):
         # we call upper to made the barcode more efficient
         data = data.upper()
         log.info("Shoving %r to the QRCode", data)
-        self.qrcode.data = data
+        return data
 
 
 
