@@ -110,14 +110,6 @@ class KeySignSection(Gtk.VBox):
                        fingerprint)
         self.setup_server(keydata, fingerprint)
 
-        self.switch_to_key_present_page(fingerprint)
-
-
-    def switch_to_key_present_page(self, fingerprint):
-        '''This switches the notebook to the page which
-        presents the information that is needed to securely
-        transfer the keydata, i.e. the fingerprint and its barcode.
-        '''
         key_present_page = self.construct_key_present_page(fingerprint)
         self.notebook.next_page()
         # This is more of a crude hack. Once the next page is presented,
