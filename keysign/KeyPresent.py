@@ -42,6 +42,8 @@ from .gpgmh import get_public_key_data
 from .gpgmh import signatures_for_keyid
 from .QRCode import QRImage
 from .util import mac_verify, mac_generate
+from .util import format_fingerprint
+
 
 log = logging.getLogger(__name__)
 
@@ -88,16 +90,7 @@ class KeyPresentPage(Gtk.HBox):
         '''The purpose of this function is to populate the label holding
         the fingerprint with a formatted version.
         '''
-        fpr = ""
-        for i in range(0, len(fingerprint), 4):
-
-            fpr += fingerprint[i:i+4]
-            if i != 0 and (i+4) % 20 == 0:
-                fpr += "\n"
-            else:
-                fpr += " "
-
-        fpr = fpr.rstrip()
+        fpr = format_fingerprint(fingerprint)
         self.fingerprintLabel.set_markup('<span size="20000">' + fpr + '</span>')
 
 
