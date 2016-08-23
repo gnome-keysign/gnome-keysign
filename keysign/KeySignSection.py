@@ -83,9 +83,9 @@ class KeySignSection(Gtk.VBox):
         # FIXME: Consider a GtkHeaderBar for the application
         vbox.pack_start (self.backButton, False, False, 0)
         vbox.pack_start (kpp, True, True, 10)
-        self.key_present_page_index = self.notebook.append_page (vbox, None)
         vbox.show_all()
-        return kpp
+        self.key_present_page_index = self.notebook.append_page (vbox, None)
+        return self.key_present_page_index, kpp
 
 
     def destruct_key_present_page(self):
@@ -110,16 +110,14 @@ class KeySignSection(Gtk.VBox):
                        fingerprint)
         self.setup_server(keydata, fingerprint)
 
-        key_present_page = self.construct_key_present_page(fingerprint)
-        self.notebook.next_page()
+        kpp_index, key_present_page = self.construct_key_present_page(
+            fingerprint)
+        self.notebook.set_current_page(kpp_index)
         # This is more of a crude hack. Once the next page is presented,
         # the back button has the focus. This is not desirable because
         # you will go back when accidentally pressing space or enter.
         key_present_page.fingerprintLabel.grab_focus()
-        # FIXME: we better use set_current_page, but that requires
-        # knowing which page our desired widget is on.
-        # FWIW: A headerbar has named pages.
-        
+
 
     def on_next_button_clicked(self, button):
         '''A helper for legacy reasons to enable a next button
