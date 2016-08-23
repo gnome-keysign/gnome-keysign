@@ -39,7 +39,6 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .__init__ import __version__
 from .gpgmh import get_public_key_data
-from .gpgmh import signatures_for_keyid
 from .QRCode import QRImage
 from .util import mac_verify, mac_generate
 from .util import format_fingerprint
