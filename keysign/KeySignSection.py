@@ -26,6 +26,7 @@ from .KeyPresent import KeyPresentPage
 from . import Keyserver
 from .KeysPage import KeysPage
 from .gpgmh import get_public_key_data
+from .util import mac_generate
 
 log = logging.getLogger(__name__)
 
@@ -110,8 +111,11 @@ class KeySignSection(Gtk.VBox):
                        fingerprint)
         self.setup_server(keydata, fingerprint)
 
+        mac =  mac_generate(fingerprint, keydata)
+        qrcodedata = 'OPENPGP4FPR:{0}#MAC={1}'.format(
+            fingerprint, mac)
         kpp_index, key_present_page = self.construct_key_present_page(
-            fingerprint)
+            fingerprint, qrcodedata)
         self.notebook.set_current_page(kpp_index)
         # This is more of a crude hack. Once the next page is presented,
         # the back button has the focus. This is not desirable because
