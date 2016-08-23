@@ -22,7 +22,7 @@ import sys
 
 from gi.repository import Gtk
 
-from .KeyPresent import KeyPresentPage
+from .KeyPresent import KeyPresentWidget
 from . import Keyserver
 from .KeysPage import KeysPage
 from .gpgmh import get_public_key_data
@@ -70,7 +70,7 @@ class KeySignSection(Gtk.VBox):
 
 
     def construct_key_present_page(self, fingerprint, qrcodedata=None):
-        kpp = KeyPresentPage(fingerprint, qrcodedata=qrcodedata)
+        kpp = KeyPresentWidget(fingerprint, qrcodedata=qrcodedata)
         vbox = Gtk.VBox ()
 
         # create back button
