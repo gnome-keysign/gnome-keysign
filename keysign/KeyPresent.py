@@ -38,81 +38,13 @@ if  __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 from .__init__ import __version__
-from .gpgmh import get_public_key_data
 from .gpgmh import get_usable_keys
 from .QRCode import QRImage
-from .util import mac_verify, mac_generate
 from .util import format_fingerprint
 
 
 
 log = logging.getLogger(__name__)
-
-
-class KeyPresentPage(Gtk.HBox):
-    def __init__(self, fpr, qrcodedata = None):
-        super(KeyPresentPage, self).__init__()
-
-        # create left side Key labels
-        leftTopLabel = Gtk.Label()
-        leftTopLabel.set_markup('<span size="15000">' + 'Key Fingerprint' + '</span>')
-
-        self.fingerprintLabel = Gtk.Label()
-        self.fingerprintLabel.set_selectable(True)
-
-        # left vertical box
-        leftVBox = Gtk.VBox(spacing=10)
-        leftVBox.pack_start(leftTopLabel, False, False, 0)
-        leftVBox.pack_start(self.fingerprintLabel, False, False, 0)
-
-        self.pixbuf = None # Hold QR code in pixbuf
-        self.fpr = fpr # The fpr of the key selected to sign with
-
-        # display QR code on the right side
-        qrcodeLabel = Gtk.Label()
-        qrcodeLabel.set_markup('<span size="15000">' + 'Fingerprint QR code' + '</span>')
-
-        if not qrcodedata:
-            qrcodedata = self.generate_qrcode_data()
-        self.qrcode = QRImage(qrcodedata)
-        self.qrcode.props.margin = 10
-
-
-        # right vertical box
-        self.rightVBox = Gtk.VBox(spacing=10)
-        self.rightVBox.pack_start(qrcodeLabel, False, False, 0)
-        self.rightVBox.pack_start(self.qrcode, True, True, 0)
-
-        self.pack_start(leftVBox, True, True, 0)
-        self.pack_start(self.rightVBox, True, True, 0)
-
-        self.setup_fingerprint_widget(self.fpr)
-
-
-    def setup_fingerprint_widget(self, fingerprint):
-        '''The purpose of this function is to populate the label holding
-        the fingerprint with a formatted version.
-        '''
-        fpr = format_fingerprint(fingerprint)
-        self.fingerprintLabel.set_markup('<span size="20000">' + fpr + '</span>')
-
-
-    def generate_qrcode_data(self):
-        assert self.fpr
-        fingerprint = self.fpr
-        data = 'OPENPGP4FPR:' + fingerprint
-        # FIXME: okay, this is really bad.
-        # We should really try to get the keydata from another
-        # channel. There is key-selected signal. Maybe we can use that.
-        keydata = get_public_key_data(fingerprint)
-        mac = mac_generate(fingerprint, keydata)
-        # FIXME: We probably want to urlencode the thing...
-        data += '#MAC=%s' % mac
-        # we call upper to made the barcode more efficient
-        data = data.upper()
-        log.info("Shoving %r to the QRCode", data)
-        return data
-
 
 
 
