@@ -39,9 +39,11 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .__init__ import __version__
 from .gpgmh import get_public_key_data
+from .gpgmh import get_usable_keys
 from .QRCode import QRImage
 from .util import mac_verify, mac_generate
 from .util import format_fingerprint
+
 
 
 log = logging.getLogger(__name__)
@@ -110,6 +112,42 @@ class KeyPresentPage(Gtk.HBox):
         data = data.upper()
         log.info("Shoving %r to the QRCode", data)
         return data
+
+
+
+
+class KeyPresentWidget(Gtk.Widget):
+
+    def __new__(cls, *args, **kwargs):
+        thisdir = os.path.dirname(os.path.abspath(__file__))
+        builder = Gtk.Builder.new_from_file(os.path.join(thisdir, 'send.ui'))
+        stack = builder.get_object('stack2')
+        stack.set_visible_child_name("page1")
+        # Hrm. That doesn't seem to work, but I don't know why.
+        #stack = builder.get_object('box3')
+        stack._builder = builder
+        stack.__class__ = cls
+        return stack
+    
+    def __init__(self, fingerprint, qrcodedata=None):
+        key = get_usable_keys(pattern=fingerprint)[0]
+        self.key_id_label = self._builder.get_object("keyidLabel")
+        self.uids_label = self._builder.get_object("uidsLabel")
+        self.fingerprint_label = self._builder.get_object("keyFingerprintLabel")
+        self.qrcode_frame = self._builder.get_object("qrcode_frame")
+
+        self.key_id_label.set_markup(key.fingerprint[-8:])
+        self.uids_label.set_markup("\n".join(
+                                        [GLib.markup_escape_text("{}".format(uid))
+                                        for uid
+                                        in key.uidslist]))
+        self.fingerprint_label.set_markup(format_fingerprint(key.fingerprint))
+        if not qrcodedata:
+            qrcodedata = key.fingerprint
+        self.qrcode_frame.add(QRImage(qrcodedata))
+
+
+
 
 
 
