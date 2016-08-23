@@ -197,7 +197,7 @@ class KeyPresent(Gtk.Application):
         log.debug("running: %s", args)
         fpr = args
 
-        self.key_present_page = KeyPresentPage(fpr=fpr)
+        self.key_present_page = KeyPresentWidget(fpr)
 
         super(KeyPresent, self).run()
 
