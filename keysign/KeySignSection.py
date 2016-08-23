@@ -68,8 +68,8 @@ class KeySignSection(Gtk.VBox):
         self.keyserver = None
 
 
-    def construct_key_present_page(self, fingerprint):
-        kpp = KeyPresentPage(fingerprint)
+    def construct_key_present_page(self, fingerprint, qrcodedata=None):
+        kpp = KeyPresentPage(fingerprint, qrcodedata=qrcodedata)
         vbox = Gtk.VBox ()
 
         # create back button
