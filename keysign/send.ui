@@ -255,7 +255,7 @@
                 <child>
                   <object class="GtkLabel" id="keyFingerprintLabel">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can_focus">True</property>
                     <property name="label" translatable="yes">F289 F7BA 977D F414 3AE9
 FDFB F70A 0290 6C30 1813</property>
                     <property name="selectable">True</property>
