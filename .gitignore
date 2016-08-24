@@ -4,3 +4,4 @@
 /build
 /dist
 /gnome_keysign.egg-info
+/.flatpak-builder/
