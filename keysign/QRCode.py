@@ -177,6 +177,8 @@ class QRImage(Gtk.DrawingArea):
         self.set_size_request(size, size)
 
         self.queue_draw()
+        
+        self.set_tooltip_text(data)
 
     def get_data(self):
         return self._data
@@ -219,6 +221,7 @@ class FullscreenQRImageWindow(Gtk.Window):
         self.fullscreen()
         
         self.qrimage = QRImage(data=data, handle_events=False)
+        self.qrimage.set_has_tooltip(False)
         self.add(self.qrimage)
         
         self.connect('button-release-event', self.on_button_released)
