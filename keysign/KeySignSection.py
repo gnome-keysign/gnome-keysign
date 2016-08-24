@@ -120,7 +120,8 @@ class KeySignSection(Gtk.VBox):
         # This is more of a crude hack. Once the next page is presented,
         # the back button has the focus. This is not desirable because
         # you will go back when accidentally pressing space or enter.
-        key_present_page.fingerprintLabel.grab_focus()
+        key_present_page.fingerprint_label.grab_focus()
+
 
 
     def on_next_button_clicked(self, button):
