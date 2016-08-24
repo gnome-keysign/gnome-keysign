@@ -44,9 +44,9 @@ class KeySignSection(Gtk.VBox):
         # these are needed later when we need to get details about
         # a selected key
         self.keysPage = KeysPage()
-        self.keysPage.connect('key-selection-changed',
-            self.on_key_selection_changed)
-        self.keysPage.connect('key-selected', self.on_key_selected)
+        self.keysPage.connect('key-selected',
+            self.on_key_selected)
+        self.keysPage.connect('key-activated', self.on_key_activated)
 
 
         # set up notebook container
@@ -93,14 +93,14 @@ class KeySignSection(Gtk.VBox):
         self.notebook.remove_page(self.key_present_page_index)
 
 
-    def on_key_selection_changed(self, pane, fingerprint):
+    def on_key_selected(self, pane, fingerprint):
         '''This callback is attached to the signal which is emitted
         when the user changes their selection in the list of keys
         '''
         pass
 
 
-    def on_key_selected(self, pane, fingerprint):
+    def on_key_activated(self, pane, fingerprint):
         '''This is the callback for when the user has committed
         to a key, i.e. the user has made a selection and wants to
         advance the program.
