@@ -47,13 +47,11 @@ class KeysPage(Gtk.VBox):
     '''
     __gsignals__ = {
         str('key-activated'): (GObject.SIGNAL_RUN_LAST, None,
-                         # Hm, this is a str for now, but ideally
-                         # it'd be the full key object
-                         (str,)),
+                         # the activated key object
+                         (object,)),
         str('key-selected'): (GObject.SIGNAL_RUN_LAST, None,
-                         # Hm, this is a str for now, but ideally
-                         # it'd be the full key object
-                         (str,)),
+                         # the selected key object
+                         (object,)),
     }
 
     def __init__(self, show_public_keys=False):
@@ -153,11 +151,11 @@ class KeysPage(Gtk.VBox):
         name, email, fingerprint = \
             self.get_items_from_selection(selection)[:3]
         
-        self.emit('key-selected', fingerprint)
         
         # FIXME: We'd rather want to get the key object
         # (or its representation) from the model, not by querying again
         key = next(iter(get_usable_keys(pattern=fingerprint)))
+        self.emit('key-selected', key)
         exp_date = key.expiry
 
         if exp_date is None:
@@ -199,7 +197,10 @@ class KeysPage(Gtk.VBox):
         # the tree_path and column, but I don't know how.
         name, email, fingerprint = \
             self.get_items_from_selection()[:3]
-        self.emit('key-activated', fingerprint)
+        key = next(iter(get_usable_keys(pattern=fingerprint)))
+        log.info("keys: %r", get_usable_keys(pattern=fingerprint))
+        log.info("Emitting %r", key)
+        self.emit('key-activated', key)
 
 
     def on_publish_button_clicked(self, button, key, *args):
@@ -208,7 +209,7 @@ class KeysPage(Gtk.VBox):
         signal with the ID of the selected key.'''
         log.debug('Clicked publish for key (%s) %s (%s)', type(key), key, args)
         fingerprint = key.fingerprint
-        self.emit('key-activated', fingerprint)
+        self.emit('key-activated', key)
 
 
 
