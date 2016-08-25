@@ -53,14 +53,18 @@ class KeyPresentWidget(Gtk.Widget):
     def __new__(cls, *args, **kwargs):
         thisdir = os.path.dirname(os.path.abspath(__file__))
         builder = Gtk.Builder.new_from_file(os.path.join(thisdir, 'send.ui'))
-        stack = builder.get_object('stack2')
-        stack.set_visible_child_name("page1")
-        # Hrm. That doesn't seem to work, but I don't know why.
-        #stack = builder.get_object('box3')
-        stack._builder = builder
-        stack.__class__ = cls
-        return stack
-    
+        # The widget will very likely have a parent.
+        # Gtk doesn't like so much adding a Widget to a container
+        # when the widget already has been added somewhere.
+        # So we get the parent widget and remove the child.
+        w = builder.get_object('box3')
+        parent = w.get_parent()
+        if parent:
+            parent.remove(w)
+        w._builder = builder
+        w.__class__ = cls
+        return w
+
     def __init__(self, fingerprint, qrcodedata=None):
         key = get_usable_keys(pattern=fingerprint)[0]
         self.key_id_label = self._builder.get_object("keyidLabel")
