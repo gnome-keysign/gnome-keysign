@@ -65,8 +65,7 @@ class KeyPresentWidget(Gtk.Widget):
         w.__class__ = cls
         return w
 
-    def __init__(self, fingerprint, qrcodedata=None):
-        key = get_usable_keys(pattern=fingerprint)[0]
+    def __init__(self, key, qrcodedata=None):
         self.key_id_label = self._builder.get_object("keyidLabel")
         self.uids_label = self._builder.get_object("uidsLabel")
         self.fingerprint_label = self._builder.get_object("keyFingerprintLabel")
@@ -133,7 +132,8 @@ class KeyPresent(Gtk.Application):
         log.debug("running: %s", args)
         fpr = args
 
-        self.key_present_page = KeyPresentWidget(fpr)
+        key = next(iter(get_usable_keys(pattern=fpr)))
+        self.key_present_page = KeyPresentWidget(key)
 
         super(KeyPresent, self).run()
 

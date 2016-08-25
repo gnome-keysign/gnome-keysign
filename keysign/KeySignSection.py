@@ -26,6 +26,7 @@ from .KeyPresent import KeyPresentWidget
 from . import Keyserver
 from .KeysPage import KeysPage
 from .gpgmh import get_public_key_data
+from .gpgmh import get_usable_keys
 from .util import mac_generate
 
 log = logging.getLogger(__name__)
@@ -70,7 +71,8 @@ class KeySignSection(Gtk.VBox):
 
 
     def construct_key_present_page(self, fingerprint, qrcodedata=None):
-        kpp = KeyPresentWidget(fingerprint, qrcodedata=qrcodedata)
+        key = next(iter(get_usable_keys(pattern=fingerprint)))
+        kpp = KeyPresentWidget(key, qrcodedata=qrcodedata)
         vbox = Gtk.VBox ()
 
         # create back button
