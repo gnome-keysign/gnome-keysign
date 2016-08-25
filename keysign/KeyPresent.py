@@ -79,7 +79,7 @@ class KeyPresentWidget(Gtk.Widget):
                                         in key.uidslist]))
         self.fingerprint_label.set_markup(format_fingerprint(key.fingerprint))
         if not qrcodedata:
-            qrcodedata = key.fingerprint
+            qrcodedata = "OPENPGP4FPR:" + key.fingerprint
         self.qrcode_frame.add(QRImage(qrcodedata))
 
 
