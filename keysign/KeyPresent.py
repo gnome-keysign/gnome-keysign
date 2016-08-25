@@ -49,6 +49,17 @@ log = logging.getLogger(__name__)
 
 
 class KeyPresentWidget(Gtk.Widget):
+    """A widget for presenting a gpgmh.Key
+
+    It shows details of the given key and customizable data in a
+    qrcode encoded in a QRImage.
+
+    The widget takes a full key object, rather than a fingerprint,
+    because it makes assumptions about the key object anyway. So
+    it can as well take it directly and enable higher level controllers
+    to deal with the situation that a given fingerprint, which really is
+    a search string for gpg, yields multiple results.
+    """
 
     def __new__(cls, *args, **kwargs):
         thisdir = os.path.dirname(os.path.abspath(__file__))
@@ -66,6 +77,10 @@ class KeyPresentWidget(Gtk.Widget):
         return w
 
     def __init__(self, key, qrcodedata=None):
+        """A new KeyPresentWidget shows the string you provide as qrcodedata
+        in a qrcode. If it evaluates to False, the key's fingerprint will
+        be shown. That is, "OPENPGP4FPR: + fingerprint.
+        """
         self.key_id_label = self._builder.get_object("keyidLabel")
         self.uids_label = self._builder.get_object("uidsLabel")
         self.fingerprint_label = self._builder.get_object("keyFingerprintLabel")
