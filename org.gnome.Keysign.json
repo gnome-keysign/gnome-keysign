@@ -12,8 +12,9 @@
     "finish-args": [
         "--share=ipc", "--socket=x11",
         "--socket=system-bus",
+        "--device=all",
         "--filesystem=~/.gnupg:ro"],
-    "_comment": "We're waiting for webcam support: https://github.com/flatpak/xdg-desktop-portal/issues/38",
+    "_comment": "We're waiting for webcam support: https://github.com/flatpak/xdg-desktop-portal/issues/38; we use --device=all meanwhile.",
     "appstream-compose": false,
     "tags": ["nightly"],
     "desktop-file-name-prefix": "(Nightly) ",
