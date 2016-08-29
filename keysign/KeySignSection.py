@@ -24,9 +24,10 @@ from gi.repository import Gtk
 
 from .KeyPresent import KeyPresentWidget
 from . import Keyserver
-from .KeysPage import KeysPage
+from .keylistwidget import KeyListWidget
 from .gpgmh import get_public_key_data
 from .gpgmh import get_usable_keys
+from .gpgmh import get_usable_secret_keys
 from .util import mac_generate
 
 log = logging.getLogger(__name__)
@@ -39,15 +40,18 @@ class KeySignSection(Gtk.VBox):
         choose a key to be signed by other person.
         '''
         super(KeySignSection, self).__init__()
-
         self.log = logging.getLogger(__name__)
 
-        # these are needed later when we need to get details about
-        # a selected key
-        self.keysPage = KeysPage()
-        self.keysPage.connect('key-selected',
-            self.on_key_selected)
-        self.keysPage.connect('key-activated', self.on_key_activated)
+        keys = list(get_usable_secret_keys())
+        if len(keys) <= 0:
+            self.keysPage = Gtk.Label(
+                "Oops. You don't seem to have any usable private keys :-("
+                "\nPlease create a key with, e.g. Seahorse."
+                , use_markup=True)
+        else:
+            self.keysPage = KeyListWidget(get_usable_secret_keys())
+            self.keysPage.connect('key-selected',  self.on_key_selected)
+            self.keysPage.connect('key-activated', self.on_key_activated)
 
 
         # set up notebook container
