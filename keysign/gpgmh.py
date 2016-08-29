@@ -232,6 +232,10 @@ def get_usable_secret_keys(keyring=None, pattern=None):
     secret_keys_dict = keyring.get_keys(pattern=pattern,
                                         public=False,
                                         secret=True)
+    if not secret_keys_dict:
+        log.info("Keyring %r has not returned keys: %r",
+                 keyring, secret_keys_dict)
+        secret_keys_dict = {}
     secret_key_fprs = secret_keys_dict.keys()
     log.debug('Detected secret keys: %s', secret_key_fprs)
     usable_keys_fprs = filter(lambda fpr: get_usable_keys(keyring, pattern=fpr, public=True), secret_key_fprs)
