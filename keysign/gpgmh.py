@@ -205,7 +205,7 @@ def get_usable_keys(keyring=None, *args, **kwargs):
     log.debug('Retrieving keys for %s, %s', args, kwargs)
     if keyring is None:
         keyring = Keyring()
-    keys_dict = keyring.get_keys(*args, **kwargs)
+    keys_dict = keyring.get_keys(*args, **kwargs) or {}
     assert keys_dict is not None, keyring.context.stderr
     def is_usable(key):
         unusable =    key.invalid or key.disabled \
