@@ -317,7 +317,7 @@
                 },
                 {
                     "type": "file",
-                    "path": "mypaint-Makefile",
+                    "path": "keysign-Makefile",
                     "dest-filename": "Makefile"
                 }
             ]
