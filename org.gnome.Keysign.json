@@ -330,10 +330,91 @@
             ]
         },
         {
+            "name": "six",
+            "build-options": {
+                "env": {
+                    "PYTHONUSERBASE" : "/app"
+                }
+            },
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://pypi.python.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz",
+                    "sha256": "105f8d68616f8248e24bf0e9372ef04d3cc10104f1980f54d57b2ce73a5ad56a"
+                },
+                {
+                    "type": "script",
+                    "dest-filename": "configure",
+                    "commands": [
+                        "echo   just so that a configure file exists"
+                    ]
+                },
+                {
+                    "type": "file",
+                    "path": "pip-Makefile",
+                    "dest-filename": "Makefile"
+                }
+            ]
+        },
+        {
+            "name": "qrcode",
+            "build-options": {
+                "env": {
+                    "PYTHONUSERBASE" : "/app"
+                }
+            },
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://pypi.python.org/packages/87/16/99038537dc58c87b136779c0e06d46887ff5104eb8c64989aac1ec8cba81/qrcode-5.3.tar.gz",
+                    "sha256": "4115ccee832620df16b659d4653568331015c718a754855caf5930805d76924e"
+                },
+                {
+                    "type": "script",
+                    "dest-filename": "configure",
+                    "commands": [
+                        "echo   just so that a configure file exists"
+                    ]
+                },
+                {
+                    "type": "file",
+                    "path": "pip-Makefile",
+                    "dest-filename": "Makefile"
+                }
+            ]
+        },
+        {
+            "name": "requests",
+            "build-options": {
+                "env": {
+                    "PYTHONUSERBASE" : "/app"
+                }
+            },
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://pypi.python.org/packages/2e/ad/e627446492cc374c284e82381215dcd9a0a87c4f6e90e9789afefe6da0ad/requests-2.11.1.tar.gz",
+                    "sha256": "5acf980358283faba0b897c73959cecf8b841205bb4b2ad3ef545f46eae1a133"
+                },
+                {
+                    "type": "script",
+                    "dest-filename": "configure",
+                    "commands": [
+                        "echo   just so that a configure file exists"
+                    ]
+                },
+                {
+                    "type": "file",
+                    "path": "pip-Makefile",
+                    "dest-filename": "Makefile"
+                }
+            ]
+        },
+        {
             "name": "gnome-keysign",
             "no-autogen": true,
             "build-options": {
-                "build-args" : ["--share=network"],
+                "_build-args" : ["--share=network"],
                 "env": {
                     "PYTHONUSERBASE" : "/app"
                 }
