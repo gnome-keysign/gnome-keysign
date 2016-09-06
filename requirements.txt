@@ -8,10 +8,10 @@ qrcode
 
 
 # Additional Development packages
-pytest
-pytest-xdist
-pylint
-pep8
+pytest; extra == "test"
+pytest-xdist; extra == "test"
+pylint; extra == "test"
+pep8; extra == "test"
 
 # Distribution packages
 # python2
