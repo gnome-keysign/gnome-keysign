@@ -69,6 +69,9 @@ class QRImage(Gtk.DrawingArea):
         self.log.info('Event %s', dir(event))
         if event.button == 1:
             w = FullscreenQRImageWindow(data=self.data)
+            top_level_window = self.get_toplevel()
+            if top_level_window.is_toplevel():
+                w.set_transient_for(top_level_window)
 
 
     def do_size_allocate(self, event):
