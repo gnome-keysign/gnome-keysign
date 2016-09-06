@@ -231,6 +231,26 @@ class FullscreenQRImageWindow(Gtk.Window):
             self.unfullscreen()
             self.hide()
             self.close()
+        elif keyname == 'left' or keyname == 'right':
+            # We're trying to switch monitors
+            screen = self.get_screen()
+            # Determines the monitor the window is currently most visible in
+            n = screen.get_monitor_at_window(screen.get_active_window())
+            n_monitors = screen.get_n_monitors()
+
+            if keyname == 'left':
+                delta = -1
+            elif keyname == 'right':
+                delta = 1
+            else:
+                raise ValueError()
+
+            new_n = (n+delta) % n_monitors
+            log.info("Moving from %d to %d/%d", n, new_n, n_monitors)
+            if n != new_n:
+                # FIXME: Determine whether we need this call to unfullscreen
+                self.unfullscreen()
+                self.fullscreen_on_monitor(self.get_screen(), new_n)
 
 
 def main(data):
