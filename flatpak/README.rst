@@ -7,7 +7,7 @@ Building
 
 Build the software in flatpak using a command like this:
 
-    flatpak-builder  --force-clean -v  --repo=/tmp/fb.repo --gpg-sign=tobiasmue@gnome.org  /tmp/fpbuilder org.gnome.Keysign2.json 
+    flatpak-builder  --force-clean -v  --repo=/tmp/fb.repo --gpg-sign=tobiasmue@gnome.org  /tmp/fpbuilder org.gnome.Keysign.json
 
 That will have populated the *repository* in /tmp/fb.repo with the build.
 
