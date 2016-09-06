@@ -62,6 +62,13 @@ setup(
         # avahi # Also no entry in the cheeseshop
         # dbus # dbus-python is in the cheeseshop but not pip-able
         ],
+    extras_require = {
+        'test' : [
+            'tox',
+            'pep8',
+            'pylint',
+        ]
+    },
     license='GPLv3+',
     long_description=open('README.rst').read(),
     
