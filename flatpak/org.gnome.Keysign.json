@@ -421,10 +421,8 @@
             "sources": [
                 {
                     "type": "git",
-                    "branch": "flatpak",
-                    "_branch": "HEAD",
+                    "branch": "master",
                     "url": "https://github.com/muelli/geysigning.git"
-                    , "url": "file:///home/muelli/vcs/geysigning"
                 },
                 {
                     "type": "file",
