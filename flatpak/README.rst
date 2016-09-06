@@ -12,10 +12,12 @@ Build the software in flatpak using a command like this:
 That will have populated the *repository* in /tmp/fb.repo with the build.
 
 
+Then, you have to make the build known in the repository:
+
+    flatpak build-update-repo --title='GNOME Keysign' --generate-static-deltas --prune --prune-depth=5  --gpg-sign="tobiasmue@gnome.org"  /tmp/fb.repo
+
+
 To create a bundle file, use something like the following:
-
-
-    flatpak build-update-repo --title='GNOME Keysign' --generate-static-deltas --prune --prune-depth=1  --gpg-sign="tobiasmue@gnome.org"  /tmp/fb.repo
 
 
     gpg2 --output="$HOME/tobiasmue@gnome.org.gpg.asc" --armor --export \
@@ -59,5 +61,14 @@ Otherwise, you have to manually add the repository and install from there:
 Repository
 --------------
 
+If you haven't done so already, you need to make the latest build
+known to the (local) repository with the *build-update-repo* mentioned
+above.
+
+Then, you can simply copy the local repository directory to a remote location:
+
     rsync --delete --numeric-ids  -r  --partial --progress -v --links /tmp/fb.repo/ server:~/public_html/flatpak/
 
+Note that if "summary" and "summary.sig" do not get copied last,
+a client won't be able to pull the lastest changes while they
+are still in transit.
