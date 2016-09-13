@@ -183,6 +183,25 @@ class QRImage(Gtk.DrawingArea):
 
     data = GObject.property(getter=get_data, setter=set_data)
 
+
+def fullscreen_at_monitor(window, n):
+    """Fullscreens a given window on the n-th monitor
+
+    This is because Gtk's fullscreen_on_monitor seems to
+    be buggy.
+    http://stackoverflow.com/a/39386341/2015768
+    """
+    screen = Gdk.Screen.get_default()
+
+    monitor_n_geo = screen.get_monitor_geometry(n)
+    x = monitor_n_geo.x
+    y = monitor_n_geo.y
+
+    window.move(x,y)
+
+    window.fullscreen()
+
+
 class FullscreenQRImageWindow(Gtk.Window):
     '''Displays a QRImage in a fullscreen window
     
@@ -248,9 +267,13 @@ class FullscreenQRImageWindow(Gtk.Window):
             new_n = (n+delta) % n_monitors
             log.info("Moving from %d to %d/%d", n, new_n, n_monitors)
             if n != new_n:
-                # FIXME: Determine whether we need this call to unfullscreen
-                self.unfullscreen()
-                self.fullscreen_on_monitor(self.get_screen(), new_n)
+                # This call would make it animate a little,
+                # but it looks weird for me, so we don't unfullscreen.
+                # self.unfullscreen()
+                fullscreen_at_monitor(self, new_n)
+                # The following call is broken, unfortunately.
+                # https://bugzilla.gnome.org/show_bug.cgi?id=752677
+                # self.fullscreen_on_monitor(self.get_screen(), new_n)
 
 
 def main(data):
