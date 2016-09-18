@@ -1,9 +1,9 @@
-%global commit 901247227887a1e5d34a8c8c2da33e98da694000
+%global commit c97ba3c96594592a438fe4fc4a034215a79ebe48
 %global shortcommit %(c=%{commit}; echo ${c:0:7})
 
 Name:          gnome-keysign
-Version:       0.3
-Release:       0.git.%{shortcommit}%{?dist}
+Version:       0.7
+Release:       0.7.git.%{shortcommit}%{?dist}
 Summary:       GNOME OpenGPG key signing helper
 
 License:       GPLv3+
@@ -13,7 +13,8 @@ Source0:       https://github.com/muelli/geysigning/archive/%{commit}/%{name}-%{
 BuildRequires: python-devel
 BuildRequires: /usr/bin/desktop-file-validate
 Requires:      python-requests dbus-python avahi-ui-tools
-Requires:      python-qrencode monkeysign gstreamer1(element-zbar)
+Requires:      python-qrcode  python-gobject    python-avahi
+Requires:      gstreamer1-plugins-bad-free-extras
 BuildArch:     noarch
 
 %description
