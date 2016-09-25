@@ -55,10 +55,11 @@ class ScanFingerprintPage(Gtk.HBox):
         scrolledwindow.add(self.textview)
 
         # set up webcam frame
-        self.scanFrame = Gtk.Frame(label='QR Scanner')
-        self.scanFrame = BarcodeReaderGTK()
-        self.scanFrame.set_size_request(150,150)
-        self.scanFrame.show()
+        scanFrame = Gtk.Frame(label='QR Scanner')
+        scanFrame = BarcodeReaderGTK()
+        scanFrame.set_size_request(150,150)
+        scanFrame.show()
+        self.barcode_scanner = scanFrame
 
         # set up load button: this will be used to load a qr code from a file
         self.loadButton = Gtk.Button('Open Image')
@@ -74,7 +75,7 @@ class ScanFingerprintPage(Gtk.HBox):
         # set up right box
         rightBox = Gtk.VBox(spacing=10)
         rightBox.pack_start(rightLabel, False, False, 0)
-        rightBox.pack_start(self.scanFrame, True, True, 0)
+        rightBox.pack_start(scanFrame, True, True, 0)
         rightBox.pack_start(self.loadButton, False, False, 0)
 
         # pack up

@@ -106,7 +106,7 @@ class GetKeySection(Gtk.VBox):
         # We *could* overwrite the on_barcode function, but
         # let's rather go with a GObject signal
         #self.scanFrame.on_barcode = self.on_barcode
-        self.scanPage.scanFrame.connect('barcode', self.on_barcode)
+        self.scanPage.barcode_scanner.connect('barcode', self.on_barcode)
         #GLib.idle_add(        self.scanFrame.run)
 
         # A list holding references to temporary files which should probably
