@@ -42,10 +42,6 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .scan_barcode import BarcodeReaderGTK
 
-# This needs to be called before creating a BarcodeReaderGTK
-Gst.init()
-
-
 log = logging.getLogger(__name__)
 
 
@@ -77,6 +73,10 @@ class KeyFprScanWidget(Gtk.VBox):
 
         self.scan_frame = builder.get_object("scan_frame")
 
+        if not Gst.is_initialized():
+            log.error("Gst does not seem to be initialised. Call Gst.init()!")
+            # This needs to be called before creating a BarcodeReaderGTK
+            Gst.init()
         reader = BarcodeReaderGTK()
         reader.set_size_request(150,150)
         reader.connect('barcode', self.on_barcode)
@@ -124,5 +124,6 @@ class KeyScanApp(Gtk.Application):
 if __name__ == "__main__":
     import sys
     logging.basicConfig(level=logging.DEBUG)
+    Gst.init()
     app = KeyScanApp()
     app.run()
