@@ -17,6 +17,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
+from datetime import date, datetime
 import signal
 import sys
 import argparse
@@ -35,17 +36,40 @@ if  __name__ == "__main__" and __package__ is None:
                               "this script directly which is discouraged. " +
                               "Try python -m instead.")
     parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    os.sys.path.insert(0, parent_dir + "/../")
+    os.sys.path.insert(0, parent_dir)
     import keysign
     #mod = __import__('keysign')
     #sys.modules["keysign"] = mod
     __package__ = str('keysign')
 
 
-from keysign.gpgmh import get_usable_keys
-from keysign.app import format_key_header, format_uidslist
+from .gpgmh import get_usable_keys
+
 
 log = logging.getLogger(__name__)
+
+
+#FIXME: remove the temporary keyword args after updating Key class
+#with length and creation_time fields
+def format_key_header(fpr, length='2048', creation_time=None):
+    if creation_time == None:
+        creation_time = datetime.strptime('01011970', "%d%m%Y").date()
+    try:
+        creation = date.fromtimestamp(float(creation_time))
+    except TypeError as e:
+        # This might be the case when the creation_time is already a timedate
+        creation = creation_time
+
+    key_header = ("{}/{} {}".format(length, fpr[-8:], creation))
+    return key_header
+
+def format_uidslist(uidslist):
+    result = ""
+    for uid in uidslist:
+        uidstr = str(uid).replace('<', '').replace('>', '')
+        result += ("{}\n".format(uidstr))
+
+    return result
 
 
 
