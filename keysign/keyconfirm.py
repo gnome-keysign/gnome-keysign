@@ -86,7 +86,7 @@ class PreSignWidget(Gtk.VBox):
                                     (GObject.TYPE_PYOBJECT,)),
     }
 
-    def __init__(self, pattern=None):
+    def __init__(self, key):
         super(PreSignWidget, self).__init__()
         thisdir = os.path.dirname(os.path.abspath(__file__))
         builder = Gtk.Builder.new_from_file(os.path.join(thisdir, 'receive.ui'))
@@ -96,7 +96,7 @@ class PreSignWidget(Gtk.VBox):
         confirm_btn = builder.get_object("confirm_sign_button")
         confirm_btn.connect("clicked", self.on_confirm_button_clicked)
 
-        self.key = get_usable_keys(pattern=pattern)[0]
+        self.key = key
 
         keyIdsLabel = builder.get_object("key_ids_label")
         keyIdsLabel.set_markup(format_key_header(self.key.fingerprint))
@@ -139,7 +139,8 @@ class PreSignApp(Gtk.Application):
     def run(self, args):
         if not args:
             args = [""]
-        self.psw = PreSignWidget(args[0])
+        key = get_usable_keys (pattern=args[0])[0]
+        self.psw = PreSignWidget(key)
         super(PreSignApp, self).run()
 
 
