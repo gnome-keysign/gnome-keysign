@@ -17,9 +17,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
-import signal
 import sys
-import argparse
 import logging
 import os
 
@@ -27,8 +25,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Gst', '1.0')
 
-from gi.repository import Gtk, GLib, Gst, GdkPixbuf
-from gi.repository import GdkX11, GstVideo
+from gi.repository import Gtk, Gst, GdkPixbuf
 from gi.repository import GObject
 
 
