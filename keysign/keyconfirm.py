@@ -91,7 +91,10 @@ class PreSignWidget(Gtk.VBox):
         thisdir = os.path.dirname(os.path.abspath(__file__))
         builder = Gtk.Builder.new_from_file(os.path.join(thisdir, 'receive.ui'))
         widget = builder.get_object('box10')
-        widget.reparent(self)
+        parent = widget.get_parent()
+        if parent:
+            parent.remove(widget)
+        self.add(widget)
 
         confirm_btn = builder.get_object("confirm_sign_button")
         confirm_btn.connect("clicked", self.on_confirm_button_clicked)
