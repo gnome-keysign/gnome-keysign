@@ -27,6 +27,7 @@ from .compat import gtkbutton
 from .SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 from .util import mac_verify
 from .util import sign_keydata_and_send as _sign_keydata_and_send
+from .keyfprscan import KeyFprScanWidget
 
 from gi.repository import Gst, Gtk, GLib
 # Because of https://bugzilla.gnome.org/show_bug.cgi?id=698005
@@ -69,7 +70,9 @@ class GetKeySection(Gtk.VBox):
         self.app = app
         self.log = logging.getLogger(__name__)
 
-        self.scanPage = ScanFingerprintPage()
+        self.scanPage = (
+            KeyFprScanWidget(),
+            ScanFingerprintPage())[1]
         self.signPage = SignKeyPage()
         # set up notebook container
         self.notebook = Gtk.Notebook()

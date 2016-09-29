@@ -98,6 +98,9 @@ class ScanFingerprintPage(Gtk.HBox):
     def on_loadbutton_clicked(self, *args, **kwargs):
         print("load")
 
+    def on_barcode (self, barcode_reader, barcode, gstmessage, pixbuf):
+        self.emit ("barcode_scanned", barcode, gstmessage, pixbuf)
+
 
 class SignKeyPage(Gtk.HBox):
 

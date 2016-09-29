@@ -120,8 +120,8 @@ class AvahiPublisher:
             raise RuntimeError(m % error)
 
 
+DBusGMainLoop( set_as_default=True )
 if __name__ == '__main__':
-    DBusGMainLoop( set_as_default=True )
 
     ap = AvahiPublisher()
     ap.add_service()
