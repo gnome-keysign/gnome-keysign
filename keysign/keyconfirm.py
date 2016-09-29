@@ -86,10 +86,11 @@ class PreSignWidget(Gtk.VBox):
                                     (GObject.TYPE_PYOBJECT,)),
     }
 
-    def __init__(self, key):
+    def __init__(self, key, builder=None):
         super(PreSignWidget, self).__init__()
         thisdir = os.path.dirname(os.path.abspath(__file__))
-        builder = Gtk.Builder.new_from_file(os.path.join(thisdir, 'receive.ui'))
+        if not builder:
+            builder = Gtk.Builder.new_from_file(os.path.join(thisdir, 'receive.ui'))
         widget = builder.get_object('box10')
         parent = widget.get_parent()
         if parent:
