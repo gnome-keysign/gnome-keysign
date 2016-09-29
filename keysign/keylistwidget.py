@@ -139,7 +139,7 @@ class App(Gtk.Application):
         window.set_title("Key List")
 
         if not self.kpw:
-            self.kpw = KeyListWidget()
+            self.kpw = KeyListWidget(get_usable_keys())
         self.kpw.connect('key-activated', self.on_key_activated)
         self.kpw.connect('key-selected', self.on_key_selected)
         window.add(self.kpw)
