@@ -107,6 +107,8 @@ class KeyListWidget(Gtk.HBox):
         self.listbox = builder.get_object("keys_listbox")
 
         if len(list(keys)) <= 0:
+            infobar = builder.get_object("infobar")
+            infobar.show()
             l = Gtk.Label("You don't have any OpenPGP keys")
             self.listbox.add(l)
         else:
