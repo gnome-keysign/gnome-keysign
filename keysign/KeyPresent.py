@@ -65,7 +65,11 @@ class KeyPresentWidget(Gtk.Widget):
 
     def __new__(cls, *args, **kwargs):
         thisdir = os.path.dirname(os.path.abspath(__file__))
-        builder = Gtk.Builder.new_from_file(os.path.join(thisdir, 'send.ui'))
+        builder = kwargs.pop("builder", None)
+        if not builder:
+            builder = Gtk.Builder.new_from_file(
+                os.path.join(thisdir, 'send.ui'))
+        log.debug("Our builder is: %r", builder)
         # The widget will very likely have a parent.
         # Gtk doesn't like so much adding a Widget to a container
         # when the widget already has been added somewhere.
@@ -78,7 +82,7 @@ class KeyPresentWidget(Gtk.Widget):
         w.__class__ = cls
         return w
 
-    def __init__(self, key, qrcodedata=None):
+    def __init__(self, key, qrcodedata=None, builder=None):
         """A new KeyPresentWidget shows the string you provide as qrcodedata
         in a qrcode. If it evaluates to False, the key's fingerprint will
         be shown. That is, "OPENPGP4FPR: + fingerprint.
