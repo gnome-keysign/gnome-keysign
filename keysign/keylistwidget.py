@@ -91,14 +91,17 @@ class KeyListWidget(Gtk.HBox):
                                # The selected key
     }
 
-    def __init__(self, keys):
+    def __init__(self, keys, builder=None):
         "Sets the widget up with the given keys"
         super(KeyListWidget, self).__init__()
 
         thisdir = os.path.dirname(os.path.abspath(__file__))
-        builder = Gtk.Builder.new_from_file(os.path.join(thisdir, 'send.ui'))
+        if not builder:
+            builder = Gtk.Builder.new_from_file(
+                os.path.join(thisdir, 'send.ui'))
         widget = builder.get_object('box2')
-        widget.get_parent().remove(widget)
+        old_parent = widget.get_parent()
+        old_parent.remove(widget)
         self.add(widget)
 
         self.listbox = builder.get_object("keys_listbox")
