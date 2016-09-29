@@ -101,6 +101,7 @@ class KeyPresentWidget(Gtk.Widget):
         if not qrcodedata:
             qrcodedata = "OPENPGP4FPR:" + key.fingerprint
         self.qrcode_frame.add(QRImage(qrcodedata))
+        self.qrcode_frame.show_all()
 
 
 
