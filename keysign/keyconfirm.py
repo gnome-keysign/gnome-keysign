@@ -37,6 +37,7 @@ if  __name__ == "__main__" and __package__ is None:
                               "Try python -m instead.")
     parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     os.sys.path.insert(0, parent_dir)
+    os.sys.path.insert(0, os.path.join(parent_dir, 'monkeysign'))
     import keysign
     #mod = __import__('keysign')
     #sys.modules["keysign"] = mod
