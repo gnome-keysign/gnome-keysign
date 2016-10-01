@@ -159,7 +159,7 @@ class ServeKeyThread(Thread):
         super(ServeKeyThread, self).start(*args, **kwargs)
 
 
-    def serve_key(self):
+    def serve_key(self, poll_interval=0.15):
         '''An HTTPd is started and being put to serve_forever.
         You need to call shutdown() in order to stop
         serving.
@@ -169,7 +169,7 @@ class ServeKeyThread(Thread):
         try:
             log.info('Serving now on %s, this is probably blocking...',
                      self.httpd.socket.getsockname())
-            self.httpd.serve_forever()
+            self.httpd.serve_forever(poll_interval=poll_interval)
         finally:
             log.info('finished serving')
             #httpd.dispose()
