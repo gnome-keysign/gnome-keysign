@@ -44,7 +44,7 @@ class App(Gtk.Application):
 
         keys = gpgmh.get_usable_secret_keys()
         klw = KeyListWidget(keys, builder=self.builder)
-        klw.connect("key-activated", self.on_activated)
+        klw.connect("key-activated", self.on_key_activated)
 
         stack = self.builder.get_object("send_stack")
         stack.add(klw)
@@ -68,7 +68,7 @@ class App(Gtk.Application):
         self.avahi_offer = None
 
 
-    def on_activated(self, widget, key):
+    def on_key_activated(self, widget, key):
         log.info("Activated key %r", key)
         ####
         # Start network services
