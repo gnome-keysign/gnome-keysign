@@ -93,6 +93,19 @@ class App(Gtk.Application):
 
     def on_headerbutton_clicked(self, button):
         log.info("Headerbutton pressed: %r", button)
+        # If we ever defer operations here, it seems that
+        # the order of steps is somewhat important for the
+        # responsiveness of the UI.  It seems that shutting down
+        # the HTTPd takes ages to finish and blocks animations.
+        # So we want to do that first, because we can argue
+        # better that going back takes some time rather than having
+        # a half-baked switching animation.
+        # For now, it doesn't matter, because we don't defer.
+        ####
+        # Stop network services
+        avahi_offer = self.avahi_offer
+        avahi_offer.stop()
+        self.avahi_offer = None
         ####
         # Making button non-clickable
         self.headerbutton.set_sensitive(False)
@@ -105,11 +118,6 @@ class App(Gtk.Application):
         self.stack.remove(self.kpw)
         self.kpw = None
         self.stack_saved_visible_child = None
-        ####
-        # Stop network services
-        self.avahi_offer.stop()
-        self.avahi_offer = None
-
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
