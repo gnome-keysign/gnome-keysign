@@ -39,7 +39,7 @@ class App(Gtk.Application):
         assert window
         self.headerbar = self.builder.get_object("headerbar")
         hb = self.builder.get_object("headerbutton")
-        hb.connect("pressed", self.on_headerbutton_pressed)
+        hb.connect("clicked", self.on_headerbutton_clicked)
         self.headerbutton = hb
 
         keys = gpgmh.get_usable_secret_keys()
@@ -91,8 +91,8 @@ class App(Gtk.Application):
         self.headerbutton.set_sensitive(True)
 
 
-    def on_headerbutton_pressed(self, button):
-        log.info("Hedaerbutton pressed")
+    def on_headerbutton_clicked(self, button):
+        log.info("Headerbutton pressed: %r", button)
         ####
         # Making button non-clickable
         self.headerbutton.set_sensitive(False)
