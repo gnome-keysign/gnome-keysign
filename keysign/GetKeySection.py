@@ -93,6 +93,21 @@ def strip_fingerprint(input_string):
     return cleaned
 
 
+def download_key_http(address, port):
+    url = ParseResult(
+        scheme='http',
+        # This seems to work well enough with both IPv6 and IPv4
+        netloc="[[%s]]:%d" % (address, port),
+        path='/',
+        params='',
+        query='',
+        fragment='')
+    log.debug("Starting HTTP request")
+    data = requests.get(url.geturl(), timeout=5).text
+    log.debug("finished downloading %d bytes", len(data))
+    return data
+
+
 
 class GetKeySection(Gtk.VBox):
 
@@ -202,26 +217,12 @@ class GetKeySection(Gtk.VBox):
                 fingerprint, message, image, parsed_barcode=parsed)
 
 
-    def download_key_http(self, address, port):
-        url = ParseResult(
-            scheme='http',
-            # This seems to work well enough with both IPv6 and IPv4
-            netloc="[[%s]]:%d" % (address, port),
-            path='/',
-            params='',
-            query='',
-            fragment='')
-        self.log.debug("Starting HTTP request")
-        data = requests.get(url.geturl(), timeout=5).text
-        self.log.debug("finished downloading %d bytes", len(data))
-        return data
-
     def try_download_keys(self, clients):
         for client in clients:
             self.log.debug("Getting key from client %s", client)
             name, address, port, fpr = client
             try:
-                keydata = self.download_key_http(address, port)
+                keydata = download_key_http(address, port)
                 yield keydata
             except ConnectionError as e:
                 # FIXME : We probably have other errors to catch
