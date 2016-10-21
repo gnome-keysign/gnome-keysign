@@ -326,7 +326,7 @@ class GetKeySection(Gtk.VBox):
                     image = args[2]
                 else:
                     image = None
-                    raw_text = self.scanPage.get_text_from_textview()
+                    raw_text = self.scanPage.get_text()
                     fingerprint = strip_fingerprint(raw_text)
 
                     if fingerprint == None:

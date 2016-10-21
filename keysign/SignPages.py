@@ -83,7 +83,7 @@ class ScanFingerprintPage(Gtk.HBox):
         self.pack_start(rightBox, True, True, 0)
 
 
-    def get_text_from_textview(self):
+    def get_text(self):
         '''Returns the contents of the fingerprint
         input widget.  Note that this function does
         not format or validate anything.
