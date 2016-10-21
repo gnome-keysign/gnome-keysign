@@ -98,6 +98,10 @@ class KeyFprScanWidget(Gtk.VBox):
     def on_barcode(self, sender, barcode, message, image):
         self.emit('barcode', barcode, message, image)
 
+    def get_text(self):
+        "Returns the text present in the Entry"
+        text = self.fpr_entry.get_text()
+        return text
 
 class KeyScanApp(Gtk.Application):
     def __init__(self, *args, **kwargs):
