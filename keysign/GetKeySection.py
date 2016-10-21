@@ -54,6 +54,32 @@ from .gpgmh import openpgpkey_from_data, fingerprint_for_key
 
 
 
+def parse_barcode(barcode_string):
+    """Parses information contained in a barcode
+
+    It returns a dict with the parsed attributes.
+    We expect the dict to contain at least a 'fingerprint'
+    entry. Others might be added in the future.
+    """
+    # The string, currently, is of the form
+    # openpgp4fpr:foobar?baz=qux#frag=val
+    # Which urlparse handles perfectly fine.
+    p = urlparse(barcode_string)
+    log.debug("Parsed %r into %r", barcode_string, p)
+    fpr = p.path
+    query = parse_qs(p.query)
+    fragments = parse_qs(p.fragment)
+    rest = {}
+    rest.update(query)
+    rest.update(fragments)
+    # We should probably ensure that we have only one
+    # item for each parameter and flatten them accordingly.
+    rest['fingerprint'] = fpr
+
+    log.debug('Parsed barcode into %r', rest)
+    return rest
+
+
 
 class GetKeySection(Gtk.VBox):
 
@@ -147,31 +173,6 @@ class GetKeySection(Gtk.VBox):
         return cleaned
 
 
-    def parse_barcode(self, barcode_string):
-        """Parses information contained in a barcode
-
-        It returns a dict with the parsed attributes.
-        We expect the dict to contain at least a 'fingerprint'
-        entry. Others might be added in the future.
-        """
-        # The string, currently, is of the form
-        # openpgp4fpr:foobar?baz=qux#frag=val
-        # Which urlparse handles perfectly fine.
-        p = urlparse(barcode_string)
-        self.log.debug("Parsed %r into %r", barcode_string, p)
-        fpr = p.path
-        query = parse_qs(p.query)
-        fragments = parse_qs(p.fragment)
-        rest = {}
-        rest.update(query)
-        rest.update(fragments)
-        # We should probably ensure that we have only one
-        # item for each parameter and flatten them accordingly.
-        rest['fingerprint'] = fpr
-
-        self.log.debug('Parsed barcode into %r', rest)
-        return rest
-
 
     def on_barcode(self, sender, barcode, message, image):
         '''This is connected to the "barcode" signal.
@@ -191,7 +192,7 @@ class GetKeySection(Gtk.VBox):
         caused a barcode to be decoded.
         '''
         self.log.info("Barcode signal %r %r", barcode, message)
-        parsed = self.parse_barcode(barcode)
+        parsed = parse_barcode(barcode)
         fingerprint = parsed['fingerprint']
         if not fingerprint:
             self.log.error("Expected fingerprint in %r to evaluate to True, "
