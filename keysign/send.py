@@ -2,6 +2,7 @@
 
 import logging
 import os
+import signal
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -122,4 +123,8 @@ class App(Gtk.Application):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     app = App()
+    try:
+        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : app.quit(), None)
+    except AttributeError:
+        pass
     app.run()
