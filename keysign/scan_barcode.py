@@ -495,9 +495,11 @@ class ScalingImage(Gtk.DrawingArea):
             #log.info('Allocated size: %s, %s', widget_width, widget_height)
             
             # Fill in background
-            cr.save()
-            cr.set_source_rgb(1, 1, 1)
-            cr.paint()
+            #cr.save()
+            #Gtk.render_background(self.get_style_context(),
+            #       cr, 0, 0, widget_width, widget_height)
+            #cr.set_source_rgb(1, 1, 1)
+            #cr.paint()
             
             # Centering and scaling the image to fit the widget
             cr.translate(widget_width / 2.0, widget_height / 2.0)
