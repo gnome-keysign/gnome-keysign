@@ -464,6 +464,7 @@ class ScalingImage(Gtk.DrawingArea):
         self.height = height or None
         self.rowstride = rowstride or None
         super(ScalingImage, self).__init__()
+        self.props.expand = True
     
     
     def set_from_pixbuf(self, pixbuf):
@@ -495,13 +496,15 @@ class ScalingImage(Gtk.DrawingArea):
             #log.info('Allocated size: %s, %s', widget_width, widget_height)
             
             # Fill in background
-            cr.save()
-            cr.set_source_rgb(1, 1, 1)
-            cr.paint()
+            #cr.save()
+            #Gtk.render_background(self.get_style_context(),
+            #       cr, 0, 0, widget_width, widget_height)
+            #cr.set_source_rgb(1, 1, 1)
+            #cr.paint()
             
             # Centering and scaling the image to fit the widget
             cr.translate(widget_width / 2.0, widget_height / 2.0)
-            scale = min(widget_width / float(original_width), widget_width / float(original_width))
+            scale = min(widget_width / float(original_width), widget_height / float(original_height))
             cr.scale(scale, scale)
             
             cr.translate(-original_width / 2.0, -original_height / 2.0)
