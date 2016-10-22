@@ -501,7 +501,7 @@ class ScalingImage(Gtk.DrawingArea):
             
             # Centering and scaling the image to fit the widget
             cr.translate(widget_width / 2.0, widget_height / 2.0)
-            scale = min(widget_width / float(original_width), widget_width / float(original_width))
+            scale = min(widget_width / float(original_width), widget_height / float(original_height))
             cr.scale(scale, scale)
             
             cr.translate(-original_width / 2.0, -original_height / 2.0)
