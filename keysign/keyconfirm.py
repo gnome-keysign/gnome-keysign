@@ -45,7 +45,7 @@ if  __name__ == "__main__" and __package__ is None:
 
 
 from .gpgmh import get_usable_keys
-
+from .scan_barcode import ScalingImage
 
 log = logging.getLogger(__name__)
 
@@ -87,7 +87,7 @@ class PreSignWidget(Gtk.VBox):
                                     (GObject.TYPE_PYOBJECT,)),
     }
 
-    def __init__(self, key, builder=None):
+    def __init__(self, key, pixbuf=None, builder=None):
         super(PreSignWidget, self).__init__()
         thisdir = os.path.dirname(os.path.abspath(__file__))
         if not builder:
@@ -109,6 +109,12 @@ class PreSignWidget(Gtk.VBox):
         uidsLabel = builder.get_object("uids_label")
         markup = format_uidslist(self.key.uidslist)
         uidsLabel.set_markup(markup)
+
+        imagebox = builder.get_object("imagebox")
+        for child in imagebox.get_children():
+            imagebox.remove(child)
+        imagebox.add(ScalingImage(pixbuf=pixbuf))
+        imagebox.show_all()
 
 
     def on_confirm_button_clicked(self, buttonObject, *args):
