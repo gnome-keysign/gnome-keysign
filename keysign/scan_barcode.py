@@ -464,6 +464,7 @@ class ScalingImage(Gtk.DrawingArea):
         self.height = height or None
         self.rowstride = rowstride or None
         super(ScalingImage, self).__init__()
+        self.props.expand = True
     
     
     def set_from_pixbuf(self, pixbuf):
