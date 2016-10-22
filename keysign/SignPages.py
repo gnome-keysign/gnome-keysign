@@ -104,7 +104,7 @@ class ScanFingerprintPage(Gtk.HBox):
 
 class SignKeyPage(Gtk.HBox):
 
-    def __init__(self):
+    def __init__(self, key, image=None):
         super(SignKeyPage, self).__init__()
         self.set_spacing(5)
 
@@ -115,6 +115,8 @@ class SignKeyPage(Gtk.HBox):
         
         self.barcode_image = ScalingImage()
         self.pack_start(self.barcode_image, True, True, 0)
+        
+        self.display_downloaded_key(key, None, image)
 
 
     def display_downloaded_key(self, key, scanned_fpr, image):
