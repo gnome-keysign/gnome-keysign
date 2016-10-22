@@ -69,6 +69,9 @@ class BarcodeReader(object):
                 if struct_name == 'GstMessageError':
                     err, debug = message.parse_error()
                     log.error('GstError: %s, %s', err, debug)
+                elif struct_name == 'GstMessageWarning':
+                    err, debug = message.parse_warning()
+                    log.warning('GstWarning: %s, %s', err, debug)
     
                 elif struct_name == 'barcode':
                     self.timestamp = struct.get_clock_time("timestamp")[1]
