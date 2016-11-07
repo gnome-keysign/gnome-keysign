@@ -55,6 +55,9 @@ log = logging.getLogger(__name__)
 from .gpgmh import openpgpkey_from_data, fingerprint_for_key
 
 
+# FIXME: Eventually remove this condition
+NEW_UI = 1 if os.environ.get("KEYSIGN_NEWUI", None) else 0
+
 
 def parse_barcode(barcode_string):
     """Parses information contained in a barcode
@@ -126,9 +129,12 @@ class GetKeySection(Gtk.VBox):
         self.app = app
         self.log = logging.getLogger(__name__)
 
+        
+        
         self.scanPage = (
+            ScanFingerprintPage(),
             KeyFprScanWidget(),
-            ScanFingerprintPage())[1]
+            )[NEW_UI]
         self.signPage = Gtk.Box()
         # set up notebook container
         self.notebook = Gtk.Notebook()
@@ -392,10 +398,8 @@ class GetKeySection(Gtk.VBox):
         position = parent.get_current_page()
         # Removing the widget causes the Notebook to advance
         parent.remove(self.signPage)
-        # FIXME: Eventually remove this condition
-        new_ui = 1 if os.environ.get("KEYSIGN_NEWUI", None) else 0
         psw = (SignKeyPage,
-               PreSignWidget)[new_ui](openpgpkey, image)
+               PreSignWidget)[NEW_UI](openpgpkey, image)
         psw.show_all()
         parent.add(psw)
         # However, we inject our widget into the old spot
