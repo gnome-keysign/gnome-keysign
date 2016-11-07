@@ -19,6 +19,7 @@
 
 import logging
 from urlparse import urlparse, parse_qs, ParseResult
+import os  # We're using os.environ once...
 
 import requests
 from requests.exceptions import ConnectionError
@@ -27,6 +28,7 @@ from .compat import gtkbutton
 from .SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 from .util import mac_verify
 from .util import sign_keydata_and_send as _sign_keydata_and_send
+from .keyconfirm import PreSignWidget
 from .keyfprscan import KeyFprScanWidget
 
 from gi.repository import Gst, Gtk, GLib
@@ -127,7 +129,7 @@ class GetKeySection(Gtk.VBox):
         self.scanPage = (
             KeyFprScanWidget(),
             ScanFingerprintPage())[1]
-        self.signPage = SignKeyPage()
+        self.signPage = Gtk.Box()
         # set up notebook container
         self.notebook = Gtk.Notebook()
         self.notebook.append_page(self.scanPage, None)
@@ -352,8 +354,10 @@ class GetKeySection(Gtk.VBox):
 
                 # error callback function
                 err = lambda x: self.signPage.mainLabel.set_markup('<span size="15000">'
-                        'Error downloading key with fpr\n{}</span>'
-                        .format(fingerprint))
+                       'Error downloading key with fpr\n{}</span>'
+                       .format(fingerprint))
+                # FIXME: err is currently out of order, because we have a simple Box... :-/
+                err = lambda x: None
                 # use GLib.idle_add to use a separate thread for the downloading of
                 # the keydata.
                 # Note that idle_add does not seem to take kwargs...
@@ -382,4 +386,20 @@ class GetKeySection(Gtk.VBox):
         image = self.scanned_image
         openpgpkey = openpgpkey_from_data(keydata)
         assert openpgpkey.fingerprint == fingerprint
-        self.signPage.display_downloaded_key(openpgpkey, fingerprint, image)
+
+        # We know the parent is a Notebook...
+        parent = self.signPage.get_parent()
+        position = parent.get_current_page()
+        # Removing the widget causes the Notebook to advance
+        parent.remove(self.signPage)
+        # FIXME: Eventually remove this condition
+        new_ui = 1 if os.environ.get("KEYSIGN_NEWUI", None) else 0
+        psw = (SignKeyPage,
+               PreSignWidget)[new_ui](openpgpkey, image)
+        psw.show_all()
+        parent.add(psw)
+        # However, we inject our widget into the old spot
+        parent.reorder_child(psw, position)
+        # and make the Notebook go there
+        parent.set_current_page(position)
+        self.signPage = psw
