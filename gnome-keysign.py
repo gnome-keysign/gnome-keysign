@@ -12,6 +12,7 @@ from gi.repository import GLib
 from keysign.MainWindow import MainWindow
 
 def main():
+    import keysign.gtkexcepthook
     app = MainWindow()
 
     try:
