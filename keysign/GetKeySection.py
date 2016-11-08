@@ -114,6 +114,15 @@ def download_key_http(address, port):
 
 
 
+def fix_infobar(infobar):
+    # Work around https://bugzilla.gnome.org/show_bug.cgi?id=710888
+    def make_sure_revealer_does_nothing(widget):
+        if not isinstance(widget, Gtk.Revealer):
+            return
+        widget.set_transition_type(Gtk.RevealerTransitionType.NONE)
+    infobar.forall(make_sure_revealer_does_nothing)
+
+
 class GetKeySection(Gtk.VBox):
 
     def __init__(self, app):
@@ -129,8 +138,14 @@ class GetKeySection(Gtk.VBox):
         self.app = app
         self.log = logging.getLogger(__name__)
 
-        
-        
+        infobar = Gtk.InfoBar()
+        infobar.set_show_close_button(True)
+        infobar.connect("response", lambda ib, r: ib.hide())
+        # fix_infobar(infobar)
+        self.pack_start(infobar, False, False, 0)
+        GLib.idle_add(infobar.hide)
+        self.infobar = infobar
+
         self.scanPage = (
             ScanFingerprintPage(),
             KeyFprScanWidget(),
@@ -178,6 +193,7 @@ class GetKeySection(Gtk.VBox):
         # be cleaned up on exit...
         self.tmpfiles = []
 
+
     def switch_page(self, notebook, page, page_num):
         if page_num == 0:
             self.backButton.set_sensitive(False)
@@ -195,6 +211,15 @@ class GetKeySection(Gtk.VBox):
         self.progressBar.set_fraction((page_index+1)/3.0)
 
 
+
+    def display_error(self, errormsg):
+        infobar = self.infobar
+        infobar.set_message_type(Gtk.MessageType.ERROR)
+        label = Gtk.Label("{}".format(errormsg))
+        content = infobar.get_content_area()
+        content.forall(lambda w: content.remove(w))
+        content.add(label)
+        GLib.idle_add(infobar.show_all)
 
 
     def on_barcode(self, sender, barcode, message, image):
@@ -359,15 +384,16 @@ class GetKeySection(Gtk.VBox):
                 self.log.info("Transferred MAC via barcode: %r", mac)
 
                 # error callback function
-                err = lambda x: self.signPage.mainLabel.set_markup('<span size="15000">'
-                       'Error downloading key with fpr\n{}</span>'
+                # We set the notebook to the previous page, because
+                # we have just advanced it and in case of an error
+                # we don't really want to...
+                def err(foo):
+                    self.notebook.prev_page()
+                    # FIXME: The progress bar should set itself automatically...
+                    self.set_progress_bar()
+                    self.display_error(
+                       'Error downloading key with fpr\n{}'
                        .format(fingerprint))
-                # FIXME: err is currently out of order, because we have a simple Box... :-/
-                err = lambda x: None
-                # use GLib.idle_add to use a separate thread for the downloading of
-                # the keydata.
-                # Note that idle_add does not seem to take kwargs...
-                # So we work around by cosntructing an anonymous function
                 GLib.idle_add(lambda: self.obtain_key_async(fingerprint, self.recieved_key,
                         fingerprint, mac=mac, error_cb=err))
 
