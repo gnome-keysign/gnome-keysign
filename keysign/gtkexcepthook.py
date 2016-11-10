@@ -245,7 +245,7 @@ def _info(exctyp, value, tb):
 def _dialog_response_cb(dialog, resp, trace, exctyp, value):
     global exception_dialog_active
 
-    if resp == RESPONSE_QUIT and Gtk.main_level() > 0:
+    if resp == RESPONSE_QUIT:
         if not quit_confirmation_func:
             sys.exit(1)  # Exit code is important for IDEs
         else:
