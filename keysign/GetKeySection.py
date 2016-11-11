@@ -22,7 +22,7 @@ from urlparse import urlparse, parse_qs, ParseResult
 import os  # We're using os.environ once...
 
 import requests
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError, ReadTimeout
 
 from .compat import gtkbutton
 from .SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
@@ -261,6 +261,10 @@ class GetKeySection(Gtk.VBox):
                 # FIXME : We probably have other errors to catch
                 self.log.exception("While downloading key from %s %i",
                                     address, port)
+            except ReadTimeout as e:
+                self.log.exception("Timeout while downloading key from %s %i",
+                                    address, port)
+        self.log.debug("Finished trying to download keys from %s", clients)
 
     def verify_downloaded_key(self, downloaded_data, fingerprint, mac=None):
         log.info("Verifying key %r with mac %r", fingerprint, mac)
@@ -296,6 +300,7 @@ class GetKeySection(Gtk.VBox):
         other_clients = self.sort_clients(other_clients, fingerprint)
 
         for keydata in self.try_download_keys(other_clients):
+            self.log.debug("Obtained keydata %r", keydata)
             if self.verify_downloaded_key(keydata, fingerprint, mac):
                 is_valid = True
             else:
