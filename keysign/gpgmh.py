@@ -246,8 +246,12 @@ def get_usable_secret_keys(keyring=None, pattern=None):
     return usable_keys
 
 
-def sign_keydata_and_encrypt(keydata):
-    "Signs OpenPGP keydata with your regular GnuPG secret keys"
+def sign_keydata_and_encrypt(keydata, error_cb=None):
+    """Signs OpenPGP keydata with your regular GnuPG secret keys
+    
+    error_cb can be a function that is called with any exception
+    occuring during signing of the key.
+    """
 
     log = logging.getLogger(__name__ + ':sign_keydata_encrypt')
 
@@ -283,7 +287,16 @@ def sign_keydata_and_encrypt(keydata):
             tmpkeyring.context.set_option('always-trust')
             tmpkeyring.context.set_option('local-user', secret_fpr)
             # FIXME: For now, we sign all UIDs. This is bad.
-            ret = tmpkeyring.sign_key(uidlist[0].uid, signall=True)
+            try:
+                ret = tmpkeyring.sign_key(uidlist[0].uid, signall=True)
+            except GpgRuntimeError as e:
+                uid = uidlist[0].uid
+                log.exception("Error signing %r with secret key %r",
+                    uid, secret_key)
+                if error_cb:
+                    e.uid = uid
+                    error_cb (e)
+                continue
             log.info("Result of signing %s on key %s: %s", uidlist[0].uid, fingerprint, ret)
 
 
