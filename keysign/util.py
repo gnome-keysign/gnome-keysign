@@ -85,7 +85,7 @@ GNOME Keysign
 '''
 
 
-def sign_keydata_and_send(keydata):
+def sign_keydata_and_send(keydata, error_cb=None):
     """Creates, encrypts, and send signatures for each UID on the key
     
     You are supposed to give OpenPGP data which will be passed
@@ -107,7 +107,7 @@ def sign_keydata_and_send(keydata):
     # acceptable if all key operations are done before we go ahead
     # and spawn an email client.
     log.info("About to create signatures for key with fpr %r", fingerprint)
-    for uid, encrypted_key in list(sign_keydata_and_encrypt(keydata)):
+    for uid, encrypted_key in list(sign_keydata_and_encrypt(keydata, error_cb)):
             # FIXME: get rid of this redundant assignment
             uid_str = uid
             ctx = {
