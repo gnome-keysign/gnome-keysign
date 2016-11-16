@@ -19,6 +19,7 @@
 from collections import namedtuple
 from datetime import datetime
 import logging
+import os  # The SigningKeyring uses os.symlink for the agent
 from tempfile import NamedTemporaryFile
 import warnings
 
@@ -140,13 +141,38 @@ class TempSigningKeyring(TempKeyring):
 
         if base_keyring is None:
             base_keyring = Keyring()
+
         # Copy the public parts of the secret keys to the tmpkeyring
         for fpr, key in base_keyring.get_keys(None,
                                               secret=True,
                                               public=False).items():
             self.import_data (base_keyring.export_data (fpr))
 
+        ## We don't copy the config file, because we're not using a separate
+        ## homedir. So we expect gpg to still use it's normal homedir and thus
+        ## it's normal configuration.
+        # self.copy_agent_socket(base_keyring)
 
+    def copy_agent_socket(self, base_keyring):
+        ## Copied from monkeysign/ui.py as of
+        ## 741dde1cc242bf125dd206a019028736d9c4a141
+
+        # install the gpg agent socket for GnuPG 2.1 because
+        # --secret-keyring silently fails
+        # this is apparently how we should do things:
+        # https://lists.gnupg.org/pipermail/gnupg-devel/2015-January/029301.html
+        # cargo-culted from caff, thanks guilhem!
+        src = base_keyring.get_agent_socket()
+        dst = self.get_agent_socket()
+        log.info(_('installing symlinks for sockets from %s to %s'), src, dst)
+        try:
+            os.unlink(dst)
+        except OSError as e:
+            if e.errno == errno.ENOENT:
+                pass
+            else:
+                raise
+        os.symlink(src, dst)
 
 def openpgpkey_from_data(keydata):
     "Creates an OpenPGP object from given data"
