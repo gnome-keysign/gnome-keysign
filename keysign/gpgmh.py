@@ -278,6 +278,16 @@ def filter_usable_keys(keys):
     return usable_keys
 
 
+def get_usable_keys_from_keyring(keyring, pattern, public, secret):
+    keys_dict = keyring.get_keys(pattern=pattern,
+    							 public=public,
+    							 secret=secret) or {}
+    assert keys_dict is not None, keyring.context.stderr
+    # keys_fpr = keys_dict.items()
+    keys = keys_dict.values()
+    return filter_usable_keys(keys)
+
+
 ##
 ## END OF INTERNAL API
 #####
@@ -402,37 +412,20 @@ def fingerprint_from_keydata(keydata):
     return openpgpkey.fpr
 
 
-def get_usable_keys(keyring=None, *args, **kwargs):
+def get_usable_keys(pattern="", homedir=None):
     '''Uses get_keys on the keyring and filters for
     non revoked, expired, disabled, or invalid keys'''
-    log.debug('Retrieving keys for %s, %s', args, kwargs)
-    if keyring is None:
-        keyring = Keyring()
-    keys_dict = keyring.get_keys(*args, **kwargs) or {}
-    assert keys_dict is not None, keyring.context.stderr
-    # keys_fpr = keys_dict.items()
-    keys = keys_dict.values()
-    return filter_usable_keys(keys)
+    log.debug('Retrieving keys for %s, %s', pattern, homedir)
+    keyring = Keyring(homedir=homedir)
+    return get_usable_keys_from_keyring(keyring=keyring,
+    	pattern=pattern, public=True, secret=False)
 
 
-
-def get_usable_secret_keys(keyring=None, pattern=None):
-    '''Returns all secret keys which can be used to sign a key
-    
-    Uses get_keys on the keyring and filters for
-    non revoked, expired, disabled, or invalid keys'''
-    if keyring is None:
-        keyring = Keyring()
-    secret_keys_dict = keyring.get_keys(pattern=pattern,
-                                        public=False,
-                                        secret=True)
-    if not secret_keys_dict:
-        log.info("Keyring %r has not returned keys: %r",
-                 keyring, secret_keys_dict)
-        secret_keys_dict = {}
-    secret_keys = secret_keys_dict.values()
-    log.debug('Detected secret keys: %s', secret_keys)
-    return filter_usable_keys(secret_keys)
+def get_usable_secret_keys(pattern="", homedir=None):
+    '''Returns all secret keys which can be used to sign a key'''
+    keyring = Keyring(homedir=homedir)
+    return get_usable_keys_from_keyring(keyring=keyring,
+    	pattern=pattern, public=False, secret=True)
 
 
 def sign_keydata_and_encrypt(keydata, error_cb=None):
@@ -448,9 +441,8 @@ def sign_keydata_and_encrypt(keydata, error_cb=None):
     tmpkeyring.context.set_option('export-options', 'export-minimal')
     # Eventually, we want to let the user select their keys to sign with
     # For now, we just take whatever is there.
-    secret_keys = filter_usable_keys(tmpkeyring.get_keys(pattern="",
-    													 public=False,
-    													 secret=True).values())
+    secret_keys = get_usable_keys_from_keyring(keyring=tmpkeyring,
+    	pattern="", public=False, secret=True)
     log.info('Signing with these keys: %s', secret_keys)
 
     stripped_key = MinimalExport(keydata)
