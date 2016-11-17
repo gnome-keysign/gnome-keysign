@@ -214,10 +214,7 @@ def get_public_key_data(fpr, keyring=None):
 
 
 
-# FIXME: We should rename that to "from_data"
-#        otherwise someone might think we operate on
-#        a key rather than bytes.
-def fingerprint_for_key(keydata):
+def fingerprint_from_keydata(keydata):
     '''Returns the OpenPGP Fingerprint for a given key'''
     openpgpkey = openpgpkey_from_data(keydata)
     return openpgpkey.fpr
@@ -287,7 +284,7 @@ def sign_keydata_and_encrypt(keydata, error_cb=None):
     log.info('Signing with these keys: %s', secret_keys)
 
     stripped_key = MinimalExport(keydata)
-    fingerprint = fingerprint_for_key(stripped_key)
+    fingerprint = fingerprint_from_keydata(stripped_key)
 
     log.debug('Trying to import key\n%s', stripped_key)
     if tmpkeyring.import_data(stripped_key):

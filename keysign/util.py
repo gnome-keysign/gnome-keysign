@@ -22,7 +22,7 @@ from subprocess import call
 from string import Template
 from tempfile import NamedTemporaryFile
 
-from .gpgmh import fingerprint_for_key
+from .gpgmh import fingerprint_from_keydata
 from .gpgmh import sign_keydata_and_encrypt
 
 log = logging.getLogger(__name__)
@@ -100,7 +100,7 @@ def sign_keydata_and_send(keydata, error_cb=None):
     """
     log = logging.getLogger(__name__ + ':sign_keydata')
 
-    fingerprint = fingerprint_for_key(keydata)
+    fingerprint = fingerprint_from_keydata(keydata)
     # FIXME: We should rather use whatever GnuPG tells us
     keyid = fingerprint[-8:]
     # We list() the signatures, because we believe that it's more

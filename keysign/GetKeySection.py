@@ -49,7 +49,7 @@ progress_bar_text = ["Step 1: Scan QR Code or type fingerprint and click on 'Dow
 log = logging.getLogger(__name__)
 
 
-from .gpgmh import openpgpkey_from_data, fingerprint_for_key
+from .gpgmh import openpgpkey_from_data, fingerprint_from_keydata
 
 
 
@@ -230,7 +230,7 @@ class GetKeySection(Gtk.VBox):
             result = mac_verify(fingerprint, downloaded_data, mac)
         else:
             try:
-                imported_key_fpr = fingerprint_for_key(downloaded_data)
+                imported_key_fpr = fingerprint_from_keydata(downloaded_data)
             except ValueError:
                 self.log.exception("Failed to import downloaded data")
                 result = False
