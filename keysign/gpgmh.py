@@ -23,14 +23,15 @@ import os  # The SigningKeyring uses os.symlink for the agent
 from tempfile import NamedTemporaryFile
 import warnings
 
+log = logging.getLogger(__name__)
 
+
+#####
+## INTERNAL API
+##
 from monkeysign.gpg import Keyring
 from monkeysign.gpg import GpgRuntimeError
 
-
-# FIXME: This probably wants to go somewhere more central.
-# Maybe even into Monkeysign.
-log = logging.getLogger(__name__)
 
 
 def UIDExport(uid, keydata):
@@ -118,7 +119,6 @@ class TempKeyring(SplitKeyring):
                                     *args, **kwargs)
 
 
-
 class TempSigningKeyring(TempKeyring):
     """A temporary keyring which uses the secret keys of a parent keyring
     
@@ -173,6 +173,175 @@ class TempSigningKeyring(TempKeyring):
             else:
                 raise
         os.symlink(src, dst)
+
+
+
+
+from monkeysign.gpg import Keyring
+def parse_sig_list(text):
+    '''Parses GnuPG's signature list (i.e. list-sigs)
+    
+    The format is described in the GnuPG man page'''
+    sigslist = []
+    for block in text.split("\n"):
+        if block.startswith("sig"):
+            record = block.split(":")
+            log.debug("sig record (%d) %s", len(record), record)
+            keyid, timestamp, uid = record[4], record[5], record[9]
+            sigslist.append((keyid, timestamp, uid))
+
+    return sigslist
+
+
+def signatures_for_keyid(keyid, keyring=None):
+    '''Returns the list of signatures for a given key id
+    
+    This will call out to GnuPG list-sigs, using Monkeysign,
+    and parse the resulting string into a list of signatures.
+    
+    A default Keyring will be used unless you pass an instance
+    as keyring argument.
+    '''
+    if keyring is None:
+        kr = Keyring()
+    else:
+        kr = keyring
+
+    # FIXME: this would be better if it was done in monkeysign
+    kr.context.call_command(['list-sigs', keyid])
+    siglist = parse_sig_list(kr.context.stdout)
+
+    return siglist
+
+
+
+def parse_uid(uid):
+    "Parses a GnuPG UID into it's name, comment, and email component"
+    # remove the comment from UID (if it exists)
+    com_start = uid.find('(')
+    if com_start != -1:
+        com_end = uid.find(')')
+        uid = uid[:com_start].strip() + uid[com_end+1:].strip()
+
+    # FIXME: Actually parse the comment...
+    comment = ""
+    # split into user's name and email
+    tokens = uid.split('<')
+    name = tokens[0].strip()
+    email = 'unknown'
+    if len(tokens) > 1:
+        email = tokens[1].replace('>','').strip()
+    
+    return (name, comment, email)
+
+
+def parse_expiry(value):
+    """Takes either a string, an epoch, or a datetime and converts
+    it to a datetime.
+    If the string is empty (or otherwise evaluates to False)
+    then this function returns None, meaning that no expiry has been set.
+    An edge case is the epoch value "0".
+    """
+    if not value:
+        expiry = None
+    else:
+        try:
+            expiry = datetime.fromtimestamp(int(value))
+        except TypeError:
+            expiry = value
+
+    return expiry
+
+
+
+## Monkeypatching to get more debug output
+import monkeysign.gpg
+bc = monkeysign.gpg.Context.build_command
+def build_command(*args, **kwargs):
+    ret = bc(*args, **kwargs)
+    #log.info("Building command %s", ret)
+    log.debug("Building cmd: %s", ' '.join(["'%s'" % c for c in ret]))
+    return ret
+monkeysign.gpg.Context.build_command = build_command
+
+
+##
+## END OF INTERNAL API
+#####
+
+
+# The UID object is used in one place, at least,
+# to get display the name and email address.
+class UID(namedtuple("UID", "expiry name comment email")):
+    "Represents an OpenPGP UID - at least to the extent we care about it"
+
+    @classmethod
+    def from_monkeysign(cls, uid):
+        "Creates a new UID from a monkeysign key"
+        uidstr = uid.uid
+        name, comment, email = parse_uid(uidstr)
+        expiry = parse_expiry(uid.expire)
+
+        return cls(expiry, name, comment, email)
+
+
+    def __format__(self, arg):
+        if self.comment:
+            s = "{name} ({comment}) <{email}>"
+        else:
+            s = "{name} <{email}>"
+        return s.format(**self._asdict())
+
+    def __str__(self):
+        return "{}".format(self)
+
+    @property
+    def uid(self):
+        "Legacy compatibility, use str() instead"
+        warnings.warn("Legacy uid, use '{}'.format() instead",
+                      DeprecationWarning)
+        return str(self)
+
+
+
+
+# The Key object is returned from a few functions, so it's
+# API is somewhat external.
+class Key(namedtuple("Key", "expiry fingerprint uidslist")):
+    "Represents an OpenPGP Key to extent we care about"
+
+    def __init__(self, expiry, fingerprint, uidslist,
+                       *args, **kwargs):
+        exp_date = parse_expiry(expiry)
+        super(Key, self).__init__(exp_date, fingerprint, uidslist)
+
+    def __format__(self, arg):
+        s  = "{fingerprint}\r\n"
+        s += '\r\n'.join(("  {}".format(uid) for uid in self.uidslist))
+# This is what original output looks like:
+# pub  [unknown] 3072R/1BF98D6D 1336669781 [expiry: 2017-05-09 19:09:41]
+#    Fingerprint = FF52 DA33 C025 B1E0 B910  92FC 1C34 19BF 1BF9 8D6D
+# uid 1      [unknown] Tobias Mueller <tobias.mueller2@mail.dcu.ie>
+# uid 2      [unknown] Tobias Mueller <4tmuelle@informatik.uni-hamburg.de>
+# sub   3072R/3B76E8B3 1336669781 [expiry: 2017-05-09 19:09:41]
+        return s.format(**self._asdict())
+
+    @property
+    def fpr(self):
+        "Legacy compatibility, use fingerprint instead"
+        warnings.warn("Legacy fpr, use the fingerprint property",
+                      DeprecationWarning)
+        return self.fingerprint
+
+    @classmethod
+    def from_monkeysign(cls, key):
+        "Creates a new Key from an existing monkeysign key"
+        uids = [UID.from_monkeysign(uid) for uid in  key.uidslist]
+        expiry = parse_expiry(key.expiry)
+        fingerprint = key.fpr
+        return cls(expiry, fingerprint, uids)
+
+
 
 def openpgpkey_from_data(keydata):
     "Creates an OpenPGP object from given data"
@@ -240,7 +409,6 @@ def get_usable_keys(keyring=None, *args, **kwargs):
 
     log.debug('Identified usable keys: %s', usable_keys)
     return usable_keys
-
 
 
 def get_usable_secret_keys(keyring=None, pattern=None):
@@ -339,154 +507,3 @@ def sign_keydata_and_encrypt(keydata, error_cb=None):
 
 
 
-from monkeysign.gpg import Keyring
-def parse_sig_list(text):
-    '''Parses GnuPG's signature list (i.e. list-sigs)
-    
-    The format is described in the GnuPG man page'''
-    sigslist = []
-    for block in text.split("\n"):
-        if block.startswith("sig"):
-            record = block.split(":")
-            log.debug("sig record (%d) %s", len(record), record)
-            keyid, timestamp, uid = record[4], record[5], record[9]
-            sigslist.append((keyid, timestamp, uid))
-
-    return sigslist
-
-
-def signatures_for_keyid(keyid, keyring=None):
-    '''Returns the list of signatures for a given key id
-    
-    This will call out to GnuPG list-sigs, using Monkeysign,
-    and parse the resulting string into a list of signatures.
-    
-    A default Keyring will be used unless you pass an instance
-    as keyring argument.
-    '''
-    if keyring is None:
-        kr = Keyring()
-    else:
-        kr = keyring
-
-    # FIXME: this would be better if it was done in monkeysign
-    kr.context.call_command(['list-sigs', keyid])
-    siglist = parse_sig_list(kr.context.stdout)
-
-    return siglist
-
-
-
-def parse_uid(uid):
-    "Parses a GnuPG UID into it's name, comment, and email component"
-    # remove the comment from UID (if it exists)
-    com_start = uid.find('(')
-    if com_start != -1:
-        com_end = uid.find(')')
-        uid = uid[:com_start].strip() + uid[com_end+1:].strip()
-
-    # FIXME: Actually parse the comment...
-    comment = ""
-    # split into user's name and email
-    tokens = uid.split('<')
-    name = tokens[0].strip()
-    email = 'unknown'
-    if len(tokens) > 1:
-        email = tokens[1].replace('>','').strip()
-    
-    return (name, comment, email)
-
-
-def parse_expiry(value):
-    """Takes either a string, an epoch, or a datetime and converts
-    it to a datetime.
-    If the string is empty (or otherwise evaluates to False)
-    then this function returns None, meaning that no expiry has been set.
-    An edge case is the epoch value "0".
-    """
-    if not value:
-        expiry = None
-    else:
-        try:
-            expiry = datetime.fromtimestamp(int(value))
-        except TypeError:
-            expiry = value
-
-    return expiry
-
-
-class UID(namedtuple("UID", "expiry name comment email")):
-    "Represents an OpenPGP UID - at least to the extent we care about it"
-
-    @classmethod
-    def from_monkeysign(cls, uid):
-        "Creates a new UID from a monkeysign key"
-        uidstr = uid.uid
-        name, comment, email = parse_uid(uidstr)
-        expiry = parse_expiry(uid.expire)
-
-        return cls(expiry, name, comment, email)
-
-
-    def __format__(self, arg):
-        if self.comment:
-            s = "{name} ({comment}) <{email}>"
-        else:
-            s = "{name} <{email}>"
-        return s.format(**self._asdict())
-
-    def __str__(self):
-        return "{}".format(self)
-
-    @property
-    def uid(self):
-        "Legacy compatibility, use str() instead"
-        warnings.warn("Legacy uid, use '{}'.format() instead",
-                      DeprecationWarning)
-        return str(self)
-
-
-class Key(namedtuple("Key", "expiry fingerprint uidslist")):
-    "Represents an OpenPGP Key to extent we care about"
-
-    def __init__(self, expiry, fingerprint, uidslist,
-                       *args, **kwargs):
-        exp_date = parse_expiry(expiry)
-        super(Key, self).__init__(exp_date, fingerprint, uidslist)
-
-    def __format__(self, arg):
-        s  = "{fingerprint}\r\n"
-        s += '\r\n'.join(("  {}".format(uid) for uid in self.uidslist))
-# This is what original output looks like:
-# pub  [unknown] 3072R/1BF98D6D 1336669781 [expiry: 2017-05-09 19:09:41]
-#    Fingerprint = FF52 DA33 C025 B1E0 B910  92FC 1C34 19BF 1BF9 8D6D
-# uid 1      [unknown] Tobias Mueller <tobias.mueller2@mail.dcu.ie>
-# uid 2      [unknown] Tobias Mueller <4tmuelle@informatik.uni-hamburg.de>
-# sub   3072R/3B76E8B3 1336669781 [expiry: 2017-05-09 19:09:41]
-        return s.format(**self._asdict())
-
-    @property
-    def fpr(self):
-        "Legacy compatibility, use fingerprint instead"
-        warnings.warn("Legacy fpr, use the fingerprint property",
-                      DeprecationWarning)
-        return self.fingerprint
-
-    @classmethod
-    def from_monkeysign(cls, key):
-        "Creates a new Key from an existing monkeysign key"
-        uids = [UID.from_monkeysign(uid) for uid in  key.uidslist]
-        expiry = parse_expiry(key.expiry)
-        fingerprint = key.fpr
-        return cls(expiry, fingerprint, uids)
-
-
-## Monkeypatching to get more debug output
-import monkeysign.gpg
-bc = monkeysign.gpg.Context.build_command
-def build_command(*args, **kwargs):
-    ret = bc(*args, **kwargs)
-    #log.info("Building command %s", ret)
-    log.debug("Building cmd: %s", ' '.join(["'%s'" % c for c in ret]))
-    return ret
-monkeysign.gpg.Context.build_command = build_command
