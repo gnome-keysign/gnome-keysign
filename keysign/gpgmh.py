@@ -400,6 +400,9 @@ def get_public_key_data(fpr, homedir=None):
     """
     keyring = Keyring(homedir=homedir)
     keydata = keyring.export_data(fpr)
+    if not keydata:
+        s = "No data to export for {} (in {})".format(fpr, homedir)
+        raise ValueError(s)
     return keydata
 
 
