@@ -265,6 +265,14 @@ def build_command(*args, **kwargs):
 monkeysign.gpg.Context.build_command = build_command
 
 
+def is_usable(key):
+    unusable =    key.invalid or key.disabled \
+               or key.expired or key.revoked
+    log.debug('Key %s is invalid: %s (i:%s, d:%s, e:%s, r:%s)', key, unusable,
+        key.invalid, key.disabled, key.expired, key.revoked)
+    return not unusable
+
+
 ##
 ## END OF INTERNAL API
 #####
@@ -397,12 +405,6 @@ def get_usable_keys(keyring=None, *args, **kwargs):
         keyring = Keyring()
     keys_dict = keyring.get_keys(*args, **kwargs) or {}
     assert keys_dict is not None, keyring.context.stderr
-    def is_usable(key):
-        unusable =    key.invalid or key.disabled \
-                   or key.expired or key.revoked
-        log.debug('Key %s is invalid: %s (i:%s, d:%s, e:%s, r:%s)', key, unusable,
-            key.invalid, key.disabled, key.expired, key.revoked)
-        return not unusable
     # keys_fpr = keys_dict.items()
     keys = keys_dict.values()
     usable_keys = [Key.from_monkeysign(key) for key in keys if is_usable(key)]
