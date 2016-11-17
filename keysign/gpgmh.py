@@ -272,6 +272,11 @@ def is_usable(key):
         key.invalid, key.disabled, key.expired, key.revoked)
     return not unusable
 
+def filter_usable_keys(keys):
+    usable_keys = [Key.from_monkeysign(key) for key in keys if is_usable(key)]
+    log.debug('Identified usable keys: %s', usable_keys)
+    return usable_keys
+
 
 ##
 ## END OF INTERNAL API
@@ -407,10 +412,8 @@ def get_usable_keys(keyring=None, *args, **kwargs):
     assert keys_dict is not None, keyring.context.stderr
     # keys_fpr = keys_dict.items()
     keys = keys_dict.values()
-    usable_keys = [Key.from_monkeysign(key) for key in keys if is_usable(key)]
+    return filter_usable_keys(keys)
 
-    log.debug('Identified usable keys: %s', usable_keys)
-    return usable_keys
 
 
 def get_usable_secret_keys(keyring=None, pattern=None):
@@ -427,14 +430,9 @@ def get_usable_secret_keys(keyring=None, pattern=None):
         log.info("Keyring %r has not returned keys: %r",
                  keyring, secret_keys_dict)
         secret_keys_dict = {}
-    secret_key_fprs = secret_keys_dict.keys()
-    log.debug('Detected secret keys: %s', secret_key_fprs)
-    usable_keys_fprs = filter(lambda fpr: get_usable_keys(keyring, pattern=fpr, public=True), secret_key_fprs)
-    usable_keys = [Key.from_monkeysign(secret_keys_dict[fpr])
-                   for fpr in usable_keys_fprs]
-
-    log.info('Returning usable private keys: %s', usable_keys)
-    return usable_keys
+    secret_keys = secret_keys_dict.values()
+    log.debug('Detected secret keys: %s', secret_keys)
+    return filter_usable_keys(secret_keys)
 
 
 def sign_keydata_and_encrypt(keydata, error_cb=None):
@@ -450,7 +448,9 @@ def sign_keydata_and_encrypt(keydata, error_cb=None):
     tmpkeyring.context.set_option('export-options', 'export-minimal')
     # Eventually, we want to let the user select their keys to sign with
     # For now, we just take whatever is there.
-    secret_keys = get_usable_secret_keys(tmpkeyring)
+    secret_keys = filter_usable_keys(tmpkeyring.get_keys(pattern="",
+    													 public=False,
+    													 secret=True).values())
     log.info('Signing with these keys: %s', secret_keys)
 
     stripped_key = MinimalExport(keydata)
