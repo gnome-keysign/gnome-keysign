@@ -39,7 +39,7 @@ def UIDExport(uid, keydata):
     Unfortunately, GnuPG does not provide smth like
     --export-uid-only in order to obtain a UID and its
     signatures."""
-    tmp = TempKeyring()
+    tmp = TempSplitKeyring()
     # Hm, apparently this needs to be set, otherwise gnupg will issue
     # a stray "gpg: checking the trustdb" which confuses the gnupg library
     tmp.context.set_option('always-trust')
@@ -59,7 +59,7 @@ def MinimalExport(keydata):
     '''Returns the minimised version of a key
 
     For now, you must provide one key only.'''
-    tmpkeyring = TempKeyring()
+    tmpkeyring = TempSplitKeyring()
     ret = tmpkeyring.import_data(keydata)
     log.debug("Returned %s after importing %r", ret, keydata)
     assert ret
@@ -85,7 +85,7 @@ class SplitKeyring(Keyring):
         self.context.set_option('no-default-keyring')
 
 
-class TempKeyring(SplitKeyring):
+class TempSplitKeyring(SplitKeyring):
     """A temporary keyring which will be discarded after use
     
     It creates a temporary file which will be used for a SplitKeyring.
@@ -119,7 +119,7 @@ class TempKeyring(SplitKeyring):
                                     *args, **kwargs)
 
 
-class TempSigningKeyring(TempKeyring):
+class TempSigningKeyring(TempSplitKeyring):
     """A temporary keyring which uses the secret keys of a parent keyring
     
     Creates a temporary keyring which can use the orignal keyring's
@@ -127,7 +127,7 @@ class TempSigningKeyring(TempKeyring):
     a default Keyring() will be taken which represents the user's
     regular keyring.
 
-    In fact, this is not much different from a TempKeyring,
+    In fact, this is not much different from a TempSplitKeyring,
     but gpg1.4 does not see the public keys for the secret keys when run with
     --no-default-keyring and --primary-keyring.
     So we copy the public parts of the secret keys into the primary keyring.
@@ -137,7 +137,7 @@ class TempSigningKeyring(TempKeyring):
         if issubclass(self.__class__, object):
             super(TempSigningKeyring, self).__init__(*args, **kwargs)
         else:
-            TempKeyring.__init__(self, *args, **kwargs)
+            TempSplitKeyring.__init__(self, *args, **kwargs)
 
         if base_keyring is None:
             base_keyring = Keyring()
@@ -368,7 +368,7 @@ class Key(namedtuple("Key", "expiry fingerprint uidslist")):
 
 def openpgpkey_from_data(keydata):
     "Creates an OpenPGP object from given data"
-    keyring = TempKeyring()
+    keyring = TempSplitKeyring()
     if not keyring.import_data(keydata):
         raise ValueError("Could not import %r  -  stdout: %r, stderr: %r",
                          keydata,
