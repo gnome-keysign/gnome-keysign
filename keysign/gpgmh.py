@@ -29,6 +29,9 @@ log = logging.getLogger(__name__)
 #####
 ## INTERNAL API
 ##
+import sys
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(parent_dir, "monkeysign"))
 from monkeysign.gpg import Keyring, TempKeyring
 from monkeysign.gpg import GpgRuntimeError
 
