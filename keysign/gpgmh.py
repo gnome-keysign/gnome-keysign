@@ -376,10 +376,10 @@ def openpgpkey_from_data(keydata):
     # As we have imported only one key, we should also
     # only have one key at our hands now.
     keys = keyring.get_keys()
-    if len(keys) > 1:
+    if len(keys) != 1:
         log.debug('Operation on keydata "%s" failed', keydata)
-        raise ValueError("Cannot give the fingerprint for more than "
-            "one key: %s", keys)
+        raise ValueError("Expected exactly one key, but got %d: %r" % (
+        				 len(keys), keys))
     else:
         # The first (key, value) pair in the keys dict
         # next(iter(keys.items()))[0] might be semantically
