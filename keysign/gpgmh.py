@@ -78,7 +78,7 @@ class SplitKeyring(Keyring):
     def __init__(self, primary_keyring_fname, trustdb_fname, *args, **kwargs):
         # I don't think Keyring is inheriting from object,
         # so we can't use super()
-        Keyring.__init__(self)   #  *args, **kwargs)
+        Keyring.__init__(self, *args, **kwargs)
 
         self.context.set_option('primary-keyring', primary_keyring_fname)
         self.context.set_option('trustdb-name', trustdb_fname)
@@ -430,7 +430,7 @@ def get_usable_secret_keys(pattern="", homedir=None):
     	pattern=pattern, public=False, secret=True)
 
 
-def sign_keydata_and_encrypt(keydata, error_cb=None):
+def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
     """Signs OpenPGP keydata with your regular GnuPG secret keys
     
     error_cb can be a function that is called with any exception
@@ -439,7 +439,7 @@ def sign_keydata_and_encrypt(keydata, error_cb=None):
 
     log = logging.getLogger(__name__ + ':sign_keydata_encrypt')
 
-    tmpkeyring = TempSigningKeyring()
+    tmpkeyring = TempSigningKeyring(homedir=homedir)
     tmpkeyring.context.set_option('export-options', 'export-minimal')
     # Eventually, we want to let the user select their keys to sign with
     # For now, we just take whatever is there.
