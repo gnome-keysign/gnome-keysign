@@ -29,7 +29,7 @@ log = logging.getLogger(__name__)
 #####
 ## INTERNAL API
 ##
-from monkeysign.gpg import Keyring
+from monkeysign.gpg import Keyring, TempKeyring
 from monkeysign.gpg import GpgRuntimeError
 
 
@@ -368,7 +368,7 @@ class Key(namedtuple("Key", "expiry fingerprint uidslist")):
 
 def openpgpkey_from_data(keydata):
     "Creates an OpenPGP object from given data"
-    keyring = TempSplitKeyring()
+    keyring = TempKeyring()
     if not keyring.import_data(keydata):
         raise ValueError("Could not import %r  -  stdout: %r, stderr: %r",
                          keydata,
