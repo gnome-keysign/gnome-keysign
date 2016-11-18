@@ -39,7 +39,7 @@ def UIDExport(uid, keydata):
     Unfortunately, GnuPG does not provide smth like
     --export-uid-only in order to obtain a UID and its
     signatures."""
-    tmp = TempSplitKeyring()
+    tmp = TempKeyring()
     # Hm, apparently this needs to be set, otherwise gnupg will issue
     # a stray "gpg: checking the trustdb" which confuses the gnupg library
     tmp.context.set_option('always-trust')
@@ -59,7 +59,7 @@ def MinimalExport(keydata):
     '''Returns the minimised version of a key
 
     For now, you must provide one key only.'''
-    tmpkeyring = TempSplitKeyring()
+    tmpkeyring = TempKeyring()
     ret = tmpkeyring.import_data(keydata)
     log.debug("Returned %s after importing %r", ret, keydata)
     assert ret
