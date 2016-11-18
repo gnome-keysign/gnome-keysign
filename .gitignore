@@ -5,3 +5,8 @@
 /dist
 /gnome_keysign.egg-info
 .flatpak-builder/
+/.coverage
+/.noseids
+.tox/
+cover/
+
