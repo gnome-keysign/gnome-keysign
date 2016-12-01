@@ -255,6 +255,72 @@ def get_usable_keys_from_keyring(keyring, pattern, public, secret):
     return filter_usable_keys(keys)
 
 
+def sign_keydata(keydata, error_cb=None, homedir=None):
+    """Signs OpenPGP keydata with your regular GnuPG secret keys
+    
+    error_cb can be a function that is called with any exception
+    occuring during signing of the key.
+    
+    yields pairs of (uid, signed_uid)
+    """
+    log = logging.getLogger(__name__ + ':sign_keydata_encrypt')
+
+    tmpkeyring = TempSigningKeyring(homedir=homedir)
+    tmpkeyring.context.set_option('export-options', 'export-minimal')
+    # Eventually, we want to let the user select their keys to sign with
+    # For now, we just take whatever is there.
+    secret_keys = get_usable_keys_from_keyring(keyring=tmpkeyring,
+    	pattern="", public=False, secret=True)
+    log.info('Signing with these keys: %s', secret_keys)
+
+    stripped_key = MinimalExport(keydata)
+    fingerprint = fingerprint_from_keydata(stripped_key)
+
+    log.debug('Trying to import key\n%s', stripped_key)
+    if tmpkeyring.import_data(stripped_key):
+        # 3. for every user id (or all, if -a is specified)
+        # 3.1. sign the uid, using gpg-agent
+        keys = tmpkeyring.get_keys(fingerprint)
+        log.info("Found keys %s for fp %s", keys, fingerprint)
+        if len(keys) != 1:
+            raise ValueError("We received multiple keys for fp %s: %s"
+                             % (fingerprint, keys))
+        key = keys[fingerprint]
+        uidlist = key.uidslist
+        
+        for secret_key in secret_keys:
+            secret_fpr = secret_key.fpr
+            log.info('Setting up to sign with %s', secret_fpr)
+            # We need to --always-trust, because GnuPG would print
+            # warning about the trustdb.  I think this is because
+            # we have a newly signed key whose trust GnuPG wants to
+            # incorporate into the trust decision.
+            tmpkeyring.context.set_option('always-trust')
+            tmpkeyring.context.set_option('local-user', secret_fpr)
+            # FIXME: For now, we sign all UIDs. This is bad.
+            try:
+                ret = tmpkeyring.sign_key(uidlist[0].uid, signall=True)
+            except GpgRuntimeError as e:
+                uid = uidlist[0].uid
+                log.exception("Error signing %r with secret key %r",
+                    uid, secret_key)
+                if error_cb:
+                    e.uid = uid
+                    error_cb (e)
+                continue
+            log.info("Result of signing %s on key %s: %s", uidlist[0].uid, fingerprint, ret)
+
+
+        for uid in uidlist:
+            uid_str = uid.uid
+            log.info("Processing uid %s %s", uid, uid_str)
+
+            # 3.2. export and encrypt the signature
+            # 3.3. mail the key to the user
+            signed_key = UIDExport(uid_str, tmpkeyring.export_data(uid_str))
+            log.info("Exported %d bytes of signed key", len(signed_key))
+            yield (uid.uid, signed_key)
+
 ##
 ## END OF INTERNAL API
 #####
@@ -326,70 +392,6 @@ def get_usable_secret_keys(pattern="", homedir=None):
     return get_usable_keys_from_keyring(keyring=keyring,
     	pattern=pattern, public=False, secret=True)
 
-
-def sign_keydata(keydata, error_cb=None, homedir=None):
-    """Signs OpenPGP keydata with your regular GnuPG secret keys
-    
-    error_cb can be a function that is called with any exception
-    occuring during signing of the key.
-    """
-    log = logging.getLogger(__name__ + ':sign_keydata_encrypt')
-
-    tmpkeyring = TempSigningKeyring(homedir=homedir)
-    tmpkeyring.context.set_option('export-options', 'export-minimal')
-    # Eventually, we want to let the user select their keys to sign with
-    # For now, we just take whatever is there.
-    secret_keys = get_usable_keys_from_keyring(keyring=tmpkeyring,
-    	pattern="", public=False, secret=True)
-    log.info('Signing with these keys: %s', secret_keys)
-
-    stripped_key = MinimalExport(keydata)
-    fingerprint = fingerprint_from_keydata(stripped_key)
-
-    log.debug('Trying to import key\n%s', stripped_key)
-    if tmpkeyring.import_data(stripped_key):
-        # 3. for every user id (or all, if -a is specified)
-        # 3.1. sign the uid, using gpg-agent
-        keys = tmpkeyring.get_keys(fingerprint)
-        log.info("Found keys %s for fp %s", keys, fingerprint)
-        if len(keys) != 1:
-            raise ValueError("We received multiple keys for fp %s: %s"
-                             % (fingerprint, keys))
-        key = keys[fingerprint]
-        uidlist = key.uidslist
-        
-        for secret_key in secret_keys:
-            secret_fpr = secret_key.fpr
-            log.info('Setting up to sign with %s', secret_fpr)
-            # We need to --always-trust, because GnuPG would print
-            # warning about the trustdb.  I think this is because
-            # we have a newly signed key whose trust GnuPG wants to
-            # incorporate into the trust decision.
-            tmpkeyring.context.set_option('always-trust')
-            tmpkeyring.context.set_option('local-user', secret_fpr)
-            # FIXME: For now, we sign all UIDs. This is bad.
-            try:
-                ret = tmpkeyring.sign_key(uidlist[0].uid, signall=True)
-            except GpgRuntimeError as e:
-                uid = uidlist[0].uid
-                log.exception("Error signing %r with secret key %r",
-                    uid, secret_key)
-                if error_cb:
-                    e.uid = uid
-                    error_cb (e)
-                continue
-            log.info("Result of signing %s on key %s: %s", uidlist[0].uid, fingerprint, ret)
-
-
-        for uid in uidlist:
-            uid_str = uid.uid
-            log.info("Processing uid %s %s", uid, uid_str)
-
-            # 3.2. export and encrypt the signature
-            # 3.3. mail the key to the user
-            signed_key = UIDExport(uid_str, tmpkeyring.export_data(uid_str))
-            log.info("Exported %d bytes of signed key", len(signed_key))
-            yield (uid.uid, signed_key)
 
 
 def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
