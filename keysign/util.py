@@ -109,7 +109,7 @@ def sign_keydata_and_send(keydata, error_cb=None):
     log.info("About to create signatures for key with fpr %r", fingerprint)
     for uid, encrypted_key in list(sign_keydata_and_encrypt(keydata, error_cb)):
             # FIXME: get rid of this redundant assignment
-            uid_str = uid
+            uid_str = "{}".format(uid)
             ctx = {
                 'uid' : uid_str,
                 'fingerprint': fingerprint,
@@ -130,7 +130,7 @@ def sign_keydata_and_send(keydata, error_cb=None):
 
             subject = Template(SUBJECT).safe_substitute(ctx)
             body = Template(BODY).safe_substitute(ctx)
-            email_file (to=uid_str, subject=subject,
+            email_file (to=uid.email, subject=subject,
                         body=body, files=[filename])
             yield tmpfile
 
