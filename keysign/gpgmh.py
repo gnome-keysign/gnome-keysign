@@ -412,4 +412,17 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
 
 
 
+GPGME = int(os.environ.get("KEYSIGN_GPGME", 0))
+if GPGME:
+    del openpgpkey_from_data
+    del get_public_key_data
+    del fingerprint_from_keydata
+    del get_usable_keys
+    del get_usable_secret_keys
+    del sign_keydata_and_encrypt
 
+
+    from .gpgmeh import (get_usable_keys, openpgpkey_from_data,
+        get_public_key_data, fingerprint_from_keydata,
+        get_usable_secret_keys, sign_keydata_and_encrypt,
+        )
