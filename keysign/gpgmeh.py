@@ -26,7 +26,7 @@ import gpg
 from gpg.constants import PROTOCOL_OpenPGP
 
 
-from .gpgkey import Key
+from .gpgkey import Key, UID
 
 texttype = unicode if sys.version_info.major < 3 else str
 
@@ -405,4 +405,4 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
                                                # in order for it to work out of the box
                                                always_trust=True,
                                                sign=False)
-                yield (uid, ciphertext)
+                yield (UID.from_gpgme(uid), ciphertext)
