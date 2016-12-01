@@ -327,13 +327,12 @@ def get_usable_secret_keys(pattern="", homedir=None):
     	pattern=pattern, public=False, secret=True)
 
 
-def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
+def sign_keydata(keydata, error_cb=None, homedir=None):
     """Signs OpenPGP keydata with your regular GnuPG secret keys
     
     error_cb can be a function that is called with any exception
     occuring during signing of the key.
     """
-
     log = logging.getLogger(__name__ + ':sign_keydata_encrypt')
 
     tmpkeyring = TempSigningKeyring(homedir=homedir)
@@ -390,12 +389,24 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
             # 3.3. mail the key to the user
             signed_key = UIDExport(uid_str, tmpkeyring.export_data(uid_str))
             log.info("Exported %d bytes of signed key", len(signed_key))
+            yield (uid.uid, signed_key)
 
-            # self.signui.tmpkeyring.context.set_option('armor')
-            tmpkeyring.context.set_option('always-trust')
-            encrypted_key = tmpkeyring.encrypt_data(data=signed_key, recipient=uid_str)
-            yield (uid.uid, encrypted_key)
 
+def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
+    """Signs OpenPGP keydata with your regular GnuPG secret keys
+    and encrypts the result under the given key
+    
+    error_cb can be a function that is called with any exception
+    occuring during signing of the key.
+    """
+    tmpkeyring = TempKeyring()
+    tmpkeyring.import_data(keydata)
+    tmpkeyring.context.set_option('always-trust')
+    for (uid, signed_key) in sign_keydata(keydata,
+        error_cb=error_cb, homedir=homedir):
+            encrypted_key = tmpkeyring.encrypt_data(data=signed_key,
+                recipient=uid)
+            yield (uid, encrypted_key)
 
 
 
