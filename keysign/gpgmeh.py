@@ -97,11 +97,8 @@ def del_uids(uids):
     yield 'save'
 
 
-def raise_runtime_error(prompt):
-    raise RuntimeError("Error signing key: %s" % prompt)
-
 def sign_key(uid=0, sign_cmd=u"sign", expire=False, check=3,
-             error_cb=raise_runtime_error):
+             error_cb=None):
     status, prompt = yield None
     assert status == gpg.constants.STATUS_GET_LINE
     assert prompt == u"keyedit.prompt"
@@ -138,6 +135,8 @@ def sign_key(uid=0, sign_cmd=u"sign", expire=False, check=3,
         elif status == gpg.constants.STATUS_ERROR:
             if error_cb:
                 error_cb(prompt)
+            else:
+                raise RuntimeError("Error signing key: %s" % prompt)
             status, prompt = yield None
         else:
             raise AssertionError("Unexpected state %r %r" % (status, prompt))
@@ -378,7 +377,7 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
         key = ctx.get_key(fpr)
         sink = gpg.Data()
         # There is op_keysign, but it's only available with gpg 2.1.12
-        ctx.interact(key, GenEdit(sign_key()).edit_cb, sink=sink)
+        ctx.interact(key, GenEdit(sign_key(error_cb=error_cb)).edit_cb, sink=sink)
         sink.seek(0, 0)
         log.debug("Sink after signing: %s", sink.read())
 
