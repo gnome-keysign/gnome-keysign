@@ -208,7 +208,7 @@ class GetKeySection(Gtk.VBox):
             query='',
             fragment='')
         self.log.debug("Starting HTTP request")
-        data = requests.get(url.geturl(), timeout=5).text
+        data = requests.get(url.geturl(), timeout=5).content
         self.log.debug("finished downloading %d bytes", len(data))
         return data
 
