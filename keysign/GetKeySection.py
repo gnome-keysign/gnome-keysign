@@ -296,9 +296,11 @@ class GetKeySection(Gtk.VBox):
         during the signature creation process so that the MUA
         can pick them up and s.t. they will be deleted on close.
         """
-        self.tmpfiles = list(_sign_keydata_and_send(keydata))
+        self.tmpfiles = list(_sign_keydata_and_send(keydata, error_cb=self.on_sign_error))
         return False
 
+    def on_sign_error(self, prompt):
+        self.log.error("Error signing key: %r. Trying to continue", prompt)
 
     def send_email(self, fingerprint, *data):
         self.log.exception("Sending email... NOT")
