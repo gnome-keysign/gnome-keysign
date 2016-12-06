@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #    Copyright 2014 Andrei Macavei <andrei.macavei89@gmail.com>
-#    Copyright 2014, 2015 Tobias Mueller <muelli@cryptobitch.de>
+#    Copyright 2014, 2015, 2016 Tobias Mueller <muelli@cryptobitch.de>
 #
 #    This file is part of GNOME Keysign.
 #
@@ -18,30 +18,15 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import os
 from urlparse import urlparse, parse_qs, ParseResult
-from string import Template
-import shutil
-from subprocess import call
-from tempfile import NamedTemporaryFile
 
 import requests
 from requests.exceptions import ConnectionError
 
-import sys
-
-from monkeysign.gpg import Keyring
-from monkeysign.gpg import GpgRuntimeError
-
 from .compat import gtkbutton
-from .compat import monkeysign_expired_keys, monkeysign_revoked_keys
-from . import Keyserver
-from .KeysPage import KeysPage
-from .KeyPresent import KeyPresentPage
-from .SignPages import KeyDetailsPage
 from .SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 from .util import mac_verify
-from . import key
+from .util import sign_keydata_and_send as _sign_keydata_and_send
 
 from gi.repository import Gst, Gtk, GLib
 # Because of https://bugzilla.gnome.org/show_bug.cgi?id=698005
@@ -59,222 +44,12 @@ progress_bar_text = ["Step 1: Scan QR Code or type fingerprint and click on 'Dow
                      "Step 3: Key was succesfully signed and an email was sent to the owner."]
 
 
-SUBJECT = 'Your signed key $fingerprint'
-BODY = '''Hi $uid,
-
-
-I have just signed your key
-
-      $fingerprint
-
-
-Thanks for letting me sign your key!
-
---
-GNOME Keysign
-'''
-
-
 # FIXME: This probably wants to go somewhere more central.
 # Maybe even into Monkeysign.
 log = logging.getLogger(__name__)
 
 
-def UIDExport(uid, keydata):
-    """Export only the UID of a key.
-    Unfortunately, GnuPG does not provide smth like
-    --export-uid-only in order to obtain a UID and its
-    signatures."""
-    tmp = TempKeyring()
-    # Hm, apparently this needs to be set, otherwise gnupg will issue
-    # a stray "gpg: checking the trustdb" which confuses the gnupg library
-    tmp.context.set_option('always-trust')
-    tmp.import_data(keydata)
-    for fpr, key in tmp.get_keys(uid).items():
-        for u in key.uidslist:
-            key_uid = u.uid
-            if key_uid != uid:
-                log.info('Deleting UID %s from key %s', key_uid, fpr)
-                tmp.del_uid(fingerprint=fpr, pattern=key_uid)
-    only_uid = tmp.export_data(uid)
-
-    return only_uid
-
-
-def MinimalExport(keydata):
-    '''Returns the minimised version of a key
-
-    For now, you must provide one key only.'''
-    tmpkeyring = TempKeyring()
-    ret = tmpkeyring.import_data(keydata)
-    log.debug("Returned %s after importing %r", ret, keydata)
-    assert ret
-    tmpkeyring.context.set_option('export-options', 'export-minimal')
-    keys_dict = tmpkeyring.get_keys()
-    # We assume the keydata to contain one key only
-    keys = list(keys_dict.items())
-    log.debug("Keys after importing: %s (%s)", keys, keys)
-    fingerprint, key = keys[0]
-    stripped_key = tmpkeyring.export_data(fingerprint)
-    return stripped_key
-
-
-
-class SplitKeyring(Keyring):
-    def __init__(self, primary_keyring_fname, trustdb_fname, *args, **kwargs):
-        # I don't think Keyring is inheriting from object,
-        # so we can't use super()
-        Keyring.__init__(self)   #  *args, **kwargs)
-
-        self.context.set_option('primary-keyring', primary_keyring_fname)
-        self.context.set_option('trustdb-name', trustdb_fname)
-        self.context.set_option('no-default-keyring')
-
-
-class TempKeyring(SplitKeyring):
-    """A temporary keyring which will be discarded after use
-    
-    It creates a temporary file which will be used for a SplitKeyring.
-    You may not necessarily be able to use this Keyring as is, because
-    gpg1.4 does not like using secret keys which is does not have the
-    public keys of in its pubkeyring.
-    
-    So you may not necessarily be able to perform operations with
-    the user's secret keys (like creating signatures).
-    """
-    def __init__(self, *args, **kwargs):
-        # A NamedTemporaryFile deletes the backing file
-        self.kr_tempfile = NamedTemporaryFile(prefix='gpgpy-')
-        self.kr_fname = self.kr_tempfile.name
-        self.tdb_tempfile = NamedTemporaryFile(prefix='gpgpy-tdb-',
-                                               delete=True)
-        self.tdb_fname = self.tdb_tempfile.name
-        # This should delete the file.
-        # Why are we doing it?  Well...
-        # Turns out that if you run gpg --trustdb-name with an
-        # empty file, it complains about an invalid trustdb.
-        # If, however, you give it a non-existent filename,
-        # it'll happily create a new trustdb.
-        # FWIW: Am empty trustdb file seems to be 40 bytes long,
-        # but the contents seems to be non-deterministic.
-        # Anyway, we'll leak the file :-/
-        self.tdb_tempfile.close()
-
-        SplitKeyring.__init__(self, primary_keyring_fname=self.kr_fname,
-                                    trustdb_fname=self.tdb_fname,
-                                    *args, **kwargs)
-
-
-
-class TempSigningKeyring(TempKeyring):
-    """A temporary keyring which uses the secret keys of a parent keyring
-    
-    Creates a temporary keyring which can use the orignal keyring's
-    secret keys.
-
-    In fact, this is not much different from a TempKeyring,
-    but gpg1.4 does not see the public keys for the secret keys when run with
-    --no-default-keyring and --primary-keyring.
-    So we copy the public parts of the secret keys into the primary keyring.
-    """
-    def __init__(self, base_keyring, *args, **kwargs):
-        # Not a new style class...
-        if issubclass(self.__class__, object):
-            super(TempSplitKeyring, self).__init__(*args, **kwargs)
-        else:
-            TempKeyring.__init__(self, *args, **kwargs)
-
-        # Copy the public parts of the secret keys to the tmpkeyring
-        for fpr, key in base_keyring.get_keys(None,
-                                              secret=True,
-                                              public=False).items():
-            self.import_data (base_keyring.export_data (fpr))
-
-
-
-def openpgpkey_from_data(keydata):
-    "Creates an OpenPGP object from given data"
-    keyring = TempKeyring()
-    if not keyring.import_data(keydata):
-        raise ValueError("Could not import %r  -  stdout: %r, stderr: %r",
-                         keydata,
-                         keyring.context.stdout, keyring.context.stderr)
-    # As we have imported only one key, we should also
-    # only have one key at our hands now.
-    keys = keyring.get_keys()
-    if len(keys) > 1:
-        log.debug('Operation on keydata "%s" failed', keydata)
-        raise ValueError("Cannot give the fingerprint for more than "
-            "one key: %s", keys)
-    else:
-        # The first (key, value) pair in the keys dict
-        # next(iter(keys.items()))[0] might be semantically
-        # more correct than list(d.items()) as we don't care
-        # much about having a list created, but I think it's
-        # more legible.
-        fpr_key = list(keys.items())[0]
-        # is composed of the fpr as key and an OpenPGP key as value
-        key = fpr_key[1]
-        return key
-
-
-# FIXME: We should rename that to "from_data"
-#        otherwise someone might think we operate on
-#        a key rather than bytes.
-def fingerprint_for_key(keydata):
-    '''Returns the OpenPGP Fingerprint for a given key'''
-    openpgpkey = openpgpkey_from_data(keydata)
-    return openpgpkey.fpr
-
-
-def get_usable_keys(keyring, *args, **kwargs):
-    '''Uses get_keys on the keyring and filters for
-    non revoked, expired, disabled, or invalid keys'''
-    log.debug('Retrieving keys for %s, %s', args, kwargs)
-    keys_dict = keyring.get_keys(*args, **kwargs)
-    assert keys_dict is not None, keyring.context.stderr
-    def is_usable(key):
-        unusable =    key.invalid or key.disabled \
-                   or key.expired or key.revoked
-        log.debug('Key %s is invalid: %s (i:%s, d:%s, e:%s, r:%s)', key, unusable,
-            key.invalid, key.disabled, key.expired, key.revoked)
-        return not unusable
-    keys_fpr = keys_dict.items()
-    keys = keys_dict.values()
-    usable_keys = [key for key in keys if is_usable(key)]
-
-    log.debug('Identified usable keys: %s', usable_keys)
-    return usable_keys
-
-
-def get_usable_secret_keys(keyring, pattern=None):
-    '''Returns all secret keys which can be used to sign a key
-    
-    Uses get_keys on the keyring and filters for
-    non revoked, expired, disabled, or invalid keys'''
-    secret_keys_dict = keyring.get_keys(pattern=pattern,
-                                        public=False,
-                                        secret=True)
-    secret_key_fprs = secret_keys_dict.keys()
-    log.debug('Detected secret keys: %s', secret_key_fprs)
-    usable_keys_fprs = filter(lambda fpr: get_usable_keys(keyring, pattern=fpr, public=True), secret_key_fprs)
-    usable_keys = [secret_keys_dict[fpr] for fpr in usable_keys_fprs]
-
-    log.info('Returning usable private keys: %s', usable_keys)
-    return usable_keys
-
-
-
-
-## Monkeypatching to get more debug output
-import monkeysign.gpg
-bc = monkeysign.gpg.Context.build_command
-def build_command(*args, **kwargs):
-    ret = bc(*args, **kwargs)
-    #log.info("Building command %s", ret)
-    log.debug("Building cmd: %s", ' '.join(["'%s'" % c for c in ret]))
-    return ret
-monkeysign.gpg.Context.build_command = build_command
+from .gpgmh import openpgpkey_from_data, fingerprint_for_key
 
 
 
@@ -397,22 +172,30 @@ class GetKeySection(Gtk.VBox):
 
     def on_barcode(self, sender, barcode, message, image):
         '''This is connected to the "barcode" signal.
+        
+        The function will advance the application if a reasonable
+        barcode has been provided.
+        
+        Sender is the emitter of the signal and should be the scanning
+        widget.
+        
+        Barcode is the actual barcode that got decoded.
+        
         The message argument is a GStreamer message that created
-        the barcode.'''
-
+        the barcode.
+        
+        When image is set, it should be the frame as pixbuf that
+        caused a barcode to be decoded.
+        '''
+        self.log.info("Barcode signal %r %r", barcode, message)
         parsed = self.parse_barcode(barcode)
-        fpr = parsed['fingerprint']
-
-        if fpr != None:
-            try:
-                pgpkey = key.Key(fpr)
-            except key.KeyError:
-                self.log.exception("Could not create key from %s", barcode)
-            else:
-                self.log.info("Barcode signal %s %s" %( pgpkey.fingerprint, message))
-                self.on_button_clicked(self.nextButton, pgpkey, message, image, parsed_barcode=parsed)
+        fingerprint = parsed['fingerprint']
+        if not fingerprint:
+            self.log.error("Expected fingerprint in %r to evaluate to True, "
+                           "but is %r", parsed, fingerprint)
         else:
-            self.log.error("data found in barcode does not match a OpenPGP fingerprint pattern: %s", barcode)
+            self.on_button_clicked(self.nextButton,
+                fingerprint, message, image, parsed_barcode=parsed)
 
 
     def download_key_http(self, address, port):
@@ -424,7 +207,10 @@ class GetKeySection(Gtk.VBox):
             params='',
             query='',
             fragment='')
-        return requests.get(url.geturl()).text
+        self.log.debug("Starting HTTP request")
+        data = requests.get(url.geturl(), timeout=5).text
+        self.log.debug("finished downloading %d bytes", len(data))
+        return data
 
     def try_download_keys(self, clients):
         for client in clients:
@@ -502,147 +288,21 @@ class GetKeySection(Gtk.VBox):
 
 
 
-    def sign_key_async(self, fingerprint=None, callback=None, data=None, error_cb=None):
-        self.log.debug("I will sign key with fpr {}".format(fingerprint))
-
-        keyring = Keyring()
-        keyring.context.set_option('export-options', 'export-minimal')
-
-        tmpkeyring = TempSigningKeyring(keyring)
-        # Eventually, we want to let the user select their keys to sign with
-        # For now, we just take whatever is there.
-        secret_keys = get_usable_secret_keys(tmpkeyring)
-        self.log.info('Signing with these keys: %s', secret_keys)
-
-        keydata = data or self.received_key_data
-        if keydata:
-            stripped_key = MinimalExport(keydata)
-            fpr = fingerprint_for_key(stripped_key)
-            if fingerprint is None:
-                # The user hasn't provided any data to operate on
-                fingerprint = fpr
-
-            if not fingerprint == fpr:
-                self.log.warning('Something strange is going on. '
-                    'We wanted to sign fingerprint "%s", received '
-                    'keydata to operate on, but the key has fpr "%s".',
-                    fingerprint, fpr)
-                
-        else: # Do we need this branch at all?
-            if fingerprint is None:
-                raise ValueError('You need to provide either keydata or a fpr')
-            self.log.debug("looking for key %s in your keyring", fingerprint)
-            keyring.context.set_option('export-options', 'export-minimal')
-            stripped_key = keyring.export_data(fingerprint)
-
-        self.log.debug('Trying to import key\n%s', stripped_key)
-        if tmpkeyring.import_data(stripped_key):
-            # 3. for every user id (or all, if -a is specified)
-            # 3.1. sign the uid, using gpg-agent
-            keys = tmpkeyring.get_keys(fingerprint)
-            self.log.info("Found keys %s for fp %s", keys, fingerprint)
-            assert len(keys) == 1, "We received multiple keys for fp %s: %s" % (fingerprint, keys)
-            key = keys[fingerprint]
-            uidlist = key.uidslist
-            
-            for secret_key in secret_keys:
-                secret_fpr = secret_key.fpr
-                self.log.info('Setting up to sign with %s', secret_fpr)
-                # We need to --always-trust, because GnuPG would print
-                # warning about the trustdb.  I think this is because
-                # we have a newly signed key whose trust GnuPG wants to
-                # incorporate into the trust decision.
-                tmpkeyring.context.set_option('always-trust')
-                tmpkeyring.context.set_option('local-user', secret_fpr)
-                # FIXME: For now, we sign all UIDs. This is bad.
-                ret = tmpkeyring.sign_key(uidlist[0].uid, signall=True)
-                self.log.info("Result of signing %s on key %s: %s", uidlist[0].uid, fingerprint, ret)
-
-
-            for uid in uidlist:
-                uid_str = uid.uid
-                self.log.info("Processing uid %s %s", uid, uid_str)
-
-                # 3.2. export and encrypt the signature
-                # 3.3. mail the key to the user
-                signed_key = UIDExport(uid_str, tmpkeyring.export_data(uid_str))
-                self.log.info("Exported %d bytes of signed key", len(signed_key))
-                # self.signui.tmpkeyring.context.set_option('armor')
-                tmpkeyring.context.set_option('always-trust')
-                encrypted_key = tmpkeyring.encrypt_data(data=signed_key, recipient=uid_str)
-
-                keyid = str(key.keyid())
-                ctx = {
-                    'uid' : uid_str,
-                    'fingerprint': fingerprint,
-                    'keyid': keyid,
-                }
-                # We could try to dir=tmpkeyring.dir
-                # We do not use the with ... as construct as the
-                # tempfile might be deleted before the MUA had the chance
-                # to get hold of it.
-                # Hence we reference the tmpfile and hope that it will be properly
-                # cleaned up when this object will be destroyed...
-                tmpfile = NamedTemporaryFile(prefix='gnome-keysign-', suffix='.asc')
-                self.tmpfiles.append(tmpfile)
-                filename = tmpfile.name
-                self.log.info('Writing keydata to %s', filename)
-                tmpfile.write(encrypted_key)
-                # Interesting, sometimes it would not write the whole thing out,
-                # so we better flush here
-                tmpfile.flush()
-                # As we're done with the file, we close it.
-                #tmpfile.close()
-
-                subject = Template(SUBJECT).safe_substitute(ctx)
-                body = Template(BODY).safe_substitute(ctx)
-                self.email_file (to=uid_str, subject=subject,
-                                 body=body, files=[filename])
-
-
-            # FIXME: Can we get rid of self.tmpfiles here already? Even if the MUA is still running?
-
-
-            # 3.4. optionnally (-l), create a local signature and import in
-            # local keyring
-            # 4. trash the temporary keyring
-
-
-        else:
-            self.log.error('data found in barcode does not match a OpenPGP fingerprint pattern: %s', fingerprint)
-            if error_cb:
-                GLib.idle_add(error_cb, data)
-
+    def sign_keydata_and_send(self, keydata, callback=None):
+        """This is a thin (GLib) wrapper around _sign_keydata_and_send
+        
+        it only returns False to make GLib not constantly add this function
+        to the main loop. It also saves the TemporaryFiles created
+        during the signature creation process so that the MUA
+        can pick them up and s.t. they will be deleted on close.
+        """
+        self.tmpfiles = list(_sign_keydata_and_send(keydata))
         return False
 
 
     def send_email(self, fingerprint, *data):
         self.log.exception("Sending email... NOT")
         return False
-
-    def email_file(self, to, from_=None, subject=None,
-                   body=None,
-                   ccs=None, bccs=None,
-                   files=None, utf8=True):
-        cmd = ['xdg-email']
-        if utf8:
-            cmd += ['--utf8']
-        if subject:
-            cmd += ['--subject', subject]
-        if body:
-            cmd += ['--body', body]
-        for cc in ccs or []:
-            cmd += ['--cc', cc]
-        for bcc in bccs or []:
-            cmd += ['--bcc', bcc]
-        for file_ in files or []:
-            cmd += ['--attach', file_]
-
-        cmd += [to]
-
-        self.log.info("Running %s", cmd)
-        retval = call(cmd)
-        return retval
 
 
     def on_button_clicked(self, button, *args, **kwargs):
@@ -656,10 +316,9 @@ class GetKeySection(Gtk.VBox):
                 if args:
                     # If we call on_button_clicked() from on_barcode()
                     # then we get extra arguments
-                    pgpkey = args[0]
+                    fingerprint = args[0]
                     message = args[1]
                     image = args[2]
-                    fingerprint = pgpkey.fingerprint
                 else:
                     image = None
                     raw_text = self.scanPage.get_text_from_textview()
@@ -702,8 +361,10 @@ class GetKeySection(Gtk.VBox):
                 # self.received_key_data will be set by the callback of the
                 # obtain_key function. At least it should...
                 # The data flow isn't very nice. It probably needs to be redone...
-                GLib.idle_add(self.sign_key_async, self.last_received_fingerprint,
-                    self.send_email, self.received_key_data)
+                f = lambda: self.sign_keydata_and_send(
+                                    keydata=self.received_key_data,
+                                    callback=self.send_email)
+                GLib.idle_add(f)
 
 
         elif button == self.backButton:
@@ -715,5 +376,5 @@ class GetKeySection(Gtk.VBox):
         self.received_key_data = keydata
         image = self.scanned_image
         openpgpkey = openpgpkey_from_data(keydata)
-        assert openpgpkey.fpr == fingerprint
+        assert openpgpkey.fingerprint == fingerprint
         self.signPage.display_downloaded_key(openpgpkey, fingerprint, image)

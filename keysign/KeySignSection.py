@@ -22,19 +22,14 @@ import sys
 
 from gi.repository import Gtk
 
-from monkeysign.gpg import Keyring
-
-from . import key
 from .KeyPresent import KeyPresentPage
 from . import Keyserver
 from .KeysPage import KeysPage
-from .SignPages import KeyDetailsPage
-
+from .gpgmh import get_public_key_data
+from .util import mac_generate
 
 log = logging.getLogger(__name__)
 
-
-from .GetKeySection import TempKeyring
 
 class KeySignSection(Gtk.VBox):
 
@@ -45,7 +40,6 @@ class KeySignSection(Gtk.VBox):
         super(KeySignSection, self).__init__()
 
         self.log = logging.getLogger(__name__)
-        self.keyring = Keyring()
 
         # these are needed later when we need to get details about
         # a selected key
@@ -53,26 +47,14 @@ class KeySignSection(Gtk.VBox):
         self.keysPage.connect('key-selection-changed',
             self.on_key_selection_changed)
         self.keysPage.connect('key-selected', self.on_key_selected)
-        self.keyDetailsPage = KeyDetailsPage()
-        self.keyPresentPage = KeyPresentPage()
 
-
-        # create back button
-        self.backButton = Gtk.Button('Back')
-        self.backButton.set_image(Gtk.Image.new_from_icon_name("go-previous", Gtk.IconSize.BUTTON))
-        self.backButton.set_always_show_image(True)
-        self.backButton.connect('clicked', self.on_button_clicked)
 
         # set up notebook container
         self.notebook = Gtk.Notebook ()
         self.notebook.append_page (self.keysPage, None)
-        vbox = Gtk.VBox ()
-        # We place the button at the top, but that might not be the
-        # smartest thing to do. Feel free to rearrange
-        # FIXME: Consider a GtkHeaderBar for the application
-        vbox.pack_start (self.backButton, False, False, 0)
-        vbox.pack_start (self.keyPresentPage, True, True, 10)
-        self.notebook.append_page (vbox, None)
+
+        self.key_present_page_index = None
+
         self.notebook.set_show_tabs (False)
 
         self.pack_start(self.notebook, True, True, 0)
@@ -87,48 +69,59 @@ class KeySignSection(Gtk.VBox):
         self.keyserver = None
 
 
-    def on_key_selection_changed(self, pane, keyid):
+    def construct_key_present_page(self, fingerprint, qrcodedata=None):
+        kpp = KeyPresentPage(fingerprint, qrcodedata=qrcodedata)
+        vbox = Gtk.VBox ()
+
+        # create back button
+        self.backButton = Gtk.Button('Back')
+        self.backButton.set_image(Gtk.Image.new_from_icon_name("go-previous", Gtk.IconSize.BUTTON))
+        self.backButton.set_always_show_image(True)
+        self.backButton.connect('clicked', self.on_button_clicked)
+
+        # We place the button at the top, but that might not be the
+        # smartest thing to do. Feel free to rearrange
+        # FIXME: Consider a GtkHeaderBar for the application
+        vbox.pack_start (self.backButton, False, False, 0)
+        vbox.pack_start (kpp, True, True, 10)
+        vbox.show_all()
+        self.key_present_page_index = self.notebook.append_page (vbox, None)
+        return self.key_present_page_index, kpp
+
+
+    def destruct_key_present_page(self):
+        self.notebook.remove_page(self.key_present_page_index)
+
+
+    def on_key_selection_changed(self, pane, fingerprint):
         '''This callback is attached to the signal which is emitted
         when the user changes their selection in the list of keys
         '''
         pass
 
 
-    def on_key_selected(self, pane, keyid):
+    def on_key_selected(self, pane, fingerprint):
         '''This is the callback for when the user has committed
         to a key, i.e. the user has made a selection and wants to
         advance the program.
         '''
-        log.debug('User selected key %s', keyid)
+        log.debug('User selected key %s', fingerprint)
+        keydata = get_public_key_data(fingerprint)
+        self.log.debug("Keyserver switched on! Serving key with fpr: %s",
+                       fingerprint)
+        self.setup_server(keydata, fingerprint)
 
-        key = list(self.keyring.get_keys(keyid).values())[0]
-
-        keyid = key.keyid()
-        fpr = key.fpr
-        self.keyring.export_data(fpr, secret=False)
-        keydata = self.keyring.context.stdout
-
-        self.log.debug("Keyserver switched on! Serving key with fpr: %s", fpr)
-        self.setup_server(keydata, fpr)
-        
-        self.switch_to_key_present_page(key)
-
-
-    def switch_to_key_present_page(self, key):
-        '''This switches the notebook to the page which
-        presents the information that is needed to securely
-        transfer the keydata, i.e. the fingerprint and its barcode.
-        '''
-        self.keyPresentPage.display_fingerprint_qr_page(key)
-        self.notebook.next_page()
+        mac =  mac_generate(fingerprint, keydata)
+        qrcodedata = 'OPENPGP4FPR:{0}#MAC={1}'.format(
+            fingerprint, mac)
+        kpp_index, key_present_page = self.construct_key_present_page(
+            fingerprint, qrcodedata)
+        self.notebook.set_current_page(kpp_index)
         # This is more of a crude hack. Once the next page is presented,
         # the back button has the focus. This is not desirable because
         # you will go back when accidentally pressing space or enter.
-        self.keyPresentPage.fingerprintLabel.grab_focus()
-        # FIXME: we better use set_current_page, but that requires
-        # knowing which page our desired widget is on.
-        # FWIW: A headerbar has named pages.
-        
+        key_present_page.fingerprintLabel.grab_focus()
+
 
     def on_next_button_clicked(self, button):
         '''A helper for legacy reasons to enable a next button
@@ -136,8 +129,8 @@ class KeySignSection(Gtk.VBox):
         All it does is retrieve the selection from the TreeView and
         call the signal handler for when the user committed to a key
         '''
-        name, email, keyid = self.keysPage.get_items_from_selection()
-        return self.on_key_selected(button, keyid)
+        name, email, fingerprint = self.keysPage.get_items_from_selection()[:3]
+        return self.on_key_selected(button, fingerprint)
         
 
     def on_button_clicked(self, button):
@@ -149,6 +142,7 @@ class KeySignSection(Gtk.VBox):
             if page_index == 1:
                 self.log.debug("Keyserver switched off")
                 self.stop_server()
+                self.destruct_key_present_page()
 
             self.notebook.prev_page()
 

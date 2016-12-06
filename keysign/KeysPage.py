@@ -26,7 +26,7 @@ import logging
 from gi.repository import Gtk, GLib
 from gi.repository import GObject
 
-from monkeysign.gpg import Keyring
+from .gpgmh import get_usable_secret_keys, get_usable_keys
 
 # These are relative imports
 from __init__ import __version__
@@ -70,42 +70,16 @@ class KeysPage(Gtk.VBox):
         # this ListStore, e.g. when parsing the selection of the
         # TreeView, i.e. in get_items_from_selection.
         self.store = Gtk.ListStore(str, str, str)
+        #                       name, email, fingerprint
 
-        # FIXME: this should be moved to KeySignSection
-        self.keyring = Keyring() # the user's keyring
-
-        self.keysDict = {}
-
-        # FIXME: this should be a callback function to update the display
-        # when a key is changed/deleted
-        keys = self.keyring.get_keys(None, secret=True,
-                                           public=show_public_keys)
-        for fpr, key in keys.items():
-            if key.invalid or key.disabled or key.expired or key.revoked:
-                continue
-
+        keys = get_usable_secret_keys()
+        keys += get_usable_keys() if show_public_keys else []
+        for key in keys:
             uidslist = key.uidslist #UIDs: Real Name (Comment) <email@address>
-            keyid = str(key.keyid()) # the key's short id
+            fingerprint = key.fingerprint
 
-            if not keyid in self.keysDict:
-                self.keysDict[keyid] = key
-
-            for e in uidslist:
-                uid = str(e.uid)
-                # remove the comment from UID (if it exists)
-                com_start = uid.find('(')
-                if com_start != -1:
-                    com_end = uid.find(')')
-                    uid = uid[:com_start].strip() + uid[com_end+1:].strip()
-
-                # split into user's name and email
-                tokens = uid.split('<')
-                name = tokens[0].strip()
-                email = 'unknown'
-                if len(tokens) > 1:
-                    email = tokens[1].replace('>','').strip()
-
-                self.store.append((name, email, keyid))
+            for uid in uidslist:
+                self.store.append((uid.name, uid.email, fingerprint))
 
         if len(self.store) == 0:
             self.pack_start(Gtk.Label("You don't have a private key"), True, True, 0)
@@ -120,14 +94,14 @@ class KeysPage(Gtk.VBox):
             emailRenderer = Gtk.CellRendererText()
             emailColumn = Gtk.TreeViewColumn("Email", emailRenderer, text=1)
 
-            # setup 'Key' column
-            keyRenderer = Gtk.CellRendererText()
-            keyColumn = Gtk.TreeViewColumn("Key", keyRenderer, text=2)
+            ## setup 'Fingerprint' column
+            # keyRenderer = Gtk.CellRendererText()
+            # keyColumn = Gtk.TreeViewColumn("Fingerprint", keyRenderer, text=2)
 
             self.treeView.append_column(nameColumn)
             self.treeView.append_column(emailColumn)
-            self.treeView.append_column(keyColumn)
-            
+            # self.treeView.append_column(keyColumn)
+
             self.treeView.connect('row-activated', self.on_row_activated)
 
             # make the tree view resposive to single click selection
@@ -164,31 +138,27 @@ class KeysPage(Gtk.VBox):
         '''Returns the elements in the ListStore for the given selection'''
         s = selection or self.treeView.get_selection()
         model, paths = s.get_selected_rows()
-        name = email = keyid = None
+        name = email = fingerprint = None
         for path in paths:
             iterator = model.get_iter(path)
-            (name, email, keyid) = model.get(iterator, 0, 1, 2)
+            (name, email, fingerprint) = model.get(iterator, 0, 1, 2)
             break
 
-        return (name, email, keyid)
+        return (name, email, fingerprint)
 
 
     def on_selection_changed(self, selection, *args):
         log.debug('Selected new TreeView item %s = %s', selection, args)
         
-        name, email, keyid = self.get_items_from_selection(selection)
+        name, email, fingerprint = \
+            self.get_items_from_selection(selection)[:3]
         
-        key = self.keysDict[keyid]
-        self.emit('key-selection-changed', keyid)
+        self.emit('key-selection-changed', fingerprint)
         
-        try:
-            exp_date = datetime.fromtimestamp(float(key.expiry))
-        except TypeError as e:
-            # This might be the case when the key.expiry is already a timedate
-            exp_date = key.expiry
-        except ValueError as e:
-            # This happens when converting an empty string to a datetime.
-            exp_date = None
+        # FIXME: We'd rather want to get the key object
+        # (or its representation) from the model, not by querying again
+        key = next(iter(get_usable_keys(pattern=fingerprint)))
+        exp_date = key.expiry
 
         if exp_date is None:
             expiry = "No expiration date"
@@ -202,7 +172,8 @@ class KeysPage(Gtk.VBox):
             # label in the pane is a "Select a key on the left"
             # text.
             pane.remove(child)
-        ctx = {'keyid':keyid, 'expiry':expiry, 'sigs':''}
+        ctx = {'keyid':fingerprint[-8:], 'expiry':expiry,
+               'sigs':'', 'fingerprint':fingerprint}
         keyid_label = Gtk.Label(label='Key {keyid}'.format(**ctx))
         expiration_label = Gtk.Label(label='Expires: {expiry}'.format(**ctx))
         #signatures_label = Gtk.Label(label='{sigs} signatures'.format(**ctx))
@@ -226,8 +197,9 @@ class KeysPage(Gtk.VBox):
         # We just hijack the existing function.
         # I'm sure we could get the required information out of
         # the tree_path and column, but I don't know how.
-        name, email, keyid = self.get_items_from_selection()
-        self.emit('key-selected', keyid)
+        name, email, fingerprint = \
+            self.get_items_from_selection()[:3]
+        self.emit('key-selected', fingerprint)
 
 
     def on_publish_button_clicked(self, button, key, *args):
@@ -235,8 +207,8 @@ class KeysPage(Gtk.VBox):
         to publish a key on the network.  It will emit a "key-selected"
         signal with the ID of the selected key.'''
         log.debug('Clicked publish for key (%s) %s (%s)', type(key), key, args)
-        keyid = key.keyid()
-        self.emit('key-selected', keyid)
+        fingerprint = key.fingerprint
+        self.emit('key-selected', fingerprint)
 
 
 
@@ -293,13 +265,13 @@ class Keys(Gtk.Application):
         self.log.info('Selection changed to: %s', key)
 
 
-    def on_key_selected(self, button, key):
+    def on_key_selected(self, button, fpr):
         """This is the connected to the KeysPage's key-selected signal
         
         As a user of that widget, you would enable buttons or proceed
         with the GUI.
         """
-        self.log.info('User committed to a key! %s', key)
+        self.log.info('User committed to a key! %s', fpr)
 
                                                 
 def parse_command_line(argv):
