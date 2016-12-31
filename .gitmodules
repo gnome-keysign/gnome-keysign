@@ -1,4 +1,4 @@
 [submodule "monkeysign"]
 	path = monkeysign
 	#url = https://github.com/muelli/monkeysign.git
-	url =  git://git.monkeysphere.info/monkeysign
+	url =  https://0xacab.org/monkeysphere/monkeysign.git
