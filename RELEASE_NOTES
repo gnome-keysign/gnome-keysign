@@ -1,18 +1,19 @@
 GNOME Keysign is a tool to make signing OpenPGP keys as easy as possible.
-This is the v0.6 release which fixes a few bugs and increases py3k
-compatibilty.
+This is the v0.7 release which fixes a few bugs and increases gpg 2.1.
 
 Changes
 ==========
 
- * Fixed manually typing the fingerprint
- * Made gsignal definitions use str() for names
- * Got rid of warning from gi when importing
+ * showing a message when you don't have a private key
+ * Disable Next or Back button when hitting the end of the notebook
+ * More Python 3 compatible code (e.g. HTTP server, StringIOs, dict.items)
+ * (Hopefully) more efficient bar code rendering to increase the
+   success rate when reading it
+ * Using zbar's cache to hopefully save some CPU cycles while scanning
 
 
 Resources
 =========
 
-Download: https://github.com/muelli/geysigning/releases/download/0.5/gnome-keysign-0.6.tar.gz
-sha256sum:
+Download: https://github.com/muelli/geysigning/archive/0.7.tar.gz
 Web site: https://wiki.gnome.org/GnomeKeysign

@@ -33,14 +33,18 @@ setup(
         'monkeysign.gpg',
     ],
     package_dir={
-        #'keysign': 'keysign',
+        'keysign': 'keysign',
         'monkeysign': 'monkeysign/monkeysign'
     },
     package_data={'keysign': ['*.ui']},
     include_package_data = True,
     data_files=[
-        ('share/applications', ['data/gnome-keysign.desktop']),
-        ('share/icons/hicolor/scalable/apps', ['data/gnome-keysign.svg']),
+        ( 'share/applications',
+            ['data/gnome-keysign.desktop']),
+        ( 'share/appdata',
+            ['data/gnome-keysign.appdata.xml']),
+        ( 'share/icons/hicolor/scalable/apps',
+            ['data/gnome-keysign.svg']),
     ],
     #scripts = ['gnome-keysign.py'],
     install_requires=[

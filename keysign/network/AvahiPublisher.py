@@ -24,6 +24,9 @@ import dbus
 from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GObject
 
+DBusGMainLoop( set_as_default=True )
+
+
 class AvahiPublisher:
 
     def __init__(self,
@@ -122,7 +125,6 @@ class AvahiPublisher:
 
 DBusGMainLoop( set_as_default=True )
 if __name__ == '__main__':
-
     ap = AvahiPublisher()
     ap.add_service()
 
