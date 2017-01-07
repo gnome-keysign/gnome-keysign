@@ -239,6 +239,11 @@ class BarcodeReaderGTK(BarcodeReader, Gtk.DrawingArea):
 
     def __init__(self, *args, **kwargs):
         super(BarcodeReaderGTK, self).__init__(*args, **kwargs)
+        
+        # work around for https://bugzilla.gnome.org/show_bug.cgi?id=721148#c6
+        visual = Gdk.Screen.get_system_visual(self.get_screen())
+        if visual:
+            self.set_visual(visual)
 
 
     @property
