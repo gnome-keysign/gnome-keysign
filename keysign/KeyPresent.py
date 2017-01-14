@@ -67,8 +67,11 @@ class KeyPresentWidget(Gtk.Widget):
         thisdir = os.path.dirname(os.path.abspath(__file__))
         builder = kwargs.pop("builder", None)
         if not builder:
-            builder = Gtk.Builder.new_from_file(
-                os.path.join(thisdir, 'send.ui'))
+            builder = Gtk.Builder()
+            builder.add_objects_from_file(
+                os.path.join(thisdir, 'send.ui'),
+                ['box3']
+                )
         log.debug("Our builder is: %r", builder)
         # The widget will very likely have a parent.
         # Gtk doesn't like so much adding a Widget to a container
