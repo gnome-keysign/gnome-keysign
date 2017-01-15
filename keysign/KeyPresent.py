@@ -95,7 +95,8 @@ class KeyPresentWidget(Gtk.Widget):
         self.fingerprint_label = self._builder.get_object("keyFingerprintLabel")
         self.qrcode_frame = self._builder.get_object("qrcode_frame")
 
-        self.key_id_label.set_markup(key.fingerprint[-8:])
+        self.key_id_label.set_markup(
+            format_fingerprint(key.fingerprint).replace('\n', '  '))
         self.uids_label.set_markup("\n".join(
                                         [GLib.markup_escape_text("{}".format(uid))
                                         for uid
