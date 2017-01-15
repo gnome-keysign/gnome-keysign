@@ -47,9 +47,9 @@ except ImportError:
     from .gpgmh import fingerprint_for_key as fingerprint_from_keydata
 
 from .network.AvahiBrowser import AvahiBrowser
+from .util import mac_verify
 
-
-class AvahiKeysignDiscovery:
+class AvahiKeysignDiscovery(object):
     "A client discovery using Avahi"
     def __init__(self, *args, **kwargs):
         self.log = logging.getLogger(__name__)
@@ -105,6 +105,31 @@ class AvahiKeysignDiscovery:
                                   address, port)
         return downloaded_key
 
+class AvahiKeysignDiscoveryWithMac(AvahiKeysignDiscovery):
+    def find_key(self, userdata):
+        "Returns the key if it thinks it found one which also matched the MAC"
+        key = super(AvahiKeysignDiscoveryWithMac, self).find_key(userdata)
+        if key:
+            # For now, we cannot assume that a MAC exists, simply because
+            # currently the MAC is only transferred via the barcode.
+            # The user, however, might as well enter the fingerprint
+            # manually.  Unless we stop allowing that, we won't have a MAC.
+            mac = parse_barcode(userdata).get("MAC", [None])[0]
+            if mac is None:
+                # This is the ugly shortcut which exists for legacy reasons
+                verified_key = key
+            else:
+                mac_key = fingerprint_from_keydata(key)
+                verified = mac_verify(mac_key, key, mac)
+                if verified:
+                    verified_key = key
+                else:
+                    self.log.info("MAC validation failed: %r", verified)
+                    verified_key = None
+        else:
+            verified_key = None
+
+        return verified_key
 
 def main(args):
     log = logging.getLogger(__name__)
