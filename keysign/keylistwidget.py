@@ -96,7 +96,7 @@ class KeyListWidget(Gtk.HBox):
         super(KeyListWidget, self).__init__()
 
         thisdir = os.path.dirname(os.path.abspath(__file__))
-        widget_name = 'box2'
+        widget_name = 'keylistbox'
         if not builder:
             builder = Gtk.Builder.new_from_file(
                 os.path.join(thisdir, 'send.ui'))
