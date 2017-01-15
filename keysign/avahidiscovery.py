@@ -22,7 +22,7 @@ import sys
 
 from requests.exceptions import ConnectionError
 
-from gi.repository import GObject
+from gi.repository import GObject, GLib
 
 
 if  __name__ == "__main__" and __package__ is None:
@@ -49,9 +49,19 @@ except ImportError:
 from .network.AvahiBrowser import AvahiBrowser
 from .util import mac_verify
 
-class AvahiKeysignDiscovery(object):
+log = logging.getLogger(__name__)
+
+class AvahiKeysignDiscovery(GObject.GObject):
     "A client discovery using Avahi"
+
+    __gsignals__ = {
+        # Gets emitted whenever a new server has been found or has been removed.
+        # Is also emitted shortly after an object has been created.
+        str("list-changed"): (GObject.SIGNAL_RUN_LAST, None, (int,)),
+    }
+
     def __init__(self, *args, **kwargs):
+        super(AvahiKeysignDiscovery, self).__init__(*args, **kwargs)
         self.log = logging.getLogger(__name__)
         # We should probably try to put this constant in a more central place
         avahi_service_type = '_geysign._tcp'
@@ -59,6 +69,9 @@ class AvahiKeysignDiscovery(object):
         self.avahi_browser.connect('new_service', self.on_new_service)
         self.avahi_browser.connect('remove_service', self.on_remove_service)
         self.discovered_services = []
+        # It seems we cannot emit directly...
+        GLib.idle_add(lambda: self.emit("list-changed",
+            len(self.discovered_services)))
 
     def on_new_service(self, browser, name, address, port, txt_dict):
         published_fpr = txt_dict.get('fingerprint', None)
@@ -66,6 +79,7 @@ class AvahiKeysignDiscovery(object):
                       name, address, port, published_fpr)
         # FIXME: Use something more sane like attr.s
         self.discovered_services += ((name, address, port, published_fpr), )
+        self.emit("list-changed", len(self.discovered_services))
 
     def on_remove_service(self, browser, service_type, name):
         '''Handler for the on_remove signal from AvahiBrowser
@@ -83,6 +97,7 @@ class AvahiKeysignDiscovery(object):
         for client in self.discovered_services:
             if client[0] == name:
                 self.discovered_services.remove(client)
+                self.emit("list-changed", len(self.discovered_services))
         self.log.info("Clients currently in list '%s'",
                       self.discovered_services)
 
