@@ -117,9 +117,10 @@ Please use, e.g. Seahorse to create one.</property>
                   <object class="GtkLabel" id="label2">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="no_show_all">True</property>
+                    <property name="opacity">0.01</property>
                     <property name="label" translatable="yes">&lt;small&gt;Times signed&lt;/small&gt;</property>
                     <property name="use_markup">True</property>
-                    <property name="xalign">0</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
