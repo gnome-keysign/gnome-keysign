@@ -106,9 +106,16 @@ class PreSignWidget(Gtk.VBox):
         self.key = key
 
         keyIdsLabel = builder.get_object("key_ids_label")
+        log.info("The Key ID Label can focus: %r, %r",
+            keyIdsLabel.props.can_focus,
+            keyIdsLabel.get_can_focus())
+        # Weird. The glade file defines can_focus = False, but it's set to True...
+        keyIdsLabel.set_can_focus(False)
         keyIdsLabel.set_markup(format_key_header(self.key.fingerprint))
 
         uidsLabel = builder.get_object("uids_label")
+        # FIXME: Check why Builder thinks the widget can focus when the glade file says no
+        uidsLabel.set_can_focus(False)
         markup = format_uidslist(self.key.uidslist)
         uidsLabel.set_markup(markup)
 

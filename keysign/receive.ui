@@ -399,13 +399,21 @@ Alpha Bar &lt;example@example.com&gt;</property>
             <child>
               <object class="GtkButton" id="confirm_sign_button">
                 <property name="label" translatable="yes">C_onfirm</property>
+                <property name="name">confirm_button</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="is_focus">True</property>
+                <property name="can_default">True</property>
+                <property name="has_default">True</property>
                 <property name="receives_default">True</property>
                 <property name="image">confirm-button-image</property>
                 <property name="use_underline">True</property>
                 <property name="always_show_image">True</property>
                 <signal name="clicked" handler="on_confirm_button_clicked" swapped="no"/>
+                <accessibility>
+                  <action action_name="click" description="Confirm signing the OpenPGP Key"/>
+                </accessibility>
+                <accelerator key="o" signal="clicked" modifiers="GDK_MOD1_MASK"/>
                 <style>
                   <class name="suggested-action"/>
                 </style>
