@@ -189,6 +189,7 @@ Please use, e.g. Seahorse to create one.</property>
           <object class="GtkBox" id="box3">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="margin_left">5</property>
             <property name="margin_top">10</property>
             <property name="margin_bottom">40</property>
             <property name="orientation">vertical</property>
@@ -197,11 +198,11 @@ Please use, e.g. Seahorse to create one.</property>
               <object class="GtkLabel" id="label6">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="halign">start</property>
                 <property name="label" translatable="yes">&lt;small&gt;To have the key signed, the other person must enter the security code, or scan the QR code&lt;/small&gt;</property>
                 <property name="use_markup">True</property>
                 <property name="ellipsize">middle</property>
                 <property name="lines">2</property>
-                <property name="xalign">0</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -224,9 +225,9 @@ Please use, e.g. Seahorse to create one.</property>
                       <object class="GtkLabel" id="label7">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="halign">start</property>
                         <property name="label" translatable="yes">&lt;b&gt;Key Details&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
-                        <property name="xalign">0</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -249,9 +250,8 @@ Please use, e.g. Seahorse to create one.</property>
                               <object class="GtkLabel" id="label3">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
+                                <property name="halign">end</property>
                                 <property name="label" translatable="yes">Fingerprint</property>
-                                <property name="xalign">1</property>
-                                <property name="yalign">0</property>
                                 <attributes>
                                   <attribute name="foreground" value="#88888a8a8585"/>
                                 </attributes>
@@ -266,9 +266,8 @@ Please use, e.g. Seahorse to create one.</property>
                               <object class="GtkLabel" id="label4">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
+                                <property name="halign">end</property>
                                 <property name="label" translatable="yes">UIDs</property>
-                                <property name="xalign">1</property>
-                                <property name="yalign">0</property>
                                 <attributes>
                                   <attribute name="weight" value="ultralight"/>
                                   <attribute name="foreground" value="#88888a8a8585"/>
@@ -337,9 +336,10 @@ Please use, e.g. Seahorse to create one.</property>
                       <object class="GtkLabel" id="label8">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="halign">start</property>
+                        <property name="margin_top">10</property>
                         <property name="label" translatable="yes">&lt;b&gt;Security Code&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
-                        <property name="xalign">0</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -351,10 +351,10 @@ Please use, e.g. Seahorse to create one.</property>
                       <object class="GtkLabel" id="keyFingerprintLabel">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="halign">start</property>
                         <property name="label" translatable="yes">F289 F7BA 977D F414 3AE9
 FDFB F70A 0290 6C30 1813</property>
                         <property name="selectable">True</property>
-                        <property name="xalign">0</property>
                         <attributes>
                           <attribute name="scale" value="1.75"/>
                           <attribute name="font-desc" value="&lt;Enter Value&gt; 15"/>
