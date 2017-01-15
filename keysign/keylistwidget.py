@@ -98,8 +98,10 @@ class KeyListWidget(Gtk.HBox):
         thisdir = os.path.dirname(os.path.abspath(__file__))
         widget_name = 'keylistbox'
         if not builder:
-            builder = Gtk.Builder.new_from_file(
-                os.path.join(thisdir, 'send.ui'))
+            builder = Gtk.Builder()
+            builder.add_objects_from_file(
+                os.path.join(thisdir, 'send.ui'),
+                [widget_name])
         widget = builder.get_object(widget_name)
         old_parent = widget.get_parent()
         old_parent.remove(widget)
