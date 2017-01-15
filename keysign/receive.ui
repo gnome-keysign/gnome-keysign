@@ -397,6 +397,9 @@ This will generate an email that must be sent in order to complete the signing p
                 <property name="image">confirm-button-image</property>
                 <property name="always_show_image">True</property>
                 <signal name="clicked" handler="on_confirm_button_clicked" swapped="no"/>
+                <style>
+                  <class name="suggested-action"/>
+                </style>
               </object>
               <packing>
                 <property name="expand">False</property>
