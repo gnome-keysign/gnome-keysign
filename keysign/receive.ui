@@ -390,11 +390,12 @@ This will generate an email that must be sent in order to complete the signing p
             <property name="spacing">6</property>
             <child>
               <object class="GtkButton" id="confirm_sign_button">
-                <property name="label" translatable="yes">Confirm</property>
+                <property name="label" translatable="yes">C_onfirm</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="image">confirm-button-image</property>
+                <property name="use_underline">True</property>
                 <property name="always_show_image">True</property>
                 <signal name="clicked" handler="on_confirm_button_clicked" swapped="no"/>
                 <style>
