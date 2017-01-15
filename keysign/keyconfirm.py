@@ -164,7 +164,13 @@ class PreSignApp(Gtk.Application):
         if not args:
             args = [""]
         key = get_usable_keys (pattern=args[0])[0]
-        self.psw = PreSignWidget(key)
+        if len(args) >= 2:
+            image_fname = args[1]
+            log.debug("Trying to load pixbuf from %r", image_fname)
+            pixbuf = Gtk.Image.new_from_file(image_fname).get_pixbuf()
+        else:
+            pixbuf = None
+        self.psw = PreSignWidget(key, pixbuf=pixbuf)
         super(PreSignApp, self).run()
 
 
