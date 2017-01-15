@@ -92,7 +92,7 @@ class PreSignWidget(Gtk.VBox):
     def __init__(self, key, pixbuf=None, builder=None):
         super(PreSignWidget, self).__init__()
         thisdir = os.path.dirname(os.path.abspath(__file__))
-        widget_name = 'box10'
+        widget_name = 'keyconfirmbox'
         if not builder:
             builder = Gtk.Builder()
             builder.add_objects_from_file(
