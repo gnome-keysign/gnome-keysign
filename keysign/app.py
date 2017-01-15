@@ -91,6 +91,12 @@ class KeysignApp(Gtk.Application):
         self.header_button.connect('clicked', self.on_header_button_clicked)
 
         sw = builder.get_object('stackswitcher1')
+        # FIXME: I want to be able to press Alt+S and Alt+R respectively
+        # to switch the stack pages to Send and Receive.
+        # It's possible when using the Gtk Inspector and modify the
+        # Switcher's children (ToggleButton and Label) to "use-underscore".
+        # but it must be possible to do programmatically.
+        # sw.get_children()
         self.stack_switcher = sw
 
         self.send_receive_stack = builder.get_object("send_receive_stack")
