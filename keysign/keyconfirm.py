@@ -92,9 +92,13 @@ class PreSignWidget(Gtk.VBox):
     def __init__(self, key, pixbuf=None, builder=None):
         super(PreSignWidget, self).__init__()
         thisdir = os.path.dirname(os.path.abspath(__file__))
+        widget_name = 'box10'
         if not builder:
-            builder = Gtk.Builder.new_from_file(os.path.join(thisdir, 'receive.ui'))
-        widget = builder.get_object('box10')
+            builder = Gtk.Builder()
+            builder.add_objects_from_file(
+                os.path.join(thisdir, 'receive.ui'),
+                [widget_name, 'confirm-button-image'])
+        widget = builder.get_object(widget_name)
         parent = widget.get_parent()
         if parent:
             parent.remove(widget)
