@@ -104,7 +104,8 @@ class KeyListWidget(Gtk.HBox):
                 [widget_name])
         widget = builder.get_object(widget_name)
         old_parent = widget.get_parent()
-        old_parent.remove(widget)
+        if old_parent:
+            old_parent.remove(widget)
         self.add(widget)
 
         self.listbox = builder.get_object("keys_listbox")
