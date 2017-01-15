@@ -43,7 +43,7 @@ if  __name__ == "__main__" and __package__ is None:
 
 
 from .avahioffer import AvahiHTTPOffer
-from .avahidiscovery import AvahiKeysignDiscovery
+from .avahidiscovery import AvahiKeysignDiscoveryWithMac
 from .keyconfirm import PreSignWidget
 from .keyfprscan import KeyFprScanWidget
 from .keylistwidget import KeyListWidget
@@ -165,7 +165,7 @@ class KeysignApp(Gtk.Application):
         window.show_all()
         self.add_window(window)
 
-        self.discovery = AvahiKeysignDiscovery()
+        self.discovery = AvahiKeysignDiscoveryWithMac()
 
     def run(self, args=[]):
         super(KeysignApp, self).run()
