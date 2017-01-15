@@ -114,6 +114,7 @@ class KeyListWidget(Gtk.HBox):
         else:
             for key in keys:
                 lbr = ListBoxRowWithKey(key)
+                lbr.props.margin_bottom = 5
                 self.listbox.add(lbr)
             self.listbox.connect('row-activated', self.on_row_activated)
             self.listbox.connect('row-selected', self.on_row_selected)
