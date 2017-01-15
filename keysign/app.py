@@ -394,6 +394,13 @@ class KeysignApp(Gtk.Application):
         # scope too early so that they don't get deleted
         self.tmpfiles = list(
             sign_keydata_and_send(keydata))
+        
+        # After the user has signed, we switch back to the scanner,
+        # because currently, there is not much to do on the
+        # key confirmation page.
+        log.debug ("Signed the key: %r", self.tmpfiles)
+        self.receive_stack.set_visible_child(self.scanner)
+        # Do we also want to add an infobar message or so..?
 
 
 
