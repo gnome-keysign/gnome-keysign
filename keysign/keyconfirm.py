@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 #    Copyright 2016 Andrei Macavei <andrei.macavei89@gmail.com>
+#    Copyright 2017 Tobias Mueller <muelli@cryptobitch.de>
 #
 #    This file is part of GNOME Keysign.
 #
@@ -46,6 +47,7 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .gpgmh import get_usable_keys
 from .scan_barcode import ScalingImage
+from .util import format_fingerprint
 
 log = logging.getLogger(__name__)
 
@@ -61,13 +63,13 @@ def format_key_header(fpr, length='2048', creation_time=None):
         # This might be the case when the creation_time is already a timedate
         creation = creation_time
 
-    key_header = ("{}/{} {}".format(length, fpr[-8:], creation))
+    key_header = format_fingerprint(fpr).replace('\n', '  ')
     return key_header
 
 def format_uidslist(uidslist):
     result = ""
     for uid in uidslist:
-        uidstr = str(uid).replace('<', '').replace('>', '')
+        uidstr = GLib.markup_escape_text(str(uid))
         result += ("{}\n".format(uidstr))
 
     return result
