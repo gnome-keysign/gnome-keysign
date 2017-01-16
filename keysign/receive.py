@@ -75,18 +75,37 @@ class ReceiveApp(Gtk.Application):
         window.set_title("Receive")
         # window.set_size_request(600, 400)
         #window = self.builder.get_object("appwindow")
-        
-        scanner = KeyFprScanWidget()
+
+        # This is a bit quirky now.
+        # The problem is, roughly speaking, that the
+        # Glade file contains all the necessary widget to
+        # compose the ScanWidget.  Our implementation, however,
+        # "creates" new widgets which we need to add somewhere.
+        # So we need to remove the already existing ones and add
+        # the newly created ones.
+        old_scanner = builder.get_object("scanner_widget")
+        old_scanner_parent = old_scanner.get_parent()
+
+        scanner = KeyFprScanWidget() #builder=builder)
         scanner.connect("changed", self.on_scanner_changed)
         scanner.connect("barcode", self.on_barcode)
 
+        if old_scanner_parent:
+            old_scanner_parent.remove(old_scanner)
+            # Hm. If we don't have an old parent, we never get to see
+            # the newly created scanner. Weird.
+            old_scanner_parent.add(scanner)
+
         receive_stack = builder.get_object("receive_stack")
-        # FIXME: We should probaly ask the ScannerWidget what it identifies itself as
-        receive_stack.remove(receive_stack.get_child_by_name("scanner"))
-        receive_stack.add_titled(scanner, "scanner", "Scan Barcode")
+        #receive_stack.remove(receive_stack.get_child_by_name("scanner"))
+        #receive_stack.add_titled(scanner, "scanner", "Scan Barcode")
         # It needs to be show()n so that it can be made visible
         scanner.show()
-        receive_stack.set_visible_child(scanner);
+        # FIXME: Use "stack_scanner_child" or so as identification
+        # for the stack's scanner child to make it visible when the
+        # app starts
+        # receive_stack.set_visible_child(old_scanner_parent)
+        
 
         window.add(receive_stack)
         window.show_all()
