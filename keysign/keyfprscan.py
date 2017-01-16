@@ -70,7 +70,7 @@ class KeyFprScanWidget(Gtk.VBox):
 
     def __init__(self, builder=None):
         super(KeyFprScanWidget, self).__init__()
-        widget_name = 'box20'
+        widget_name = 'scanner_widget'
         if not builder:
             thisdir = os.path.dirname(os.path.abspath(__file__))
             builder = Gtk.Builder()
