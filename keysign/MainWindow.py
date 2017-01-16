@@ -150,6 +150,7 @@ class MainWindow(Gtk.Application):
 
 
 def main():
+    from . import gtkexcepthook
     app = MainWindow()
 
     try:

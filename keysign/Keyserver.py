@@ -25,14 +25,27 @@ except ImportError:
     from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
     from SocketServer import ThreadingMixIn
 import logging
+import os
 import socket
 from threading import Thread
 
 # This is probably really bad...  But doing relative imports only
 # works for modules.  However, I want to be able to call this Keyserver.py
 # for testing purposes.
-from __init__ import __version__
-from network.AvahiPublisher import AvahiPublisher
+if  __name__ == "__main__" and __package__ is None:
+    logging.getLogger().error("You seem to be trying to execute " +
+                              "this script directly which is discouraged. " +
+                              "Try python -m instead.")
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    os.sys.path.insert(0, parent_dir)
+    os.sys.path.insert(0, os.path.join(parent_dir, 'monkeysign'))
+    import keysign
+    #mod = __import__('keysign')
+    #sys.modules["keysign"] = mod
+    __package__ = str('keysign')
+
+from .__init__ import __version__
+from .network.AvahiPublisher import AvahiPublisher
 
 from .gpgmh import fingerprint_from_keydata
 
@@ -161,7 +174,7 @@ class ServeKeyThread(Thread):
         super(ServeKeyThread, self).start(*args, **kwargs)
 
 
-    def serve_key(self):
+    def serve_key(self, poll_interval=0.15):
         '''An HTTPd is started and being put to serve_forever.
         You need to call shutdown() in order to stop
         serving.
@@ -171,7 +184,7 @@ class ServeKeyThread(Thread):
         try:
             log.info('Serving now on %s, this is probably blocking...',
                      self.httpd.socket.getsockname())
-            self.httpd.serve_forever()
+            self.httpd.serve_forever(poll_interval=poll_interval)
         finally:
             log.info('finished serving')
             #httpd.dispose()

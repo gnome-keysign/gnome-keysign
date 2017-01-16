@@ -29,6 +29,7 @@ import logging
 
 __all__ = ["AvahiBrowser"]
 
+DBusGMainLoop( set_as_default=True )
 
 # This should probably be upstreamed.
 # Unfortunately, upstream seems rather inactive.
