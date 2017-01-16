@@ -148,6 +148,7 @@ class KeysignApp(Gtk.Application):
         rs.connect('notify::visible-child',
             self.on_receive_stack_switch)
 
+
         scanner = KeyFprScanWidget() #builder=builder)
         scanner.connect("barcode", self.on_barcode)
         scanner.connect("changed", self.on_changed)
@@ -181,6 +182,9 @@ class KeysignApp(Gtk.Application):
         self.add_window(window)
 
         self.discovery = AvahiKeysignDiscoveryWithMac()
+        infobar = builder.get_object('infobar_discovery')
+        self.discovery.connect("list-changed",
+            self.on_discovery_changed, infobar)
 
     def run(self, args=[]):
         super(KeysignApp, self).run()
@@ -419,6 +423,14 @@ class KeysignApp(Gtk.Application):
 
 
 
+
+    def on_discovery_changed(self, discovery, number, userdata):
+        log.info("Discovery changed: %r", number)
+        ib = userdata
+        if number <= 0:
+            ib.show()
+        elif ib.is_visible():
+            ib.hide()
 
 
 def main(args):
