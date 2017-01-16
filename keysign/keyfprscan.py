@@ -68,12 +68,20 @@ class KeyFprScanWidget(Gtk.VBox):
                                               # the above string to be decoded
     }
 
-    def __init__(self):
+    def __init__(self, builder=None):
         super(KeyFprScanWidget, self).__init__()
-        thisdir = os.path.dirname(os.path.abspath(__file__))
-        builder = Gtk.Builder.new_from_file(os.path.join(thisdir, 'receive.ui'))
-        widget = builder.get_object('box20')
-        widget.reparent(self)
+        widget_name = 'box20'
+        if not builder:
+            thisdir = os.path.dirname(os.path.abspath(__file__))
+            builder = Gtk.Builder()
+            builder.add_objects_from_file(os.path.join(thisdir, 'receive.ui'),
+                [widget_name])
+        widget = builder.get_object(widget_name)
+        parent = widget.get_parent()
+        if parent:
+            parent.remove(widget)
+        self.add(widget)
+        
 
         self.scan_frame = builder.get_object("scan_frame")
 
