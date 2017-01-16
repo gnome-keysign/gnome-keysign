@@ -96,6 +96,9 @@ class KeyFprScanWidget(Gtk.VBox):
 
         self.fpr_entry = builder.get_object("fingerprint_entry")
         self.fpr_entry.connect('changed', self.on_text_changed)
+        
+        self.set_hexpand(True)
+        self.set_vexpand(True)
 
         # Temporary measure...
         self.barcode_scanner = self
