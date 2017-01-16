@@ -112,6 +112,8 @@ class ReceiveApp(Gtk.Application):
         self.add_window(window)
 
         self.discovery = AvahiKeysignDiscovery()
+        ib = builder.get_object('infobar_discovery')
+        self.discovery.connect('list-changed', self.on_list_changed, ib)
 
     def on_keydata_downloaded(self, keydata, pixbuf=None):
         key = openpgpkey_from_data(keydata)
@@ -144,6 +146,14 @@ class ReceiveApp(Gtk.Application):
         if not args:
             args = [""]
         super(ReceiveApp, self).run()
+
+
+    def on_list_changed(self, discovery, number, userdata):
+        ib = userdata
+        if number == 0:
+            ib.show()
+        elif ib.is_visible():
+            ib.hide()
 
 
 def main(args):
