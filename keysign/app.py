@@ -148,20 +148,29 @@ class KeysignApp(Gtk.Application):
         rs.connect('notify::visible-child',
             self.on_receive_stack_switch)
 
-        scanner = KeyFprScanWidget()
+        scanner = KeyFprScanWidget() #builder=builder)
         scanner.connect("barcode", self.on_barcode)
         scanner.connect("changed", self.on_changed)
         scanner.connect("map", self.on_scanner_mapped)
 
-        # FIXME: We should probaly ask the ScannerWidget what it identifies itself as
-        rs.remove(rs.get_child_by_name("scanner"))
-        rs.add_titled(scanner, "scanner", "Scan Barcode")
+        old_scanner = builder.get_object("scanner_widget")
+        old_scanner_parent = old_scanner.get_parent()
+
+        if old_scanner_parent:
+            old_scanner_parent.remove(old_scanner)
+            # Hrm. We probably always have to have a parent
+            # otherwise we won't add the scanner here...
+            old_scanner_parent.add(scanner)
+
+
         self.receive_stack = rs
         self.scanner = scanner
 
         # It needs to be show()n so that it can be made visible
         scanner.show()
-        rs.set_visible_child(scanner)
+        # The stack now contains a box which we don't modify.
+        # We could potentially ask the stack to show scanner.parent...
+        # rs.set_visible_child(old_scanner_parent)
 
 
         self.send_receive_stack.add_titled(self.send_stack,
