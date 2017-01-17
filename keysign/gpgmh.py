@@ -317,7 +317,7 @@ def sign_keydata(keydata, error_cb=None, homedir=None):
 
         for uid in uidlist:
             uid_str = uid.uid
-            log.info("Processing uid %s %s", uid, uid_str)
+            log.info("Processing uid %r %s", uid, uid_str)
 
             # 3.2. export and encrypt the signature
             # 3.3. mail the key to the user
@@ -410,9 +410,10 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
     tmpkeyring.context.set_option('always-trust')
     for (uid, signed_key) in sign_keydata(keydata,
         error_cb=error_cb, homedir=homedir):
-            encrypted_key = tmpkeyring.encrypt_data(data=signed_key,
-                recipient=uid.uid)
-            yield (UID.from_monkeysign(uid), encrypted_key)
+            if not uid.revoked:
+                encrypted_key = tmpkeyring.encrypt_data(data=signed_key,
+                    recipient=uid.uid)
+                yield (UID.from_monkeysign(uid), encrypted_key)
 
 
 
