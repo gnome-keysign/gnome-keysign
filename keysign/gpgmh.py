@@ -320,7 +320,7 @@ def sign_keydata(keydata, error_cb=None, homedir=None):
             # 3.3. mail the key to the user
             signed_key = UIDExport(uid_str, tmpkeyring.export_data(uid_str))
             log.info("Exported %d bytes of signed key", len(signed_key))
-            yield (uid.uid, signed_key)
+            yield (uid, signed_key)
 
 ##
 ## END OF INTERNAL API
@@ -408,8 +408,8 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
     for (uid, signed_key) in sign_keydata(keydata,
         error_cb=error_cb, homedir=homedir):
             encrypted_key = tmpkeyring.encrypt_data(data=signed_key,
-                recipient=uid)
-            yield (uid, encrypted_key)
+                recipient=uid.uid)
+            yield (UID.from_monkeysign(uid), encrypted_key)
 
 
 
