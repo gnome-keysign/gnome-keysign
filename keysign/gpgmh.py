@@ -258,8 +258,9 @@ def get_usable_keys_from_keyring(keyring, pattern, public, secret):
 def sign_keydata(keydata, error_cb=None, homedir=None):
     """Signs OpenPGP keydata with your regular GnuPG secret keys
     
-    error_cb can be a function that is called with any exception
-    occuring during signing of the key.
+    If error_cb is provided, that function is called with any exception
+    occuring during signing of the key.  If error_cb is False, any
+    exception is raised.
     
     yields pairs of (uid, signed_uid)
     """
@@ -303,11 +304,13 @@ def sign_keydata(keydata, error_cb=None, homedir=None):
                 ret = tmpkeyring.sign_key(fingerprint, signall=True)
             except GpgRuntimeError as e:
                 uid = uidlist[0].uid
-                log.exception("Error signing %r with secret key %r",
-                    uid, secret_key)
+                log.exception("Error signing %r with secret key %r. stdout: %r, stderr: %r",
+                    uid, secret_key, tmpkeyring.context.stdout, tmpkeyring.context.stderr)
                 if error_cb:
                     e.uid = uid
                     error_cb (e)
+                else:
+                    raise
                 continue
             log.info("Result of signing %s on key %s: %s", uidlist[0].uid, fingerprint, ret)
 
