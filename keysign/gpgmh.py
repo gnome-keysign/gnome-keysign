@@ -300,7 +300,7 @@ def sign_keydata(keydata, error_cb=None, homedir=None):
             tmpkeyring.context.set_option('local-user', secret_fpr)
             # FIXME: For now, we sign all UIDs. This is bad.
             try:
-                ret = tmpkeyring.sign_key(uidlist[0].uid, signall=True)
+                ret = tmpkeyring.sign_key(fingerprint, signall=True)
             except GpgRuntimeError as e:
                 uid = uidlist[0].uid
                 log.exception("Error signing %r with secret key %r",
