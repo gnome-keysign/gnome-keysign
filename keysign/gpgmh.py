@@ -16,20 +16,28 @@
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
-from collections import namedtuple
 from datetime import datetime
 import logging
+import os  # The SigningKeyring uses os.symlink for the agent
 from tempfile import NamedTemporaryFile
-import warnings
+
+# The UID object is used in one place, at least,
+# to get display the name and email address.
+# The Key object is returned from a few functions, so it's
+# API is somewhat external.
+from .gpgkey import Key, UID
+log = logging.getLogger(__name__)
 
 
-from monkeysign.gpg import Keyring
+#####
+## INTERNAL API
+##
+import sys
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(os.path.join(parent_dir, "monkeysign"))
+from monkeysign.gpg import Keyring, TempKeyring
 from monkeysign.gpg import GpgRuntimeError
 
-
-# FIXME: This probably wants to go somewhere more central.
-# Maybe even into Monkeysign.
-log = logging.getLogger(__name__)
 
 
 def UIDExport(uid, keydata):
@@ -76,14 +84,14 @@ class SplitKeyring(Keyring):
     def __init__(self, primary_keyring_fname, trustdb_fname, *args, **kwargs):
         # I don't think Keyring is inheriting from object,
         # so we can't use super()
-        Keyring.__init__(self)   #  *args, **kwargs)
+        Keyring.__init__(self, *args, **kwargs)
 
         self.context.set_option('primary-keyring', primary_keyring_fname)
         self.context.set_option('trustdb-name', trustdb_fname)
         self.context.set_option('no-default-keyring')
 
 
-class TempKeyring(SplitKeyring):
+class TempSplitKeyring(SplitKeyring):
     """A temporary keyring which will be discarded after use
     
     It creates a temporary file which will be used for a SplitKeyring.
@@ -117,8 +125,7 @@ class TempKeyring(SplitKeyring):
                                     *args, **kwargs)
 
 
-
-class TempSigningKeyring(TempKeyring):
+class TempSigningKeyring(TempSplitKeyring):
     """A temporary keyring which uses the secret keys of a parent keyring
     
     Creates a temporary keyring which can use the orignal keyring's
@@ -126,7 +133,7 @@ class TempSigningKeyring(TempKeyring):
     a default Keyring() will be taken which represents the user's
     regular keyring.
 
-    In fact, this is not much different from a TempKeyring,
+    In fact, this is not much different from a TempSplitKeyring,
     but gpg1.4 does not see the public keys for the secret keys when run with
     --no-default-keyring and --primary-keyring.
     So we copy the public parts of the secret keys into the primary keyring.
@@ -136,182 +143,42 @@ class TempSigningKeyring(TempKeyring):
         if issubclass(self.__class__, object):
             super(TempSigningKeyring, self).__init__(*args, **kwargs)
         else:
-            TempKeyring.__init__(self, *args, **kwargs)
+            TempSplitKeyring.__init__(self, *args, **kwargs)
 
         if base_keyring is None:
             base_keyring = Keyring()
+
         # Copy the public parts of the secret keys to the tmpkeyring
         for fpr, key in base_keyring.get_keys(None,
                                               secret=True,
                                               public=False).items():
             self.import_data (base_keyring.export_data (fpr))
 
+        ## We don't copy the config file, because we're not using a separate
+        ## homedir. So we expect gpg to still use it's normal homedir and thus
+        ## it's normal configuration.
+        # self.copy_agent_socket(base_keyring)
 
+    def copy_agent_socket(self, base_keyring):
+        ## Copied from monkeysign/ui.py as of
+        ## 741dde1cc242bf125dd206a019028736d9c4a141
 
-def openpgpkey_from_data(keydata):
-    "Creates an OpenPGP object from given data"
-    keyring = TempKeyring()
-    if not keyring.import_data(keydata):
-        raise ValueError("Could not import %r  -  stdout: %r, stderr: %r",
-                         keydata,
-                         keyring.context.stdout, keyring.context.stderr)
-    # As we have imported only one key, we should also
-    # only have one key at our hands now.
-    keys = keyring.get_keys()
-    if len(keys) > 1:
-        log.debug('Operation on keydata "%s" failed', keydata)
-        raise ValueError("Cannot give the fingerprint for more than "
-            "one key: %s", keys)
-    else:
-        # The first (key, value) pair in the keys dict
-        # next(iter(keys.items()))[0] might be semantically
-        # more correct than list(d.items()) as we don't care
-        # much about having a list created, but I think it's
-        # more legible.
-        fpr_key = list(keys.items())[0]
-        # is composed of the fpr as key and an OpenPGP key as value
-        key = fpr_key[1]
-        return Key.from_monkeysign(key)
-
-
-
-def get_public_key_data(fpr, keyring=None):
-    """Returns keydata for a given fingerprint
-    
-    In fact, fpr could be anything that gpg happily exports.
-    """
-    if not keyring:
-        keyring = Keyring()
-    keydata = keyring.export_data(fpr)
-    return keydata
-
-
-
-
-# FIXME: We should rename that to "from_data"
-#        otherwise someone might think we operate on
-#        a key rather than bytes.
-def fingerprint_for_key(keydata):
-    '''Returns the OpenPGP Fingerprint for a given key'''
-    openpgpkey = openpgpkey_from_data(keydata)
-    return openpgpkey.fpr
-
-
-def get_usable_keys(keyring=None, *args, **kwargs):
-    '''Uses get_keys on the keyring and filters for
-    non revoked, expired, disabled, or invalid keys'''
-    log.debug('Retrieving keys for %s, %s', args, kwargs)
-    if keyring is None:
-        keyring = Keyring()
-    keys_dict = keyring.get_keys(*args, **kwargs) or {}
-    assert keys_dict is not None, keyring.context.stderr
-    def is_usable(key):
-        unusable =    key.invalid or key.disabled \
-                   or key.expired or key.revoked
-        log.debug('Key %s is invalid: %s (i:%s, d:%s, e:%s, r:%s)', key, unusable,
-            key.invalid, key.disabled, key.expired, key.revoked)
-        return not unusable
-    # keys_fpr = keys_dict.items()
-    keys = keys_dict.values()
-    usable_keys = [Key.from_monkeysign(key) for key in keys if is_usable(key)]
-
-    log.debug('Identified usable keys: %s', usable_keys)
-    return usable_keys
-
-
-
-def get_usable_secret_keys(keyring=None, pattern=None):
-    '''Returns all secret keys which can be used to sign a key
-    
-    Uses get_keys on the keyring and filters for
-    non revoked, expired, disabled, or invalid keys'''
-    if keyring is None:
-        keyring = Keyring()
-    secret_keys_dict = keyring.get_keys(pattern=pattern,
-                                        public=False,
-                                        secret=True)
-    if not secret_keys_dict:
-        log.info("Keyring %r has not returned keys: %r",
-                 keyring, secret_keys_dict)
-        secret_keys_dict = {}
-    secret_key_fprs = secret_keys_dict.keys()
-    log.debug('Detected secret keys: %s', secret_key_fprs)
-    usable_keys_fprs = filter(lambda fpr: get_usable_keys(keyring, pattern=fpr, public=True), secret_key_fprs)
-    usable_keys = [Key.from_monkeysign(secret_keys_dict[fpr])
-                   for fpr in usable_keys_fprs]
-
-    log.info('Returning usable private keys: %s', usable_keys)
-    return usable_keys
-
-
-def sign_keydata_and_encrypt(keydata, error_cb=None):
-    """Signs OpenPGP keydata with your regular GnuPG secret keys
-    
-    error_cb can be a function that is called with any exception
-    occuring during signing of the key.
-    """
-
-    log = logging.getLogger(__name__ + ':sign_keydata_encrypt')
-
-    tmpkeyring = TempSigningKeyring()
-    tmpkeyring.context.set_option('export-options', 'export-minimal')
-    # Eventually, we want to let the user select their keys to sign with
-    # For now, we just take whatever is there.
-    secret_keys = get_usable_secret_keys(tmpkeyring)
-    log.info('Signing with these keys: %s', secret_keys)
-
-    stripped_key = MinimalExport(keydata)
-    fingerprint = fingerprint_for_key(stripped_key)
-
-    log.debug('Trying to import key\n%s', stripped_key)
-    if tmpkeyring.import_data(stripped_key):
-        # 3. for every user id (or all, if -a is specified)
-        # 3.1. sign the uid, using gpg-agent
-        keys = tmpkeyring.get_keys(fingerprint)
-        log.info("Found keys %s for fp %s", keys, fingerprint)
-        if len(keys) != 1:
-            raise ValueError("We received multiple keys for fp %s: %s"
-                             % (fingerprint, keys))
-        key = keys[fingerprint]
-        uidlist = key.uidslist
-        
-        for secret_key in secret_keys:
-            secret_fpr = secret_key.fpr
-            log.info('Setting up to sign with %s', secret_fpr)
-            # We need to --always-trust, because GnuPG would print
-            # warning about the trustdb.  I think this is because
-            # we have a newly signed key whose trust GnuPG wants to
-            # incorporate into the trust decision.
-            tmpkeyring.context.set_option('always-trust')
-            tmpkeyring.context.set_option('local-user', secret_fpr)
-            # FIXME: For now, we sign all UIDs. This is bad.
-            try:
-                ret = tmpkeyring.sign_key(uidlist[0].uid, signall=True)
-            except GpgRuntimeError as e:
-                uid = uidlist[0].uid
-                log.exception("Error signing %r with secret key %r",
-                    uid, secret_key)
-                if error_cb:
-                    e.uid = uid
-                    error_cb (e)
-                continue
-            log.info("Result of signing %s on key %s: %s", uidlist[0].uid, fingerprint, ret)
-
-
-        for uid in uidlist:
-            uid_str = uid.uid
-            log.info("Processing uid %s %s", uid, uid_str)
-
-            # 3.2. export and encrypt the signature
-            # 3.3. mail the key to the user
-            signed_key = UIDExport(uid_str, tmpkeyring.export_data(uid_str))
-            log.info("Exported %d bytes of signed key", len(signed_key))
-
-            # self.signui.tmpkeyring.context.set_option('armor')
-            tmpkeyring.context.set_option('always-trust')
-            encrypted_key = tmpkeyring.encrypt_data(data=signed_key, recipient=uid_str)
-            yield (uid.uid, encrypted_key)
-
+        # install the gpg agent socket for GnuPG 2.1 because
+        # --secret-keyring silently fails
+        # this is apparently how we should do things:
+        # https://lists.gnupg.org/pipermail/gnupg-devel/2015-January/029301.html
+        # cargo-culted from caff, thanks guilhem!
+        src = base_keyring.get_agent_socket()
+        dst = self.get_agent_socket()
+        log.info(_('installing symlinks for sockets from %s to %s'), src, dst)
+        try:
+            os.unlink(dst)
+        except OSError as e:
+            if e.errno == errno.ENOENT:
+                pass
+            else:
+                raise
+        os.symlink(src, dst)
 
 
 
@@ -354,110 +221,6 @@ def signatures_for_keyid(keyid, keyring=None):
 
 
 
-def parse_uid(uid):
-    "Parses a GnuPG UID into it's name, comment, and email component"
-    # remove the comment from UID (if it exists)
-    com_start = uid.find('(')
-    if com_start != -1:
-        com_end = uid.find(')')
-        uid = uid[:com_start].strip() + uid[com_end+1:].strip()
-
-    # FIXME: Actually parse the comment...
-    comment = ""
-    # split into user's name and email
-    tokens = uid.split('<')
-    name = tokens[0].strip()
-    email = 'unknown'
-    if len(tokens) > 1:
-        email = tokens[1].replace('>','').strip()
-    
-    return (name, comment, email)
-
-
-def parse_expiry(value):
-    """Takes either a string, an epoch, or a datetime and converts
-    it to a datetime.
-    If the string is empty (or otherwise evaluates to False)
-    then this function returns None, meaning that no expiry has been set.
-    An edge case is the epoch value "0".
-    """
-    if not value:
-        expiry = None
-    else:
-        try:
-            expiry = datetime.fromtimestamp(int(value))
-        except TypeError:
-            expiry = value
-
-    return expiry
-
-
-class UID(namedtuple("UID", "expiry name comment email")):
-    "Represents an OpenPGP UID - at least to the extent we care about it"
-
-    @classmethod
-    def from_monkeysign(cls, uid):
-        "Creates a new UID from a monkeysign key"
-        uidstr = uid.uid
-        name, comment, email = parse_uid(uidstr)
-        expiry = parse_expiry(uid.expire)
-
-        return cls(expiry, name, comment, email)
-
-
-    def __format__(self, arg):
-        if self.comment:
-            s = "{name} ({comment}) <{email}>"
-        else:
-            s = "{name} <{email}>"
-        return s.format(**self._asdict())
-
-    def __str__(self):
-        return "{}".format(self)
-
-    @property
-    def uid(self):
-        "Legacy compatibility, use str() instead"
-        warnings.warn("Legacy uid, use '{}'.format() instead",
-                      DeprecationWarning)
-        return str(self)
-
-
-class Key(namedtuple("Key", "expiry fingerprint uidslist")):
-    "Represents an OpenPGP Key to extent we care about"
-
-    def __init__(self, expiry, fingerprint, uidslist,
-                       *args, **kwargs):
-        exp_date = parse_expiry(expiry)
-        super(Key, self).__init__(exp_date, fingerprint, uidslist)
-
-    def __format__(self, arg):
-        s  = "{fingerprint}\r\n"
-        s += '\r\n'.join(("  {}".format(uid) for uid in self.uidslist))
-# This is what original output looks like:
-# pub  [unknown] 3072R/1BF98D6D 1336669781 [expiry: 2017-05-09 19:09:41]
-#    Fingerprint = FF52 DA33 C025 B1E0 B910  92FC 1C34 19BF 1BF9 8D6D
-# uid 1      [unknown] Tobias Mueller <tobias.mueller2@mail.dcu.ie>
-# uid 2      [unknown] Tobias Mueller <4tmuelle@informatik.uni-hamburg.de>
-# sub   3072R/3B76E8B3 1336669781 [expiry: 2017-05-09 19:09:41]
-        return s.format(**self._asdict())
-
-    @property
-    def fpr(self):
-        "Legacy compatibility, use fingerprint instead"
-        warnings.warn("Legacy fpr, use the fingerprint property",
-                      DeprecationWarning)
-        return self.fingerprint
-
-    @classmethod
-    def from_monkeysign(cls, key):
-        "Creates a new Key from an existing monkeysign key"
-        uids = [UID.from_monkeysign(uid) for uid in  key.uidslist]
-        expiry = parse_expiry(key.expiry)
-        fingerprint = key.fpr
-        return cls(expiry, fingerprint, uids)
-
-
 ## Monkeypatching to get more debug output
 import monkeysign.gpg
 bc = monkeysign.gpg.Context.build_command
@@ -467,3 +230,204 @@ def build_command(*args, **kwargs):
     log.debug("Building cmd: %s", ' '.join(["'%s'" % c for c in ret]))
     return ret
 monkeysign.gpg.Context.build_command = build_command
+
+
+def is_usable(key):
+    unusable =    key.invalid or key.disabled \
+               or key.expired or key.revoked
+    log.debug('Key %s is invalid: %s (i:%s, d:%s, e:%s, r:%s)', key, unusable,
+        key.invalid, key.disabled, key.expired, key.revoked)
+    return not unusable
+
+def filter_usable_keys(keys):
+    usable_keys = [Key.from_monkeysign(key) for key in keys if is_usable(key)]
+    log.debug('Identified usable keys: %s', usable_keys)
+    return usable_keys
+
+
+def get_usable_keys_from_keyring(keyring, pattern, public, secret):
+    keys_dict = keyring.get_keys(pattern=pattern,
+    							 public=public,
+    							 secret=secret) or {}
+    assert keys_dict is not None, keyring.context.stderr
+    # keys_fpr = keys_dict.items()
+    keys = keys_dict.values()
+    return filter_usable_keys(keys)
+
+
+def sign_keydata(keydata, error_cb=None, homedir=None):
+    """Signs OpenPGP keydata with your regular GnuPG secret keys
+    
+    If error_cb is provided, that function is called with any exception
+    occuring during signing of the key.  If error_cb is False, any
+    exception is raised.
+    
+    yields pairs of (uid, signed_uid)
+    """
+    log = logging.getLogger(__name__ + ':sign_keydata_encrypt')
+
+    tmpkeyring = TempSigningKeyring(homedir=homedir,
+        base_keyring=Keyring(homedir=homedir))
+    tmpkeyring.context.set_option('export-options', 'export-minimal')
+    # Eventually, we want to let the user select their keys to sign with
+    # For now, we just take whatever is there.
+    secret_keys = get_usable_keys_from_keyring(keyring=tmpkeyring,
+    	pattern="", public=False, secret=True)
+    log.info('Signing with these keys: %s', secret_keys)
+
+    stripped_key = MinimalExport(keydata)
+    fingerprint = fingerprint_from_keydata(stripped_key)
+
+    log.debug('Trying to import key\n%s', stripped_key)
+    if tmpkeyring.import_data(stripped_key):
+        # 3. for every user id (or all, if -a is specified)
+        # 3.1. sign the uid, using gpg-agent
+        keys = tmpkeyring.get_keys(fingerprint)
+        log.info("Found keys %s for fp %s", keys, fingerprint)
+        if len(keys) != 1:
+            raise ValueError("We received multiple keys for fp %s: %s"
+                             % (fingerprint, keys))
+        key = keys[fingerprint]
+        uidlist = key.uidslist
+        
+        for secret_key in secret_keys:
+            secret_fpr = secret_key.fpr
+            log.info('Setting up to sign with %s', secret_fpr)
+            # We need to --always-trust, because GnuPG would print
+            # warning about the trustdb.  I think this is because
+            # we have a newly signed key whose trust GnuPG wants to
+            # incorporate into the trust decision.
+            tmpkeyring.context.set_option('always-trust')
+            tmpkeyring.context.set_option('local-user', secret_fpr)
+            # FIXME: For now, we sign all UIDs. This is bad.
+            try:
+                ret = tmpkeyring.sign_key(fingerprint, signall=True)
+            except GpgRuntimeError as e:
+                uid = uidlist[0].uid
+                log.exception("Error signing %r with secret key %r. stdout: %r, stderr: %r",
+                    uid, secret_key, tmpkeyring.context.stdout, tmpkeyring.context.stderr)
+                if error_cb:
+                    e.uid = uid
+                    error_cb (e)
+                else:
+                    raise
+                continue
+            log.info("Result of signing %s on key %s: %s", uidlist[0].uid, fingerprint, ret)
+
+
+        for uid in uidlist:
+            uid_str = uid.uid
+            log.info("Processing uid %r %s", uid, uid_str)
+
+            # 3.2. export and encrypt the signature
+            # 3.3. mail the key to the user
+            signed_key = UIDExport(uid_str, tmpkeyring.export_data(uid_str))
+            log.info("Exported %d bytes of signed key", len(signed_key))
+            yield (uid, signed_key)
+
+##
+## END OF INTERNAL API
+#####
+
+
+
+
+
+def openpgpkey_from_data(keydata):
+    "Creates an OpenPGP object from given data"
+    keyring = TempKeyring()
+    if not keyring.import_data(keydata):
+        raise ValueError("Could not import %r  -  stdout: %r, stderr: %r",
+                         keydata,
+                         keyring.context.stdout, keyring.context.stderr)
+    # As we have imported only one key, we should also
+    # only have one key at our hands now.
+    keys = keyring.get_keys()
+    if len(keys) != 1:
+        log.debug('Operation on keydata "%s" failed', keydata)
+        raise ValueError("Expected exactly one key, but got %d: %r" % (
+        				 len(keys), keys))
+    else:
+        # The first (key, value) pair in the keys dict
+        # next(iter(keys.items()))[0] might be semantically
+        # more correct than list(d.items()) as we don't care
+        # much about having a list created, but I think it's
+        # more legible.
+        fpr_key = list(keys.items())[0]
+        # is composed of the fpr as key and an OpenPGP key as value
+        key = fpr_key[1]
+        return Key.from_monkeysign(key)
+
+
+
+def get_public_key_data(fpr, homedir=None):
+    """Returns keydata for a given fingerprint
+    
+    In fact, fpr could be anything that gpg happily exports.
+    """
+    keyring = Keyring(homedir=homedir)
+    keydata = keyring.export_data(fpr)
+    if not keydata:
+        s = "No data to export for {} (in {})".format(fpr, homedir)
+        raise ValueError(s)
+    return keydata
+
+
+
+
+def fingerprint_from_keydata(keydata):
+    '''Returns the OpenPGP Fingerprint for a given key'''
+    openpgpkey = openpgpkey_from_data(keydata)
+    return openpgpkey.fpr
+
+
+def get_usable_keys(pattern="", homedir=None):
+    '''Uses get_keys on the keyring and filters for
+    non revoked, expired, disabled, or invalid keys'''
+    log.debug('Retrieving keys for %s, %s', pattern, homedir)
+    keyring = Keyring(homedir=homedir)
+    return get_usable_keys_from_keyring(keyring=keyring,
+    	pattern=pattern, public=True, secret=False)
+
+
+def get_usable_secret_keys(pattern="", homedir=None):
+    '''Returns all secret keys which can be used to sign a key'''
+    keyring = Keyring(homedir=homedir)
+    return get_usable_keys_from_keyring(keyring=keyring,
+    	pattern=pattern, public=False, secret=True)
+
+
+
+def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
+    """Signs OpenPGP keydata with your regular GnuPG secret keys
+    and encrypts the result under the given key
+    
+    error_cb can be a function that is called with any exception
+    occuring during signing of the key.
+    """
+    tmpkeyring = TempKeyring()
+    tmpkeyring.import_data(keydata)
+    tmpkeyring.context.set_option('always-trust')
+    for (uid, signed_key) in sign_keydata(keydata,
+        error_cb=error_cb, homedir=homedir):
+            if not uid.revoked:
+                encrypted_key = tmpkeyring.encrypt_data(data=signed_key,
+                    recipient=uid.uid)
+                yield (UID.from_monkeysign(uid), encrypted_key)
+
+
+
+GPGME = int(os.environ.get("KEYSIGN_GPGME", 0))
+if GPGME:
+    del openpgpkey_from_data
+    del get_public_key_data
+    del fingerprint_from_keydata
+    del get_usable_keys
+    del get_usable_secret_keys
+    del sign_keydata_and_encrypt
+
+
+    from .gpgmeh import (get_usable_keys, openpgpkey_from_data,
+        get_public_key_data, fingerprint_from_keydata,
+        get_usable_secret_keys, sign_keydata_and_encrypt,
+        )
