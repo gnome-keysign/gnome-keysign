@@ -256,7 +256,7 @@ def _dialog_response_cb(dialog, resp, trace, exctyp, value):
                 exception_dialog_active = False
     elif resp == RESPONSE_SEARCH:
         search_url = (
-            "https://github.com/muelli/geysigning/search"
+            "https://github.com/GNOME-Keysign/gnome-keysign/search"
             "?utf8=%E2%9C%93"
             "&q={}+{}"
             "&type=Issues"
@@ -297,7 +297,7 @@ def _dialog_response_cb(dialog, resp, trace, exctyp, value):
             for p in textwrap.dedent(body).split("\n\n")
         ] + [trace])
         report_url = (
-            "https://github.com/muelli/geysigning/issues/new"
+            "https://github.com/GNOME-Keysign/gnome-keysign/issues/new"
             "?title={title}"
             "&body={body}"
         ).format(
