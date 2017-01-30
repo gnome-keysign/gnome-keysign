@@ -35,7 +35,9 @@ class App(Gtk.Application):
         #self.builder = Gtk.Builder.new_from_file('send.ui')
 
     def on_activate(self, data=None):
-        ui_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "send.ui")
+        ui_file_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "send.ui")
         self.builder = Gtk.Builder.new_from_file(ui_file_path)
         window = self.builder.get_object("appwindow")
         assert window
