@@ -5,8 +5,8 @@ A tool for signing OpenPGP keys.
 
 Its purpose is to ease signing other peoples' keys.
 It is similar to caff, PIUS, or monkeysign.  In fact, it is influenced a lot by these tools
-and either reimplements ideas or reuses code.
-Consider either of the aboved mentioned tools when you need a much more mature codebase.
+and either re-implements ideas or reuses code.
+Consider either of the above mentioned tools when you need a much more mature codebase.
 
 In contrast to caff or monkeysign, this tool enables you to sign a key without contacting
 a key server.
@@ -110,7 +110,7 @@ should have been deployed such that you should be able to run the
 program from your desktop shell. Search for "Keysign".
 If you want to run the program from the command line, you can
 add ~/.local/bin to your PATH.  The installation should have put an
-exectuable named keysign in that directory.
+executable named keysign in that directory.
 
 If you haven't installed via pip or not to your user's home directory
 (i.e. with --user), you can start the program from your environment's
