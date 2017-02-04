@@ -184,20 +184,26 @@ class TestGetUsableKeys:
         assert_equals(fpr, self.originalkey.fingerprint)
 
 
+def import_fixture_file_in_random_directory(filename):
+    fname = get_fixture_file(filename)
+    original = open(fname, 'r').read()
+    # This should be a new, empty directory
+    homedir = tempfile.mkdtemp()
+    gpgcmd = ["gpg", "--homedir={}".format(homedir)]
+    # The directory should not have any keys
+    # I don't know how to easily check for that, though
+    # Now we import a single key
+    check_call(gpgcmd + ["--import", fname])
+
+    originalkey = openpgpkey_from_data(original)
+    return homedir, originalkey
+
 
 class TestGetUsableSecretKeys:
     def setup(self):
-        fname = get_fixture_file("seckey-1.asc")
-        original = open(fname, 'r').read()
-        # This should be a new, empty directory
-        self.homedir = tempfile.mkdtemp()
-        gpgcmd = ["gpg", "--homedir={}".format(self.homedir)]
-        # The directory should not have any keys
-        # I don't know how to easily check for that, though
-        # Now we import a single key
-        check_call(gpgcmd + ["--import", fname])
-    
-        self.originalkey = openpgpkey_from_data(original)
+        homedir, key = import_fixture_file_in_random_directory("seckey-1.asc")
+        self.homedir = homedir
+        self.originalkey = key
 
     def teardown(self):
         # shutil.rmtree(self.homedir)
