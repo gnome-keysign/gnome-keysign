@@ -187,15 +187,15 @@ class TestGetUsableKeys:
 
 class TestGetUsableSecretKeys:
     def setup(self):
-        self.fname = get_fixture_file("seckey-1.asc")
-        original = open(self.fname, 'r').read()
+        fname = get_fixture_file("seckey-1.asc")
+        original = open(fname, 'r').read()
         # This should be a new, empty directory
         self.homedir = tempfile.mkdtemp()
         gpgcmd = ["gpg", "--homedir={}".format(self.homedir)]
         # The directory should not have any keys
         # I don't know how to easily check for that, though
         # Now we import a single key
-        check_call(gpgcmd + ["--import", self.fname])
+        check_call(gpgcmd + ["--import", fname])
     
         self.originalkey = openpgpkey_from_data(original)
 
