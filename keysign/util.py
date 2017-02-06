@@ -21,8 +21,12 @@ import logging
 from subprocess import call
 from string import Template
 from tempfile import NamedTemporaryFile
-from urlparse import urlparse, parse_qs
-from urlparse import ParseResult
+try:
+    from urllib.parse import urlparse, parse_qs
+    from urllib.parse import ParseResult
+except ImportError:
+    from urlparse import urlparse, parse_qs
+    from urlparse import ParseResult
 
 import requests
 
