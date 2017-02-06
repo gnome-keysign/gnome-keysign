@@ -27,7 +27,7 @@ from requests.exceptions import ConnectionError, ReadTimeout
 from .compat import gtkbutton
 from .SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 from .util import mac_verify
-from .util import parse_barcode
+from .util import parse_barcode, strip_fingerprint
 from .util import sign_keydata_and_send as _sign_keydata_and_send
 from .keyconfirm import PreSignWidget
 from .keyfprscan import KeyFprScanWidget
@@ -42,7 +42,6 @@ from gi.repository import GstVideo
 
 Gst.init([])
 
-FPR_PREFIX = "OPENPGP4FPR:"
 progress_bar_text = ["Step 1: Scan QR Code or type fingerprint and click on 'Download' button",
                      "Step 2: Compare the received fpr with the owner's fpr and click 'Sign'",
                      "Step 3: Key was succesfully signed and an email was sent to the owner."]
@@ -60,18 +59,6 @@ from .gpgmh import openpgpkey_from_data, fingerprint_from_keydata
 NEW_UI = 1 if os.environ.get("KEYSIGN_NEWUI", None) else 0
 
 
-def strip_fingerprint(input_string):
-    '''Strips a fingerprint of any whitespaces and returns
-    a clean version. It also drops the "OPENPGP4FPR:" prefix
-    from the scanned QR-encoded fingerprints'''
-    # The split removes the whitespaces in the string
-    cleaned = ''.join(input_string.split())
-
-    if cleaned.upper().startswith(FPR_PREFIX.upper()):
-        cleaned = cleaned[len(FPR_PREFIX):]
-
-    log.warning('Cleaned fingerprint to %s', cleaned)
-    return cleaned
 
 
 def download_key_http(address, port):

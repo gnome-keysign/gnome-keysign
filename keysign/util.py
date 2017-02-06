@@ -178,3 +178,19 @@ def parse_barcode(barcode_string):
     log.debug('Parsed barcode into %r', rest)
     return rest
 
+
+
+FPR_PREFIX = "OPENPGP4FPR:"
+
+def strip_fingerprint(input_string):
+    '''Strips a fingerprint of any whitespaces and returns
+    a clean version. It also drops the "OPENPGP4FPR:" prefix
+    from the scanned QR-encoded fingerprints'''
+    # The split removes the whitespaces in the string
+    cleaned = ''.join(input_string.split())
+
+    if cleaned.upper().startswith(FPR_PREFIX.upper()):
+        cleaned = cleaned[len(FPR_PREFIX):]
+
+    log.warning('Cleaned fingerprint to %s', cleaned)
+    return cleaned
