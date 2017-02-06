@@ -30,85 +30,84 @@ if  __name__ == "__main__" and __package__ is None:
                               "this script directly which is discouraged. " +
                               "Try python -m instead.")
     parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     os.sys.path.insert(0, parent_dir)
+    os.sys.path.insert(0, os.path.join(parent_dir, 'monkeysign'))
     import keysign
     #mod = __import__('keysign')
     #sys.modules["keysign"] = mod
     __package__ = str('keysign')
 
 from .__init__ import __version__
-from .gpgmh import get_public_key_data
+from .gpgmh import get_usable_keys
 from .QRCode import QRImage
-from .util import mac_verify, mac_generate
 from .util import format_fingerprint
+
 
 
 log = logging.getLogger(__name__)
 
 
-class KeyPresentPage(Gtk.HBox):
-    def __init__(self, fpr, qrcodedata = None):
-        super(KeyPresentPage, self).__init__()
 
-        # create left side Key labels
-        leftTopLabel = Gtk.Label()
-        leftTopLabel.set_markup('<span size="15000">' + 'Key Fingerprint' + '</span>')
+class KeyPresentWidget(Gtk.Widget):
+    """A widget for presenting a gpgmh.Key
 
-        self.fingerprintLabel = Gtk.Label()
-        self.fingerprintLabel.set_selectable(True)
+    It shows details of the given key and customizable data in a
+    qrcode encoded in a QRImage.
 
-        # left vertical box
-        leftVBox = Gtk.VBox(spacing=10)
-        leftVBox.pack_start(leftTopLabel, False, False, 0)
-        leftVBox.pack_start(self.fingerprintLabel, False, False, 0)
+    The widget takes a full key object, rather than a fingerprint,
+    because it makes assumptions about the key object anyway. So
+    it can as well take it directly and enable higher level controllers
+    to deal with the situation that a given fingerprint, which really is
+    a search string for gpg, yields multiple results.
+    """
 
-        self.pixbuf = None # Hold QR code in pixbuf
-        self.fpr = fpr # The fpr of the key selected to sign with
+    def __new__(cls, *args, **kwargs):
+        thisdir = os.path.dirname(os.path.abspath(__file__))
+        builder = kwargs.pop("builder", None)
+        if not builder:
+            builder = Gtk.Builder()
+            builder.add_objects_from_file(
+                os.path.join(thisdir, 'send.ui'),
+                ['box3']
+                )
+        log.debug("Our builder is: %r", builder)
+        # The widget will very likely have a parent.
+        # Gtk doesn't like so much adding a Widget to a container
+        # when the widget already has been added somewhere.
+        # So we get the parent widget and remove the child.
+        w = builder.get_object('box3')
+        parent = w.get_parent()
+        if parent:
+            parent.remove(w)
+        w._builder = builder
+        w.__class__ = cls
+        return w
 
-        # display QR code on the right side
-        qrcodeLabel = Gtk.Label()
-        qrcodeLabel.set_markup('<span size="15000">' + 'Fingerprint QR code' + '</span>')
+    def __init__(self, key, qrcodedata=None, builder=None):
+        """A new KeyPresentWidget shows the string you provide as qrcodedata
+        in a qrcode. If it evaluates to False, the key's fingerprint will
+        be shown. That is, "OPENPGP4FPR: + fingerprint.
+        """
+        self.key_id_label = self._builder.get_object("keyidLabel")
+        self.uids_label = self._builder.get_object("uidsLabel")
+        self.fingerprint_label = self._builder.get_object("keyFingerprintLabel")
+        self.qrcode_frame = self._builder.get_object("qrcode_frame")
 
+        self.key_id_label.set_markup(
+            format_fingerprint(key.fingerprint).replace('\n', '  '))
+        self.uids_label.set_markup("\n".join(
+                                        [GLib.markup_escape_text("{}".format(uid))
+                                        for uid
+                                        in key.uidslist]))
+        self.fingerprint_label.set_markup(format_fingerprint(key.fingerprint))
         if not qrcodedata:
-            qrcodedata = self.generate_qrcode_data()
-        self.qrcode = QRImage(qrcodedata)
-        self.qrcode.props.margin = 10
+            qrcodedata = "OPENPGP4FPR:" + key.fingerprint
+        self.qrcode_frame.add(QRImage(qrcodedata))
+        self.qrcode_frame.show_all()
 
 
-        # right vertical box
-        self.rightVBox = Gtk.VBox(spacing=10)
-        self.rightVBox.pack_start(qrcodeLabel, False, False, 0)
-        self.rightVBox.pack_start(self.qrcode, True, True, 0)
 
-        self.pack_start(leftVBox, True, True, 0)
-        self.pack_start(self.rightVBox, True, True, 0)
-
-        self.setup_fingerprint_widget(self.fpr)
-
-
-    def setup_fingerprint_widget(self, fingerprint):
-        '''The purpose of this function is to populate the label holding
-        the fingerprint with a formatted version.
-        '''
-        fpr = format_fingerprint(fingerprint)
-        self.fingerprintLabel.set_markup('<span size="20000">' + fpr + '</span>')
-
-
-    def generate_qrcode_data(self):
-        assert self.fpr
-        fingerprint = self.fpr
-        data = 'OPENPGP4FPR:' + fingerprint
-        # FIXME: okay, this is really bad.
-        # We should really try to get the keydata from another
-        # channel. There is key-selected signal. Maybe we can use that.
-        keydata = get_public_key_data(fingerprint)
-        mac = mac_generate(fingerprint, keydata)
-        # FIXME: We probably want to urlencode the thing...
-        data += '#MAC=%s' % mac
-        # we call upper to made the barcode more efficient
-        data = data.upper()
-        log.info("Shoving %r to the QRCode", data)
-        return data
 
 
 
@@ -158,7 +157,8 @@ class KeyPresent(Gtk.Application):
         log.debug("running: %s", args)
         fpr = args
 
-        self.key_present_page = KeyPresentPage(fpr=fpr)
+        key = next(iter(get_usable_keys(pattern=fpr)))
+        self.key_present_page = KeyPresentWidget(key)
 
         super(KeyPresent, self).run()
 

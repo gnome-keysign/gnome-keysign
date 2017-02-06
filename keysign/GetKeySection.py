@@ -19,14 +19,17 @@
 
 import logging
 from urlparse import urlparse, parse_qs, ParseResult
+import os  # We're using os.environ once...
 
 import requests
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError, ReadTimeout
 
 from .compat import gtkbutton
 from .SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 from .util import mac_verify
 from .util import sign_keydata_and_send as _sign_keydata_and_send
+from .keyconfirm import PreSignWidget
+from .keyfprscan import KeyFprScanWidget
 
 from gi.repository import Gst, Gtk, GLib
 # Because of https://bugzilla.gnome.org/show_bug.cgi?id=698005
@@ -52,6 +55,72 @@ log = logging.getLogger(__name__)
 from .gpgmh import openpgpkey_from_data, fingerprint_from_keydata
 
 
+# FIXME: Eventually remove this condition
+NEW_UI = 1 if os.environ.get("KEYSIGN_NEWUI", None) else 0
+
+
+def parse_barcode(barcode_string):
+    """Parses information contained in a barcode
+
+    It returns a dict with the parsed attributes.
+    We expect the dict to contain at least a 'fingerprint'
+    entry. Others might be added in the future.
+    """
+    # The string, currently, is of the form
+    # openpgp4fpr:foobar?baz=qux#frag=val
+    # Which urlparse handles perfectly fine.
+    p = urlparse(barcode_string)
+    log.debug("Parsed %r into %r", barcode_string, p)
+    fpr = p.path
+    query = parse_qs(p.query)
+    fragments = parse_qs(p.fragment)
+    rest = {}
+    rest.update(query)
+    rest.update(fragments)
+    # We should probably ensure that we have only one
+    # item for each parameter and flatten them accordingly.
+    rest['fingerprint'] = fpr
+
+    log.debug('Parsed barcode into %r', rest)
+    return rest
+
+def strip_fingerprint(input_string):
+    '''Strips a fingerprint of any whitespaces and returns
+    a clean version. It also drops the "OPENPGP4FPR:" prefix
+    from the scanned QR-encoded fingerprints'''
+    # The split removes the whitespaces in the string
+    cleaned = ''.join(input_string.split())
+
+    if cleaned.upper().startswith(FPR_PREFIX.upper()):
+        cleaned = cleaned[len(FPR_PREFIX):]
+
+    log.warning('Cleaned fingerprint to %s', cleaned)
+    return cleaned
+
+
+def download_key_http(address, port):
+    url = ParseResult(
+        scheme='http',
+        # This seems to work well enough with both IPv6 and IPv4
+        netloc="[[%s]]:%d" % (address, port),
+        path='/',
+        params='',
+        query='',
+        fragment='')
+    log.debug("Starting HTTP request")
+    data = requests.get(url.geturl(), timeout=5).content
+    log.debug("finished downloading %d bytes", len(data))
+    return data
+
+
+
+def fix_infobar(infobar):
+    # Work around https://bugzilla.gnome.org/show_bug.cgi?id=710888
+    def make_sure_revealer_does_nothing(widget):
+        if not isinstance(widget, Gtk.Revealer):
+            return
+        widget.set_transition_type(Gtk.RevealerTransitionType.NONE)
+    infobar.forall(make_sure_revealer_does_nothing)
 
 
 class GetKeySection(Gtk.VBox):
@@ -69,8 +138,19 @@ class GetKeySection(Gtk.VBox):
         self.app = app
         self.log = logging.getLogger(__name__)
 
-        self.scanPage = ScanFingerprintPage()
-        self.signPage = SignKeyPage()
+        infobar = Gtk.InfoBar()
+        infobar.set_show_close_button(True)
+        infobar.connect("response", lambda ib, r: ib.hide())
+        # fix_infobar(infobar)
+        self.pack_start(infobar, False, False, 0)
+        GLib.idle_add(infobar.hide)
+        self.infobar = infobar
+
+        self.scanPage = (
+            ScanFingerprintPage(),
+            KeyFprScanWidget(),
+            )[NEW_UI]
+        self.signPage = Gtk.Box()
         # set up notebook container
         self.notebook = Gtk.Notebook()
         self.notebook.append_page(self.scanPage, None)
@@ -106,12 +186,13 @@ class GetKeySection(Gtk.VBox):
         # We *could* overwrite the on_barcode function, but
         # let's rather go with a GObject signal
         #self.scanFrame.on_barcode = self.on_barcode
-        self.scanPage.scanFrame.connect('barcode', self.on_barcode)
+        self.scanPage.barcode_scanner.connect('barcode', self.on_barcode)
         #GLib.idle_add(        self.scanFrame.run)
 
         # A list holding references to temporary files which should probably
         # be cleaned up on exit...
         self.tmpfiles = []
+
 
     def switch_page(self, notebook, page, page_num):
         if page_num == 0:
@@ -130,44 +211,15 @@ class GetKeySection(Gtk.VBox):
         self.progressBar.set_fraction((page_index+1)/3.0)
 
 
-    def strip_fingerprint(self, input_string):
-        '''Strips a fingerprint of any whitespaces and returns
-        a clean version. It also drops the "OPENPGP4FPR:" prefix
-        from the scanned QR-encoded fingerprints'''
-        # The split removes the whitespaces in the string
-        cleaned = ''.join(input_string.split())
 
-        if cleaned.upper().startswith(FPR_PREFIX.upper()):
-            cleaned = cleaned[len(FPR_PREFIX):]
-
-        self.log.warning('Cleaned fingerprint to %s', cleaned)
-        return cleaned
-
-
-    def parse_barcode(self, barcode_string):
-        """Parses information contained in a barcode
-
-        It returns a dict with the parsed attributes.
-        We expect the dict to contain at least a 'fingerprint'
-        entry. Others might be added in the future.
-        """
-        # The string, currently, is of the form
-        # openpgp4fpr:foobar?baz=qux#frag=val
-        # Which urlparse handles perfectly fine.
-        p = urlparse(barcode_string)
-        self.log.debug("Parsed %r into %r", barcode_string, p)
-        fpr = p.path
-        query = parse_qs(p.query)
-        fragments = parse_qs(p.fragment)
-        rest = {}
-        rest.update(query)
-        rest.update(fragments)
-        # We should probably ensure that we have only one
-        # item for each parameter and flatten them accordingly.
-        rest['fingerprint'] = fpr
-
-        self.log.debug('Parsed barcode into %r', rest)
-        return rest
+    def display_error(self, errormsg):
+        infobar = self.infobar
+        infobar.set_message_type(Gtk.MessageType.ERROR)
+        label = Gtk.Label("{}".format(errormsg))
+        content = infobar.get_content_area()
+        content.forall(lambda w: content.remove(w))
+        content.add(label)
+        GLib.idle_add(infobar.show_all)
 
 
     def on_barcode(self, sender, barcode, message, image):
@@ -188,7 +240,7 @@ class GetKeySection(Gtk.VBox):
         caused a barcode to be decoded.
         '''
         self.log.info("Barcode signal %r %r", barcode, message)
-        parsed = self.parse_barcode(barcode)
+        parsed = parse_barcode(barcode)
         fingerprint = parsed['fingerprint']
         if not fingerprint:
             self.log.error("Expected fingerprint in %r to evaluate to True, "
@@ -198,31 +250,21 @@ class GetKeySection(Gtk.VBox):
                 fingerprint, message, image, parsed_barcode=parsed)
 
 
-    def download_key_http(self, address, port):
-        url = ParseResult(
-            scheme='http',
-            # This seems to work well enough with both IPv6 and IPv4
-            netloc="[[%s]]:%d" % (address, port),
-            path='/',
-            params='',
-            query='',
-            fragment='')
-        self.log.debug("Starting HTTP request")
-        data = requests.get(url.geturl(), timeout=5).content
-        self.log.debug("finished downloading %d bytes", len(data))
-        return data
-
     def try_download_keys(self, clients):
         for client in clients:
             self.log.debug("Getting key from client %s", client)
             name, address, port, fpr = client
             try:
-                keydata = self.download_key_http(address, port)
+                keydata = download_key_http(address, port)
                 yield keydata
             except ConnectionError as e:
                 # FIXME : We probably have other errors to catch
                 self.log.exception("While downloading key from %s %i",
                                     address, port)
+            except ReadTimeout as e:
+                self.log.exception("Timeout while downloading key from %s %i",
+                                    address, port)
+        self.log.debug("Finished trying to download keys from %s", clients)
 
     def verify_downloaded_key(self, downloaded_data, fingerprint, mac=None):
         log.info("Verifying key %r with mac %r", fingerprint, mac)
@@ -258,6 +300,7 @@ class GetKeySection(Gtk.VBox):
         other_clients = self.sort_clients(other_clients, fingerprint)
 
         for keydata in self.try_download_keys(other_clients):
+            self.log.debug("Obtained keydata %r", keydata)
             if self.verify_downloaded_key(keydata, fingerprint, mac):
                 is_valid = True
             else:
@@ -323,8 +366,8 @@ class GetKeySection(Gtk.VBox):
                     image = args[2]
                 else:
                     image = None
-                    raw_text = self.scanPage.get_text_from_textview()
-                    fingerprint = self.strip_fingerprint(raw_text)
+                    raw_text = self.scanPage.get_text()
+                    fingerprint = strip_fingerprint(raw_text)
 
                     if fingerprint == None:
                         self.log.error("The fingerprint typed was wrong."
@@ -348,13 +391,16 @@ class GetKeySection(Gtk.VBox):
                 self.log.info("Transferred MAC via barcode: %r", mac)
 
                 # error callback function
-                err = lambda x: self.signPage.mainLabel.set_markup('<span size="15000">'
-                        'Error downloading key with fpr\n{}</span>'
-                        .format(fingerprint))
-                # use GLib.idle_add to use a separate thread for the downloading of
-                # the keydata.
-                # Note that idle_add does not seem to take kwargs...
-                # So we work around by cosntructing an anonymous function
+                # We set the notebook to the previous page, because
+                # we have just advanced it and in case of an error
+                # we don't really want to...
+                def err(foo):
+                    self.notebook.prev_page()
+                    # FIXME: The progress bar should set itself automatically...
+                    self.set_progress_bar()
+                    self.display_error(
+                       'Error downloading key with fpr\n{}'
+                       .format(fingerprint))
                 GLib.idle_add(lambda: self.obtain_key_async(fingerprint, self.recieved_key,
                         fingerprint, mac=mac, error_cb=err))
 
@@ -379,4 +425,18 @@ class GetKeySection(Gtk.VBox):
         image = self.scanned_image
         openpgpkey = openpgpkey_from_data(keydata)
         assert openpgpkey.fingerprint == fingerprint
-        self.signPage.display_downloaded_key(openpgpkey, fingerprint, image)
+
+        # We know the parent is a Notebook...
+        parent = self.signPage.get_parent()
+        position = parent.get_current_page()
+        # Removing the widget causes the Notebook to advance
+        parent.remove(self.signPage)
+        psw = (SignKeyPage,
+               PreSignWidget)[NEW_UI](openpgpkey, image)
+        psw.show_all()
+        parent.add(psw)
+        # However, we inject our widget into the old spot
+        parent.reorder_child(psw, position)
+        # and make the Notebook go there
+        parent.set_current_page(position)
+        self.signPage = psw
