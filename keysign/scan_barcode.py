@@ -17,12 +17,10 @@
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
-import argparse
 import logging
 import signal
 import sys
 
-import cairo
 import gi
 gi.require_version('Gst', '1.0')
 gi.require_version('GstVideo', '1.0')
@@ -30,18 +28,15 @@ from gi.repository import GObject
 from gi.repository import Gst
 from gi.repository import Gtk, GLib
 # Because of https://bugzilla.gnome.org/show_bug.cgi?id=698005
-from gi.repository import Gtk, GdkX11, GdkPixbuf
-# Needed for window.get_xid(), xvimagesink.set_window_handle(), respectively:
-from gi.repository import GdkX11, GstVideo
+from gi.repository import Gtk, GdkPixbuf
+from gi.repository import GstVideo
 from gi.repository import Gdk
 
 log = logging.getLogger(__name__)
 
 
 
-
-
-class BarcodeReaderGTK(Gtk.DrawingArea):
+class BarcodeReaderGTK(Gtk.Box):
 
     __gsignals__ = {
         str('barcode'): (GObject.SIGNAL_RUN_LAST, None,
@@ -56,25 +51,9 @@ class BarcodeReaderGTK(Gtk.DrawingArea):
 
     def __init__(self, *args, **kwargs):
         super(BarcodeReaderGTK, self).__init__(*args, **kwargs)
+        self.connect('unmap', self.on_unmap)
+        self.connect('map', self.on_map)
 
-
-    @property
-    def x_window_id(self, *args, **kwargs):
-        window = self.get_property('window')
-        # If you have not requested a size, the window might not exist
-        assert window, "Window is %s (%s), but not a window" % (window, type(window))
-        if "X11" in window.__format__(""):
-            xid = window.get_xid()
-        elif "Wayland" in window.__format__(""):
-            self.window_xid = 0
-        else:
-            log.warning("Don't know how to handle windowing system %r",
-                        window.__format__(""))
-            self.window_xid = 0
-
-
-        self._x_window_id = xid
-        return xid
 
 
     def on_message(self, bus, message):
@@ -88,11 +67,7 @@ class BarcodeReaderGTK(Gtk.DrawingArea):
                 if struct_name == 'GstMessageError':
                     err, debug = message.parse_error()
                     log.error('GstError: %s, %s', err, debug)
-
-                elif struct_name == "prepare-window-handle":
-                    log.debug('XWindow ID')
-                    message.src.set_window_handle(self.x_window_id)
-
+    
                 elif struct_name == 'barcode':
                     self.timestamp = struct.get_clock_time("timestamp")[1]
                     log.debug ("at %s", self.timestamp)
@@ -107,7 +82,7 @@ class BarcodeReaderGTK(Gtk.DrawingArea):
                         # with the barcode.
                         sample = struct.get_value ("frame")
                         pixbuf = gst_sample_to_pixbuf(sample)
-                        self.on_barcode(barcode, message, pixbuf)
+                        self.emit("barcode", barcode, message, pixbuf)
                     else:
                         # If we do not see the zbar < 1.6, we raise
                         raise
@@ -123,7 +98,13 @@ class BarcodeReaderGTK(Gtk.DrawingArea):
         p += "                  ! zbar cache=true attach_frame=true \n"
         p += "                  ! fakesink \n"
         p += "       t. ! queue ! videoconvert \n"
-        p += "                  ! xvimagesink name=imagesink \n"
+        p += ("                 ! gtksink "
+            "sync=false "
+            "name=imagesink "
+            #"max-lateness=2000000000000  "
+            "enable-last-sample=false "
+            "\n"
+            )
 
         pipeline = p
         log.info("Launching pipeline %s", pipeline)
@@ -131,36 +112,28 @@ class BarcodeReaderGTK(Gtk.DrawingArea):
 
         self.bus = bus = pipeline.get_bus()
         self.imagesink = pipeline.get_by_name('imagesink')
+        self.gtksink_widget = self.imagesink.get_property("widget")
+        for child in self.get_children():
+            self.remove(child)
+        # self.gtksink_widget.set_property("expand", False)
+        self.add(self.gtksink_widget)
+        self.gtksink_widget.show()
+
         self.pipeline = pipeline
 
         bus.connect('message', self.on_message)
         bus.add_signal_watch()
 
         pipeline.set_state(Gst.State.PLAYING)
-        self.running = True
 
 
-
-
-    def do_realize(self, *args, **kwargs):
-        #super(BarcodeReaderGTK, self).do_realize(*args, **kwargs)
-        # ^^^^ does not work :-\
-        Gtk.DrawingArea.do_realize(self)
-        #self.run()
-        #self.connect('hide', self.on_hide)
-        self.connect('unmap', self.on_unmap)
-        self.connect('map', self.on_map)
+    def pause(self):
+        self.pipeline.set_state(Gst.State.PAUSED)
 
 
     def on_map(self, *args, **kwargs):
         '''It seems this is called when the widget is becoming visible'''
         self.run()
-
-    def do_unrealize(self, *args, **kwargs):
-        '''This appears to be called when the app is destroyed,
-        not when a tab is hidden.'''
-        self.pipeline.set_state(Gst.State.NULL)
-        Gtk.DrawingArea.do_unrealize(self)
 
 
     def on_unmap(self, *args, **kwargs):
@@ -177,13 +150,6 @@ class BarcodeReaderGTK(Gtk.DrawingArea):
                   barcode, message, image)
 
 
-    def on_barcode(self, barcode, message, image):
-        '''You can implement this function to
-        get notified when a new barcode has been read.
-        If you do, you will not get the GObject "barcode" signal
-        as it is emitted from here.'''
-        log.debug("About to emit barcode signal: %s", barcode)
-        self.emit('barcode', barcode, message, image)
 
 
 
@@ -252,33 +218,26 @@ class SimpleInterface(ReaderApp):
 
 
     def playToggled(self, w):
-        self.run()
-
-
-    def on_sync_message(self, bus, message):
-        if message.structure is None:
-            return
-        if message.structure.get_name() == 'prepare-window-handle':
-            #self.videoslot.set_sink(message.src)
-            message.src.set_window_handle(self.xid)
-
-
-    def on_message(self, bus, message):
-        log.debug("Message: %s", message)
-        struct = message.get_structure()
-        assert struct
-        name = struct.get_name()
-        log.debug("Name: %s", name)
-        if name == "prepare-window-handle":
-            log.debug('XWindow ID')
-            #self.videoslot.set_sink(message.src)
-            message.src.set_window_handle(self.xid)
-        else:
-            return super(SimpleInterface, self).on_message(bus, message)
+        self.reader.pause()
 
 
     def on_barcode(self, reader, barcode, message, pixbuf):
+        log.info("Barcode!!1 %r", barcode)
+
+        # Hrm. Somehow, the Gst Widget is allocating
+        # space relatively aggressively.  Our imagebox on
+        # the right side does not get any space.
+        #self.imagebox.remove(self.image)
+        #self.image = ScalingImage(pixbuf)
+        #self.imagebox.pack_start(self.image, True, True, 0)
+        #self.image.set_property('expand', True)
+        #self.image.show()
         self.image.set_from_pixbuf(pixbuf)
+
+        # So we just show a window instead...
+        w = Gtk.Window()
+        w.add(ScalingImage(pixbuf))
+        w.show_all()
         return False
 
 
