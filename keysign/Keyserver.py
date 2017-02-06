@@ -47,6 +47,8 @@ if  __name__ == "__main__" and __package__ is None:
 from .__init__ import __version__
 from .network.AvahiPublisher import AvahiPublisher
 
+from .gpgmh import fingerprint_from_keydata
+
 log = logging.getLogger(__name__)
 
 class KeyRequestHandlerBase(BaseHTTPRequestHandler):
@@ -218,7 +220,7 @@ if __name__ == '__main__':
         KEYDATA = open(fname, 'r').read()
         # FIXME: Someone needs to determine the fingerprint
         #        of the data just read
-        fpr = ''.join('F289 F7BA 977D F414 3AE9  FDFB F70A 0290 6C30 1813'.split())
+        fpr = fingerprint_from_keydata(KEYDATA)
     else:
         KEYDATA = 'Example data'
         fpr = ''.join('F289 F7BA 977D F414 3AE9  FDFB F70A 0290 6C30 1813'.split())

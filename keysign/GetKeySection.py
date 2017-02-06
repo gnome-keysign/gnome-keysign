@@ -52,7 +52,7 @@ progress_bar_text = ["Step 1: Scan QR Code or type fingerprint and click on 'Dow
 log = logging.getLogger(__name__)
 
 
-from .gpgmh import openpgpkey_from_data, fingerprint_for_key
+from .gpgmh import openpgpkey_from_data, fingerprint_from_keydata
 
 
 # FIXME: Eventually remove this condition
@@ -108,7 +108,7 @@ def download_key_http(address, port):
         query='',
         fragment='')
     log.debug("Starting HTTP request")
-    data = requests.get(url.geturl(), timeout=5).text
+    data = requests.get(url.geturl(), timeout=5).content
     log.debug("finished downloading %d bytes", len(data))
     return data
 
@@ -272,7 +272,7 @@ class GetKeySection(Gtk.VBox):
             result = mac_verify(fingerprint, downloaded_data, mac)
         else:
             try:
-                imported_key_fpr = fingerprint_for_key(downloaded_data)
+                imported_key_fpr = fingerprint_from_keydata(downloaded_data)
             except ValueError:
                 self.log.exception("Failed to import downloaded data")
                 result = False
@@ -339,9 +339,11 @@ class GetKeySection(Gtk.VBox):
         during the signature creation process so that the MUA
         can pick them up and s.t. they will be deleted on close.
         """
-        self.tmpfiles = list(_sign_keydata_and_send(keydata))
+        self.tmpfiles = list(_sign_keydata_and_send(keydata, error_cb=self.on_sign_error))
         return False
 
+    def on_sign_error(self, prompt):
+        self.log.error("Error signing key: %r. Trying to continue", prompt)
 
     def send_email(self, fingerprint, *data):
         self.log.exception("Sending email... NOT")
