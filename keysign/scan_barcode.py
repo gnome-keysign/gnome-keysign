@@ -109,7 +109,6 @@ class BarcodeReaderGTK(Gtk.Box):
         log.info("Launching pipeline %s", pipeline)
         pipeline = Gst.parse_launch(pipeline)
 
-        self.bus = bus = pipeline.get_bus()
         self.imagesink = pipeline.get_by_name('imagesink')
         self.gtksink_widget = self.imagesink.get_property("widget")
         for child in self.get_children():
@@ -120,6 +119,7 @@ class BarcodeReaderGTK(Gtk.Box):
 
         self.pipeline = pipeline
 
+        bus = pipeline.get_bus()
         bus.connect('message', self.on_message)
         bus.add_signal_watch()
 
@@ -198,11 +198,15 @@ class SimpleInterface(ReaderApp):
         reader = BarcodeReaderGTK()
         reader.connect('barcode', self.on_barcode)
         vbox.pack_start(reader, True, True, 0)
-        self.playing = False
+        self.reader = reader
 
         #self.image = Gtk.Image()
+        # FIXME: We could show a default image like "no barcode scanned just yet"
         self.image = ScalingImage()
-        vbox.pack_end(self.image, True, True, 0)
+        self.imagebox = Gtk.Box() #expand=True)
+        self.imagebox.add(self.image)
+        self.imagebox.show()
+        vbox.pack_end(self.imagebox, True, True, 0)
 
 
         self.playButtonImage = Gtk.Image()
@@ -284,16 +288,23 @@ class ScalingImage(Gtk.DrawingArea):
 
     def __init__(self, pixbuf=None, width=None, height=None, rowstride=None):
         self.pixbuf = pixbuf
-        self.width = width or None
-        self.height = height or None
         self.rowstride = rowstride or None
         super(ScalingImage, self).__init__()
+        #self.set_property("width_request", 400)
+        #self.set_property("height_request", 400)
+        #self.set_property("margin", 10)
+        # self.set_property("expand", True)
     
     
     def set_from_pixbuf(self, pixbuf):
         self.pixbuf = pixbuf
         self.queue_draw()
 
+
+#    def do_size_allocate(self, allocation):
+#        log.debug("Size Allocate  %r", allocation)
+#        log.debug("w: %r  h: %r",  allocation.width, allocation.height)
+#        self.queue_draw()
 
     def do_draw(self, cr, pixbuf=None):
         log.debug('Drawing ScalingImage! %r', self)
@@ -316,7 +327,7 @@ class ScalingImage(Gtk.DrawingArea):
             
             # I think we might not need this calculation
             #widget_size = min(widget_width, widget_height)
-            #log.info('Allocated size: %s, %s', widget_width, widget_height)
+            log.info('Allocated size: %s, %s', widget_width, widget_height)
             
             # Fill in background
             cr.save()
