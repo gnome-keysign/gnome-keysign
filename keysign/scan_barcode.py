@@ -41,14 +41,41 @@ log = logging.getLogger(__name__)
 
 
 
-class BarcodeReader(object):
+class BarcodeReaderGTK(Gtk.DrawingArea):
 
-    def on_barcode(self, barcode, message, image):
-        '''This is called when a barcode is available
-        with barcode being the decoded barcode.
-        Message is the GStreamer message containing
-        the barcode.'''
-        return barcode
+    __gsignals__ = {
+        str('barcode'): (GObject.SIGNAL_RUN_LAST, None,
+                        (str, # The barcode string
+                         Gst.Message.__gtype__, # The GStreamer message itself
+                         GdkPixbuf.Pixbuf.__gtype__, # The pixbuf which caused
+                                              # the above string to be decoded
+                    ),
+                   )
+    }
+
+
+    def __init__(self, *args, **kwargs):
+        super(BarcodeReaderGTK, self).__init__(*args, **kwargs)
+
+
+    @property
+    def x_window_id(self, *args, **kwargs):
+        window = self.get_property('window')
+        # If you have not requested a size, the window might not exist
+        assert window, "Window is %s (%s), but not a window" % (window, type(window))
+        if "X11" in window.__format__(""):
+            xid = window.get_xid()
+        elif "Wayland" in window.__format__(""):
+            self.window_xid = 0
+        else:
+            log.warning("Don't know how to handle windowing system %r",
+                        window.__format__(""))
+            self.window_xid = 0
+
+
+        self._x_window_id = xid
+        return xid
+
 
     def on_message(self, bus, message):
         log.debug("Message: %s", message)
@@ -61,7 +88,11 @@ class BarcodeReader(object):
                 if struct_name == 'GstMessageError':
                     err, debug = message.parse_error()
                     log.error('GstError: %s, %s', err, debug)
-    
+
+                elif struct_name == "prepare-window-handle":
+                    log.debug('XWindow ID')
+                    message.src.set_window_handle(self.x_window_id)
+
                 elif struct_name == 'barcode':
                     self.timestamp = struct.get_clock_time("timestamp")[1]
                     log.debug ("at %s", self.timestamp)
@@ -109,59 +140,6 @@ class BarcodeReader(object):
         self.running = True
 
 
-
-
-#class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
-class BarcodeReaderGTK(BarcodeReader, Gtk.DrawingArea):
-
-    __gsignals__ = {
-        str('barcode'): (GObject.SIGNAL_RUN_LAST, None,
-                        (str, # The barcode string
-                         Gst.Message.__gtype__, # The GStreamer message itself
-                         GdkPixbuf.Pixbuf.__gtype__, # The pixbuf which caused
-                                              # the above string to be decoded
-                    ),
-                   )
-    }
-
-
-    def __init__(self, *args, **kwargs):
-        super(BarcodeReaderGTK, self).__init__(*args, **kwargs)
-
-
-    @property
-    def x_window_id(self, *args, **kwargs):
-        window = self.get_property('window')
-        # If you have not requested a size, the window might not exist
-        assert window, "Window is %s (%s), but not a window" % (window, type(window))
-        if "X11" in window.__format__(""):
-            xid = window.get_xid()
-        elif "Wayland" in window.__format__(""):
-            self.window_xid = 0
-        else:
-            log.warning("Don't know how to handle windowing system %r",
-                        window.__format__(""))
-            self.window_xid = 0
-
-
-        self._x_window_id = xid
-        return xid
-
-    def on_message(self, bus, message):
-        log.debug("Message: %s %r", message, message.type)
-        struct = message.get_structure()
-        if not struct:
-            log.debug('Message has no struct')
-        else:
-            name = struct.get_name()
-            log.debug("Name: %s", name)
-            if name == "prepare-window-handle":
-                log.debug('XWindow ID')
-                message.src.set_window_handle(self.x_window_id)
-
-                return
-
-        return super(BarcodeReaderGTK, self).on_message(bus, message)
 
 
     def do_realize(self, *args, **kwargs):
