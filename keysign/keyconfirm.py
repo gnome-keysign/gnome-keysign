@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 #    Copyright 2016 Andrei Macavei <andrei.macavei89@gmail.com>
+#    Copyright 2017 Tobias Mueller <muelli@cryptobitch.de>
 #
 #    This file is part of GNOME Keysign.
 #
@@ -46,6 +47,7 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .gpgmh import get_usable_keys
 from .scan_barcode import ScalingImage
+from .util import format_fingerprint
 
 log = logging.getLogger(__name__)
 
@@ -61,13 +63,13 @@ def format_key_header(fpr, length='2048', creation_time=None):
         # This might be the case when the creation_time is already a timedate
         creation = creation_time
 
-    key_header = ("{}/{} {}".format(length, fpr[-8:], creation))
+    key_header = format_fingerprint(fpr).replace('\n', '  ')
     return key_header
 
 def format_uidslist(uidslist):
     result = ""
     for uid in uidslist:
-        uidstr = str(uid).replace('<', '').replace('>', '')
+        uidstr = GLib.markup_escape_text(str(uid))
         result += ("{}\n".format(uidstr))
 
     return result
@@ -90,9 +92,13 @@ class PreSignWidget(Gtk.VBox):
     def __init__(self, key, pixbuf=None, builder=None):
         super(PreSignWidget, self).__init__()
         thisdir = os.path.dirname(os.path.abspath(__file__))
+        widget_name = 'keyconfirmbox'
         if not builder:
-            builder = Gtk.Builder.new_from_file(os.path.join(thisdir, 'receive.ui'))
-        widget = builder.get_object('box10')
+            builder = Gtk.Builder()
+            builder.add_objects_from_file(
+                os.path.join(thisdir, 'receive.ui'),
+                [widget_name, 'confirm-button-image'])
+        widget = builder.get_object(widget_name)
         parent = widget.get_parent()
         if parent:
             parent.remove(widget)
@@ -104,9 +110,16 @@ class PreSignWidget(Gtk.VBox):
         self.key = key
 
         keyIdsLabel = builder.get_object("key_ids_label")
+        log.info("The Key ID Label can focus: %r, %r",
+            keyIdsLabel.props.can_focus,
+            keyIdsLabel.get_can_focus())
+        # Weird. The glade file defines can_focus = False, but it's set to True...
+        keyIdsLabel.set_can_focus(False)
         keyIdsLabel.set_markup(format_key_header(self.key.fingerprint))
 
         uidsLabel = builder.get_object("uids_label")
+        # FIXME: Check why Builder thinks the widget can focus when the glade file says no
+        uidsLabel.set_can_focus(False)
         markup = format_uidslist(self.key.uidslist)
         uidsLabel.set_markup(markup)
 
@@ -151,7 +164,13 @@ class PreSignApp(Gtk.Application):
         if not args:
             args = [""]
         key = get_usable_keys (pattern=args[0])[0]
-        self.psw = PreSignWidget(key)
+        if len(args) >= 2:
+            image_fname = args[1]
+            log.debug("Trying to load pixbuf from %r", image_fname)
+            pixbuf = Gtk.Image.new_from_file(image_fname).get_pixbuf()
+        else:
+            pixbuf = None
+        self.psw = PreSignWidget(key, pixbuf=pixbuf)
         super(PreSignApp, self).run()
 
 

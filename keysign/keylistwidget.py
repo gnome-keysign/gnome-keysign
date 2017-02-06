@@ -96,12 +96,16 @@ class KeyListWidget(Gtk.HBox):
         super(KeyListWidget, self).__init__()
 
         thisdir = os.path.dirname(os.path.abspath(__file__))
+        widget_name = 'keylistbox'
         if not builder:
-            builder = Gtk.Builder.new_from_file(
-                os.path.join(thisdir, 'send.ui'))
-        widget = builder.get_object('box2')
+            builder = Gtk.Builder()
+            builder.add_objects_from_file(
+                os.path.join(thisdir, 'send.ui'),
+                [widget_name])
+        widget = builder.get_object(widget_name)
         old_parent = widget.get_parent()
-        old_parent.remove(widget)
+        if old_parent:
+            old_parent.remove(widget)
         self.add(widget)
 
         self.listbox = builder.get_object("keys_listbox")
@@ -114,6 +118,7 @@ class KeyListWidget(Gtk.HBox):
         else:
             for key in keys:
                 lbr = ListBoxRowWithKey(key)
+                lbr.props.margin_bottom = 5
                 self.listbox.add(lbr)
             self.listbox.connect('row-activated', self.on_row_activated)
             self.listbox.connect('row-selected', self.on_row_selected)
