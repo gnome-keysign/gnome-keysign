@@ -38,7 +38,7 @@ if  __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 
-from .GetKeySection import strip_fingerprint, download_key_http, parse_barcode
+from .util import strip_fingerprint, download_key_http, parse_barcode
 
 try:
     from .gpgmh import fingerprint_from_keydata
