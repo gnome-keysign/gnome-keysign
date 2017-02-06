@@ -1,3 +1,7 @@
+# Apparently, package_data is bundled for bdists but not for sdists
+# For sdists, this MANIFEST.in seems to be used.
+# http://stackoverflow.com/a/14159430/2015768
 include data/gnome-keysign.desktop data/gnome-keysign.svg data/gnome-keysign.appdata.xml
+include keysign/*.ui
 include COPYING
 include README.rst

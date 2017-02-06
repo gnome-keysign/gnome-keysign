@@ -22,10 +22,12 @@ import sys
 
 from gi.repository import Gtk
 
-from .KeyPresent import KeyPresentPage
+from .KeyPresent import KeyPresentWidget
 from . import Keyserver
-from .KeysPage import KeysPage
+from .keylistwidget import KeyListWidget
 from .gpgmh import get_public_key_data
+from .gpgmh import get_usable_keys
+from .gpgmh import get_usable_secret_keys
 from .util import mac_generate
 
 log = logging.getLogger(__name__)
@@ -38,15 +40,18 @@ class KeySignSection(Gtk.VBox):
         choose a key to be signed by other person.
         '''
         super(KeySignSection, self).__init__()
-
         self.log = logging.getLogger(__name__)
 
-        # these are needed later when we need to get details about
-        # a selected key
-        self.keysPage = KeysPage()
-        self.keysPage.connect('key-selection-changed',
-            self.on_key_selection_changed)
-        self.keysPage.connect('key-selected', self.on_key_selected)
+        keys = list(get_usable_secret_keys())
+        if len(keys) <= 0:
+            self.keysPage = Gtk.Label(
+                "Oops. You don't seem to have any usable private keys :-("
+                "\nPlease create a key with, e.g. Seahorse."
+                , use_markup=True)
+        else:
+            self.keysPage = KeyListWidget(get_usable_secret_keys())
+            self.keysPage.connect('key-selected',  self.on_key_selected)
+            self.keysPage.connect('key-activated', self.on_key_activated)
 
 
         # set up notebook container
@@ -70,7 +75,8 @@ class KeySignSection(Gtk.VBox):
 
 
     def construct_key_present_page(self, fingerprint, qrcodedata=None):
-        kpp = KeyPresentPage(fingerprint, qrcodedata=qrcodedata)
+        key = next(iter(get_usable_keys(pattern=fingerprint)))
+        kpp = KeyPresentWidget(key, qrcodedata=qrcodedata)
         vbox = Gtk.VBox ()
 
         # create back button
@@ -93,18 +99,19 @@ class KeySignSection(Gtk.VBox):
         self.notebook.remove_page(self.key_present_page_index)
 
 
-    def on_key_selection_changed(self, pane, fingerprint):
+    def on_key_selected(self, pane, fingerprint):
         '''This callback is attached to the signal which is emitted
         when the user changes their selection in the list of keys
         '''
         pass
 
 
-    def on_key_selected(self, pane, fingerprint):
+    def on_key_activated(self, pane, key):
         '''This is the callback for when the user has committed
         to a key, i.e. the user has made a selection and wants to
         advance the program.
         '''
+        fingerprint = key.fingerprint
         log.debug('User selected key %s', fingerprint)
         keydata = get_public_key_data(fingerprint)
         self.log.debug("Keyserver switched on! Serving key with fpr: %s",
@@ -120,7 +127,8 @@ class KeySignSection(Gtk.VBox):
         # This is more of a crude hack. Once the next page is presented,
         # the back button has the focus. This is not desirable because
         # you will go back when accidentally pressing space or enter.
-        key_present_page.fingerprintLabel.grab_focus()
+        key_present_page.fingerprint_label.grab_focus()
+
 
 
     def on_next_button_clicked(self, button):

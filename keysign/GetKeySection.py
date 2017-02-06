@@ -27,6 +27,7 @@ from .compat import gtkbutton
 from .SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 from .util import mac_verify
 from .util import sign_keydata_and_send as _sign_keydata_and_send
+from .keyfprscan import KeyFprScanWidget
 
 from gi.repository import Gst, Gtk, GLib
 # Because of https://bugzilla.gnome.org/show_bug.cgi?id=698005
@@ -53,6 +54,60 @@ from .gpgmh import openpgpkey_from_data, fingerprint_from_keydata
 
 
 
+def parse_barcode(barcode_string):
+    """Parses information contained in a barcode
+
+    It returns a dict with the parsed attributes.
+    We expect the dict to contain at least a 'fingerprint'
+    entry. Others might be added in the future.
+    """
+    # The string, currently, is of the form
+    # openpgp4fpr:foobar?baz=qux#frag=val
+    # Which urlparse handles perfectly fine.
+    p = urlparse(barcode_string)
+    log.debug("Parsed %r into %r", barcode_string, p)
+    fpr = p.path
+    query = parse_qs(p.query)
+    fragments = parse_qs(p.fragment)
+    rest = {}
+    rest.update(query)
+    rest.update(fragments)
+    # We should probably ensure that we have only one
+    # item for each parameter and flatten them accordingly.
+    rest['fingerprint'] = fpr
+
+    log.debug('Parsed barcode into %r', rest)
+    return rest
+
+def strip_fingerprint(input_string):
+    '''Strips a fingerprint of any whitespaces and returns
+    a clean version. It also drops the "OPENPGP4FPR:" prefix
+    from the scanned QR-encoded fingerprints'''
+    # The split removes the whitespaces in the string
+    cleaned = ''.join(input_string.split())
+
+    if cleaned.upper().startswith(FPR_PREFIX.upper()):
+        cleaned = cleaned[len(FPR_PREFIX):]
+
+    log.warning('Cleaned fingerprint to %s', cleaned)
+    return cleaned
+
+
+def download_key_http(address, port):
+    url = ParseResult(
+        scheme='http',
+        # This seems to work well enough with both IPv6 and IPv4
+        netloc="[[%s]]:%d" % (address, port),
+        path='/',
+        params='',
+        query='',
+        fragment='')
+    log.debug("Starting HTTP request")
+    data = requests.get(url.geturl(), timeout=5).content
+    log.debug("finished downloading %d bytes", len(data))
+    return data
+
+
 
 class GetKeySection(Gtk.VBox):
 
@@ -69,7 +124,9 @@ class GetKeySection(Gtk.VBox):
         self.app = app
         self.log = logging.getLogger(__name__)
 
-        self.scanPage = ScanFingerprintPage()
+        self.scanPage = (
+            KeyFprScanWidget(),
+            ScanFingerprintPage())[1]
         self.signPage = SignKeyPage()
         # set up notebook container
         self.notebook = Gtk.Notebook()
@@ -106,7 +163,7 @@ class GetKeySection(Gtk.VBox):
         # We *could* overwrite the on_barcode function, but
         # let's rather go with a GObject signal
         #self.scanFrame.on_barcode = self.on_barcode
-        self.scanPage.scanFrame.connect('barcode', self.on_barcode)
+        self.scanPage.barcode_scanner.connect('barcode', self.on_barcode)
         #GLib.idle_add(        self.scanFrame.run)
 
         # A list holding references to temporary files which should probably
@@ -130,44 +187,6 @@ class GetKeySection(Gtk.VBox):
         self.progressBar.set_fraction((page_index+1)/3.0)
 
 
-    def strip_fingerprint(self, input_string):
-        '''Strips a fingerprint of any whitespaces and returns
-        a clean version. It also drops the "OPENPGP4FPR:" prefix
-        from the scanned QR-encoded fingerprints'''
-        # The split removes the whitespaces in the string
-        cleaned = ''.join(input_string.split())
-
-        if cleaned.upper().startswith(FPR_PREFIX.upper()):
-            cleaned = cleaned[len(FPR_PREFIX):]
-
-        self.log.warning('Cleaned fingerprint to %s', cleaned)
-        return cleaned
-
-
-    def parse_barcode(self, barcode_string):
-        """Parses information contained in a barcode
-
-        It returns a dict with the parsed attributes.
-        We expect the dict to contain at least a 'fingerprint'
-        entry. Others might be added in the future.
-        """
-        # The string, currently, is of the form
-        # openpgp4fpr:foobar?baz=qux#frag=val
-        # Which urlparse handles perfectly fine.
-        p = urlparse(barcode_string)
-        self.log.debug("Parsed %r into %r", barcode_string, p)
-        fpr = p.path
-        query = parse_qs(p.query)
-        fragments = parse_qs(p.fragment)
-        rest = {}
-        rest.update(query)
-        rest.update(fragments)
-        # We should probably ensure that we have only one
-        # item for each parameter and flatten them accordingly.
-        rest['fingerprint'] = fpr
-
-        self.log.debug('Parsed barcode into %r', rest)
-        return rest
 
 
     def on_barcode(self, sender, barcode, message, image):
@@ -188,7 +207,7 @@ class GetKeySection(Gtk.VBox):
         caused a barcode to be decoded.
         '''
         self.log.info("Barcode signal %r %r", barcode, message)
-        parsed = self.parse_barcode(barcode)
+        parsed = parse_barcode(barcode)
         fingerprint = parsed['fingerprint']
         if not fingerprint:
             self.log.error("Expected fingerprint in %r to evaluate to True, "
@@ -198,26 +217,12 @@ class GetKeySection(Gtk.VBox):
                 fingerprint, message, image, parsed_barcode=parsed)
 
 
-    def download_key_http(self, address, port):
-        url = ParseResult(
-            scheme='http',
-            # This seems to work well enough with both IPv6 and IPv4
-            netloc="[[%s]]:%d" % (address, port),
-            path='/',
-            params='',
-            query='',
-            fragment='')
-        self.log.debug("Starting HTTP request")
-        data = requests.get(url.geturl(), timeout=5).content
-        self.log.debug("finished downloading %d bytes", len(data))
-        return data
-
     def try_download_keys(self, clients):
         for client in clients:
             self.log.debug("Getting key from client %s", client)
             name, address, port, fpr = client
             try:
-                keydata = self.download_key_http(address, port)
+                keydata = download_key_http(address, port)
                 yield keydata
             except ConnectionError as e:
                 # FIXME : We probably have other errors to catch
@@ -324,7 +329,7 @@ class GetKeySection(Gtk.VBox):
                 else:
                     image = None
                     raw_text = self.scanPage.get_text_from_textview()
-                    fingerprint = self.strip_fingerprint(raw_text)
+                    fingerprint = strip_fingerprint(raw_text)
 
                     if fingerprint == None:
                         self.log.error("The fingerprint typed was wrong."

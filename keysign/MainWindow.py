@@ -111,7 +111,8 @@ class MainWindow(Gtk.Application):
     def on_new_service(self, browser, name, address, port, txt_dict):
         published_fpr = txt_dict.get('fingerprint', None)
 
-        self.log.info("Probably discovered something, let's check; %s %s:%i:%s",             name, address, port, published_fpr)
+        self.log.info("Probably discovered something, let's check; %s %s:%i:%s",
+                      name, address, port, published_fpr)
 
         if self.verify_service(name, address, port):
             GLib.idle_add(self.add_discovered_service, name, address, port, published_fpr)
@@ -123,7 +124,8 @@ class MainWindow(Gtk.Application):
     def on_remove_service(self, browser, service_type, name):
         '''Receives on_remove signal from avahibrowser.py to remove service from list and
         transfers data to remove_discovered_service'''
-        self.log.info("Received a remove signal, let's check; %s:%s", service_type, name)
+        self.log.info("Received a remove signal, let's check; %s:%s",
+                      service_type, name)
         GLib.idle_add(self.remove_discovered_service, name)
 
 
