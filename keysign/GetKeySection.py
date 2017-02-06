@@ -18,7 +18,7 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from urlparse import urlparse, parse_qs, ParseResult
+from urlparse import ParseResult
 import os  # We're using os.environ once...
 
 import requests
@@ -27,6 +27,7 @@ from requests.exceptions import ConnectionError, ReadTimeout
 from .compat import gtkbutton
 from .SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 from .util import mac_verify
+from .util import parse_barcode
 from .util import sign_keydata_and_send as _sign_keydata_and_send
 from .keyconfirm import PreSignWidget
 from .keyfprscan import KeyFprScanWidget
@@ -58,31 +59,6 @@ from .gpgmh import openpgpkey_from_data, fingerprint_from_keydata
 # FIXME: Eventually remove this condition
 NEW_UI = 1 if os.environ.get("KEYSIGN_NEWUI", None) else 0
 
-
-def parse_barcode(barcode_string):
-    """Parses information contained in a barcode
-
-    It returns a dict with the parsed attributes.
-    We expect the dict to contain at least a 'fingerprint'
-    entry. Others might be added in the future.
-    """
-    # The string, currently, is of the form
-    # openpgp4fpr:foobar?baz=qux#frag=val
-    # Which urlparse handles perfectly fine.
-    p = urlparse(barcode_string)
-    log.debug("Parsed %r into %r", barcode_string, p)
-    fpr = p.path
-    query = parse_qs(p.query)
-    fragments = parse_qs(p.fragment)
-    rest = {}
-    rest.update(query)
-    rest.update(fragments)
-    # We should probably ensure that we have only one
-    # item for each parameter and flatten them accordingly.
-    rest['fingerprint'] = fpr
-
-    log.debug('Parsed barcode into %r', rest)
-    return rest
 
 def strip_fingerprint(input_string):
     '''Strips a fingerprint of any whitespaces and returns

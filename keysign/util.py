@@ -21,6 +21,7 @@ import logging
 from subprocess import call
 from string import Template
 from tempfile import NamedTemporaryFile
+from urlparse import urlparse, parse_qs
 
 from .gpgmh import fingerprint_from_keydata
 from .gpgmh import sign_keydata_and_encrypt
@@ -148,4 +149,32 @@ def format_fingerprint(fpr):
         # except at the end
         elif i < 9: s += ' '
     return s
+
+
+
+
+def parse_barcode(barcode_string):
+    """Parses information contained in a barcode
+
+    It returns a dict with the parsed attributes.
+    We expect the dict to contain at least a 'fingerprint'
+    entry. Others might be added in the future.
+    """
+    # The string, currently, is of the form
+    # openpgp4fpr:foobar?baz=qux#frag=val
+    # Which urlparse handles perfectly fine.
+    p = urlparse(barcode_string)
+    log.debug("Parsed %r into %r", barcode_string, p)
+    fpr = p.path
+    query = parse_qs(p.query)
+    fragments = parse_qs(p.fragment)
+    rest = {}
+    rest.update(query)
+    rest.update(fragments)
+    # We should probably ensure that we have only one
+    # item for each parameter and flatten them accordingly.
+    rest['fingerprint'] = fpr
+
+    log.debug('Parsed barcode into %r', rest)
+    return rest
 
