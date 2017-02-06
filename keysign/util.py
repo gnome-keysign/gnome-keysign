@@ -22,7 +22,7 @@ from subprocess import call
 from string import Template
 from tempfile import NamedTemporaryFile
 
-from .gpgmh import fingerprint_for_key
+from .gpgmh import fingerprint_from_keydata
 from .gpgmh import sign_keydata_and_encrypt
 
 log = logging.getLogger(__name__)
@@ -85,7 +85,7 @@ GNOME Keysign
 '''
 
 
-def sign_keydata_and_send(keydata):
+def sign_keydata_and_send(keydata, error_cb=None):
     """Creates, encrypts, and send signatures for each UID on the key
     
     You are supposed to give OpenPGP data which will be passed
@@ -100,16 +100,16 @@ def sign_keydata_and_send(keydata):
     """
     log = logging.getLogger(__name__ + ':sign_keydata')
 
-    fingerprint = fingerprint_for_key(keydata)
+    fingerprint = fingerprint_from_keydata(keydata)
     # FIXME: We should rather use whatever GnuPG tells us
     keyid = fingerprint[-8:]
     # We list() the signatures, because we believe that it's more
     # acceptable if all key operations are done before we go ahead
     # and spawn an email client.
     log.info("About to create signatures for key with fpr %r", fingerprint)
-    for uid, encrypted_key in list(sign_keydata_and_encrypt(keydata)):
+    for uid, encrypted_key in list(sign_keydata_and_encrypt(keydata, error_cb)):
             # FIXME: get rid of this redundant assignment
-            uid_str = uid
+            uid_str = "{}".format(uid)
             ctx = {
                 'uid' : uid_str,
                 'fingerprint': fingerprint,
@@ -130,7 +130,7 @@ def sign_keydata_and_send(keydata):
 
             subject = Template(SUBJECT).safe_substitute(ctx)
             body = Template(BODY).safe_substitute(ctx)
-            email_file (to=uid_str, subject=subject,
+            email_file (to=uid.email, subject=subject,
                         body=body, files=[filename])
             yield tmpfile
 
