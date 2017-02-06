@@ -22,6 +22,9 @@ from subprocess import call
 from string import Template
 from tempfile import NamedTemporaryFile
 from urlparse import urlparse, parse_qs
+from urlparse import ParseResult
+
+import requests
 
 from .gpgmh import fingerprint_from_keydata
 from .gpgmh import sign_keydata_and_encrypt
@@ -194,3 +197,20 @@ def strip_fingerprint(input_string):
 
     log.warning('Cleaned fingerprint to %s', cleaned)
     return cleaned
+
+
+
+
+def download_key_http(address, port):
+    url = ParseResult(
+        scheme='http',
+        # This seems to work well enough with both IPv6 and IPv4
+        netloc="[[%s]]:%d" % (address, port),
+        path='/',
+        params='',
+        query='',
+        fragment='')
+    log.debug("Starting HTTP request")
+    data = requests.get(url.geturl(), timeout=5).content
+    log.debug("finished downloading %d bytes", len(data))
+    return data

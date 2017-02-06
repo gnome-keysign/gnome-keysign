@@ -18,7 +18,6 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-from urlparse import ParseResult
 import os  # We're using os.environ once...
 
 import requests
@@ -27,7 +26,7 @@ from requests.exceptions import ConnectionError, ReadTimeout
 from .compat import gtkbutton
 from .SignPages import ScanFingerprintPage, SignKeyPage, PostSignPage
 from .util import mac_verify
-from .util import parse_barcode, strip_fingerprint
+from .util import parse_barcode, strip_fingerprint, download_key_http
 from .util import sign_keydata_and_send as _sign_keydata_and_send
 from .keyconfirm import PreSignWidget
 from .keyfprscan import KeyFprScanWidget
@@ -61,19 +60,6 @@ NEW_UI = 1 if os.environ.get("KEYSIGN_NEWUI", None) else 0
 
 
 
-def download_key_http(address, port):
-    url = ParseResult(
-        scheme='http',
-        # This seems to work well enough with both IPv6 and IPv4
-        netloc="[[%s]]:%d" % (address, port),
-        path='/',
-        params='',
-        query='',
-        fragment='')
-    log.debug("Starting HTTP request")
-    data = requests.get(url.geturl(), timeout=5).content
-    log.debug("finished downloading %d bytes", len(data))
-    return data
 
 
 
