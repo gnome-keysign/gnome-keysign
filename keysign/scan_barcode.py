@@ -43,14 +43,6 @@ log = logging.getLogger(__name__)
 
 class BarcodeReader(object):
 
-    def __init__(self, *args, **kwargs):
-        self.timestamp = None
-        self.scanned_barcode = None
-        self.zbar_message = None
-
-        return super(BarcodeReader, self).__init__(*args, **kwargs)
-
-
     def on_barcode(self, barcode, message, image):
         '''This is called when a barcode is available
         with barcode being the decoded barcode.
@@ -76,53 +68,18 @@ class BarcodeReader(object):
 
                     assert struct.has_field('symbol')
                     barcode = struct.get_string('symbol')
-                    log.info("Read Barcode: {}".format(barcode)) 
+                    log.info("Read Barcode: {}".format(barcode))
 
                     pixbuf = None
                     if struct.has_field ("frame"):
                         # This is the new zbar, which posts the frame along
-                        # with the barcode.  It might be too new for users.
+                        # with the barcode.
                         sample = struct.get_value ("frame")
                         pixbuf = gst_sample_to_pixbuf(sample)
                         self.on_barcode(barcode, message, pixbuf)
                     else:
-                        # If we do not see the newer zbar, we save the
-                        # barcode symbol now along with its timestamp.
-                        # There should be a pixbuf on the bus with
-                        # the same timestamp which we will then collect.
-                        self.timestamp = struct.get_clock_time("timestamp")[1]
-                        self.scanned_barcode = barcode
-                        self.zbar_message = message
-                        
-                elif struct_name == 'pixbuf':
-                    # Here we check whether the pixbuf is unsolicitated,
-                    # e.g. a "regular" pixbuf or the one belonging to the
-                    # barcode we have just scanned.  Note that if we
-                    # haven't scanned a barcode yet, self.timestamp
-                    # should be None.  We also use None instead of just
-                    # if self.timestamp because the timestamp might be 0.
-                    if self.timestamp is not None:
-                        pixbuf_timestamp = struct.get_clock_time("timestamp")[1]
-                        if pixbuf_timestamp == self.timestamp:
-                            log.debug('Pixbuf %r matches barcode seen at %r',
-                                      struct, pixbuf_timestamp)
-
-                            if not struct.has_field("pixbuf"):
-                                log.error("Why does the pixbuf message not "
-                                          "contain a pixbuf field? %r", struct)
-                                for i in range(struct.n_fields()):
-                                    log.debug("Struct field %d name: %s",
-                                              i, struct.nth_field_name(i))
-                            else:
-                                pixbuf = struct.get_value("pixbuf")
-                                barcode = self.scanned_barcode
-                                message = self.zbar_message
-                                self.timestamp = None
-                                self.scanned_barcode = None
-                                self.zbar_message = None
-                                self.set_pixbuf_post_messages(False)
-                                self.on_barcode(barcode, message, pixbuf)
-                    
+                        # If we do not see the zbar < 1.6, we raise
+                        raise
 
 
     def run(self):
@@ -132,95 +89,26 @@ class BarcodeReader(object):
         #p = "uridecodebin uri=file:///tmp/qr.png "
         p += " ! tee name=t \n"
         p += "       t. ! queue ! videoconvert \n"
-        p += "                  ! zbar cache=true %(attach_frame)s \n"
+        p += "                  ! zbar cache=true attach_frame=true \n"
+        p += "                  ! fakesink \n"
         p += "       t. ! queue ! videoconvert \n"
         p += "                  ! xvimagesink name=imagesink \n"
 
-        # It's getting ugly down here.  What these lines do is trying to
-        # detect whether we have a new enough GStreamer, i.e. 1.6+, where
-        # the zbar element has the required "attach-frame" property.
-        # If the element does not have such a property, parse_launch will
-        # fail.  We try to detect our special case to not break other
-        # error messages.  If we detect an old GStreamer version,
-        # we simply discard "attach-frame" and work around the limitation
-        # of the zbar element.
-        pipeline_s = p % {
-              # Without the fakesink the zbar element seems to not work
-              'attach_frame':'attach-frame=true !  fakesink \n'
-        }
-        try:
-            log.info("Launching pipeline %s", pipeline_s)
-            pipeline = Gst.parse_launch(pipeline_s)
-        except GLib.Error as e:
-            if 'no property "attach-frame" in element' in e.message:
-                # We assume that the zbar element has no attach-frame
-                # property, because GStramer is too old.
-                # The property was introduced with GStreamer 1.6 with
-                # 1246d93f3e32a13c95c70cf3ba0f26b224de5e58
-                # https://bugzilla.gnome.org/show_bug.cgi?id=747557
-                log.info('Running with GStreamer <1.5.1, '
-                         'using a (slow) pixbufsink')
-                pipeline_s = p % {
-                    'attach_frame':'  ! videoconvert  \n'
-                                   '  ! gdkpixbufsink name=pixbufsink \n'
-                                   '                  post-messages=false \n'
-                }
-                try:
-                    log.info("Launching pipeline %s", pipeline_s)
-                    pipeline = Gst.parse_launch(pipeline_s)
-                except:
-                    raise
-                else:
-                    # We install this handler only if we do not
-                    # have the newer GStreamer version
-                    pipeline.get_bus().set_sync_handler(self.bus_sync_handler)
-            else:
-                raise
-            
+        pipeline = p
+        log.info("Launching pipeline %s", pipeline)
+        pipeline = Gst.parse_launch(pipeline)
+
         self.bus = bus = pipeline.get_bus()
         self.imagesink = pipeline.get_by_name('imagesink')
         self.pipeline = pipeline
 
         bus.connect('message', self.on_message)
-        bus.connect('sync-message::element', self.on_sync_message)
         bus.add_signal_watch()
-        
+
         pipeline.set_state(Gst.State.PLAYING)
         self.running = True
 
 
-    def bus_sync_handler(self, bus, message, data=None):
-        '''A simple handler which only checks for the message being
-        from the zbar element and then makes the pixbufsink post messages
-        
-        This is to save some computing costs for the pixbuf conversion.
-        Some performance impact is measurable, but only a couple of
-        percent CPU usage.
-        
-        Always returns Gst.BusSyncReply.PASS so that messages
-        will be dispatched as usual.
-        '''
-        log.info('Sync handler for message %r', message)
-        if message:
-            struct = message.get_structure()
-            if struct:
-                struct_name = struct.get_name()
-                if struct_name == 'barcode':
-                    self.set_pixbuf_post_messages(True)
-
-        return Gst.BusSyncReply.PASS
-
-
-    def on_sync_message(self, bus, message):
-        log.debug("Sync Message!")
-        pass
-
-
-    def set_pixbuf_post_messages(self, value):
-        'Locates the element with the name "pixbufsink" and sets post-messages'
-        pixbufsink = self.pipeline.get_by_name('pixbufsink')
-        assert(pixbufsink is not None)
-        return pixbufsink.set_property('post-messages', value)
 
 
 #class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
