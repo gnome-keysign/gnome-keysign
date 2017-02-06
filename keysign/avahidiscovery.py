@@ -38,7 +38,7 @@ if  __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 
-from .GetKeySection import strip_fingerprint, download_key_http, parse_barcode
+from .util import strip_fingerprint, download_key_http, parse_barcode
 
 try:
     from .gpgmh import fingerprint_from_keydata
@@ -64,7 +64,7 @@ class AvahiKeysignDiscovery(GObject.GObject):
         super(AvahiKeysignDiscovery, self).__init__(*args, **kwargs)
         self.log = logging.getLogger(__name__)
         # We should probably try to put this constant in a more central place
-        avahi_service_type = '_geysign._tcp'
+        avahi_service_type = '_gnome-keysign._tcp'
         self.avahi_browser = AvahiBrowser(service=avahi_service_type)
         self.avahi_browser.connect('new_service', self.on_new_service)
         self.avahi_browser.connect('remove_service', self.on_remove_service)
