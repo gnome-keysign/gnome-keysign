@@ -501,7 +501,7 @@ class ScalingImage(Gtk.DrawingArea):
             #log.info('Allocated size: %s, %s', widget_width, widget_height)
             
             # Fill in background
-            #cr.save()
+            cr.save()
             #Gtk.render_background(self.get_style_context(),
             #       cr, 0, 0, widget_width, widget_height)
             #cr.set_source_rgb(1, 1, 1)
