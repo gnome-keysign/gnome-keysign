@@ -29,16 +29,17 @@ def main():
     from gi.repository import GLib, Gtk
     
     from . import gtkexcepthook
-    from .MainWindow import MainWindow
+    from .app import KeysignApp
 
     logging.basicConfig(stream=sys.stderr,
         level=logging.DEBUG,
         format='%(name)s (%(levelname)s): %(message)s')
 
-    app = MainWindow()
+    app = KeysignApp()
 
     try:
-        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : app.quit(), None)
+        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
+            lambda *args : app.quit(), None)
     except AttributeError:
         pass
 
@@ -50,4 +51,3 @@ def main():
 
 if __name__ == '__main__':
     sys.exit(main())
-
