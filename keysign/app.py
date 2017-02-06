@@ -72,7 +72,6 @@ class KeysignApp(Gtk.Application):
         self.header_button_handler_id = None
         self.key_list_widget = None
         self.key_present_widget = None
-        self.scanner = None
         self.pre_sign_widget = None
 
     def on_activate(self, app):
@@ -164,7 +163,6 @@ class KeysignApp(Gtk.Application):
 
 
         self.receive_stack = rs
-        self.scanner = scanner
 
         # It needs to be show()n so that it can be made visible
         scanner.show()
@@ -337,7 +335,7 @@ class KeysignApp(Gtk.Application):
         # we could have possibly pressed this button, i.e.
         # from the presignwidget.
         log.debug("Receive Headerbutton %r clicked! %r", button, args)
-        self.receive_stack.set_visible_child(self.scanner)
+        self.receive_stack.set_visible_child_name("scanner")
 
     def on_header_button_clicked(self, button, *args):
         log.debug("Headerbutton %r clicked! %r", button, args)
@@ -414,7 +412,7 @@ class KeysignApp(Gtk.Application):
         # because currently, there is not much to do on the
         # key confirmation page.
         log.debug ("Signed the key: %r", self.tmpfiles)
-        self.receive_stack.set_visible_child(self.scanner)
+        self.receive_stack.set_visible_child_name("scanner")
         # Do we also want to add an infobar message or so..?
 
 

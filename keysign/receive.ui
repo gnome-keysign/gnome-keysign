@@ -13,6 +13,7 @@
     <property name="transition_type">slide-left-right</property>
     <child>
       <object class="GtkBox" id="box20">
+        <property name="name">scanner</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
