@@ -89,10 +89,9 @@ class BarcodeReaderGTK(Gtk.Box):
 
 
     def run(self):
-        p = "v4l2src \n"
-        ## FIXME: When using an image, the recorded frame is somewhat
-        ##        greenish.  I think we need to investigate that at some stage.
+        p = "autovideosrc  \n"
         #p = "uridecodebin uri=file:///tmp/qr.png "
+        #p = "uridecodebin uri=file:///tmp/v.webm "
         p += " ! tee name=t \n"
         p += "       t. ! queue ! videoconvert \n"
         p += "                  ! zbar cache=true attach_frame=true \n"
