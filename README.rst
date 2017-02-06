@@ -54,12 +54,11 @@ Debian and Ubuntu dependencies
 
 This list of packages seems to make it work:
 
-    python  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad gstreamer1.0-plugins-good gstreamer1.0-x python-cairo
+    python  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad gstreamer1.0-plugins-good python-cairo
 
 In Ubuntu, the package
-gstreamer1.0-x provides the xvimagesink element,
-gstreamer1.0-plugins-bad provides the zbar element, and
-gstreamer1.0-plugins-good provides the v4l2src element.
+gstreamer1.0-plugins-bad provides the zbar and the gtksink element, and
+gstreamer1.0-plugins-good provides the autovideosrc element.
 
 These packages should be optional:
 
