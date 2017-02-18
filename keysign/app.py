@@ -50,6 +50,7 @@ from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
 from .gpgmh import openpgpkey_from_data
 from . import gpgmh
+from .receive import ReceiveApp
 from .send import SendApp
 from .util import sign_keydata_and_send
 from . import gtkexcepthook
@@ -61,6 +62,29 @@ def remove_whitespace(s):
     cleaned = re.sub('[\s+]', '', s)
     return cleaned
 
+
+
+class PswMappingReceiveApp(ReceiveApp):
+    """A simple extension to the existing Receive class
+    to connect to the PreSignWidget's mapped signal (or
+    an emulation thereof.  This is a bit of a hack, but by
+    having pushed common receive functionality in the ReceiveApp
+    class, we do not necessarily control anymore when the 
+    PreSignWidget is created let alone connect to the map signal
+    in time.
+    """
+    def __init__(self, mapped_func, builder=None):
+        # ReceiveApp, in Python 2, is an old style object
+        ReceiveApp.__init__(self, builder=builder)
+        self.func = mapped_func
+        
+    def on_keydata_downloaded(self, *args, **kwargs):
+        ReceiveApp.on_keydata_downloaded(self, *args, **kwargs)
+        psw = self.psw
+        psw.connect('map', self.func)
+        if psw.get_mapped():
+            self.func(psw)
+    
 
 
 class KeysignApp(Gtk.Application):
@@ -119,43 +143,16 @@ class KeysignApp(Gtk.Application):
 
 
         # Load Receive part
-        ui_file_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            "receive.ui")
-        widget_name = 'receive_stack'
-        builder = Gtk.Builder()
-        builder.add_objects_from_file(ui_file_path,
-            # Weird. The UI file has the confirm-button-image out of hierarchy
-            [widget_name, 'confirm-button-image'])
-        widget = builder.get_object(widget_name)
-        rs = widget
+        self.receive = PswMappingReceiveApp(self.on_presign_mapped)
+        rs = self.receive.stack
 
         rs.connect('notify::visible-child',
             self.on_receive_stack_switch)
 
 
-        scanner = KeyFprScanWidget() #builder=builder)
-        scanner.connect("barcode", self.on_barcode)
-        scanner.connect("changed", self.on_changed)
+        scanner = self.receive.scanner
         scanner.connect("map", self.on_scanner_mapped)
-
-        old_scanner = builder.get_object("scanner_widget")
-        old_scanner_parent = old_scanner.get_parent()
-
-        if old_scanner_parent:
-            old_scanner_parent.remove(old_scanner)
-            # Hrm. We probably always have to have a parent
-            # otherwise we won't add the scanner here...
-            old_scanner_parent.add(scanner)
-
-
         self.receive_stack = rs
-
-        # It needs to be show()n so that it can be made visible
-        scanner.show()
-        # The stack now contains a box which we don't modify.
-        # We could potentially ask the stack to show scanner.parent...
-        # rs.set_visible_child(old_scanner_parent)
 
 
         self.send_receive_stack.add_titled(self.send_stack,
@@ -165,10 +162,6 @@ class KeysignApp(Gtk.Application):
         window.show_all()
         self.add_window(window)
 
-        self.discovery = AvahiKeysignDiscoveryWithMac()
-        infobar = builder.get_object('infobar_discovery')
-        self.discovery.connect("list-changed",
-            self.on_discovery_changed, infobar)
 
     def run(self, args=[]):
         super(KeysignApp, self).run()
@@ -196,18 +189,7 @@ class KeysignApp(Gtk.Application):
         self.header_button.set_sensitive(True)
 
 
-    def on_barcode(self, scanner, barcode, gstmessage, pixbuf):
-        log.debug("Scanned barcode %r", barcode)
-        keydata = self.discovery.find_key(barcode)
-        if keydata:
-            self.on_keydata_downloaded(keydata, pixbuf)
 
-    def on_changed(self, widget, entry):
-        log.debug("Entry changed %r: %r", widget, entry)
-        text = entry.get_text()
-        keydata = self.discovery.find_key(text)
-        if keydata:
-            self.on_keydata_downloaded(keydata)
 
     # FIXME: I don't think we use this function anymore.
     # It's very complex for what it wants to achieve and
@@ -343,19 +325,7 @@ class KeysignApp(Gtk.Application):
                 "but got %r" % visible_child)
 
 
-    def on_keydata_downloaded(self, keydata, pixbuf=None):
-        key = openpgpkey_from_data(keydata)
-        psw = PreSignWidget(key, pixbuf)
-        psw.connect('sign-key-confirmed',
-            self.on_sign_key_confirmed,
-            keydata)
-        psw.connect('map', self.on_presign_mapped)
-        psw.set_name("presign")
-        stack = self.receive_stack
-        stack.add_titled(psw, "presign", "Sign Key")
-        psw.show()
-        stack.set_visible_child(psw)
-        # self.psw = psw
+
 
     def on_keylist_mapped(self, keylistwidget):
         log.debug("Keylist becomes visible!")
@@ -390,30 +360,7 @@ class KeysignApp(Gtk.Application):
             Gtk.Image.new_from_icon_name("gtk-go-back",
             Gtk.IconSize.BUTTON))
 
-    def on_sign_key_confirmed(self, keyPreSignWidget, key, keydata):
-        log.debug ("Sign key confirmed! %r", key)
-        # We need to prevent tmpfiles from going out of
-        # scope too early so that they don't get deleted
-        self.tmpfiles = list(
-            sign_keydata_and_send(keydata))
-        
-        # After the user has signed, we switch back to the scanner,
-        # because currently, there is not much to do on the
-        # key confirmation page.
-        log.debug ("Signed the key: %r", self.tmpfiles)
-        self.receive_stack.set_visible_child_name("scanner")
-        # Do we also want to add an infobar message or so..?
 
-
-
-
-    def on_discovery_changed(self, discovery, number, userdata):
-        log.info("Discovery changed: %r", number)
-        ib = userdata
-        if number <= 0:
-            ib.show()
-        elif ib.is_visible():
-            ib.hide()
 
 
 def main(args):
