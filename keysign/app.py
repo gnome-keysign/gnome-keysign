@@ -50,8 +50,10 @@ from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
 from .gpgmh import openpgpkey_from_data
 from . import gpgmh
+from .send import SendApp
 from .util import sign_keydata_and_send
 from . import gtkexcepthook
+
 
 log = logging.getLogger(__name__)
 
@@ -70,8 +72,6 @@ class KeysignApp(Gtk.Application):
         self.receive_stack = None
         self.send_receive_stack = None
         self.header_button_handler_id = None
-        self.key_list_widget = None
-        self.key_present_widget = None
         self.pre_sign_widget = None
 
     def on_activate(self, app):
@@ -102,32 +102,19 @@ class KeysignApp(Gtk.Application):
             self.on_sr_stack_switch)
 
 
-        # Load Send part
-        ui_file_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            "send.ui")
-        widget_name = 'send_stack'
-        builder = Gtk.Builder()
-        builder.add_objects_from_file(ui_file_path, [widget_name])
-        widget = builder.get_object(widget_name)
-        ss = widget
+        ## Load Send part
+        self.send = SendApp()
+        ss = self.send.stack
+        p = ss.get_parent()
+        if p:
+            p.remove(ss)
         ss.connect('notify::visible-child', self.on_send_stack_switch)
         ss.connect('map', self.on_send_stack_mapped)
-
-        keys = gpgmh.get_usable_secret_keys()
-        klw = KeyListWidget(keys, builder=builder)
+        klw = self.send.klw
         klw.connect("key-activated", self.on_key_activated)
         klw.connect("map", self.on_keylist_mapped)
         klw.props.margin_left = klw.props.margin_right = 15
-
-        ss.add_titled(klw, "keylist", "All Keys")
-        self.key_list_widget = klw
         self.send_stack = ss
-
-        # Dirty hack
-        fakekey = gpgmh.Key("","","")
-        kpw = KeyPresentWidget(fakekey, builder=builder)
-        self.avahi_offer = None
         ## End of loading send part
 
 
@@ -188,20 +175,18 @@ class KeysignApp(Gtk.Application):
 
     def on_key_activated(self, widget, key):
         log.info("Activated key %r", key)
-        ####
-        # Start network services
-        self.avahi_offer = AvahiHTTPOffer(key)
-        discovery_data = self.avahi_offer.start()
-        log.info("Use this for discovering the other key: %r", discovery_data)
-        ####
-        # Create and show widget for key
-        stack = self.send_stack
-        kpw = KeyPresentWidget(key, qrcodedata=discovery_data)
+        # Ouf, we rely on the the SendApp to have reacted to
+        # the signal first, so that it sets up the keypresentwidget
+        # and so that we can access it here.  If it did, however,
+        # We might not be able to catch the mapped signal quickly
+        # enough. So we ask the widget wether it is already mapped.
+        kpw = self.send.kpw
         kpw.connect('map', self.on_keypresent_mapped)
-        stack.add_titled(kpw, "keypresent", "Publishing")
-        stack_saved_visible_child = stack.get_visible_child()
-        self.key_present_widget = kpw
-        stack.set_visible_child(kpw)
+        log.debug("KPW to wait for map: %r (%r)", kpw, kpw.get_mapped())
+        if kpw.get_mapped():
+            # The widget is already visible. Let's quickly call our handler
+            self.on_keypresent_mapped(kpw)
+
         ####
         # Saving subtitle
         self.headerbar_subtitle = self.headerbar.get_subtitle()
@@ -209,6 +194,7 @@ class KeysignApp(Gtk.Application):
         ####
         # Making button clickable
         self.header_button.set_sensitive(True)
+
 
     def on_barcode(self, scanner, barcode, gstmessage, pixbuf):
         log.debug("Scanned barcode %r", barcode)
@@ -326,12 +312,12 @@ class KeysignApp(Gtk.Application):
         # we could have possibly pressed this button, i.e.
         # from the keypresentwidget.
         log.debug("Send Headerbutton %r clicked! %r", button, args)
-        self.send_stack.set_visible_child(self.key_list_widget)
-        # Now more send specific actions are performed.
-        # It would probably be helpful to have those in
-        # a more central place for the "send" app to re-use
-        self.avahi_offer.stop()
-        self.avahi_offer = None
+        klw = self.send.klw
+        self.send_stack.set_visible_child(klw)
+        
+        self.send.deactivate()
+
+
 
     def on_receive_header_button_clicked(self, button, *args):
         # Here we assume that there is only one place where
