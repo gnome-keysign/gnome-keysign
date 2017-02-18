@@ -28,29 +28,35 @@ from . import gpgmh
 
 log = logging.getLogger(__name__)
 
-class App(Gtk.Application):
-    def __init__(self, *args, **kwargs):
-        super(App, self).__init__(*args, **kwargs)
-        self.connect('activate', self.on_activate)
-        #self.builder = Gtk.Builder.new_from_file('send.ui')
 
-    def on_activate(self, data=None):
+class SendApp:
+    """Common functionality needed when building the sending part
+    
+    This class will automatically start the keyserver
+    and avahi components.  It will load a GtkStack from "send.ui"
+    and automatically switch to a newly generate KeyPresentWidget.
+    To switch the stack back and stop the keyserver, you have to
+    call deactivate().
+    """
+    def __init__(self, builder=None):
+        self.avahi_offer = None
+        self.stack = None
+        self.stack_saved_visible_child = None
+        self.klw = None
+        self.kpw = None
+
         ui_file_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "send.ui")
-        self.builder = Gtk.Builder.new_from_file(ui_file_path)
-        window = self.builder.get_object("appwindow")
-        assert window
-        self.headerbar = self.builder.get_object("headerbar")
-        hb = self.builder.get_object("headerbutton")
-        hb.connect("clicked", self.on_headerbutton_clicked)
-        self.headerbutton = hb
-
+        if not builder:
+            builder = Gtk.Builder()
+            builder.add_objects_from_file(ui_file_path, ["send_stack"])
         keys = gpgmh.get_usable_secret_keys()
-        klw = KeyListWidget(keys, builder=self.builder)
+        klw = KeyListWidget(keys, builder=builder)
         klw.connect("key-activated", self.on_key_activated)
+        self.klw = klw
 
-        stack = self.builder.get_object("send_stack")
+        stack = builder.get_object("send_stack")
         stack.add(klw)
         self.stack = stack
 
@@ -64,12 +70,7 @@ class App(Gtk.Application):
         # code runs, it detaches itself from its parent, i.e. the stack.
         # We need need to instantiate the widget with key, however.
         fakekey = gpgmh.Key("","","")
-        kpw = KeyPresentWidget(fakekey, builder=self.builder)
-
-        window.show_all()
-        self.add_window(window)
-
-        self.avahi_offer = None
+        kpw = KeyPresentWidget(fakekey, builder=builder)
 
 
     def on_key_activated(self, widget, key):
@@ -85,7 +86,53 @@ class App(Gtk.Application):
         self.stack.add(kpw)
         self.stack_saved_visible_child = self.stack.get_visible_child()
         self.stack.set_visible_child(kpw)
+        log.debug('Setting kpw: %r', kpw)
         self.kpw = kpw
+
+    def deactivate(self):
+        ####
+        # Stop network services
+        avahi_offer = self.avahi_offer
+        avahi_offer.stop()
+        self.avahi_offer = None
+
+        ####
+        # Re-set stack to inital position
+        self.stack.set_visible_child(self.stack_saved_visible_child)
+        self.stack.remove(self.kpw)
+        self.kpw = None
+        self.stack_saved_visible_child = None
+
+
+class App(Gtk.Application):
+    def __init__(self, *args, **kwargs):
+        super(App, self).__init__(*args, **kwargs)
+        self.connect('activate', self.on_activate)
+        self.send_app = None
+        #self.builder = Gtk.Builder.new_from_file('send.ui')
+
+    def on_activate(self, data=None):
+        ui_file_path = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "send.ui")
+        self.builder = Gtk.Builder.new_from_file(ui_file_path)
+        window = self.builder.get_object("appwindow")
+        assert window
+        self.headerbar = self.builder.get_object("headerbar")
+        hb = self.builder.get_object("headerbutton")
+        hb.connect("clicked", self.on_headerbutton_clicked)
+        self.headerbutton = hb
+
+        self.send_app = SendApp(builder=self.builder)
+        self.send_app.klw.connect("key-activated", self.on_key_activated)
+
+        window.show_all()
+        self.add_window(window)
+
+
+    
+
+    def on_key_activated(self, widget, key):
         ####
         # Saving subtitle
         self.headerbar_subtitle = self.headerbar.get_subtitle()
@@ -97,6 +144,8 @@ class App(Gtk.Application):
 
     def on_headerbutton_clicked(self, button):
         log.info("Headerbutton pressed: %r", button)
+        self.send_app.deactivate()
+
         # If we ever defer operations here, it seems that
         # the order of steps is somewhat important for the
         # responsiveness of the UI.  It seems that shutting down
@@ -105,23 +154,13 @@ class App(Gtk.Application):
         # better that going back takes some time rather than having
         # a half-baked switching animation.
         # For now, it doesn't matter, because we don't defer.
-        ####
-        # Stop network services
-        avahi_offer = self.avahi_offer
-        avahi_offer.stop()
-        self.avahi_offer = None
+
         ####
         # Making button non-clickable
         self.headerbutton.set_sensitive(False)
         ####
         # Restoring subtitle
         self.headerbar.set_subtitle(self.headerbar_subtitle)
-        ####
-        # Re-set stack to inital position
-        self.stack.set_visible_child(self.stack_saved_visible_child)
-        self.stack.remove(self.kpw)
-        self.kpw = None
-        self.stack_saved_visible_child = None
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
