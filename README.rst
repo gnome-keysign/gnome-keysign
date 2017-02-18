@@ -72,6 +72,8 @@ Fedora dependencies
 The following has worked at least once for getting the application running,
 assuming that pip and git are already installed:
 
+.. code::
+
     sudo dnf install -y python-gobject python-avahi dbus-python gstreamer1-plugins-bad-free-extras gstreamer1-plugins-good  gnupg
 
 
@@ -81,6 +83,8 @@ Installation with pip
 
 You may try the following in order to install the program to
 your user's home directory.
+
+.. code::
 
     pip install --user 'git+https://github.com/GNOME-Keysign/gnome-keysign.git#egg=gnome-keysign'
     
@@ -94,8 +98,11 @@ From git
 If you intend to hack on the software (*yay*!),
 you may want to clone the repository and install from there.
 
-    git clone --recursive  https://github.com/gnome-keysign/gnome-keysign.git
-    virtualenv --system-site-packages --python=python2  /tmp/keysign
+.. code::
+
+    git clone --recursive https://github.com/gnome-keysign/gnome-keysign.git
+    cd gnome-keysign
+    virtualenv --system-site-packages --python=python2 /tmp/keysign
     /tmp/keysign/bin/pip install .
 
 Note that this installs the application in the virtual environment,
@@ -156,7 +163,7 @@ After you either typed a fingerprint or scanned a bar code, the program
 will look for the relevant key on your local network.  Note that you've
 transmitted the fingerprint securely, i.e. via a visual channel in form 
 of a bar code or the displayed fingerprint.  This data allows to 
-find the correct key.  In fact, they client tries to find the correct 
+find the correct key.  In fact, the client tries to find the correct 
 key by comparing the fingerprint of the keys available on the local 
 network.
 
