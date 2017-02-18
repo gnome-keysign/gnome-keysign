@@ -42,7 +42,7 @@ if  __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 
-from .avahidiscovery import AvahiKeysignDiscovery
+from .avahidiscovery import AvahiKeysignDiscoveryWithMac
 from .keyfprscan import KeyFprScanWidget
 from .keyconfirm import PreSignWidget
 from .gpgmh import openpgpkey_from_data
@@ -110,10 +110,10 @@ class ReceiveApp(Gtk.Application):
         window.add(receive_stack)
         window.show_all()
         self.add_window(window)
-
-        self.discovery = AvahiKeysignDiscovery()
+        self.discovery = AvahiKeysignDiscoveryWithMac()
         ib = builder.get_object('infobar_discovery')
         self.discovery.connect('list-changed', self.on_list_changed, ib)
+
 
     def on_keydata_downloaded(self, keydata, pixbuf=None):
         key = openpgpkey_from_data(keydata)
