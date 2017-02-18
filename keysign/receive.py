@@ -55,34 +55,21 @@ def remove_whitespace(s):
     return cleaned
 
 
-class ReceiveApp(Gtk.Application):
-    def __init__(self, *args, **kwargs):
-        super(ReceiveApp, self).__init__(*args, **kwargs)
-        self.connect('activate', self.on_activate)
-        self.scanner = None
+class ReceiveApp:
+    def __init__(self, builder=None):
         self.psw = None
         self.discovery = None
-        
         self.log = logging.getLogger(__name__)
 
-    def on_activate(self, app):
-        ui_file = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            "receive.ui")
-        builder = Gtk.Builder.new_from_file(ui_file)
+        widget_name = "receive_stack"
+        if not builder:
+            ui_file = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                "receive.ui")
+            builder = Gtk.Builder()
+            builder.add_objects_from_file(ui_file,
+                [widget_name, 'confirm-button-image'])
 
-        window = Gtk.ApplicationWindow()
-        window.set_title("Receive")
-        # window.set_size_request(600, 400)
-        #window = self.builder.get_object("appwindow")
-
-        # This is a bit quirky now.
-        # The problem is, roughly speaking, that the
-        # Glade file contains all the necessary widget to
-        # compose the ScanWidget.  Our implementation, however,
-        # "creates" new widgets which we need to add somewhere.
-        # So we need to remove the already existing ones and add
-        # the newly created ones.
         old_scanner = builder.get_object("scanner_widget")
         old_scanner_parent = old_scanner.get_parent()
 
@@ -96,20 +83,16 @@ class ReceiveApp(Gtk.Application):
             # the newly created scanner. Weird.
             old_scanner_parent.add(scanner)
 
-        receive_stack = builder.get_object("receive_stack")
-        #receive_stack.remove(receive_stack.get_child_by_name("scanner"))
-        #receive_stack.add_titled(scanner, "scanner", "Scan Barcode")
+        receive_stack = builder.get_object(widget_name)
         # It needs to be show()n so that it can be made visible
         scanner.show()
         # FIXME: Use "stack_scanner_child" or so as identification
         # for the stack's scanner child to make it visible when the
         # app starts
         # receive_stack.set_visible_child(old_scanner_parent)
-        
+        self.scanner = scanner
+        self.stack = receive_stack
 
-        window.add(receive_stack)
-        window.show_all()
-        self.add_window(window)
         self.discovery = AvahiKeysignDiscoveryWithMac()
         ib = builder.get_object('infobar_discovery')
         self.discovery.connect('list-changed', self.on_list_changed, ib)
@@ -117,13 +100,17 @@ class ReceiveApp(Gtk.Application):
 
     def on_keydata_downloaded(self, keydata, pixbuf=None):
         key = openpgpkey_from_data(keydata)
-        self.psw = PreSignWidget(key, pixbuf)
-        self.psw.connect('sign-key-confirmed', self.on_sign_key_confirmed, keydata)
-        self.stack.add_titled(self.psw, "presign", "Sign Key")
-        self.psw.show()
+        psw = PreSignWidget(key, pixbuf)
+        psw.connect('sign-key-confirmed',
+            self.on_sign_key_confirmed, keydata)
+        self.stack.add_titled(psw, "presign", "Sign Key")
+        psw.set_name("presign")
+        psw.show()
+        self.psw = psw
         self.stack.set_visible_child(self.psw)
 
     def on_scanner_changed(self, scanner, entry):
+        self.log.debug("Entry changed %r: %r", scanner, entry)
         text = entry.get_text()
         keydata = self.discovery.find_key(text)
         if keydata:
@@ -142,6 +129,14 @@ class ReceiveApp(Gtk.Application):
         self.tmpfiles = list(
             sign_keydata_and_send(keydata))
 
+        # After the user has signed, we switch back to the scanner,
+        # because currently, there is not much to do on the
+        # key confirmation page.
+        log.debug ("Signed the key: %r", self.tmpfiles)
+        self.receive_stack.set_visible_child_name("scanner")
+        # Do we also want to add an infobar message or so..?
+
+
     def run(self, args):
         if not args:
             args = [""]
@@ -156,6 +151,34 @@ class ReceiveApp(Gtk.Application):
             ib.hide()
 
 
+
+class App(Gtk.Application):
+    def __init__(self, *args, **kwargs):
+        super(App, self).__init__(*args, **kwargs)
+        self.connect('activate', self.on_activate)
+        self.log = logging.getLogger(__name__)
+
+
+    def on_activate(self, app):
+        ui_file = os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            "receive.ui")
+        builder = Gtk.Builder.new_from_file(ui_file)
+
+        window = Gtk.ApplicationWindow()
+        window.set_title("Receive")
+        # window.set_size_request(600, 400)
+        #window = self.builder.get_object("appwindow")
+        
+        self.receive = ReceiveApp(builder)
+        receive_stack = self.receive.stack
+
+        window.add(receive_stack)
+        window.show_all()
+        self.add_window(window)
+
+
+
 def main(args):
     log = logging.getLogger(__name__)
     log.debug('Running main with args: %s', args)
@@ -163,7 +186,7 @@ def main(args):
         args = []
     Gst.init()
 
-    app = ReceiveApp()
+    app = App()
     try:
         GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : app.quit(), None)
     except AttributeError:
