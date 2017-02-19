@@ -22,7 +22,16 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk, GObject
 import qrcode
+
+## It seems python3-cairo does not implement Surface.create_for_data
+## https://bugs.freedesktop.org/show_bug.cgi?id=99855
+## Also, the gi version of cairo seems to be mostly useless,
+## so either pycairo or cairocffi needs to exist.
+## Rumour has it, though, that cairocffi cannot work well together
+## with the CairoContext exposed in the do_draw method that we are trying to
+## overwrite.  So we're back to square one and need to take pycairo.
 import cairo
+
 
 log = logging.getLogger(__name__)
 
