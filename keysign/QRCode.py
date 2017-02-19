@@ -131,7 +131,8 @@ class QRImage(Gtk.DrawingArea):
 
         matrix = code.get_matrix()
         size = len(matrix)
-        stride = (size + 3) / 4 * 4
+        stride = (size + 3) // 4 * 4
+        log.debug("stride: %r  size: %r", stride, size)
         data = bytearray(stride * size)
 
         background = self.background
