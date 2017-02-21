@@ -82,8 +82,9 @@ def main(args):
     discovery_info = offer.start()
     print ("Offering key: {}".format(key))
     print ("Discovery info: {}".format(discovery_info))
-    print ("Press Enter to stop")
-    raw_input()
+    try: input_ = raw_input
+    except NameError: input_ = input
+    input_("Press Enter to stop")
     offer.stop()
 
 if __name__ == "__main__":
