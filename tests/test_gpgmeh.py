@@ -51,7 +51,7 @@ def get_fixture_file(fixture):
 
 def read_fixture_file(fixture):
     fname = get_fixture_file(fixture)
-    data = open(fname, 'r').read()
+    data = open(fname, 'rb').read()
     return data
 
 @raises(ValueError)
@@ -262,7 +262,7 @@ def test_get_public_key_no_data():
 class TestGetPublicKeyData:
     def setup(self):
         self.fname = get_fixture_file("pubkey-1.asc")
-        original = open(self.fname, 'r').read()
+        original = open(self.fname, 'rb').read()
         # This should be a new, empty directory
         self.homedir = tempfile.mkdtemp()
         gpgcmd = ["gpg", "--homedir={}".format(self.homedir)]
@@ -309,7 +309,7 @@ def test_get_empty_usable_keys():
 class TestGetUsableKeys:
     def setup(self):
         self.fname = get_fixture_file("pubkey-1.asc")
-        original = open(self.fname, 'r').read()
+        original = open(self.fname, 'rb').read()
         # This should be a new, empty directory
         self.homedir = tempfile.mkdtemp()
         gpgcmd = ["gpg", "--homedir={}".format(self.homedir)]
@@ -343,7 +343,7 @@ class TestGetUsableKeys:
 class TestGetUsableSecretKeys:
     def setup(self):
         self.fname = get_fixture_file("seckey-1.asc")
-        original = open(self.fname, 'r').read()
+        original = open(self.fname, 'rb').read()
         # This should be a new, empty directory
         self.homedir = tempfile.mkdtemp()
         gpgcmd = ["gpg", "--homedir={}".format(self.homedir)]
@@ -407,7 +407,7 @@ class TestSignAndEncrypt:
         pass
 
     def test_sign_and_encrypt(self):
-        secret_keydata = open(self.key_sender_key, "r").read()
+        secret_keydata = open(self.key_sender_key, "rb").read()
         # We get the public portion of the key
         sender = TempContext()
         sender.op_import(secret_keydata)
