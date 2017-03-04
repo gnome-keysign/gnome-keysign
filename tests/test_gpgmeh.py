@@ -374,6 +374,19 @@ class TestGetUsableSecretKeys:
 
 
 
+def get_signatures_for_uids_on_key(ctx, key):
+    """It seems to be a bit hard to get a key with its signatures,
+    so this is a small helper function"""
+    # esp. get_key does not take a SIGS argument.
+    # What happens if keylist returns multiple keys, e.g. because there
+    # is another key with a UID named as the fpr?  How can I make sure I
+    # get the signatures of any given key?
+    keys = list(ctx.keylist(key.fpr, mode=(gpg.constants.keylist.mode.LOCAL
+                                           |gpg.constants.keylist.mode.SIGS)))
+    assert len(keys) == 1
+    uid_sigs = {uid.uid: [s for s in uid.signatures] for uid in keys[0].uids}
+    log.info("Signatures: %r", uid_sigs)
+    return uid_sigs
 
 
 class TestSignAndEncrypt:
@@ -416,10 +429,11 @@ class TestSignAndEncrypt:
         assert_equals(len(uids), len(uid_encrypted))
 
         # We need to explicitly request signatures
-        sender.set_keylist_mode(gpg.constants.KEYLIST_MODE_SIGS)
-        uids_before = sender.get_key(fpr).uids
-        sigs = [uid.signatures for uid in uids_before]
-        sigs_before = [sig for signatures in sigs for sig in signatures]
+        uids_before = uids
+        assert_equals (len(uids_before), len(sender.get_key(fpr).uids))
+
+        sigs_before = [s for l in get_signatures_for_uids_on_key(sender,
+                                    key).values() for s in l]
         for uid, uid_enc in zip(uids_before, uid_encrypted):
             # The test doesn't work so well, because comments
             # are not rendered :-/
@@ -438,9 +452,8 @@ class TestSignAndEncrypt:
             log.debug("updated key: %r", updated_key)
             log.debug("updated key sigs: %r", [(uid, uid.signatures) for uid in updated_key.uids])
 
-        uids_after = sender.get_key(fpr).uids
-        sigs = [uid.signatures for uid in uids_after]
-        sigs_after = [sig for signatures in sigs for sig in signatures]
+        sigs_after = [s for l in get_signatures_for_uids_on_key(sender,
+                                    key).values() for s in l]
         assert_greater(len(sigs_after), len(sigs_before))
 
     def test_sign_and_encrypt_double_secret(self):
@@ -478,8 +491,8 @@ class TestSignAndEncrypt:
         assert_equals(len(sender_key.uids), len(uid_encrypted))
 
         uids_before = sender.get_key(fpr).uids
-        sigs = [uid.signatures for uid in uids_before]
-        sigs_before = [sig for signatures in sigs for sig in signatures]
+        sigs_before = [s for l in get_signatures_for_uids_on_key(sender,
+                                    sender_key).values() for s in l]
         for uid, uid_enc in zip(uids_before, uid_encrypted):
             # FIXME: assert_equals(uid, uid_enc[0])
             assert_in(uid.name, uid_enc[0].uid)
@@ -497,8 +510,8 @@ class TestSignAndEncrypt:
             log.debug("updated key: %r", updated_key)
             log.debug("updated key sigs: %r", [(uid, uid.signatures) for uid in updated_key.uids])
 
-        uids_after = sender.get_key(fpr).uids
-        sigs = [uid.signatures for uid in uids_after]
-        sigs_after = [sig for signatures in sigs for sig in signatures]
+        sigs_after = [s for l in get_signatures_for_uids_on_key(sender,
+                                    sender_key).values() for s in l]
+
         assert_greater(len(sigs_after), len(sigs_before))
 
