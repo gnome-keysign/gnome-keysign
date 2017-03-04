@@ -73,7 +73,7 @@ class AvahiBrowser(GObject.GObject):
     }
 
 
-    def __init__(self, loop=None, service='_geysign._tcp'):
+    def __init__(self, loop=None, service='_gnome-keysign._tcp'):
         GObject.GObject.__init__(self)
 
         self.log = logging.getLogger(__name__)

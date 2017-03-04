@@ -57,9 +57,11 @@ class KeyRequestHandlerBase(BaseHTTPRequestHandler):
     but create a use one inheriting from this class. The subclass
     must also define a keydata field.
     '''
-    server_version = 'Geysign/' + 'FIXME-Version'
+    server_version = 'GNOME-Keysign/' + '%s' % __version__
 
-    ctype = 'application/openpgpkey' # FIXME: What the mimetype of an OpenPGP key?
+    # As per RFC 2015 Section 7
+    # https://tools.ietf.org/html/rfc2015#section-7
+    ctype = 'application/pgp-keys'
 
     def do_GET(self):
         f = self.send_head(self.keydata)
@@ -153,8 +155,8 @@ class ServeKeyThread(Thread):
                     service_port = port_i,
                     service_name = 'HTTP Keyserver %s' % fpr,
                     service_txt = service_txt,
-                    # self.keydata is too big for Avahi; it chrashes
-                    service_type = '_geysign._tcp',
+                    # self.keydata is too big for Avahi; it crashes
+                    service_type = '_gnome-keysign._tcp',
                 )
                 log.info('Trying to add Avahi Service')
                 ap.add_service()

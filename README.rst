@@ -5,8 +5,8 @@ A tool for signing OpenPGP keys.
 
 Its purpose is to ease signing other peoples' keys.
 It is similar to caff, PIUS, or monkeysign.  In fact, it is influenced a lot by these tools
-and either reimplements ideas or reuses code.
-Consider either of the aboved mentioned tools when you need a much more mature codebase.
+and either re-implements ideas or reuses code.
+Consider either of the above mentioned tools when you need a much more mature codebase.
 
 In contrast to caff or monkeysign, this tool enables you to sign a key without contacting
 a key server.
@@ -29,42 +29,87 @@ and gives the user a well known interface.
 Installation
 =============
 
-The list of dependencies has not yet fully been determined.
-However, this list of Ubuntu packages seems to make it work:
+Before you can install GNOME Keysign, you need to have a few
+dependencies installed.
 
-    python  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad python-gi-cairo
+The list of dependencies includes:
 
+    * avahi with python bindings
+    * dbus with python bindings
+    * GStreamer with the good and bad plugins
+    * GTK and Cairo
+    * gobject introspection for those libraries
+
+
+OpenSuSE installation
+----------------------
+
+OpenSuSE has `packaged the application <https://build.opensuse.org/package/show/GNOME:Apps/gnome-keysign>`_
+so it should be easy for you to install it.
+
+
+
+Debian and Ubuntu dependencies
+---------------------------------
+
+This list of packages seems to make it work:
+
+    python  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad gstreamer1.0-plugins-good python-cairo
+
+In Ubuntu, the package
+gstreamer1.0-plugins-bad provides the zbar and the gtksink element, and
+gstreamer1.0-plugins-good provides the autovideosrc element.
 
 These packages should be optional:
 
     python-requests monkeysign python-qrcode
 
 
-Once you have the dependencies installed, a
+Fedora dependencies
+--------------------
 
-    pip install --user .
+The following has worked at least once for getting the application running,
+assuming that pip and git are already installed:
 
-should do everything in order to install the program to your
-user's home directory.
+    sudo dnf install -y python-gobject python-avahi dbus-python gstreamer1-plugins-bad-free-extras gstreamer1-plugins-good  gnupg
 
-If you don't have a local copy of the repository, you may try
 
-    pip install --user 'git+https://github.com/muelli/geysigning.git#egg=gnome-keysign'
+
+Installation with pip
+-----------------------
+
+You may try the following in order to install the program to
+your user's home directory.
+
+    pip install --user 'git+https://github.com/GNOME-Keysign/gnome-keysign.git#egg=gnome-keysign'
     
+You should find a script in ~/.local/bin/gnome-keysign as well as a
+.desktop launcher in ~/.local/share/applications/.
 
 
+From git
+---------
 
+If you intend to hack on the software (*yay*!),
+you may want to clone the repository and install from there.
+
+    git clone --recursive  https://github.com/gnome-keysign/gnome-keysign.git
+    virtualenv --system-site-packages --python=python2  /tmp/keysign
+    /tmp/keysign/bin/pip install .
+
+Note that this installs the application in the virtual environment,
+so you run the program from there, e.g. /tmp/keysign/bin/gnome-keysign.
 
 
 Starting
-=======
+=========
 
 If you have installed the application with pip, a .desktop file
 should have been deployed such that you should be able to run the
 program from your desktop shell. Search for "Keysign".
 If you want to run the program from the command line, you can
 add ~/.local/bin to your PATH.  The installation should have put an
-exectuable named keysign in that directory.
+executable named keysign in that directory.
 
 If you haven't installed via pip or not to your user's home directory
 (i.e. with --user), you can start the program from your environment's

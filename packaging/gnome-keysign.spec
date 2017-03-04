@@ -12,9 +12,11 @@ Source0:       https://github.com/muelli/geysigning/archive/%{commit}/%{name}-%{
 
 BuildRequires: python-devel
 BuildRequires: /usr/bin/desktop-file-validate
-Requires:      python-requests dbus-python avahi-ui-tools
-Requires:      python-qrcode  python-gobject    python-avahi
-Requires:      gstreamer1-plugins-bad-free-extras
+Requires:      python-gobject  gtk3
+Requires:      python-avahi  dbus-python
+Requires:      gstreamer1-plugins-bad-free-extras gstreamer1-plugins-good
+Requires:      python-qrcode
+Requires:      python-requests avahi-ui-tools
 BuildArch:     noarch
 
 %description

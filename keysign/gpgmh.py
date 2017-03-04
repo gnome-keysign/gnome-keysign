@@ -258,14 +258,16 @@ def get_usable_keys_from_keyring(keyring, pattern, public, secret):
 def sign_keydata(keydata, error_cb=None, homedir=None):
     """Signs OpenPGP keydata with your regular GnuPG secret keys
     
-    error_cb can be a function that is called with any exception
-    occuring during signing of the key.
+    If error_cb is provided, that function is called with any exception
+    occuring during signing of the key.  If error_cb is False, any
+    exception is raised.
     
     yields pairs of (uid, signed_uid)
     """
     log = logging.getLogger(__name__ + ':sign_keydata_encrypt')
 
-    tmpkeyring = TempSigningKeyring(homedir=homedir)
+    tmpkeyring = TempSigningKeyring(homedir=homedir,
+        base_keyring=Keyring(homedir=homedir))
     tmpkeyring.context.set_option('export-options', 'export-minimal')
     # Eventually, we want to let the user select their keys to sign with
     # For now, we just take whatever is there.
@@ -299,27 +301,29 @@ def sign_keydata(keydata, error_cb=None, homedir=None):
             tmpkeyring.context.set_option('local-user', secret_fpr)
             # FIXME: For now, we sign all UIDs. This is bad.
             try:
-                ret = tmpkeyring.sign_key(uidlist[0].uid, signall=True)
+                ret = tmpkeyring.sign_key(fingerprint, signall=True)
             except GpgRuntimeError as e:
                 uid = uidlist[0].uid
-                log.exception("Error signing %r with secret key %r",
-                    uid, secret_key)
+                log.exception("Error signing %r with secret key %r. stdout: %r, stderr: %r",
+                    uid, secret_key, tmpkeyring.context.stdout, tmpkeyring.context.stderr)
                 if error_cb:
                     e.uid = uid
                     error_cb (e)
+                else:
+                    raise
                 continue
             log.info("Result of signing %s on key %s: %s", uidlist[0].uid, fingerprint, ret)
 
 
         for uid in uidlist:
             uid_str = uid.uid
-            log.info("Processing uid %s %s", uid, uid_str)
+            log.info("Processing uid %r %s", uid, uid_str)
 
             # 3.2. export and encrypt the signature
             # 3.3. mail the key to the user
             signed_key = UIDExport(uid_str, tmpkeyring.export_data(uid_str))
             log.info("Exported %d bytes of signed key", len(signed_key))
-            yield (uid.uid, signed_key)
+            yield (uid, signed_key)
 
 ##
 ## END OF INTERNAL API
@@ -406,10 +410,24 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
     tmpkeyring.context.set_option('always-trust')
     for (uid, signed_key) in sign_keydata(keydata,
         error_cb=error_cb, homedir=homedir):
-            encrypted_key = tmpkeyring.encrypt_data(data=signed_key,
-                recipient=uid)
-            yield (uid, encrypted_key)
+            if not uid.revoked:
+                encrypted_key = tmpkeyring.encrypt_data(data=signed_key,
+                    recipient=uid.uid)
+                yield (UID.from_monkeysign(uid), encrypted_key)
 
 
 
+GPGME = int(os.environ.get("KEYSIGN_GPGME", 0))
+if GPGME:
+    del openpgpkey_from_data
+    del get_public_key_data
+    del fingerprint_from_keydata
+    del get_usable_keys
+    del get_usable_secret_keys
+    del sign_keydata_and_encrypt
 
+
+    from .gpgmeh import (get_usable_keys, openpgpkey_from_data,
+        get_public_key_data, fingerprint_from_keydata,
+        get_usable_secret_keys, sign_keydata_and_encrypt,
+        )

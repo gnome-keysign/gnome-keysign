@@ -24,10 +24,17 @@ import linecache
 import pydoc
 import sys
 import traceback
-from cStringIO import StringIO
+if sys.version_info.major < 3:
+    from io import BytesIO as StringIO
+else:
+    from io import StringIO as StringIO
 from gettext import gettext as _
 import os
-from urllib import quote_plus
+
+try:
+    from urllib.parse import quote_plus
+except ImportError:
+    from urllib import quote_plus
 import textwrap
 
 from gi.repository import Gtk
@@ -256,7 +263,7 @@ def _dialog_response_cb(dialog, resp, trace, exctyp, value):
                 exception_dialog_active = False
     elif resp == RESPONSE_SEARCH:
         search_url = (
-            "https://github.com/muelli/geysigning/search"
+            "https://github.com/GNOME-Keysign/gnome-keysign/search"
             "?utf8=%E2%9C%93"
             "&q={}+{}"
             "&type=Issues"
@@ -297,7 +304,7 @@ def _dialog_response_cb(dialog, resp, trace, exctyp, value):
             for p in textwrap.dedent(body).split("\n\n")
         ] + [trace])
         report_url = (
-            "https://github.com/muelli/geysigning/issues/new"
+            "https://github.com/GNOME-Keysign/gnome-keysign/issues/new"
             "?title={title}"
             "&body={body}"
         ).format(
