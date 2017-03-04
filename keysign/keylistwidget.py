@@ -94,6 +94,8 @@ class KeyListWidget(Gtk.HBox):
     def __init__(self, keys, builder=None):
         "Sets the widget up with the given keys"
         super(KeyListWidget, self).__init__()
+        self.log = logging.getLogger(__name__)
+        self.log.debug("KLW with keys: %r", keys)
 
         thisdir = os.path.dirname(os.path.abspath(__file__))
         widget_name = 'keylistbox'
@@ -117,6 +119,7 @@ class KeyListWidget(Gtk.HBox):
             self.listbox.add(l)
         else:
             for key in keys:
+                self.log.debug("Adding key: %r", key)
                 lbr = ListBoxRowWithKey(key)
                 lbr.props.margin_bottom = 5
                 self.listbox.add(lbr)
