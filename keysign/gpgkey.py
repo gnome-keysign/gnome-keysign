@@ -18,7 +18,10 @@
 
 from collections import namedtuple
 from datetime import datetime
+import logging
 import warnings
+
+
 
 def parse_uid(uid):
     "Parses a GnuPG UID into it's name, comment, and email component"
@@ -60,13 +63,16 @@ def parse_expiry(value):
 
 
 
-class Key(namedtuple("Key", "expiry fingerprint uidslist")):
+class Key(namedtuple("Key", ["expiry", "fingerprint", "uidslist"])):
     "Represents an OpenPGP Key to extent we care about"
+    
+    log = logging.getLogger(__name__)
 
-    def __init__(self, expiry, fingerprint, uidslist,
+    def __new__(cls, expiry, fingerprint, uidslist,
                        *args, **kwargs):
         exp_date = parse_expiry(expiry)
-        super(Key, self).__init__(exp_date, fingerprint, uidslist)
+        self = super(Key, cls).__new__(cls, exp_date, fingerprint, uidslist)
+        return self
 
     def __format__(self, arg):
         s  = "{fingerprint}\r\n"
