@@ -137,11 +137,6 @@ class ReceiveApp:
         # Do we also want to add an infobar message or so..?
 
 
-    def run(self, args):
-        if not args:
-            args = [""]
-        super(ReceiveApp, self).run()
-
 
     def on_list_changed(self, discovery, number, userdata):
         ib = userdata
