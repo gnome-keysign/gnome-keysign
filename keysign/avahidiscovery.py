@@ -135,7 +135,7 @@ class AvahiKeysignDiscoveryWithMac(AvahiKeysignDiscovery):
                 verified_key = key
             else:
                 mac_key = fingerprint_from_keydata(key)
-                verified = mac_verify(mac_key, key, mac)
+                verified = mac_verify(mac_key.encode('ascii'), key, mac)
                 if verified:
                     verified_key = key
                 else:
