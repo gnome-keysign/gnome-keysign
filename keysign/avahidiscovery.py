@@ -77,9 +77,14 @@ class AvahiKeysignDiscovery(GObject.GObject):
         published_fpr = txt_dict.get('fingerprint', None)
         self.log.info("discovered something: %s %s:%i:%s",
                       name, address, port, published_fpr)
-        # FIXME: Use something more sane like attr.s
-        self.discovered_services += ((name, address, port, published_fpr), )
-        self.emit("list-changed", len(self.discovered_services))
+        if not address.startswith('fe80::'):
+            # We intend to ignore IPv6 link local addresses, because it seems
+            # that you cannot just connect to that address without also
+            # knowing which NIC the address belongs to.
+            # http://serverfault.com/a/794967
+            # FIXME: Use something more sane like attr.s instead of the tuple
+            self.discovered_services += ((name, address, port, published_fpr), )
+            self.emit("list-changed", len(self.discovered_services))
 
     def on_remove_service(self, browser, service_type, name):
         '''Handler for the on_remove signal from AvahiBrowser
