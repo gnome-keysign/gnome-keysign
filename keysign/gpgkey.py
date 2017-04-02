@@ -15,13 +15,13 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
-
+from __future__ import unicode_literals
 from collections import namedtuple
 from datetime import datetime
 import logging
 import warnings
 
-
+log = logging.getLogger(__name__)
 
 def parse_uid(uid):
     "Parses a GnuPG UID into it's name, comment, and email component"
@@ -40,6 +40,7 @@ def parse_uid(uid):
     if len(tokens) > 1:
         email = tokens[1].replace('>','').strip()
     
+    log.debug("Parsed %r to name: %r", uid, name)
     return (name, comment, email)
 
 
@@ -95,6 +96,7 @@ class Key(namedtuple("Key", ["expiry", "fingerprint", "uidslist"])):
     @classmethod
     def from_monkeysign(cls, key):
         "Creates a new Key from an existing monkeysign key"
+        log.debug("From mks: %r", key)
         uids = [UID.from_monkeysign(uid) for uid in  key.uidslist]
         expiry = parse_expiry(key.expiry)
         fingerprint = key.fpr
