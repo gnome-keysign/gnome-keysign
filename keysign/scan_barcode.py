@@ -114,10 +114,14 @@ class BarcodeReaderGTK(Gtk.Box):
 
         self.imagesink = pipeline.get_by_name('imagesink')
         self.gtksink_widget = self.imagesink.get_property("widget")
+        log.info("About to remove children from %r", self)
         for child in self.get_children():
+            log.info("About to remove child: %r", child)
             self.remove(child)
         # self.gtksink_widget.set_property("expand", False)
-        self.add(self.gtksink_widget)
+        log.info("Adding sink widget: %r", self.gtksink_widget)
+        #self.add(self.gtksink_widget)
+        self.pack_start(self.gtksink_widget, True, True, 0)
         self.gtksink_widget.show()
 
         self.pipeline = pipeline
