@@ -279,7 +279,10 @@ class KeysignApp(Gtk.Application):
 
 
 
-def main(args):
+def main(args = []):
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(name)s (%(levelname)s): %(message)s')
     log = logging.getLogger(__name__)
     log.debug('Running main with args: %s', args)
     if not args:
