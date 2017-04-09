@@ -174,7 +174,7 @@ class App(Gtk.Application):
 
 
 
-def main(args):
+def main(args=[]):
     log = logging.getLogger(__name__)
     log.debug('Running main with args: %s', args)
     if not args:
