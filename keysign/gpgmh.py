@@ -51,6 +51,7 @@ def UIDExport(uid, keydata):
     # a stray "gpg: checking the trustdb" which confuses the gnupg library
     tmp.context.set_option('always-trust')
     tmp.import_data(keydata)
+    log.debug("Looking for %r", uid)
     for fpr, key in tmp.get_keys(uid).items():
         for u in key.uidslist:
             key_uid = u.uid
