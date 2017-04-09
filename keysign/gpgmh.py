@@ -45,6 +45,7 @@ def UIDExport(uid, keydata):
     Unfortunately, GnuPG does not provide smth like
     --export-uid-only in order to obtain a UID and its
     signatures."""
+    log = logging.getLogger(__name__ + ".UIDExport")
     tmp = TempKeyring()
     # Hm, apparently this needs to be set, otherwise gnupg will issue
     # a stray "gpg: checking the trustdb" which confuses the gnupg library
