@@ -273,8 +273,7 @@ def sign_keydata(keydata, error_cb=None, homedir=None):
     tmpkeyring.context.set_option('export-options', 'export-minimal')
     # Eventually, we want to let the user select their keys to sign with
     # For now, we just take whatever is there.
-    secret_keys = get_usable_keys_from_keyring(keyring=tmpkeyring,
-    	pattern="", public=False, secret=True)
+    secret_keys = get_usable_secret_keys(homedir=homedir)
     log.info('Signing with these keys: %s', secret_keys)
 
     stripped_key = MinimalExport(keydata)
