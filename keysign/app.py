@@ -246,7 +246,7 @@ class KeysignApp(Gtk.Application):
     def on_keylist_mapped(self, keylistwidget):
         log.debug("Keylist becomes visible!")
         self.header_button.set_image(
-            Gtk.Image.new_from_icon_name("gtk-refresh",
+            Gtk.Image.new_from_icon_name("view-refresh",
             Gtk.IconSize.BUTTON))
         # We don't support refreshing for now.
         self.header_button.set_sensitive(False)
@@ -259,21 +259,21 @@ class KeysignApp(Gtk.Application):
         log.debug("keypresent becomes visible!")
         self.header_button.set_sensitive(True)
         self.header_button.set_image(
-            Gtk.Image.new_from_icon_name("gtk-go-back",
+            Gtk.Image.new_from_icon_name("go-previous",
             Gtk.IconSize.BUTTON))
 
     def on_scanner_mapped(self, scanner):
         log.debug("scanner becomes visible!")
         self.header_button.set_sensitive(False)
         self.header_button.set_image(
-            Gtk.Image.new_from_icon_name("gtk-go-back",
+            Gtk.Image.new_from_icon_name("go-previous",
             Gtk.IconSize.BUTTON))
 
     def on_presign_mapped(self, psw):
         log.debug("presign becomes visible!")
         self.header_button.set_sensitive(True)
         self.header_button.set_image(
-            Gtk.Image.new_from_icon_name("gtk-go-back",
+            Gtk.Image.new_from_icon_name("go-previous",
             Gtk.IconSize.BUTTON))
 
 
