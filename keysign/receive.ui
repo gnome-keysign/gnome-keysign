@@ -154,15 +154,11 @@ For more information click &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
               </packing>
             </child>
             <child>
-              <object class="GtkFrame" id="scan_frame">
+              <object class="GtkBox" id="scan_frame">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label_xalign">0</property>
-                <property name="shadow_type">none</property>
+                <property name="orientation">vertical</property>
                 <child>
-                  <placeholder/>
-                </child>
-                <child type="label_item">
                   <placeholder/>
                 </child>
               </object>
