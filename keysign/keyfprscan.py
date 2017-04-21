@@ -69,7 +69,13 @@ class KeyFprScanWidget(Gtk.VBox):
     }
 
     def __init__(self, builder=None):
-        super(KeyFprScanWidget, self).__init__()
+        log.debug("Init KFSW %r %r", self, builder)
+        if issubclass(self.__class__, object):
+            super(KeyFprScanWidget, self).__init__()
+        else:
+            Gtk.VBox.__init__(self)
+        log.debug("Inited parent KFSW %r", self)
+
         widget_name = 'scanner_widget'
         if not builder:
             thisdir = os.path.dirname(os.path.abspath(__file__))
