@@ -89,7 +89,7 @@ class KeyFprScanWidget(Gtk.VBox):
         self.add(widget)
         
 
-        self.scan_frame = builder.get_object("scan_frame")
+        self.scanner = builder.get_object("scanner")
 
         if not Gst.is_initialized():
             log.error("Gst does not seem to be initialised. Call Gst.init()!")
@@ -98,7 +98,7 @@ class KeyFprScanWidget(Gtk.VBox):
         reader = BarcodeReaderGTK()
         reader.set_size_request(150,150)
         reader.connect('barcode', self.on_barcode)
-        self.scan_frame.add(reader)
+        self.scanner.add(reader)
 
         self.fpr_entry = builder.get_object("fingerprint_entry")
         self.fpr_entry.connect('changed', self.on_text_changed)

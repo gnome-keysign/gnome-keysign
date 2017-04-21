@@ -154,7 +154,7 @@ For more information click &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
               </packing>
             </child>
             <child>
-              <object class="GtkBox" id="scan_frame">
+              <object class="GtkBox" id="scanner">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
