@@ -57,12 +57,12 @@ class BarcodeReaderGTK(Gtk.Box):
 
 
     def on_message(self, bus, message):
-        log.debug("Message: %s", message)
+        #log.debug("Message: %s", message)
         if message:
             struct = message.get_structure()
             if struct:
                 struct_name = struct.get_name()
-                log.debug('Message name: %s', struct_name)
+                #log.debug('Message name: %s', struct_name)
 
                 if struct_name == 'GstMessageError':
                     err, debug = message.parse_error()
