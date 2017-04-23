@@ -99,6 +99,11 @@ class KeyFprScanWidget(Gtk.VBox):
         reader.set_size_request(150,150)
         reader.connect('barcode', self.on_barcode)
         self.scanner.add(reader)
+        # We keep a referece here to not "lose" the object.
+        # If we don't, Gtk crashes. With a segfault. Probably
+        # because the object is freed but still used.
+        # Somebody should look at that...
+        self.reader = reader
 
         self.fpr_entry = builder.get_object("fingerprint_entry")
         self.fpr_entry.connect('changed', self.on_text_changed)
