@@ -133,7 +133,7 @@ class ReceiveApp:
         # because currently, there is not much to do on the
         # key confirmation page.
         log.debug ("Signed the key: %r", self.tmpfiles)
-        self.receive_stack.set_visible_child_name("scanner")
+        self.stack.set_visible_child_name("scanner")
         # Do we also want to add an infobar message or so..?
 
 
