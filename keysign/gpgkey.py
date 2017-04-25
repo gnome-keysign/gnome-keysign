@@ -15,10 +15,13 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
-
+from __future__ import unicode_literals
 from collections import namedtuple
 from datetime import datetime
+import logging
 import warnings
+
+log = logging.getLogger(__name__)
 
 def parse_uid(uid):
     "Parses a GnuPG UID into it's name, comment, and email component"
@@ -37,6 +40,7 @@ def parse_uid(uid):
     if len(tokens) > 1:
         email = tokens[1].replace('>','').strip()
     
+    log.debug("Parsed %r to name: %r", uid, name)
     return (name, comment, email)
 
 
@@ -60,13 +64,16 @@ def parse_expiry(value):
 
 
 
-class Key(namedtuple("Key", "expiry fingerprint uidslist")):
+class Key(namedtuple("Key", ["expiry", "fingerprint", "uidslist"])):
     "Represents an OpenPGP Key to extent we care about"
+    
+    log = logging.getLogger(__name__)
 
-    def __init__(self, expiry, fingerprint, uidslist,
+    def __new__(cls, expiry, fingerprint, uidslist,
                        *args, **kwargs):
         exp_date = parse_expiry(expiry)
-        super(Key, self).__init__(exp_date, fingerprint, uidslist)
+        self = super(Key, cls).__new__(cls, exp_date, fingerprint, uidslist)
+        return self
 
     def __format__(self, arg):
         s  = "{fingerprint}\r\n"
@@ -89,6 +96,7 @@ class Key(namedtuple("Key", "expiry fingerprint uidslist")):
     @classmethod
     def from_monkeysign(cls, key):
         "Creates a new Key from an existing monkeysign key"
+        log.debug("From mks: %r", key)
         uids = [UID.from_monkeysign(uid) for uid in  key.uidslist]
         expiry = parse_expiry(key.expiry)
         fingerprint = key.fpr

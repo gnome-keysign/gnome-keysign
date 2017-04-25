@@ -51,7 +51,7 @@ def get_fixture_file(fixture):
 
 def read_fixture_file(fixture):
     fname = get_fixture_file(fixture)
-    data = open(fname, 'r').read()
+    data = open(fname, 'rb').read()
     return data
 
 @raises(ValueError)
@@ -262,7 +262,7 @@ def test_get_public_key_no_data():
 class TestGetPublicKeyData:
     def setup(self):
         self.fname = get_fixture_file("pubkey-1.asc")
-        original = open(self.fname, 'r').read()
+        original = open(self.fname, 'rb').read()
         # This should be a new, empty directory
         self.homedir = tempfile.mkdtemp()
         gpgcmd = ["gpg", "--homedir={}".format(self.homedir)]
@@ -309,7 +309,7 @@ def test_get_empty_usable_keys():
 class TestGetUsableKeys:
     def setup(self):
         self.fname = get_fixture_file("pubkey-1.asc")
-        original = open(self.fname, 'r').read()
+        original = open(self.fname, 'rb').read()
         # This should be a new, empty directory
         self.homedir = tempfile.mkdtemp()
         gpgcmd = ["gpg", "--homedir={}".format(self.homedir)]
@@ -343,7 +343,7 @@ class TestGetUsableKeys:
 class TestGetUsableSecretKeys:
     def setup(self):
         self.fname = get_fixture_file("seckey-1.asc")
-        original = open(self.fname, 'r').read()
+        original = open(self.fname, 'rb').read()
         # This should be a new, empty directory
         self.homedir = tempfile.mkdtemp()
         gpgcmd = ["gpg", "--homedir={}".format(self.homedir)]
@@ -374,6 +374,19 @@ class TestGetUsableSecretKeys:
 
 
 
+def get_signatures_for_uids_on_key(ctx, key):
+    """It seems to be a bit hard to get a key with its signatures,
+    so this is a small helper function"""
+    # esp. get_key does not take a SIGS argument.
+    # What happens if keylist returns multiple keys, e.g. because there
+    # is another key with a UID named as the fpr?  How can I make sure I
+    # get the signatures of any given key?
+    keys = list(ctx.keylist(key.fpr, mode=(gpg.constants.keylist.mode.LOCAL
+                                           |gpg.constants.keylist.mode.SIGS)))
+    assert len(keys) == 1
+    uid_sigs = {uid.uid: [s for s in uid.signatures] for uid in keys[0].uids}
+    log.info("Signatures: %r", uid_sigs)
+    return uid_sigs
 
 
 class TestSignAndEncrypt:
@@ -394,7 +407,7 @@ class TestSignAndEncrypt:
         pass
 
     def test_sign_and_encrypt(self):
-        secret_keydata = open(self.key_sender_key, "r").read()
+        secret_keydata = open(self.key_sender_key, "rb").read()
         # We get the public portion of the key
         sender = TempContext()
         sender.op_import(secret_keydata)
@@ -416,10 +429,11 @@ class TestSignAndEncrypt:
         assert_equals(len(uids), len(uid_encrypted))
 
         # We need to explicitly request signatures
-        sender.set_keylist_mode(gpg.constants.KEYLIST_MODE_SIGS)
-        uids_before = sender.get_key(fpr).uids
-        sigs = [uid.signatures for uid in uids_before]
-        sigs_before = [sig for signatures in sigs for sig in signatures]
+        uids_before = uids
+        assert_equals (len(uids_before), len(sender.get_key(fpr).uids))
+
+        sigs_before = [s for l in get_signatures_for_uids_on_key(sender,
+                                    key).values() for s in l]
         for uid, uid_enc in zip(uids_before, uid_encrypted):
             # The test doesn't work so well, because comments
             # are not rendered :-/
@@ -438,9 +452,8 @@ class TestSignAndEncrypt:
             log.debug("updated key: %r", updated_key)
             log.debug("updated key sigs: %r", [(uid, uid.signatures) for uid in updated_key.uids])
 
-        uids_after = sender.get_key(fpr).uids
-        sigs = [uid.signatures for uid in uids_after]
-        sigs_after = [sig for signatures in sigs for sig in signatures]
+        sigs_after = [s for l in get_signatures_for_uids_on_key(sender,
+                                    key).values() for s in l]
         assert_greater(len(sigs_after), len(sigs_before))
 
     def test_sign_and_encrypt_double_secret(self):
@@ -478,8 +491,8 @@ class TestSignAndEncrypt:
         assert_equals(len(sender_key.uids), len(uid_encrypted))
 
         uids_before = sender.get_key(fpr).uids
-        sigs = [uid.signatures for uid in uids_before]
-        sigs_before = [sig for signatures in sigs for sig in signatures]
+        sigs_before = [s for l in get_signatures_for_uids_on_key(sender,
+                                    sender_key).values() for s in l]
         for uid, uid_enc in zip(uids_before, uid_encrypted):
             # FIXME: assert_equals(uid, uid_enc[0])
             assert_in(uid.name, uid_enc[0].uid)
@@ -497,8 +510,8 @@ class TestSignAndEncrypt:
             log.debug("updated key: %r", updated_key)
             log.debug("updated key sigs: %r", [(uid, uid.signatures) for uid in updated_key.uids])
 
-        uids_after = sender.get_key(fpr).uids
-        sigs = [uid.signatures for uid in uids_after]
-        sigs_after = [sig for signatures in sigs for sig in signatures]
+        sigs_after = [s for l in get_signatures_for_uids_on_key(sender,
+                                    sender_key).values() for s in l]
+
         assert_greater(len(sigs_after), len(sigs_before))
 

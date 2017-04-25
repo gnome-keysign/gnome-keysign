@@ -45,11 +45,13 @@ def UIDExport(uid, keydata):
     Unfortunately, GnuPG does not provide smth like
     --export-uid-only in order to obtain a UID and its
     signatures."""
+    log = logging.getLogger(__name__ + ".UIDExport")
     tmp = TempKeyring()
     # Hm, apparently this needs to be set, otherwise gnupg will issue
     # a stray "gpg: checking the trustdb" which confuses the gnupg library
     tmp.context.set_option('always-trust')
     tmp.import_data(keydata)
+    log.debug("Looking for %r", uid)
     for fpr, key in tmp.get_keys(uid).items():
         for u in key.uidslist:
             key_uid = u.uid
@@ -268,11 +270,9 @@ def sign_keydata(keydata, error_cb=None, homedir=None):
 
     tmpkeyring = TempSigningKeyring(homedir=homedir,
         base_keyring=Keyring(homedir=homedir))
-    tmpkeyring.context.set_option('export-options', 'export-minimal')
     # Eventually, we want to let the user select their keys to sign with
     # For now, we just take whatever is there.
-    secret_keys = get_usable_keys_from_keyring(keyring=tmpkeyring,
-    	pattern="", public=False, secret=True)
+    secret_keys = get_usable_secret_keys(homedir=homedir)
     log.info('Signing with these keys: %s', secret_keys)
 
     stripped_key = MinimalExport(keydata)

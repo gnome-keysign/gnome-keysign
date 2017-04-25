@@ -46,7 +46,7 @@ def get_fixture_file(fixture):
 
 def read_fixture_file(fixture):
     fname = get_fixture_file(fixture)
-    data = open(fname, 'r').read()
+    data = open(fname, 'rb').read()
     return data
 
 
@@ -107,7 +107,7 @@ def test_get_public_key_no_data():
 class TestGetPublicKeyData:
     def setup(self):
         self.fname = get_fixture_file("pubkey-1.asc")
-        original = open(self.fname, 'r').read()
+        original = open(self.fname, 'rb').read()
         # This should be a new, empty directory
         self.homedir = tempfile.mkdtemp()
         gpgcmd = ["gpg", "--homedir={}".format(self.homedir)]
@@ -154,7 +154,7 @@ def test_get_empty_usable_keys():
 class TestGetUsableKeys:
     def setup(self):
         self.fname = get_fixture_file("pubkey-1.asc")
-        original = open(self.fname, 'r').read()
+        original = open(self.fname, 'rb').read()
         # This should be a new, empty directory
         self.homedir = tempfile.mkdtemp()
         gpgcmd = ["gpg", "--homedir={}".format(self.homedir)]
@@ -184,20 +184,26 @@ class TestGetUsableKeys:
         assert_equals(fpr, self.originalkey.fingerprint)
 
 
+def import_fixture_file_in_random_directory(filename):
+    fname = get_fixture_file(filename)
+    original = open(fname, 'rb').read()
+    # This should be a new, empty directory
+    homedir = tempfile.mkdtemp()
+    gpgcmd = ["gpg", "--homedir={}".format(homedir)]
+    # The directory should not have any keys
+    # I don't know how to easily check for that, though
+    # Now we import a single key
+    check_call(gpgcmd + ["--import", fname])
+
+    originalkey = openpgpkey_from_data(original)
+    return homedir, originalkey
+
 
 class TestGetUsableSecretKeys:
     def setup(self):
-        self.fname = get_fixture_file("seckey-1.asc")
-        original = open(self.fname, 'r').read()
-        # This should be a new, empty directory
-        self.homedir = tempfile.mkdtemp()
-        gpgcmd = ["gpg", "--homedir={}".format(self.homedir)]
-        # The directory should not have any keys
-        # I don't know how to easily check for that, though
-        # Now we import a single key
-        check_call(gpgcmd + ["--import", self.fname])
-    
-        self.originalkey = openpgpkey_from_data(original)
+        homedir, key = import_fixture_file_in_random_directory("seckey-1.asc")
+        self.homedir = homedir
+        self.originalkey = key
 
     def teardown(self):
         # shutil.rmtree(self.homedir)
@@ -223,7 +229,7 @@ class TestGetUsableSecretKeys:
 
 class TestSignAndEncrypt:
     def setup(self):
-        self.sender_key = get_fixture_file("seckey-1.asc")
+        self.sender_key = get_fixture_file("seckey-no-pw-2.asc")
         self.receiver_key = get_fixture_file("seckey-2.asc")
         # This should be a new, empty directory
         self.sender_homedir = tempfile.mkdtemp()
@@ -239,18 +245,48 @@ class TestSignAndEncrypt:
         pass
 
     def test_sign_and_encrypt(self):
-        keydata = open(self.sender_key, "r").read()
+        keydata = open(self.sender_key, "rb").read()
         keys = get_usable_secret_keys(homedir=self.sender_homedir)
         assert_equals(1, len(keys))
         key = keys[0]
         uids = key.uidslist
+        # This is a tuple (uid, encrypted)
         uid_encrypted = list(sign_keydata_and_encrypt(keydata,
             error_cb=None, homedir=self.receiver_homedir))
         assert_equals(len(uids), len(uid_encrypted))
-        for uid in uids:
+        for plain_uid, enc_uid in zip(uids, uid_encrypted):
+            uid_from_signing = enc_uid[0]
+            signed_uid = enc_uid[1]
             # The test doesn't work so well, because comments
             # are not rendered :-/
             # assert_in(uid.uid, [e[0] for e in uid_encrypted])
-            pass
-        # Ideally, we could decrypt the message, parse the email,
-        # extract the attached key, and check the signatures...
+
+            # Decrypt...
+            from monkeysign.gpg import Keyring
+            kr = Keyring(homedir=self.sender_homedir)
+            log.info("encrypted UID: %r", enc_uid)
+            decrypted = kr.decrypt_data(signed_uid)
+
+            # Now we have the signed UID. We want see if it really carries a signature.
+            from tempfile import mkdtemp
+            current_uid = plain_uid.uid
+            # This is a bit dirty. We should probably rather single out the UID.
+            # Right now we're calling list-sigs on the proper keyring.
+            # The output includes all UIDs and their signatures.
+            # We may get a minimized version from the sign_and_encrypt call.
+            # Or only email addresses but not photo UIDs.
+            # Currently this tests simply checks for the number of signature on a key.
+            # And we expect more after the signing process.
+            # But our test is not reliable because the result of sign_and_encrypt
+            # may be smaller due to, e.g. the photo UIDs mentioned above.
+            kr.context.call_command('--list-sigs', current_uid)
+            stdout_before = kr.context.stdout
+            log.debug('Sigs before: %s', stdout_before)
+            after_dir = mkdtemp()
+            kr_after = Keyring(after_dir)
+            kr_after.import_data(decrypted)
+            kr_after.context.call_command('--list-sigs')
+            stdout_after = kr_after.context.stdout
+            log.debug('Sigs after: %s', stdout_after)
+
+            assert_less(len(stdout_before), len(stdout_after))
