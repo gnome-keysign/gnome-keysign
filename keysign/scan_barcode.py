@@ -57,12 +57,12 @@ class BarcodeReaderGTK(Gtk.Box):
 
 
     def on_message(self, bus, message):
-        log.debug("Message: %s", message)
+        #log.debug("Message: %s", message)
         if message:
             struct = message.get_structure()
             if struct:
                 struct_name = struct.get_name()
-                log.debug('Message name: %s', struct_name)
+                #log.debug('Message name: %s', struct_name)
 
                 if struct_name == 'GstMessageError':
                     err, debug = message.parse_error()
@@ -114,10 +114,14 @@ class BarcodeReaderGTK(Gtk.Box):
 
         self.imagesink = pipeline.get_by_name('imagesink')
         self.gtksink_widget = self.imagesink.get_property("widget")
+        log.info("About to remove children from %r", self)
         for child in self.get_children():
+            log.info("About to remove child: %r", child)
             self.remove(child)
         # self.gtksink_widget.set_property("expand", False)
-        self.add(self.gtksink_widget)
+        log.info("Adding sink widget: %r", self.gtksink_widget)
+        #self.add(self.gtksink_widget)
+        self.pack_start(self.gtksink_widget, True, True, 0)
         self.gtksink_widget.show()
 
         self.pipeline = pipeline
@@ -333,7 +337,7 @@ class ScalingImage(Gtk.DrawingArea):
             log.info('Allocated size: %s, %s', widget_width, widget_height)
             
             # Fill in background
-            #cr.save()
+            cr.save()
             #Gtk.render_background(self.get_style_context(),
             #       cr, 0, 0, widget_width, widget_height)
             #cr.set_source_rgb(1, 1, 1)

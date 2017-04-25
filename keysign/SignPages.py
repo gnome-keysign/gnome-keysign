@@ -55,10 +55,11 @@ class ScanFingerprintPage(Gtk.HBox):
         scrolledwindow.add(self.textview)
 
         # set up webcam frame
-        self.scanFrame = Gtk.Frame(label='QR Scanner')
-        self.scanFrame = BarcodeReaderGTK()
-        self.scanFrame.set_size_request(150,150)
-        self.scanFrame.show()
+        scanFrame = Gtk.Frame(label='QR Scanner')
+        scanFrame = BarcodeReaderGTK()
+        scanFrame.set_size_request(150,150)
+        scanFrame.show()
+        self.barcode_scanner = scanFrame
 
         # set up load button: this will be used to load a qr code from a file
         self.loadButton = Gtk.Button('Open Image')
@@ -74,7 +75,7 @@ class ScanFingerprintPage(Gtk.HBox):
         # set up right box
         rightBox = Gtk.VBox(spacing=10)
         rightBox.pack_start(rightLabel, False, False, 0)
-        rightBox.pack_start(self.scanFrame, True, True, 0)
+        rightBox.pack_start(scanFrame, True, True, 0)
         rightBox.pack_start(self.loadButton, False, False, 0)
 
         # pack up
@@ -82,7 +83,7 @@ class ScanFingerprintPage(Gtk.HBox):
         self.pack_start(rightBox, True, True, 0)
 
 
-    def get_text_from_textview(self):
+    def get_text(self):
         '''Returns the contents of the fingerprint
         input widget.  Note that this function does
         not format or validate anything.
@@ -97,10 +98,13 @@ class ScanFingerprintPage(Gtk.HBox):
     def on_loadbutton_clicked(self, *args, **kwargs):
         print("load")
 
+    def on_barcode (self, barcode_reader, barcode, gstmessage, pixbuf):
+        self.emit ("barcode_scanned", barcode, gstmessage, pixbuf)
+
 
 class SignKeyPage(Gtk.HBox):
 
-    def __init__(self):
+    def __init__(self, key, image=None):
         super(SignKeyPage, self).__init__()
         self.set_spacing(5)
 
@@ -111,6 +115,8 @@ class SignKeyPage(Gtk.HBox):
         
         self.barcode_image = ScalingImage()
         self.pack_start(self.barcode_image, True, True, 0)
+        
+        self.display_downloaded_key(key, None, image)
 
 
     def display_downloaded_key(self, key, scanned_fpr, image):

@@ -9,4 +9,5 @@
 /.noseids
 .tox/
 cover/
+**.flatpak-builder/
 
