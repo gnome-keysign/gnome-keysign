@@ -41,10 +41,10 @@ The list of dependencies includes:
     * gobject introspection for those libraries
 
 
-OpenSuSE installation
+openSUSE installation
 ----------------------
 
-OpenSuSE has `packaged the application <https://build.opensuse.org/package/show/GNOME:Apps/gnome-keysign>`_
+openSUSE has `packaged the application <https://build.opensuse.org/package/show/GNOME:Apps/gnome-keysign>`_
 so it should be easy for you to install it.
 
 
