@@ -27,6 +27,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
+from gi.repository import Gdk
 
 
 if  __name__ == "__main__" and __package__ is None:
@@ -159,6 +160,15 @@ class KeysignApp(Gtk.Application):
             "send_stack", "Send")
         self.send_receive_stack.add_titled(rs,
             "receive_stack", "Receive")
+
+        # These properties must be set after the stacks has been added to the window
+        # because they require a window element that "receive.ui" file doesn't provide.
+        accel_group = Gtk.AccelGroup()
+        window.add_accel_group(accel_group)
+        self.receive.accept_button.add_accelerator("clicked", accel_group, ord('o'), Gdk.ModifierType.MOD1_MASK,
+                                                   Gtk.AccelFlags.VISIBLE)
+        self.receive.accept_button.set_can_default(True)
+
         window.show_all()
         self.add_window(window)
 

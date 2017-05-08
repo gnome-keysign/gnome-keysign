@@ -70,6 +70,8 @@ class ReceiveApp:
             builder.add_objects_from_file(ui_file,
                 [widget_name, 'confirm-button-image'])
 
+        self.accept_button = builder.get_object("confirm_sign_button")
+
         old_scanner = builder.get_object("scanner_widget")
         old_scanner_parent = old_scanner.get_parent()
 
