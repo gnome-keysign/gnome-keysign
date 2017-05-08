@@ -27,12 +27,12 @@ thisdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.join(thisdir, "..")
 sys.path.insert(0, os.sep.join((parentdir, 'monkeysign')))
 
-from keysign.gpgmh import openpgpkey_from_data
-from keysign.gpgmh import fingerprint_from_keydata
-from keysign.gpgmh import get_public_key_data
-from keysign.gpgmh import get_usable_keys
-from keysign.gpgmh import get_usable_secret_keys
-from keysign.gpgmh import sign_keydata_and_encrypt
+from keysign.gpgmks import openpgpkey_from_data
+from keysign.gpgmks import fingerprint_from_keydata
+from keysign.gpgmks import get_public_key_data
+from keysign.gpgmks import get_usable_keys
+from keysign.gpgmks import get_usable_secret_keys
+from keysign.gpgmks import sign_keydata_and_encrypt
 
 log = logging.getLogger(__name__)
 
