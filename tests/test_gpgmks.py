@@ -282,7 +282,7 @@ class TestSignAndEncrypt:
             # And we expect more after the signing process.
             # But our test is not reliable because the result of sign_and_encrypt
             # may be smaller due to, e.g. the photo UIDs mentioned above.
-            kr.context.call_command('--list-sigs', current_uid)
+            kr.context.call_command(b'--list-sigs', current_uid)
             stdout_before = kr.context.stdout
             log.debug('Sigs before: %s', stdout_before)
             after_dir = mkdtemp()
@@ -293,3 +293,8 @@ class TestSignAndEncrypt:
             log.debug('Sigs after: %s', stdout_after)
 
             assert_less(len(stdout_before), len(stdout_after))
+
+
+class TestLatin1(TestSignAndEncrypt):
+    SENDER_KEY = "seckey-latin1.asc"
+    RECEIVER_KEY = "seckey-2.asc"

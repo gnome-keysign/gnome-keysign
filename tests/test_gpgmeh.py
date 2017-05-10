@@ -518,3 +518,7 @@ class TestSignAndEncrypt:
 
         assert_greater(len(sigs_after), len(sigs_before))
 
+
+class TestLatin1(TestSignAndEncrypt):
+    SENDER_KEY = "seckey-latin1.asc"
+    RECEIVER_KEY = "seckey-2.asc"
