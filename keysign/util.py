@@ -15,6 +15,7 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
+from __future__ import unicode_literals
 
 import hmac
 import logging
@@ -117,7 +118,8 @@ def sign_keydata_and_send(keydata, error_cb=None):
     log.info("About to create signatures for key with fpr %r", fingerprint)
     for uid, encrypted_key in list(sign_keydata_and_encrypt(keydata, error_cb)):
             # FIXME: get rid of this redundant assignment
-            uid_str = "{}".format(uid)
+            log.info("formatting UID: %r", uid)
+            uid_str = b"{}".format(uid).decode('utf-8', 'replace')
             ctx = {
                 'uid' : uid_str,
                 'fingerprint': fingerprint,

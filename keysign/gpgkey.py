@@ -26,21 +26,21 @@ log = logging.getLogger(__name__)
 def parse_uid(uid):
     "Parses a GnuPG UID into it's name, comment, and email component"
     # remove the comment from UID (if it exists)
-    com_start = uid.find('(')
+    com_start = uid.find(b'(')
     if com_start != -1:
-        com_end = uid.find(')')
+        com_end = uid.find(b')')
         uid = uid[:com_start].strip() + uid[com_end+1:].strip()
 
     # FIXME: Actually parse the comment...
     comment = ""
     # split into user's name and email
-    tokens = uid.split('<')
+    tokens = uid.split(b'<')
     name = tokens[0].strip()
     email = 'unknown'
     if len(tokens) > 1:
         email = tokens[1].replace('>','').strip()
     
-    log.debug("Parsed %r to name: %r", uid, name)
+    log.debug("Parsed %r to name (%d): %r", uid, len(name), name)
     return (name, comment, email)
 
 
@@ -118,7 +118,11 @@ class UID(namedtuple("UID", "expiry name comment email")):
     @classmethod
     def from_monkeysign(cls, uid):
         "Creates a new UID from a monkeysign key"
+        # We expect to get raw bytes.
+        # While RFC4880 demands UTF-8 encoded data,
+        # real-life has produced non UTF-8 keys...
         uidstr = uid.uid
+        log.debug("UidStr (%d): %r", len(uidstr), uidstr)
         name, comment, email = parse_uid(uidstr)
         expiry = parse_expiry(uid.expire)
 
@@ -138,18 +142,18 @@ class UID(namedtuple("UID", "expiry name comment email")):
 
     def __format__(self, arg):
         if self.comment:
-            s = "{name} ({comment}) <{email}>"
+            s = b"{name} ({comment}) <{email}>"
         else:
-            s = "{name} <{email}>"
+            s = b"{name} <{email}>"
         return s.format(**self._asdict())
 
     def __str__(self):
-        return "{}".format(self)
+        return b"{}".format(self)
 
     @property
     def uid(self):
         "Legacy compatibility, use str() instead"
         warnings.warn("Legacy uid, use '{}'.format() instead",
                       DeprecationWarning)
-        return str(self)
+        return b"{}".format(self)
 
