@@ -390,9 +390,12 @@ def get_signatures_for_uids_on_key(ctx, key):
 
 
 class TestSignAndEncrypt:
+    SENDER_KEY = "seckey-no-pw-1.asc"
+    RECEIVER_KEY = "seckey-no-pw-2.asc"
+
     def setup(self):
-        self.key_sender_key = get_fixture_file("seckey-no-pw-1.asc")
-        self.key_receiver_key = get_fixture_file("seckey-no-pw-2.asc")
+        self.key_sender_key = get_fixture_file(self.SENDER_KEY)
+        self.key_receiver_key = get_fixture_file(self.RECEIVER_KEY)
         # This should be a new, empty directory
         self.key_sender_homedir = tempfile.mkdtemp()
         self.key_receiver_homedir = tempfile.mkdtemp()

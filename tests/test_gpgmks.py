@@ -228,9 +228,12 @@ class TestGetUsableSecretKeys:
 
 
 class TestSignAndEncrypt:
+    SENDER_KEY = "seckey-no-pw-2.asc"
+    RECEIVER_KEY = "seckey-2.asc"
+
     def setup(self):
-        self.sender_key = get_fixture_file("seckey-no-pw-2.asc")
-        self.receiver_key = get_fixture_file("seckey-2.asc")
+        self.sender_key = get_fixture_file(self.SENDER_KEY)
+        self.receiver_key = get_fixture_file(self.RECEIVER_KEY)
         # This should be a new, empty directory
         self.sender_homedir = tempfile.mkdtemp()
         self.receiver_homedir = tempfile.mkdtemp()
