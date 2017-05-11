@@ -135,16 +135,16 @@ you to have your key signed by others running the application in client
 mode.
 
 Once you've fired up the application, you can see a list of your private keys.
-Select one and click "Next".
+Select one and the application will advance to the next stage.
 
-You will see the details of the key you've selected.  You can revise 
-your selected and click "Back".  If you are happy with the key you have 
-selected, click "Next".  This will cause the key's availability to be 
-published on the local network.  Also, a HTTP server will be spawned in 
-order to enable others to download your key.  You also notice a bar 
-code.  For now, it encodes the fingerprint of the key you have selected.
+You will see the details of the key you've selected.
+If you are happy with the key you have selected, click "Next".  
+This will cause the key's availability to be published on the local network.
+Also, a HTTP server will be spawned in order to enable others to download
+your key.  In order for others to find you, the app displays both
+a string identifying your key and a bar code.
 
-Either share the fingerprint or the bar code with someone who wants to 
+Either share the string or the bar code with someone who wants to
 sign your key.
 
 
@@ -153,10 +153,10 @@ Client side
 
 Here, the client side is described. This is to sign someone's key.
 
-If you select the "Get Key" Tab, you can either enter a key's 
-fingerprint manually or scan a bar code.  If you meet someone who has 
-the server side of the application running, you can scan the bar code
-present at the other party.
+You are presented with feed of your camera and an entry field to
+type in a string.  If you meet someone who has the server side of
+the application running, you can scan the bar code present at the
+other party.
 
 After you either typed a fingerprint or scanned a bar code, the program
 will look for the relevant key on your local network.  Note that you've

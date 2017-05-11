@@ -1,21 +1,30 @@
 GNOME Keysign is a tool to make signing OpenPGP keys as easy as possible.
-This is the v0.8 release which fixes a few bugs and adds a gpgme based
-gpg library.
+This is the v0.9 release which makes use of Glade based widgets and fixes
+a few important bugs.
 
-The project location also changed to
+You can get the app from:
             
             https://github.com/GNOME-Keysign/gnome-keysign/
 
 Changes
 ==========
 
- * Show a window with a stacktrace if an exception is not caught
- * Added gpgmh which wraps both monkeysign and gpgme
- * Dynamically construct static widgets
- * The fullscreen QR code can now be moved to another screen by pressing
-   the left or right key
- * The keyserver module can now be called directly to serve a given key
- * Made the Keyserver poll more often to detect shutdowns earlier
+ * Widgets are now loaded from Glade files instead of
+   created from Python code
+ 
+ * The key downloader returns bytes rather than strings
+ * Keyserver: Now using application/pgp-keys as MIME type
+
+ * Barcode scanner: Removed GStreamer<1.6 compatibility
+ * Barcode scanner: Moved to gtksink for reducing code
+   and increasing compatibility with running in a VM
+ * Barcode scanner: Moved to autovideosrc
+ * Barcode scanner: Stopped logging every single message
+ 
+ * ScalingImage: Respecting the height when calculating the scale
+ 
+ * KeysPage: Renamed signals to match Gtk convention more closely
+ 
  * Make it find the relevant key faster by ordering the list
    of servers before attempting to download
 
@@ -23,5 +32,5 @@ Changes
 Resources
 =========
 
-Download: https://github.com/GNOME-Keysign/gnome-keysign/archive/0.8.tar.gz
+Download: https://github.com/GNOME-Keysign/gnome-keysign/archive/0.9.tar.gz
 Web site: https://wiki.gnome.org/GnomeKeysign
