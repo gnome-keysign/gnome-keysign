@@ -54,7 +54,7 @@ def UIDExport(uid, keydata):
     log.debug("Looking for %r", uid)
     for fpr, key in tmp.get_keys(uid).items():
         for u in key.uidslist:
-            key_uid = u.uid
+            key_uid = u.uid.decode('string-escape')
             if key_uid != uid:
                 log.info('Deleting UID %s from key %s', key_uid, fpr)
                 tmp.del_uid(fingerprint=fpr, pattern=key_uid)
@@ -316,6 +316,8 @@ def sign_keydata(keydata, error_cb=None, homedir=None):
 
 
         for uid in uidlist:
+            # uid needs to be unescaped or the export will fail if it contains characters like colon.
+            uid.uid = uid.uid.decode('string-escape')
             uid_str = uid.uid
             log.info("Processing uid %r %s", uid, uid_str)
 
