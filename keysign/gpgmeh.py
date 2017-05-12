@@ -47,7 +47,8 @@ class GenEdit:
                        gpg.constants.STATUS_KEYEXPIRED,
                        gpg.constants.STATUS_PROGRESS,
                        gpg.constants.STATUS_KEY_CREATED,
-                       gpg.constants.STATUS_ALREADY_SIGNED)
+                       gpg.constants.STATUS_ALREADY_SIGNED,
+                       gpg.constants.STATUS_KEY_CONSIDERED)
 
     def __init__(self, generator):
         generator.send(None)
