@@ -56,6 +56,8 @@ from .send import SendApp
 from .util import sign_keydata_and_send
 from . import gtkexcepthook
 
+_ = lambda x: x
+
 
 log = logging.getLogger(__name__)
 
@@ -193,7 +195,7 @@ class KeysignApp(Gtk.Application):
         ####
         # Saving subtitle
         self.headerbar_subtitle = self.headerbar.get_subtitle()
-        self.headerbar.set_subtitle("Sending {}".format(key.fpr))
+        self.headerbar.set_subtitle(_("Sending {}").format(key.fpr))
         ####
         # Making button clickable
         self.header_button.set_sensitive(True)
