@@ -36,7 +36,11 @@ setup(
         'keysign': 'keysign',
         'monkeysign': 'monkeysign/monkeysign'
     },
-    package_data={'keysign': ['*.ui']},
+    package_data={
+        'keysign': [
+            '*.ui',
+        ]
+    },
     include_package_data = True,
     data_files=[
         ( 'share/applications',
@@ -45,6 +49,13 @@ setup(
             ['data/gnome-keysign.appdata.xml']),
         ( 'share/icons/hicolor/scalable/apps',
             ['data/gnome-keysign.svg']),
+        #( 'share/locale/',
+        # # We cannot use the glob below, because it only copies the file
+        # # into the directory mentioned above, i.e. keysign.po, rather
+        # # than de/LC_MESSAGES/keysign.po including the de/... directories.
+        #    ([f for f in glob.glob('keysign/locale/*/*/*.po')] +
+        #     [f for f in glob.glob('keysign/locale/*')])
+        #    ),
     ],
     #scripts = ['gnome-keysign.py'],
     install_requires=[
@@ -109,5 +120,11 @@ setup(
         'Topic :: Multimedia :: Video :: Capture',
         'Topic :: Security :: Cryptography',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        ]
+        ],
+        message_extractors = {
+            'keysign': [
+                ('**.py', 'python', None),
+                ('**.ui', 'babelglade:extract_glade', None),
+            ],
+        },
     )
