@@ -111,5 +111,5 @@ def extract_glade(fileobj, keywords, comment_tags, options):
             if comment_tags:
                 yield (lineno, None, message, comments)
             else:
-                yield (lineno, None, message)
+                yield (lineno, None, message, [])
     return get_messages()
