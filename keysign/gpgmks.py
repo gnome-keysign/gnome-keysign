@@ -54,7 +54,7 @@ def UIDExport(uid, keydata):
     log.debug("Looking for %r", uid)
     for fpr, key in tmp.get_keys(uid).items():
         for u in key.uidslist:
-            key_uid = u.uid
+            key_uid = decode_gpg_uid(u.uid)
             if key_uid != uid:
                 log.info('Deleting UID %s from key %s', key_uid, fpr)
                 tmp.del_uid(fingerprint=fpr, pattern=key_uid)
@@ -314,8 +314,8 @@ def sign_keydata(keydata, error_cb=None, homedir=None):
                 continue
             log.info("Result of signing %s on key %s: %s", uidlist[0].uid, fingerprint, ret)
 
-
         for uid in uidlist:
+            uid.uid = decode_gpg_uid(uid.uid)
             uid_str = uid.uid
             log.info("Processing uid %r %s", uid, uid_str)
 
@@ -414,3 +414,12 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
                 encrypted_key = tmpkeyring.encrypt_data(data=signed_key,
                     recipient=uid.uid)
                 yield (UID.from_monkeysign(uid), encrypted_key)
+
+
+def decode_gpg_uid(uid):
+    """ Unescape the UID.
+    There is a bug in Monkeysign which consists in returning an encoded UID
+    instead of the actual bytes (i.e. for the colon character).
+    The decode is a guess of how gpg encodes data.
+    """
+    return uid.decode('string-escape')
