@@ -25,8 +25,8 @@ from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
 from .avahioffer import AvahiHTTPOffer
 from . import gpgmh
-
-_ = lambda x: x
+# We import i18n to have the locale set up for Glade
+from .i18n import _
 
 log = logging.getLogger(__name__)
 

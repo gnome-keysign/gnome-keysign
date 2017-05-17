@@ -25,7 +25,6 @@ import os
 from gi.repository import Gtk, GLib
 from gi.repository import GObject
 
-_ = lambda x: x
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -41,6 +40,7 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .__init__ import __version__
 from .gpgmh import get_usable_keys, get_public_key_data
+from .i18n import _
 from .util import mac_generate
 from . import Keyserver
 
