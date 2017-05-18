@@ -257,6 +257,18 @@ class TestSignAndEncrypt:
         uid_encrypted = list(sign_keydata_and_encrypt(keydata,
             error_cb=None, homedir=self.receiver_homedir))
         assert_equals(len(uids), len(uid_encrypted))
+        signatures_before = {}
+        signatures_after = {}
+        import pgpy
+        pgpykeys = pgpy.PGPKey.from_blob(keydata)
+        log.info("Loaded Keys: %r", pgpykeys)
+        k = pgpykeys[0]
+        for uid in k.userids:
+            # We make the UID a string, because we might not get the
+            # very same object back later. And I don't know whether
+            # the dict uses "is" or "eq" for finding members
+            signatures_before[u"{}".format(uid)] = uid._signatures
+        
         for plain_uid, enc_uid in zip(uids, uid_encrypted):
             uid_from_signing = enc_uid[0]
             signed_uid = enc_uid[1]
@@ -269,30 +281,18 @@ class TestSignAndEncrypt:
             kr = Keyring(homedir=self.sender_homedir)
             log.info("encrypted UID: %r", enc_uid)
             decrypted = kr.decrypt_data(signed_uid)
-
+            pgpykeys = pgpy.PGPKey.from_blob(decrypted)
+            log.info("Loaded Signed Keys: %r", pgpykeys)
+            k = pgpykeys[0]
+            # assert_equal(uid_from_signing, k.userids[0])
+            assert_equal(len(k.userids), 1)
+            uid = k.userids[0]
+            uidstr = u"{}".format(uid)
+            assert_in(uidstr, signatures_before)
             # Now we have the signed UID. We want see if it really carries a signature.
-            from tempfile import mkdtemp
-            current_uid = plain_uid.uid
-            # This is a bit dirty. We should probably rather single out the UID.
-            # Right now we're calling list-sigs on the proper keyring.
-            # The output includes all UIDs and their signatures.
-            # We may get a minimized version from the sign_and_encrypt call.
-            # Or only email addresses but not photo UIDs.
-            # Currently this tests simply checks for the number of signature on a key.
-            # And we expect more after the signing process.
-            # But our test is not reliable because the result of sign_and_encrypt
-            # may be smaller due to, e.g. the photo UIDs mentioned above.
-            kr.context.call_command(b'--list-sigs', current_uid)
-            stdout_before = kr.context.stdout
-            log.debug('Sigs before: %s', stdout_before)
-            after_dir = mkdtemp()
-            kr_after = Keyring(after_dir)
-            kr_after.import_data(decrypted)
-            kr_after.context.call_command('--list-sigs')
-            stdout_after = kr_after.context.stdout
-            log.debug('Sigs after: %s', stdout_after)
+            signatures_after[uidstr] = uid._signatures
+            assert_less(len(signatures_before[uidstr]), len(signatures_after[uidstr]))
 
-            assert_less(len(stdout_before), len(stdout_after))
 
 
 class TestLatin1(TestSignAndEncrypt):
