@@ -52,8 +52,7 @@ class AvahiHTTPOffer:
         self.fingerprint = fingerprint = key.fingerprint
         self.keydata = keydata = get_public_key_data(fingerprint)
         self.keyserver = Keyserver.ServeKeyThread(str(keydata), fingerprint)
-
-        self.mac =  mac = mac_generate(fingerprint, keydata)
+        self.mac = mac_generate(fingerprint.encode('ascii'), keydata)
 
     def start(self):
         "Starts offering the key"
@@ -82,8 +81,9 @@ def main(args):
     discovery_info = offer.start()
     print ("Offering key: {}".format(key))
     print ("Discovery info: {}".format(discovery_info))
-    print ("Press Enter to stop")
-    raw_input()
+    try: input_ = raw_input
+    except NameError: input_ = input
+    input_("Press Enter to stop")
     offer.stop()
 
 if __name__ == "__main__":
