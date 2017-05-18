@@ -81,7 +81,7 @@ class ThreadedKeyserver(ThreadingMixIn, HTTPServer):
 
     def __init__(self, server_address, *args, **kwargs):
         if issubclass(self.__class__, object):
-            super(ThreadedKeyserver, self).__init__(*args, **kwargs)
+            super(ThreadedKeyserver, self).__init__(server_address, *args, **kwargs)
         else:
             HTTPServer.__init__(self, server_address, *args, **kwargs)
             # WTF? There is no __init__..?
