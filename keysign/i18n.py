@@ -19,7 +19,10 @@ DIR = os.path.join(os.path.dirname(__file__), 'locale')
 ## This is for C libraries, I think. I.e. not for pure python
 ## ones like us.  We do, however, need this for Gtk.Builder
 ## to load translations
-locale.setlocale(locale.LC_ALL, '')
+try:
+    locale.setlocale(locale.LC_ALL, '')
+except locale.Error:
+    log.exception("Cannot set locale")
 locale.bindtextdomain(APP, DIR)
 locale.textdomain(APP)
 gettext.bindtextdomain(APP, DIR)
