@@ -46,6 +46,7 @@ from .keyconfirm import PreSignWidget
 from .gpgmh import openpgpkey_from_data
 from .i18n import _
 from .util import sign_keydata_and_send
+import keysign.wormhole_functions as worm
 
 log = logging.getLogger(__name__)
 
@@ -75,6 +76,7 @@ class ReceiveApp:
 
         scanner = KeyFprScanWidget() #builder=builder)
         scanner.connect("changed", self.on_scanner_changed)
+        scanner.connect("clicked", self.on_receive_button_clicked)
         scanner.connect("barcode", self.on_barcode)
 
         if old_scanner_parent:
@@ -104,6 +106,16 @@ class ReceiveApp:
         psw.show()
         self.psw = psw
         self.stack.set_visible_child(self.psw)
+
+    def on_receive_button_clicked(self, fpr_widget, entry):
+        self.log.debug("Receive clicked")
+        code = entry.get_text()
+        worm.start_receive(code, self.on_message_received)
+
+    def on_message_received(self, key_data):
+        self.log.debug("message received")
+        self.on_keydata_downloaded(key_data)
+        pass
 
     def on_scanner_changed(self, scanner, entry):
         self.log.debug("Entry changed %r: %r", scanner, entry)

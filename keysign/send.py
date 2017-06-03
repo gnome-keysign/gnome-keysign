@@ -24,6 +24,8 @@ if  __name__ == "__main__" and __package__ is None:
 from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
 from . import gpgmh
+from .gpgmh import get_public_key_data
+import keysign.wormhole_functions as worm
 # We import i18n to have the locale set up for Glade
 from .i18n import _
 
@@ -72,11 +74,14 @@ class SendApp:
         fakekey = gpgmh.Key("","","")
         kpw = KeyPresentWidget(fakekey, builder=builder)
 
+        self.builder = builder
 
     def on_key_activated(self, widget, key):
         log.info("Activated key %r", key)
         ####
-        # Start network services
+        # Start wormhole services
+        key_data = get_public_key_data(key.fingerprint)
+        worm.send(key_data, self.on_message_callback, self.on_code_generated)
 
         ####
         # Create and show widget for key
@@ -87,10 +92,18 @@ class SendApp:
         log.debug('Setting kpw: %r', kpw)
         self.kpw = kpw
 
+    def on_code_generated(self, code):
+        self.kpw.set_wormhole_code(code)
+
+    def on_message_callback(self, key_data, code, completed):
+        """When the sending ends we re-send the same key data choosing the same
+        wormhole code"""
+        worm.send(key_data, self.on_message_callback, code=code)
+
     def deactivate(self):
         ####
         # Stop network services
-
+        worm.stop_sending()
         ####
         # Re-set stack to inital position
         self.stack.set_visible_child(self.stack_saved_visible_child)
