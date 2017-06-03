@@ -94,7 +94,7 @@ class KeyFprScanWidget(Gtk.VBox):
         if not Gst.is_initialized():
             log.error("Gst does not seem to be initialised. Call Gst.init()!")
             # This needs to be called before creating a BarcodeReaderGTK
-            Gst.init()
+            Gst.init(None)
         reader = BarcodeReaderGTK()
         reader.set_size_request(150,150)
         reader.connect('barcode', self.on_barcode)
@@ -157,6 +157,6 @@ class KeyScanApp(Gtk.Application):
 if __name__ == "__main__":
     import sys
     logging.basicConfig(level=logging.DEBUG)
-    Gst.init()
+    Gst.init(None)
     app = KeyScanApp()
     app.run()
