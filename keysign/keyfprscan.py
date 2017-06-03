@@ -64,8 +64,11 @@ class KeyFprScanWidget(Gtk.VBox):
         str('barcode'): (GObject.SIGNAL_RUN_LAST, None,
                         (str, # The barcode string
                          Gst.Message.__gtype__, # The GStreamer message itself
-                         GdkPixbuf.Pixbuf.__gtype__,),) # The pixbuf which caused
+                         GdkPixbuf.Pixbuf.__gtype__,),), # The pixbuf which caused
                                               # the above string to be decoded
+        # Signal when the receive button has been pressed
+        str('clicked'): (GObject.SIGNAL_RUN_LAST, None,
+                         (GObject.TYPE_PYOBJECT,))
     }
 
     def __init__(self, builder=None):
@@ -106,13 +109,18 @@ class KeyFprScanWidget(Gtk.VBox):
         self.reader = reader
 
         self.fpr_entry = builder.get_object("fingerprint_entry")
-        self.fpr_entry.connect('changed', self.on_text_changed)
-        
+
+        receive_button = builder.get_object("receive_button")
+        receive_button.connect('clicked', self.on_receive_button_clicked)
+
         self.set_hexpand(True)
         self.set_vexpand(True)
 
         # Temporary measure...
         self.barcode_scanner = self
+
+    def on_receive_button_clicked(self, button):
+        self.emit('clicked', self.fpr_entry)
 
     def on_text_changed(self, entryObject, *args):
         self.emit('changed', entryObject, *args)

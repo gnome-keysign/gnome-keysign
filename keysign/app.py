@@ -28,6 +28,10 @@ from gi.repository import Gtk, GLib
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 from gi.repository import Gdk
+from twisted.internet import gtk3reactor
+gtk3reactor.install()
+
+from twisted.internet import reactor
 
 
 if  __name__ == "__main__" and __package__ is None:
@@ -90,7 +94,7 @@ class KeysignApp(Gtk.Application):
     def __init__(self, *args, **kwargs):
         super(KeysignApp, self).__init__(*args, **kwargs)
         self.connect('activate', self.on_activate)
-        
+
         self.send_stack = None
         self.receive_stack = None
         self.send_receive_stack = None
@@ -107,6 +111,7 @@ class KeysignApp(Gtk.Application):
         window = builder.get_object(appwindow)
         window.set_wmclass ("GNOME Keysign", "GNOME Keysign")
         window.set_title("GNOME Keysign")
+        window.connect("delete-event", self.on_delete_window)
         self.headerbar = window.get_titlebar()
         self.header_button = builder.get_object("back_refresh_button")
         self.header_button.connect('clicked', self.on_header_button_clicked)
@@ -169,7 +174,7 @@ class KeysignApp(Gtk.Application):
 
         window.show_all()
         self.add_window(window)
-
+        reactor.run()
 
     def run(self, args=[]):
         super(KeysignApp, self).run()
@@ -196,9 +201,10 @@ class KeysignApp(Gtk.Application):
         # Making button clickable
         self.header_button.set_sensitive(True)
 
-
-
-
+    @staticmethod
+    def on_delete_window(*args):
+        reactor.callFromThread(reactor.stop)
+        Gtk.main_quit(*args)
 
     def on_sr_stack_switch(self, stack, *args):
         log.debug("Switched Stack! %r", args)
