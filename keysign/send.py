@@ -23,7 +23,6 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
-from .avahioffer import AvahiHTTPOffer
 from . import gpgmh
 # We import i18n to have the locale set up for Glade
 from .i18n import _
@@ -41,7 +40,6 @@ class SendApp:
     call deactivate().
     """
     def __init__(self, builder=None):
-        self.avahi_offer = None
         self.stack = None
         self.stack_saved_visible_child = None
         self.klw = None
@@ -79,12 +77,10 @@ class SendApp:
         log.info("Activated key %r", key)
         ####
         # Start network services
-        self.avahi_offer = AvahiHTTPOffer(key)
-        discovery_data = self.avahi_offer.start()
-        log.info("Use this for discovering the other key: %r", discovery_data)
+
         ####
         # Create and show widget for key
-        kpw = KeyPresentWidget(key, qrcodedata=discovery_data)
+        kpw = KeyPresentWidget(key)
         self.stack.add(kpw)
         self.stack_saved_visible_child = self.stack.get_visible_child()
         self.stack.set_visible_child(kpw)
@@ -94,9 +90,6 @@ class SendApp:
     def deactivate(self):
         ####
         # Stop network services
-        avahi_offer = self.avahi_offer
-        avahi_offer.stop()
-        self.avahi_offer = None
 
         ####
         # Re-set stack to inital position
