@@ -301,7 +301,7 @@ def main(args = []):
     log.debug('Running main with args: %s', args)
     if not args:
         args = []
-    Gst.init()
+    Gst.init(None)
 
     app = KeysignApp()
     try:
