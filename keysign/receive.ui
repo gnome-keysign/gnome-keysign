@@ -92,7 +92,7 @@ For more information click &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
             <property name="margin_left">100</property>
             <property name="margin_right">100</property>
             <property name="margin_top">10</property>
-            <property name="margin_bottom">10</property>
+            <property name="margin_bottom">5</property>
             <property name="orientation">vertical</property>
             <property name="spacing">6</property>
             <child>
@@ -185,6 +185,7 @@ For more information click &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
             </child>
             <child>
               <object class="GtkEntry" id="fingerprint_entry">
+                <property name="name">fingerprint_entry</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <signal name="changed" handler="on_text_changed" swapped="no"/>
@@ -195,9 +196,37 @@ For more information click &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
                 <property name="position">5</property>
               </packing>
             </child>
+            <child>
+              <object class="GtkBox" id="box45">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkButton" id="receive_button">
+                    <property name="label">receive</property>
+                    <property name="name">receive_button</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="always_show_image">True</property>
+                    <signal name="clicked" handler="on_receive_button_clicked" swapped="no"/>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="pack_type">end</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">6</property>
+              </packing>
+            </child>
           </object>
           <packing>
-            <property name="expand">False</property>
+            <property name="expand">True</property>
             <property name="fill">True</property>
             <property name="position">1</property>
           </packing>
