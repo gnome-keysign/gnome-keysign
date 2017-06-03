@@ -10,4 +10,5 @@
 .tox/
 cover/
 **.flatpak-builder/
-
+.idea/
+*.ui~
