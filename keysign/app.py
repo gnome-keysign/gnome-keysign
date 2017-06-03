@@ -43,8 +43,6 @@ if  __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 
-from .avahioffer import AvahiHTTPOffer
-from .avahidiscovery import AvahiKeysignDiscoveryWithMac
 from .keyconfirm import PreSignWidget
 from .keyfprscan import KeyFprScanWidget
 from .keylistwidget import KeyListWidget
