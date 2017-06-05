@@ -57,7 +57,8 @@ class KeyFprScanWidget(Gtk.VBox):
     __gsignals__ = {
         # This is the Gtk widget signal's name
         str('changed'): (GObject.SIGNAL_RUN_LAST, None,
-                        (GObject.TYPE_PYOBJECT,)),
+                         (GObject.TYPE_PYOBJECT,
+                          GObject.TYPE_PYOBJECT)),
         # It's probably not the best name for that signal.
         # While "barcode_scanned" might be better, it is probably
         # unneccesarily specific.
@@ -90,7 +91,7 @@ class KeyFprScanWidget(Gtk.VBox):
         if parent:
             parent.remove(widget)
         self.add(widget)
-        
+
 
         self.scanner = builder.get_object("scanner")
 
@@ -109,9 +110,11 @@ class KeyFprScanWidget(Gtk.VBox):
         self.reader = reader
 
         self.fpr_entry = builder.get_object("fingerprint_entry")
+        self.fpr_entry.connect('changed', self.on_text_changed)
 
-        receive_button = builder.get_object("receive_button")
-        receive_button.connect('clicked', self.on_receive_button_clicked)
+        self.receive_button = builder.get_object("receive_button")
+        self.receive_button.connect('clicked', self.on_receive_button_clicked)
+        self.receive_button.set_sensitive(False)
 
         self.set_hexpand(True)
         self.set_vexpand(True)
@@ -123,7 +126,7 @@ class KeyFprScanWidget(Gtk.VBox):
         self.emit('clicked', self.fpr_entry)
 
     def on_text_changed(self, entryObject, *args):
-        self.emit('changed', entryObject, *args)
+        self.emit('changed', entryObject, self.receive_button)
 
     def on_barcode(self, sender, barcode, message, image):
         self.emit('barcode', barcode, message, image)
