@@ -77,12 +77,13 @@ def start_receive(code, callback):
     w1.get_message().addCallback(received)
 
 
-def stop_receiving(callback):
+def stop_receiving(callback=None):
     global w1
     if w1 is not None:
         w1.close()
 
-    GLib.idle_add(callback)
+    if callback is not None:
+        GLib.idle_add(callback)
 
 
 def _encode_message(message):
