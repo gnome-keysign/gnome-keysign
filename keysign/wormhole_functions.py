@@ -4,6 +4,7 @@ import wormhole
 import gi
 import logging
 import json
+from builtins import str
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib
 
@@ -59,7 +60,8 @@ def stop_sending():
 def start_receive(code, callback):
     global w1
     w1 = wormhole.create(app_id, RENDEZVOUS_RELAY, reactor)
-    w1.set_code(code)
+    # The following mod is required for Python 2 support
+    w1.set_code("%s" % str(code))
 
     def received(message):
         m = _decode_message(message)
