@@ -22,6 +22,7 @@ if  __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 from .gpgmh import get_usable_keys
+from .util import glib_markup_escape_rencoded_text
 
 log = logging.getLogger(__name__)
 
@@ -42,7 +43,11 @@ class ListBoxRowWithKey(Gtk.ListBoxRow):
         "Returns a pango string for a gpgmh.UID"
         fmt = "{name}\t<i>{email}</i>\t<small>{expiry}</small>"
 
-        d = {k: GLib.markup_escape_text("{}".format(v))
+        # This encode, decode dance looks funny, but when
+        # the UID contains surrogate, i.e. non-decodable bytes,
+        # Python will complain.
+        d = {k: glib_markup_escape_rencoded_text(
+                    "{}".format(v))
              for k, v in uid._asdict().items()}
         log.info("Formatting UID %r", d)
         s = fmt.format(**d)

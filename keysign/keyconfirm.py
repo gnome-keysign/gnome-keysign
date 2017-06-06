@@ -47,7 +47,7 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .gpgmh import get_usable_keys
 from .scan_barcode import ScalingImage
-from .util import format_fingerprint
+from .util import format_fingerprint, glib_markup_escape_rencoded_text
 
 log = logging.getLogger(__name__)
 
@@ -69,8 +69,7 @@ def format_key_header(fpr, length='2048', creation_time=None):
 def format_uidslist(uidslist):
     result = ""
     for uid in uidslist:
-        uidstr = GLib.markup_escape_text(
-            uid.uid.decode('utf8', 'xmlcharrefreplace'))
+        uidstr = glib_markup_escape_rencoded_text(uid.uid)
         result += ("{}\n".format(uidstr))
 
     return result
