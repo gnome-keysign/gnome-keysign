@@ -1,0 +1,274 @@
+# French translations for gnome-keysign.
+# Copyright (C) 2017 Tobias Mueller
+# This file is distributed under the same license as the gnome-keysign
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-keysign 0.9\n"
+"Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
+"POT-Creation-Date: 2017-05-17 20:42+0200\n"
+"PO-Revision-Date: 2017-05-20 21:28+0200\n"
+"Language: fr\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.4.0\n"
+"Last-Translator: \n"
+"X-Generator: Poedit 1.8.7.1\n"
+
+#: keysign/app.py:162
+msgid "Send"
+msgstr "Envoyer"
+
+#: keysign/app.py:164 keysign/receive.py:168
+msgid "Receive"
+msgstr "Recevoir"
+
+#: keysign/app.py:198 keysign/send.py:143
+msgid "Sending {}"
+msgstr "Envoyer {}"
+
+#: keysign/avahioffer.py:85
+msgid "Offering key: {}"
+msgstr "Clé offerte: {}"
+
+#: keysign/avahioffer.py:86
+msgid "Discovery info: {}"
+msgstr "Information découverte: {}"
+
+#: keysign/avahioffer.py:87
+msgid "Press Enter to stop"
+msgstr "Presse Enter pour interrompre"
+
+#: keysign/gpgmks.py:175
+#, python-format
+msgid "installing symlinks for sockets from %s to %s"
+msgstr ""
+
+#: keysign/gtkexcepthook.py:173
+msgid "Bug Detected"
+msgstr ""
+
+#: keysign/gtkexcepthook.py:175
+msgid "<big><b>A programming error has been detected.</b></big>"
+msgstr ""
+
+#: keysign/gtkexcepthook.py:178
+msgid ""
+"You may be able to ignore this error and carry on working, but you may get "
+"unexpected results.\n"
+"\n"
+"Please tell the developers about this using the issue tracker if no-one else "
+"has reported it yet."
+msgstr ""
+
+#: keysign/gtkexcepthook.py:187
+msgid "Search Tracker..."
+msgstr ""
+
+#: keysign/gtkexcepthook.py:189
+msgid "Report..."
+msgstr ""
+
+#: keysign/gtkexcepthook.py:191
+msgid "Ignore Error"
+msgstr ""
+
+#: keysign/gtkexcepthook.py:192
+msgid "Quit GNOME Keysign"
+msgstr ""
+
+#: keysign/gtkexcepthook.py:202
+msgid "Details..."
+msgstr ""
+
+#: keysign/gtkexcepthook.py:229 keysign/gtkexcepthook.py:232
+msgid "Exception while analyzing the exception."
+msgstr ""
+
+#: keysign/gtkexcepthook.py:281
+msgid ""
+"            #### Description\n"
+"\n"
+"            Give this report a short descriptive title.\n"
+"            Use something like\n"
+"            \"{feature-that-broke}: {what-went-wrong}\"\n"
+"            for the title, if you can.\n"
+"            Then please replace this text\n"
+"            with a longer description of the bug.\n"
+"            Screenshots or videos are great, too!\n"
+"\n"
+"            #### Steps to reproduce\n"
+"\n"
+"            Please tell us what you were doing\n"
+"            when the error message popped up.\n"
+"            If you can provide step-by-step instructions\n"
+"            on how to reproduce the bug,\n"
+"            that's even better.\n"
+"\n"
+"            #### Traceback\n"
+"        "
+msgstr ""
+
+#: keysign/i18n.py:36
+msgid "Translated for gettext (C)"
+msgstr ""
+
+#: keysign/i18n.py:40
+msgid "Translated for Python (C)"
+msgstr ""
+
+#: keysign/keylistwidget.py:59
+msgid "Expires: "
+msgstr "Date d'expiration: "
+
+#: keysign/offer-key.py:78
+msgid "Keysign - Offering Key"
+msgstr "Keysign - Offrir clé"
+
+#: keysign/offer-key.py:113
+msgid "Auxiliary helper program to present a key"
+msgstr ""
+
+#: keysign/offer-key.py:120
+msgid "increases log verbosity for each occurence."
+msgstr ""
+
+#: keysign/offer-key.py:129
+msgid "The fingerprint of the key to transfer"
+msgstr "Empreinte de clé à transférer"
+
+#: keysign/receive.ui:56
+msgid ""
+"No GNOME Keysign servers around :-(\n"
+"Find a friend to use GNOME Keysign with.\n"
+"You may also suffer from connectivity problems.\n"
+"For more information click <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"NoServers/1\">here</a>."
+msgstr ""
+"Il n'y a pas de server de GNOME Keysign :-(\n"
+"Trouve un ami pour utiliser GNOME Keysign.\n"
+"Ou il peut s'agir d'un problème de connection.\n"
+"Pour plus d'info clique <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"NoServers/1\">ici</a>."
+
+#: keysign/receive.ui:105
+msgid "<small>To sign someone's key, scan their QR or enter security code</small>"
+msgstr ""
+"<small>Pour signer la clé de quelqu'un, scanne le code QR ou entre le code "
+"sécurité</small>"
+
+#: keysign/receive.ui:124
+msgid "<b>Camera</b>"
+msgstr "<b>Caméra</b>"
+
+#: keysign/receive.ui:176 keysign/send.ui:341
+msgid "<b>Security Code</b>"
+msgstr "<b>Code de sécurité</b>"
+
+#: keysign/receive.ui:208
+msgid "Scan Barcode"
+msgstr "Scanner le code-barre"
+
+#: keysign/receive.ui:225
+msgid "Downloading key-data. Please wait ..."
+msgstr ""
+
+#: keysign/receive.ui:250
+msgid "Key download was interrupted!"
+msgstr ""
+
+#: keysign/receive.ui:310 keysign/send.ui:426
+msgid "page1"
+msgstr ""
+
+#: keysign/receive.ui:335
+msgid ""
+"To sign the key, confirm that you want to sign the following key.\n"
+"This will generate an email that must be sent in order to complete the signing "
+"process."
+msgstr ""
+"Pour signer, confirme la clé.\n"
+"La confirmation va générer un couriel que tu dois envoyer pour compléter la "
+"procédure de signature."
+
+#: keysign/receive.ui:362
+msgid "Key"
+msgstr "Clé"
+
+#: keysign/receive.ui:395 keysign/send.ui:270
+msgid "UIDs"
+msgstr "IdU"
+
+#: keysign/receive.ui:482
+msgid "C_onfirm"
+msgstr "C_onfirme"
+
+#: keysign/receive.ui:518
+msgid "page2"
+msgstr ""
+
+#: keysign/receive.ui:536
+msgid "Signing the following UIDs:"
+msgstr "Signe les IdU suivantes:"
+
+#: keysign/receive.ui:612
+msgid "page3"
+msgstr ""
+
+# This is a test comment
+#: keysign/send.ui:7
+msgid "Select and send key"
+msgstr "Selectionner et envoyer la clé"
+
+#: keysign/send.ui:59
+msgid ""
+"You don't have any keys!\n"
+"Please use, e.g. Seahorse to create one."
+msgstr ""
+"Tu n'as pas de clés!\n"
+"Utilise, par exemple Seahorse pour en créer une."
+
+#: keysign/send.ui:114
+msgid "<b>Select a key for signing</b>"
+msgstr "<b>Sélectionne une clé à signer</b>"
+
+#: keysign/send.ui:130
+msgid "<small>Times signed</small>"
+msgstr "<small>Nombre de signatures</small>"
+
+#: keysign/send.ui:185
+msgid "Keylist"
+msgstr "Liste de clés"
+
+#: keysign/send.ui:202
+msgid ""
+"<small>To have the key signed, the other person must enter the security code, "
+"or scan the QR code</small>"
+msgstr ""
+"<small>Pour que la clé soit signée, l'autre personne doit entrer le code de "
+"sécurité ou scanner le code QR</small>"
+
+#: keysign/send.ui:229
+msgid "<b>Key Details</b>"
+msgstr "<b>Détails de clé</b>"
+
+#: keysign/send.ui:254
+msgid "Fingerprint"
+msgstr "Empreinte digitale"
+
+#: keysign/send.ui:397
+msgid "<b>QR Code</b>"
+msgstr "<b>Code QR</b>"
+
+#: keysign/transtest.py:5
+msgid "Hallo"
+msgstr "Bonjour"
+
+#: keysign/transtest.py:6
+msgid "Moinsen..."
+msgstr "Coucou..."

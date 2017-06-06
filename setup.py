@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 #
+from __future__ import print_function
 
 from setuptools import setup
 from setuptools.command.install import install
+from distutils.command.build import build
 #import py2exe
 import os
 import sys
@@ -13,6 +15,28 @@ os.chdir(os.path.dirname(os.path.realpath(__file__)))
 with open(os.path.join('keysign', '_version.py')) as f:
     # This should define __version__
     exec(f.read())
+
+
+class BuildWithCompile(build):
+    sub_commands = [('compile_catalog', None)] + build.sub_commands
+
+# Pretty much from http://stackoverflow.com/a/41120180/2015768
+class InstallWithCompile(install):
+    def run(self):
+        try:
+            from babel.messages.frontend import compile_catalog
+            compiler = compile_catalog(self.distribution)
+            option_dict = self.distribution.get_option_dict('compile_catalog')
+            compiler.domain = [option_dict['domain'][1]]
+            compiler.directory = option_dict['directory'][1]
+            compiler.run()
+        except Exception as e:
+            print ("Error compiling message catalogs: {}".format(e),
+                file=sys.stderr)
+            print ("Do you have Babel (python-babel) installed?",
+                file=sys.stderr)
+        #super(InstallWithCompile, self).run()
+        install.run(self)
 
 
 setup(
@@ -36,7 +60,15 @@ setup(
         'keysign': 'keysign',
         'monkeysign': 'monkeysign/monkeysign'
     },
-    package_data={'keysign': ['*.ui']},
+    package_data={
+        'keysign': [
+            '*.ui',
+            'locale/*/*/*.mo',
+            # The PO files are added in the MANIFEST, because they
+            # should be part of the source distribution.
+            # 'locale/*/*/*.po'
+        ]
+    },
     include_package_data = True,
     data_files=[
         ( 'share/applications',
@@ -45,6 +77,13 @@ setup(
             ['data/gnome-keysign.appdata.xml']),
         ( 'share/icons/hicolor/scalable/apps',
             ['data/gnome-keysign.svg']),
+        #( 'share/locale/',
+        # # We cannot use the glob below, because it only copies the file
+        # # into the directory mentioned above, i.e. keysign.po, rather
+        # # than de/LC_MESSAGES/keysign.po including the de/... directories.
+        #    ([f for f in glob.glob('keysign/locale/*/*/*.po')] +
+        #     [f for f in glob.glob('keysign/locale/*')])
+        #    ),
     ],
     #scripts = ['gnome-keysign.py'],
     install_requires=[
@@ -63,6 +102,9 @@ setup(
         # avahi # Also no entry in the cheeseshop
         # dbus # dbus-python is in the cheeseshop but not pip-able
         ],
+    setup_requires=[
+        "babel",
+    ],
     tests_require=[
         "pgpy",
         "nose",
@@ -113,5 +155,15 @@ setup(
         'Topic :: Multimedia :: Video :: Capture',
         'Topic :: Security :: Cryptography',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        ]
+        ],
+        message_extractors = {
+            'keysign': [
+                ('**.py', 'python', None),
+                ('**.ui', 'babelglade:extract_glade', None),
+            ],
+        },
+        cmdclass={
+            'build': BuildWithCompile,
+            #'install': InstallWithCompile,
+        },
     )

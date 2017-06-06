@@ -376,7 +376,7 @@ This will generate an email that must be sent in order to complete the signing p
                         <property name="width_request">200</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">23FD 347A 4194 29BA CCD5 E72D 6BC4 7780 54AC D246</property>
+                        <property name="label">23FD 347A 4194 29BA CCD5 E72D 6BC4 7780 54AC D246</property>
                         <property name="selectable">True</property>
                         <property name="xalign">0</property>
                       </object>
@@ -408,7 +408,7 @@ This will generate an email that must be sent in order to complete the signing p
                       <object class="GtkLabel" id="uids_label">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Zulu Test &lt;foo@example.com&gt;
+                        <property name="label">Zulu Test &lt;foo@example.com&gt;
 Alpha Bar &lt;example@example.com&gt;</property>
                         <property name="selectable">True</property>
                         <property name="xalign">0</property>

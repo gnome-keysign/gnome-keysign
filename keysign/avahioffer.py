@@ -25,6 +25,7 @@ import os
 from gi.repository import Gtk, GLib
 from gi.repository import GObject
 
+
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
                               "this script directly which is discouraged. " +
@@ -39,6 +40,7 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .__init__ import __version__
 from .gpgmh import get_usable_keys, get_public_key_data
+from .i18n import _
 from .util import mac_generate
 from . import Keyserver
 
@@ -80,9 +82,9 @@ def main(args):
     key = get_usable_keys(pattern=args[0])[0]
     offer = AvahiHTTPOffer(key)
     discovery_info = offer.start()
-    print ("Offering key: {}".format(key))
-    print ("Discovery info: {}".format(discovery_info))
-    print ("Press Enter to stop")
+    print (_("Offering key: {}").format(key))
+    print (_("Discovery info: {}").format(discovery_info))
+    print (_("Press Enter to stop"))
     raw_input()
     offer.stop()
 
