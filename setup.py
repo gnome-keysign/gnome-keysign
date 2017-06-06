@@ -4,6 +4,7 @@ from __future__ import print_function
 
 from setuptools import setup
 from setuptools.command.install import install
+from setuptools.command.test import test as TestCommand
 from distutils.command.build import build
 #import py2exe
 import os
@@ -37,6 +38,19 @@ class InstallWithCompile(install):
                 file=sys.stderr)
         #super(InstallWithCompile, self).run()
         install.run(self)
+
+
+# Inspired by the example at https://pytest.org/latest/goodpractises.html
+class NoseTestCommand(TestCommand):
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        # Run nose ensuring that argv simulates running nosetests directly
+        import nose
+        nose.run_exit(argv=['nosetests'])
 
 
 setup(
@@ -165,5 +179,6 @@ setup(
         cmdclass={
             'build': BuildWithCompile,
             #'install': InstallWithCompile,
+            'test': NoseTestCommand,
         },
     )
