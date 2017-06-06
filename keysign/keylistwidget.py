@@ -56,7 +56,7 @@ class ListBoxRowWithKey(Gtk.ListBoxRow):
         fmt  = "{created} "
         fmt  = "<b>{fingerprint}</b>\n"
         fmt += "\n".join((cls.format_uid(uid) for uid in key.uidslist))
-        fmt += "\n<small>Expires {expiry}</small>"
+        fmt += "\n<small>" + _("Expires: ") + " {expiry}</small>"
 
         d = {k: GLib.markup_escape_text("{}".format(v))
              for k,v in key._asdict().items()}

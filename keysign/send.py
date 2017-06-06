@@ -25,6 +25,8 @@ from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
 from .avahioffer import AvahiHTTPOffer
 from . import gpgmh
+# We import i18n to have the locale set up for Glade
+from .i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -136,7 +138,7 @@ class App(Gtk.Application):
         ####
         # Saving subtitle
         self.headerbar_subtitle = self.headerbar.get_subtitle()
-        self.headerbar.set_subtitle("Sending {}".format(key.fpr))
+        self.headerbar.set_subtitle(_("Sending {}").format(key.fpr))
         ####
         # Making button clickable
         self.headerbutton.set_sensitive(True)
