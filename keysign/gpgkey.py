@@ -112,7 +112,7 @@ class Key(namedtuple("Key", ["expiry", "fingerprint", "uidslist"])):
 
 
 
-class UID(namedtuple("UID", "expiry name comment email")):
+class UID(namedtuple("UID", "expiry uid name comment email")):
     "Represents an OpenPGP UID - at least to the extent we care about it"
 
     @classmethod
@@ -121,39 +121,20 @@ class UID(namedtuple("UID", "expiry name comment email")):
         # We expect to get raw bytes.
         # While RFC4880 demands UTF-8 encoded data,
         # real-life has produced non UTF-8 keys...
-        uidstr = uid.uid
-        log.debug("UidStr (%d): %r", len(uidstr), uidstr)
-        name, comment, email = parse_uid(uidstr)
+        rawuid = uid.uid
+        log.debug("UidStr (%d): %r", len(rawuid), rawuid)
+        name, comment, email = parse_uid(rawuid)
         expiry = parse_expiry(uid.expire)
 
-        return cls(expiry, name, comment, email)
+        return cls(expiry, rawuid, name, comment, email)
 
     @classmethod
     def from_gpgme(cls, uid):
         "Creates a new UID from a monkeysign key"
-        uidstr = uid.uid
+        rawuid = uid.uid
         name = uid.name
         comment = '' # FIXME: uid.comment
         email = uid.email
         expiry = None  #  FIXME: Maybe UIDs don't expire themselves but via the binding signature
 
-        return cls(expiry, name, comment, email)
-
-
-    def __format__(self, arg):
-        if self.comment:
-            s = b"{name} ({comment}) <{email}>"
-        else:
-            s = b"{name} <{email}>"
-        return s.format(**self._asdict())
-
-    def __str__(self):
-        return b"{}".format(self)
-
-    @property
-    def uid(self):
-        "Legacy compatibility, use str() instead"
-        warnings.warn("Legacy uid, use '{}'.format() instead",
-                      DeprecationWarning)
-        return b"{}".format(self)
-
+        return cls(expiry, rawuid, name, comment, email)

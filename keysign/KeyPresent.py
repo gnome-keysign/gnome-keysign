@@ -96,7 +96,8 @@ class KeyPresentWidget(Gtk.Widget):
         self.key_id_label.set_markup(
             format_fingerprint(key.fingerprint).replace('\n', '  '))
         self.uids_label.set_markup("\n".join(
-                                        [GLib.markup_escape_text("{}".format(uid))
+                                        [GLib.markup_escape_text(
+                                            uid.uid.decode('utf8', 'xmlcharrefreplace'))
                                         for uid
                                         in key.uidslist]))
         self.fingerprint_label.set_markup(format_fingerprint(key.fingerprint))
