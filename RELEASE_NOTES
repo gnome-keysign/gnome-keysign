@@ -9,7 +9,8 @@ You can get the app from:
 Changes
 ==========
 
- * Translation support. Read keysign/locale/README.rst for details
+ * Translation support. Read keysign/locale/README.rst for details.
+ * gpgme: Ignore KEY_CONSIDERED and CARDCTRL.
 
 
 Resources
