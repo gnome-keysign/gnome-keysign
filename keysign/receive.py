@@ -41,6 +41,7 @@ if  __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 
+from .avahidiscovery import AvahiKeysignDiscoveryWithMac
 from .keyfprscan import KeyFprScanWidget
 from .keyconfirm import PreSignWidget
 from .gpgmh import openpgpkey_from_data
@@ -58,6 +59,7 @@ def remove_whitespace(s):
 class ReceiveApp:
     def __init__(self, builder=None):
         self.psw = None
+        self.discovery = None
         self.log = logging.getLogger(__name__)
 
         widget_name = "receive_stack"
@@ -95,6 +97,10 @@ class ReceiveApp:
         # receive_stack.set_visible_child(old_scanner_parent)
         self.scanner = scanner
         self.stack = receive_stack
+
+        self.discovery = AvahiKeysignDiscoveryWithMac()
+        ib = builder.get_object('infobar_discovery')
+        self.discovery.connect('list-changed', self.on_list_changed, ib)
 
 
     def on_keydata_downloaded(self, keydata, pixbuf=None):

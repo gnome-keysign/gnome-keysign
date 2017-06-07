@@ -23,6 +23,7 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
+from .avahioffer import AvahiHTTPOffer
 from . import gpgmh
 from .gpgmh import get_public_key_data
 import keysign.wormhole_functions as worm
@@ -42,6 +43,7 @@ class SendApp:
     call deactivate().
     """
     def __init__(self, builder=None):
+        self.avahi_offer = None
         self.stack = None
         self.stack_saved_visible_child = None
         self.klw = None
@@ -79,13 +81,15 @@ class SendApp:
     def on_key_activated(self, widget, key):
         log.info("Activated key %r", key)
         ####
-        # Start wormhole services
+        # Start network services
         key_data = get_public_key_data(key.fingerprint)
         worm.send(key_data, self.on_message_callback, self.on_code_generated)
-
+        self.avahi_offer = AvahiHTTPOffer(key)
+        discovery_data = self.avahi_offer.start()
+        log.info("Use this for discovering the other key: %r", discovery_data)
         ####
         # Create and show widget for key
-        kpw = KeyPresentWidget(key)
+        kpw = KeyPresentWidget(key, qrcodedata=discovery_data)
         self.stack.add(kpw)
         self.stack_saved_visible_child = self.stack.get_visible_child()
         self.stack.set_visible_child(kpw)
@@ -104,6 +108,10 @@ class SendApp:
         ####
         # Stop network services
         worm.stop_sending()
+        avahi_offer = self.avahi_offer
+        avahi_offer.stop()
+        self.avahi_offer = None
+
         ####
         # Re-set stack to inital position
         self.stack.set_visible_child(self.stack_saved_visible_child)
