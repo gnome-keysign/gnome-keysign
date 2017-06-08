@@ -3,6 +3,7 @@
 import logging
 import os
 import signal
+from .avahiwormholeoffer import AvahiWormholeOffer
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -26,7 +27,6 @@ from .KeyPresent import KeyPresentWidget
 from .avahioffer import AvahiHTTPOffer
 from . import gpgmh
 from .gpgmh import get_public_key_data
-import keysign.wormhole_functions as worm
 # We import i18n to have the locale set up for Glade
 from .i18n import _
 
@@ -43,7 +43,7 @@ class SendApp:
     call deactivate().
     """
     def __init__(self, builder=None):
-        self.avahi_offer = None
+        self.avahi_worm_offer = None
         self.stack = None
         self.stack_saved_visible_child = None
         self.klw = None
@@ -81,36 +81,35 @@ class SendApp:
     def on_key_activated(self, widget, key):
         log.info("Activated key %r", key)
         ####
-        # Start network services
-        key_data = get_public_key_data(key.fingerprint)
-        worm.send(key_data, self.on_message_callback, self.on_code_generated)
-        self.avahi_offer = AvahiHTTPOffer(key)
-        discovery_data = self.avahi_offer.start()
-        log.info("Use this for discovering the other key: %r", discovery_data)
-        ####
         # Create and show widget for key
-        kpw = KeyPresentWidget(key, qrcodedata=discovery_data)
+        kpw = KeyPresentWidget(key)
         self.stack.add(kpw)
         self.stack_saved_visible_child = self.stack.get_visible_child()
         self.stack.set_visible_child(kpw)
         log.debug('Setting kpw: %r', kpw)
         self.kpw = kpw
+        ####
+        # Start network services
+        self.avahi_worm_offer = AvahiWormholeOffer(key, callback_code=self.on_code_generated)
+        self.avahi_worm_offer.start()
 
-    def on_code_generated(self, code):
-        self.kpw.set_wormhole_code(code)
+    def on_code_generated(self, worm_code, discovery_data):
+        self.kpw.set_wormhole_code(worm_code)
+        log.info("Use this for discovering the other key: %r", discovery_data)
+        self.kpw.set_qrcode(discovery_data)
 
     def on_message_callback(self, key_data, code, completed):
         """When the sending ends we re-send the same key data choosing the same
         wormhole code"""
-        worm.send(key_data, self.on_message_callback, code=code)
+        # TODO: maybe just return to the default page instead of reuse the same code
+        # worm.send(key_data, self.on_message_callback, code=code)
+        pass
 
     def deactivate(self):
         ####
         # Stop network services
-        worm.stop_sending()
-        avahi_offer = self.avahi_offer
-        avahi_offer.stop()
-        self.avahi_offer = None
+        self.avahi_worm_offer.stop()
+        self.avahi_worm_offer = None
 
         ####
         # Re-set stack to inital position
@@ -152,7 +151,7 @@ class App(Gtk.Application):
         ####
         # Saving subtitle
         self.headerbar_subtitle = self.headerbar.get_subtitle()
-        self.headerbar.set_subtitle(_("Sending {}").format(key.fpr))
+        self.headerbar.set_subtitle("Sending {}".format(key.fpr))
         ####
         # Making button clickable
         self.headerbutton.set_sensitive(True)
