@@ -47,7 +47,7 @@ from .keyfprscan import KeyFprScanWidget
 from .keyconfirm import PreSignWidget
 from .gpgmh import openpgpkey_from_data
 from .util import sign_keydata_and_send
-import keysign.wormhole_functions as worm
+from keysign.wormholereceive import WormholeReceive
 
 log = logging.getLogger(__name__)
 
@@ -60,6 +60,7 @@ class ReceiveApp:
     def __init__(self, builder=None):
         self.psw = None
         self.discovery = None
+        self.worm = None
         self.log = logging.getLogger(__name__)
 
         widget_name = "receive_stack"
@@ -118,13 +119,12 @@ class ReceiveApp:
         self.log.debug("Receive clicked")
         code = entry.get_text()
         # Stops an eventually precedent receive and starts a new one
-        worm.stop_receiving()
-        worm.start_receive(code, self.on_message_received)
+        self.worm = WormholeReceive(code, self.on_message_received)
+        self.worm.start()
 
     def on_message_received(self, key_data):
         self.log.debug("message received")
         self.on_keydata_downloaded(key_data)
-        pass
 
     def on_code_changed(self, scanner, entry, receive_button):
         self.log.debug("Entry changed %r: %r", scanner, entry)
@@ -132,6 +132,11 @@ class ReceiveApp:
             receive_button.set_sensitive(True)
         else:
             receive_button.set_sensitive(False)
+
+        text = entry.get_text()
+        keydata = self.discovery.find_key(text)
+        if keydata:
+            self.on_keydata_downloaded(keydata)
 
     def on_barcode(self, scanner, barcode, gstmessage, pixbuf):
         self.log.debug("Scanned barcode %r", barcode)

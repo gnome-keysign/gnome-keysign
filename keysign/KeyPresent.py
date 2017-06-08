@@ -102,14 +102,17 @@ class KeyPresentWidget(Gtk.Widget):
                                         for uid
                                         in key.uidslist]))
         self.fingerprint_label.set_markup(format_fingerprint(key.fingerprint))
-        if not qrcodedata:
-            qrcodedata = "OPENPGP4FPR:" + key.fingerprint
-        self.qrcode_frame.add(QRImage(qrcodedata))
-        self.qrcode_frame.show_all()
         self.wormhole_code.set_label("")
+        self.key_fingerprint = key.fingerprint
 
     def set_wormhole_code(self, wormhole_code):
         self.wormhole_code.set_label(wormhole_code)
+
+    def set_qrcode(self, qrcodedata=None):
+        if not qrcodedata:
+            qrcodedata = "OPENPGP4FPR:" + self.key_fingerprint
+        self.qrcode_frame.add(QRImage(qrcodedata))
+        self.qrcode_frame.show_all()
 
 
 class KeyPresent(Gtk.Application):
