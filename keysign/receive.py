@@ -139,10 +139,15 @@ class ReceiveApp:
             self.on_keydata_downloaded(keydata)
 
     def on_barcode(self, scanner, barcode, gstmessage, pixbuf):
+        """ Firstly we try to download the key with avahi
+            and if it fails we try with wormhole """
         self.log.debug("Scanned barcode %r", barcode)
         keydata = self.discovery.find_key(barcode)
         if keydata:
             self.on_keydata_downloaded(keydata, pixbuf)
+        else:
+            self.worm = WormholeReceive(barcode, self.on_message_received)
+            self.worm.start()
 
     def on_sign_key_confirmed(self, keyPreSignWidget, key, keydata):
         self.log.debug ("Sign key confirmed! %r", key)

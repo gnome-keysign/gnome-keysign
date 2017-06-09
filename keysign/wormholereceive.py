@@ -3,7 +3,7 @@ from wormhole.cli.public_relay import RENDEZVOUS_RELAY
 import wormhole
 import logging
 
-from .util import decode_message, encode_message
+from .util import decode_message, encode_message, parse_barcode
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
@@ -14,7 +14,13 @@ log = logging.getLogger(__name__)
 class WormholeReceive:
     def __init__(self, code, callback=None, app_id=None):
         self.w = None
-        self.code = code
+        # Check if the given code is a barcode or directly the wormhole code
+        parsed = parse_barcode(code).get("WORM", [None])[0]
+        if parsed:
+            self.code = parsed
+        else:
+            self.code = code
+
         self.callback = callback
 
         if app_id:

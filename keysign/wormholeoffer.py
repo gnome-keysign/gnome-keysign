@@ -48,7 +48,7 @@ class WormholeOffer:
 
             def write_code(code_generated):
                 log.info("Invitation Code: {}".format(code_generated))
-                wormhole_data = "+WORM:{0}".format(code_generated)
+                wormhole_data = "WORM={0}".format(code_generated)
                 GLib.idle_add(self.callback_code, code_generated, wormhole_data)
 
             self.w.get_code().addCallback(write_code)

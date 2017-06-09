@@ -17,10 +17,7 @@ class AvahiWormholeOffer:
         self.worm_offer.start()
 
     def _callback_code(self, wormhole_code, wormhole_data):
-        discovery_data = self.avahi_discovery_data + wormhole_data.upper()
-        print(wormhole_data)
-        wormhole_data.upper()
-        print(wormhole_data.upper())
+        discovery_data = self.avahi_discovery_data + ";" + wormhole_data
         self.callback_code(wormhole_code, discovery_data)
 
     def stop(self):
