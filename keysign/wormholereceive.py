@@ -42,7 +42,8 @@ class WormholeReceive:
             m = decode_message(message)
             key_data = m["offer"]["message"]
             log.info("Message received: {}".format(key_data))
-            GLib.idle_add(self.callback, key_data.encode("utf-8"))
+            if self.callback:
+                GLib.idle_add(self.callback, key_data.encode("utf-8"))
 
             # send a reply with a message ack, this also ensures wormhole cli interoperability
             reply = {"answer": {"message_ack": "ok"}}
@@ -52,8 +53,8 @@ class WormholeReceive:
         self.w.get_message().addCallback(received)
 
     def stop(self, callback=None):
-        if self.w is not None:
+        if self.w:
             self.w.close()
 
-        if callback is not None:
+        if callback:
             GLib.idle_add(callback)
