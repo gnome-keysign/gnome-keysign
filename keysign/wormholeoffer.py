@@ -49,7 +49,8 @@ class WormholeOffer:
             def write_code(code_generated):
                 log.info("Invitation Code: {}".format(code_generated))
                 wormhole_data = "WORM={0}".format(code_generated)
-                GLib.idle_add(self.callback_code, code_generated, wormhole_data)
+                if self.callback_code:
+                    GLib.idle_add(self.callback_code, code_generated, wormhole_data)
 
             self.w.get_code().addCallback(write_code)
 
@@ -65,13 +66,14 @@ class WormholeOffer:
         # wait for reply
         def received(msg):
             log.info("Got data, %d bytes" % len(msg))
-            GLib.idle_add(self.callback_receive, key_data, self.code, True)
+            if self.callback_receive:
+                GLib.idle_add(self.callback_receive, key_data, self.code, True)
             self.w.close()
 
         self.w.get_message().addCallback(received)
 
     def stop(self):
-        if self.w is not None:
+        if self.w:
             self.w.close()
 
 
