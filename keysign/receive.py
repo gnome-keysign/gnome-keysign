@@ -127,6 +127,7 @@ class ReceiveApp:
         self.on_keydata_downloaded(key_data)
 
     def on_code_changed(self, scanner, entry, receive_button):
+        # TODO: alternatives to try wormhole code every time a character changes?
         self.log.debug("Entry changed %r: %r", scanner, entry)
         if len(entry.get_text()) > 0:
             receive_button.set_sensitive(True)
