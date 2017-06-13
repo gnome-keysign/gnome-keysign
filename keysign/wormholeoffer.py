@@ -1,3 +1,4 @@
+from textwrap import dedent
 from twisted.internet import reactor
 from wormhole.cli.public_relay import RENDEZVOUS_RELAY
 import wormhole
@@ -45,14 +46,14 @@ class WormholeOffer:
             self.w.set_code(self.code)
         else:
             self.w.allocate_code()
+            self.w.get_code().addCallback(self._write_code)
 
-            def write_code(code_generated):
-                log.info("Invitation Code: {}".format(code_generated))
-                wormhole_data = "WORM={0}".format(code_generated)
-                if self.callback_code:
-                    GLib.idle_add(self.callback_code, code_generated, wormhole_data)
+        self.w.get_unverified_key().addCallback(self._unverified)
 
-            self.w.get_code().addCallback(write_code)
+        d = self.w.get_verifier()
+        d.addCallback(self._verified)
+        # In this way we catch the WrongPasswordError
+        d.addErrback(self._handle_failure)
 
         key_data = get_public_key_data(self.key.fingerprint)
         kd_decoded = key_data.decode('utf-8')
@@ -64,13 +65,30 @@ class WormholeOffer:
         self.w.send_message(m)
 
         # wait for reply
-        def received(msg):
-            log.info("Got data, %d bytes" % len(msg))
-            if self.callback_receive:
-                GLib.idle_add(self.callback_receive, key_data, self.code, True)
-            self.w.close()
+        self.w.get_message().addCallback(self._received)
 
-        self.w.get_message().addCallback(received)
+    def _write_code(self, code_generated):
+        log.info("Invitation Code: {}".format(code_generated))
+        wormhole_data = "WORM={0}".format(code_generated)
+        if self.callback_code:
+            GLib.idle_add(self.callback_code, code_generated, wormhole_data)
+
+    def _unverified(self, verifier):
+        # TODO this event may not be useful
+        log.info("Unverified key: {}".format(verifier))
+
+    def _verified(self, verifier):
+        # TODO maybe we can show it to the user and ask for a confirm that is the right one
+        log.info("Verified key: {}".format(verifier))
+
+    def _handle_failure(self, f):
+        log.info(dedent(f.type.__doc__))
+
+    def _received(self, msg):
+        log.info("Got data, %d bytes" % len(msg))
+        if self.callback_receive:
+            GLib.idle_add(self.callback_receive, msg, self.code, True)
+        self.w.close()
 
     def stop(self):
         if self.w:

@@ -38,19 +38,20 @@ class WormholeReceive:
         # TODO check if code is None
         self.w.set_code("%s" % str(self.code))
 
-        def received(message):
-            m = decode_message(message)
-            key_data = m["offer"]["message"]
-            log.info("Message received: {}".format(key_data))
-            if self.callback:
-                GLib.idle_add(self.callback, key_data.encode("utf-8"))
+        # callback when we receive a message
+        self.w.get_message().addCallback(self._received)
 
-            # send a reply with a message ack, this also ensures wormhole cli interoperability
-            reply = {"answer": {"message_ack": "ok"}}
-            reply_encoded = encode_message(reply)
-            return self.w.send_message(reply_encoded)
+    def _received(self, message):
+        m = decode_message(message)
+        key_data = m["offer"]["message"]
+        log.info("Message received: {}".format(key_data))
+        if self.callback:
+            GLib.idle_add(self.callback, key_data.encode("utf-8"))
 
-        self.w.get_message().addCallback(received)
+        # send a reply with a message ack, this also ensures wormhole cli interoperability
+        reply = {"answer": {"message_ack": "ok"}}
+        reply_encoded = encode_message(reply)
+        return self.w.send_message(reply_encoded)
 
     def stop(self, callback=None):
         if self.w:
