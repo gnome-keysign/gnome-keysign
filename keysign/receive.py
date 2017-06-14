@@ -47,7 +47,8 @@ from .keyconfirm import PreSignWidget
 from .gpgmh import openpgpkey_from_data
 from .i18n import _
 from .util import sign_keydata_and_send
-from keysign.wormholereceive import WormholeReceive
+from .wormholereceive import WormholeReceive
+from .avahiwormholediscover import AvahiWormholeDiscover
 
 log = logging.getLogger(__name__)
 
@@ -73,14 +74,12 @@ class ReceiveApp:
                 [widget_name, 'confirm-button-image'])
 
         self.accept_button = builder.get_object("confirm_sign_button")
-        self.receive_button = builder.get_object("receive_button")
 
         old_scanner = builder.get_object("scanner_widget")
         old_scanner_parent = old_scanner.get_parent()
 
         scanner = KeyFprScanWidget() #builder=builder)
         scanner.connect("changed", self.on_code_changed)
-        scanner.connect("clicked", self.on_receive_button_clicked)
         scanner.connect("barcode", self.on_barcode)
 
         if old_scanner_parent:
@@ -99,9 +98,12 @@ class ReceiveApp:
         self.scanner = scanner
         self.stack = receive_stack
 
+        # TODO check if we can avoid this
         self.discovery = AvahiKeysignDiscoveryWithMac()
         ib = builder.get_object('infobar_discovery')
         self.discovery.connect('list-changed', self.on_list_changed, ib)
+
+        self.aw_discovery = None
 
 
     def on_keydata_downloaded(self, keydata, pixbuf=None):
@@ -115,29 +117,15 @@ class ReceiveApp:
         self.psw = psw
         self.stack.set_visible_child(self.psw)
 
-    def on_receive_button_clicked(self, fpr_widget, entry):
-        self.log.debug("Receive clicked")
-        code = entry.get_text()
-        # Stops an eventually precedent receive and starts a new one
-        self.worm = WormholeReceive(code, self.on_message_received)
-        self.worm.start()
-
     def on_message_received(self, key_data):
         self.log.debug("message received")
         self.on_keydata_downloaded(key_data)
 
-    def on_code_changed(self, scanner, entry, receive_button):
-        # TODO: alternatives to try wormhole code every time a character changes?
+    def on_code_changed(self, scanner, entry):
         self.log.debug("Entry changed %r: %r", scanner, entry)
-        if len(entry.get_text()) > 0:
-            receive_button.set_sensitive(True)
-        else:
-            receive_button.set_sensitive(False)
-
         text = entry.get_text()
-        keydata = self.discovery.find_key(text)
-        if keydata:
-            self.on_keydata_downloaded(keydata)
+        self.aw_discovery = AvahiWormholeDiscover(text, self.on_message_received)
+        self.aw_discovery.start()
 
     def on_barcode(self, scanner, barcode, gstmessage, pixbuf):
         """ Firstly we try to download the key with avahi
