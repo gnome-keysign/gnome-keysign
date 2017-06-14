@@ -18,10 +18,12 @@
 from __future__ import unicode_literals
 
 import hmac
+import json
 import logging
 from subprocess import call
 from string import Template
 from tempfile import NamedTemporaryFile
+from wormhole._wordlist import PGPWordList
 try:
     from urllib.parse import urlparse, parse_qs
     from urllib.parse import ParseResult
@@ -242,3 +244,20 @@ def glib_markup_escape_rencoded_text(s, errors='replace'):
     escaped = GLib.markup_escape_text(replaced)
     log.debug('escaped: %r', escaped)
     return escaped
+
+
+def encode_message(message):
+    """Serialize a string to json object and encode it in utf-8"""
+    return json.dumps(message).encode("utf-8")
+
+
+def decode_message(message):
+    """deserialize a json returning a string"""
+    return json.loads(message.decode("utf-8"))
+
+
+def is_code_complete(code, length=2):
+    wl = PGPWordList()
+    gc = wl.get_completions
+    words = code.split("-", 1)[-1]
+    return words in gc(words, length)

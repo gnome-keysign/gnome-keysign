@@ -57,8 +57,7 @@ class KeyFprScanWidget(Gtk.VBox):
     __gsignals__ = {
         # This is the Gtk widget signal's name
         str('changed'): (GObject.SIGNAL_RUN_LAST, None,
-                         (GObject.TYPE_PYOBJECT,
-                          GObject.TYPE_PYOBJECT)),
+                         (GObject.TYPE_PYOBJECT,)),
         # It's probably not the best name for that signal.
         # While "barcode_scanned" might be better, it is probably
         # unneccesarily specific.
@@ -67,9 +66,6 @@ class KeyFprScanWidget(Gtk.VBox):
                          Gst.Message.__gtype__, # The GStreamer message itself
                          GdkPixbuf.Pixbuf.__gtype__,),), # The pixbuf which caused
                                               # the above string to be decoded
-        # Signal when the receive button has been pressed
-        str('clicked'): (GObject.SIGNAL_RUN_LAST, None,
-                         (GObject.TYPE_PYOBJECT,))
     }
 
     def __init__(self, builder=None):
@@ -112,21 +108,14 @@ class KeyFprScanWidget(Gtk.VBox):
         self.fpr_entry = builder.get_object("fingerprint_entry")
         self.fpr_entry.connect('changed', self.on_text_changed)
 
-        self.receive_button = builder.get_object("receive_button")
-        self.receive_button.connect('clicked', self.on_receive_button_clicked)
-        self.receive_button.set_sensitive(False)
-
         self.set_hexpand(True)
         self.set_vexpand(True)
 
         # Temporary measure...
         self.barcode_scanner = self
 
-    def on_receive_button_clicked(self, button):
-        self.emit('clicked', self.fpr_entry)
-
-    def on_text_changed(self, entryObject, *args):
-        self.emit('changed', entryObject, self.receive_button)
+    def on_text_changed(self, entry_object, *args):
+        self.emit('changed', entry_object, *args)
 
     def on_barcode(self, sender, barcode, message, image):
         self.emit('barcode', barcode, message, image)
