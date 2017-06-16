@@ -3,7 +3,6 @@
 import logging
 import os
 import signal
-from .avahiwormholeoffer import AvahiWormholeOffer
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -24,9 +23,8 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
-from .avahioffer import AvahiHTTPOffer
+from .avahiwormholeoffer import AvahiWormholeOffer
 from . import gpgmh
-from .gpgmh import get_public_key_data
 
 log = logging.getLogger(__name__)
 
@@ -74,9 +72,19 @@ class SendApp:
         fakekey = gpgmh.Key("","","")
         kpw = KeyPresentWidget(fakekey, builder=builder)
 
-        self.builder = builder
+        self.rb = builder.get_object('resultbox')
+        self.stack.remove(self.rb)
+        self.key = None
+        self.result_label = builder.get_object("result_label")
+        self.cancel_button = builder.get_object("cancel_download_button")
+        self.ok_button = builder.get_object("ok_download_button")
+        self.redo_button = builder.get_object("redo_download_button")
+        self.redo_button.connect("clicked", self.on_redo_button_clicked)
+        self.ok_button.connect("clicked", self.on_ok_button_clicked)
+        self.cancel_button.connect("clicked", self.on_cancel_button_clicked)
 
     def on_key_activated(self, widget, key):
+        self.key = key
         log.info("Activated key %r", key)
         ####
         # Create and show widget for key
@@ -88,7 +96,7 @@ class SendApp:
         self.kpw = kpw
         ####
         # Start network services
-        self.avahi_worm_offer = AvahiWormholeOffer(key, callback_code=self.on_code_generated)
+        self.avahi_worm_offer = AvahiWormholeOffer(key, self.on_message_callback, self.on_code_generated)
         self.avahi_worm_offer.start()
 
     def on_code_generated(self, worm_code, discovery_data):
@@ -97,24 +105,59 @@ class SendApp:
         self.kpw.set_qrcode(discovery_data)
 
     def on_message_callback(self, key_data, code, completed):
-        """When the sending ends we re-send the same key data choosing the same
-        wormhole code"""
-        # TODO: maybe just return to the default page instead of reuse the same code
-        # worm.send(key_data, self.on_message_callback, code=code)
-        pass
+        self.show_result(completed)
 
-    def deactivate(self):
-        ####
-        # Stop network services
-        self.avahi_worm_offer.stop()
-        self.avahi_worm_offer = None
+    def show_result(self, success):
+        self._deactivate_avahi_worm_offer()
 
-        ####
-        # Re-set stack to inital position
-        self.stack.set_visible_child(self.stack_saved_visible_child)
+        self.stack.add(self.rb)
         self.stack.remove(self.kpw)
         self.kpw = None
+
+        if success:
+            self.result_label.set_label("Key successfully sent.\nYou should receive soon an email with the signature.")
+            self.cancel_button.set_visible(False)
+            self.ok_button.set_visible(True)
+            self.redo_button.set_visible(True)
+            self.stack.set_visible_child(self.rb)
+        else:
+            self.result_label.set_label("An error occurred sending the key.")
+            self.cancel_button.set_visible(True)
+            self.ok_button.set_visible(False)
+            self.redo_button.set_visible(True)
+            self.stack.set_visible_child(self.rb)
+
+    def on_redo_button_clicked(self, button):
+        log.info("redo pressed")
+        self._set_saved_child_visible()
+        self.on_key_activated(None, self.key)
+
+    def on_ok_button_clicked(self, button):
+        log.info("ok pressed")
+        self._set_saved_child_visible()
+
+    def on_cancel_button_clicked(self, button):
+        log.info("cancel pressed")
+        self._set_saved_child_visible()
+
+    def deactivate(self):
+        self._deactivate_avahi_worm_offer()
+
+        ####
+        # Re-set stack to initial position
+        self._set_saved_child_visible()
+        self.stack.remove(self.kpw)
+        self.kpw = None
+
+    def _set_saved_child_visible(self):
+        self.stack.set_visible_child(self.stack_saved_visible_child)
         self.stack_saved_visible_child = None
+
+    def _deactivate_avahi_worm_offer(self):
+        # Stop network services
+        if self.avahi_worm_offer:
+            self.avahi_worm_offer.stop()
+            self.avahi_worm_offer = None
 
 
 class App(Gtk.Application):
