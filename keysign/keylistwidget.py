@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+from __future__ import unicode_literals
 import logging
 import os
 
@@ -46,9 +46,14 @@ class ListBoxRowWithKey(Gtk.ListBoxRow):
         # This encode, decode dance looks funny, but when
         # the UID contains surrogate, i.e. non-decodable bytes,
         # Python will complain.
-        d = {k: glib_markup_escape_rencoded_text(
-                    "{}".format(v))
-             for k, v in uid._asdict().items()}
+        items = ('name', 'email', 'expiry')
+        format_dict = {k: bytes(uid._asdict()[k]).decode('utf-8', 'replace')
+                          for k in items}
+        log.info("format dicT: %r", format_dict)
+        d = {k: (log.debug("handling kv: %r %r", k, v),
+                  glib_markup_escape_rencoded_text(
+                    "{}".format(v)))[1]
+             for k, v in format_dict.items()}
         log.info("Formatting UID %r", d)
         s = fmt.format(**d)
         log.info("Formatted UID: %r", s)
