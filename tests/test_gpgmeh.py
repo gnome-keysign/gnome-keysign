@@ -522,3 +522,11 @@ class TestSignAndEncrypt:
 class TestLatin1(TestSignAndEncrypt):
     SENDER_KEY = "seckey-latin1.asc"
     RECEIVER_KEY = "seckey-2.asc"
+
+class TestColon(TestSignAndEncrypt):
+    SENDER_KEY = "seckey-colon.asc"
+    RECEIVER_KEY = "seckey-2.asc"
+
+class TestMultipleUID(TestSignAndEncrypt):
+    SENDER_KEY = "seckey-multiple-uid-colon.asc"
+    RECEIVER_KEY = "seckey-2.asc"
