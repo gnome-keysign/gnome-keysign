@@ -478,6 +478,8 @@ FDFB F70A 0290 6C30 1813</property>
                 <property name="label" translatable="yes">Key successfully sent.
 You should receive soon an email with the signature.</property>
                 <property name="justify">center</property>
+                <property name="wrap">True</property>
+                <property name="wrap_mode">char</property>
                 <attributes>
                   <attribute name="weight" value="heavy"/>
                 </attributes>
@@ -493,14 +495,14 @@ You should receive soon an email with the signature.</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
-                  <object class="GtkButton" id="cancel_download_button">
-                    <property name="label">gtk-cancel</property>
+                  <object class="GtkButton" id="ok_download_button">
+                    <property name="label">gtk-ok</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_stock">True</property>
                     <property name="always_show_image">True</property>
-                    <signal name="clicked" handler="on_cancel_download_button_clicked" swapped="no"/>
+                    <signal name="clicked" handler="on_ok_download_button_clicked" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -510,14 +512,14 @@ You should receive soon an email with the signature.</property>
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton" id="ok_download_button">
-                    <property name="label">gtk-ok</property>
+                  <object class="GtkButton" id="cancel_download_button">
+                    <property name="label">gtk-cancel</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="use_stock">True</property>
                     <property name="always_show_image">True</property>
-                    <signal name="clicked" handler="on_ok_download_button_clicked" swapped="no"/>
+                    <signal name="clicked" handler="on_cancel_download_button_clicked" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>

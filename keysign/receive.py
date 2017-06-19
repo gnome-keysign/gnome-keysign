@@ -61,7 +61,6 @@ class ReceiveApp:
     def __init__(self, builder=None):
         self.psw = None
         self.discovery = None
-        self.worm = None
         self.log = logging.getLogger(__name__)
 
         widget_name = "receive_stack"
@@ -98,13 +97,32 @@ class ReceiveApp:
         self.scanner = scanner
         self.stack = receive_stack
 
-        # TODO check if we can avoid this
         self.discovery = AvahiKeysignDiscoveryWithMac()
         ib = builder.get_object('infobar_discovery')
         self.discovery.connect('list-changed', self.on_list_changed, ib)
 
         self.aw_discovery = None
+        self.rb = builder.get_object('box50')
+        self.result_label = builder.get_object("error_download_label")
+        self.cancel_button = builder.get_object("cancel_download_button")
+        self.redo_button = builder.get_object("redo_download_button")
+        self.redo_button.connect("clicked", self.on_redo_button_clicked)
+        self.cancel_button.connect("clicked", self.on_cancel_button_clicked)
+        # Clear the "downloading" label
+        builder.get_object("label10").set_label("")
 
+    def on_redo_button_clicked(self, button):
+        """ Right know the redo button is quite useless because the sender after
+        the first error it will never reuse the same wormhole code, even if the
+        user press the redo button. So trying a redo here with the same code will
+        never be success"""
+        log.info("redo pressed")
+        self.stack.remove(self.rb)
+        self.aw_discovery.start()
+
+    def on_cancel_button_clicked(self, button):
+        log.info("cancel pressed")
+        self.stack.remove(self.rb)
 
     def on_keydata_downloaded(self, keydata, pixbuf=None):
         key = openpgpkey_from_data(keydata)
@@ -117,9 +135,14 @@ class ReceiveApp:
         self.psw = psw
         self.stack.set_visible_child(self.psw)
 
-    def on_message_received(self, key_data):
-        self.log.debug("message received")
-        self.on_keydata_downloaded(key_data)
+    def on_message_received(self, key_data, success=True, message=None):
+        if success:
+            self.log.debug("message received")
+            self.on_keydata_downloaded(key_data)
+        else:
+            self.stack.add(self.rb)
+            self.result_label.set_label(str(message))
+            self.stack.set_visible_child(self.rb)
 
     def on_code_changed(self, scanner, entry):
         self.log.debug("Entry changed %r: %r", scanner, entry)
@@ -128,15 +151,10 @@ class ReceiveApp:
         self.aw_discovery.start()
 
     def on_barcode(self, scanner, barcode, gstmessage, pixbuf):
-        """ Firstly we try to download the key with avahi
-            and if it fails we try with wormhole """
+        """ Should we prefer wormhole or avahi? Because with a barcode we have both """
         self.log.debug("Scanned barcode %r", barcode)
-        keydata = self.discovery.find_key(barcode)
-        if keydata:
-            self.on_keydata_downloaded(keydata, pixbuf)
-        else:
-            self.worm = WormholeReceive(barcode, self.on_message_received)
-            self.worm.start()
+        self.aw_discovery = AvahiWormholeDiscover(barcode, self.on_message_received)
+        self.aw_discovery.start()
 
     def on_sign_key_confirmed(self, keyPreSignWidget, key, keydata):
         self.log.debug ("Sign key confirmed! %r", key)
@@ -151,8 +169,6 @@ class ReceiveApp:
         log.debug ("Signed the key: %r", self.tmpfiles)
         self.stack.set_visible_child_name("scanner")
         # Do we also want to add an infobar message or so..?
-
-
 
     def on_list_changed(self, discovery, number, userdata):
         ib = userdata

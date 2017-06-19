@@ -249,6 +249,8 @@ For more information click &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
           <object class="GtkLabel" id="error_download_label">
             <property name="can_focus">False</property>
             <property name="label" translatable="yes">Key download was interrupted!</property>
+            <property name="wrap">True</property>
+            <property name="wrap_mode">char</property>
             <attributes>
               <attribute name="weight" value="heavy"/>
               <attribute name="foreground" value="#000000000000"/>

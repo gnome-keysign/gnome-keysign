@@ -55,11 +55,14 @@ class WormholeReceive:
             reply_encoded = encode_message(reply)
             return self.w.send_message(reply_encoded)
         else:
-            log.info("Unknown message received")
-            reply = {"error": "Unrecognized message: {}".format(m)}
+            log.info("Unrecognized message: {}".format(m))
+            error_message = "Unrecognized message"
+            success = False
+            if self.callback:
+                GLib.idle_add(self.callback, key_data, success, error_message)
+            reply = {"error": error_message}
             reply_encoded = encode_message(reply)
             return self.w.send_message(reply_encoded)
-            # TODO display the error to the user
 
     def stop(self, callback=None):
         if self.w:
