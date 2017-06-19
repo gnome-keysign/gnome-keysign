@@ -69,7 +69,8 @@ def format_key_header(fpr, length='2048', creation_time=None):
 def format_uidslist(uidslist):
     result = ""
     for uid in uidslist:
-        uidstr = glib_markup_escape_rencoded_text(uid.uid)
+        uidstr = glib_markup_escape_rencoded_text(
+            uid.uid.decode('utf-8', 'replace'))
         result += ("{}\n".format(uidstr))
 
     return result
