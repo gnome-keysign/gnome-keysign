@@ -38,7 +38,7 @@ def parse_uid(uid):
     name = tokens[0].strip()
     email = 'unknown'
     if len(tokens) > 1:
-        email = tokens[1].replace('>','').strip()
+        email = tokens[1].replace(b'>','').strip()
     
     log.debug("Parsed %r to name (%d): %r", uid, len(name), name)
     return (name, comment, email)
