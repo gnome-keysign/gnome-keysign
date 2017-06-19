@@ -232,5 +232,13 @@ def glib_markup_escape_rencoded_text(s, errors='replace'):
     Because surrogates cannot be encoded as utf-8, we replace the
     errornous bytes (with '?').  You can control that behaviour via the
     errors parameter.
+    You better pass a string here that we can `encode` in first place.
     """
-    return GLib.markup_escape_text(s.encode('utf-8', errors).decode('utf-8'))
+    log.debug('markup rencode escape %s %r (%r)', type(s), s, errors)
+    encoded = s.encode('utf-8', errors)
+    decoded = encoded.decode('utf-8')
+    log.debug('Decoded: %r', decoded)
+    replaced = decoded.replace('\ufffd', '?')
+    escaped = GLib.markup_escape_text(replaced)
+    log.debug('escaped: %r', escaped)
+    return escaped
