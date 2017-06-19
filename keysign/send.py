@@ -106,10 +106,15 @@ class SendApp:
         log.info("Use this for discovering the other key: %r", discovery_data)
         self.kpw.set_qrcode(discovery_data)
 
-    def on_message_callback(self, key_data, code, completed):
-        self.show_result(completed)
+    def on_message_callback(self, success, message=None):
+        # TODO use a better filter
+        if message == 'wormhole.close() was called before the peer connection could be\n    established':
+            pass
+        else:
+            self.show_result(success, message)
+            # Deactivate wormhole and avahi?
 
-    def show_result(self, success):
+    def show_result(self, success, message):
         self._deactivate_avahi_worm_offer()
 
         self.stack.add(self.rb)
@@ -123,7 +128,7 @@ class SendApp:
             self.redo_button.set_visible(True)
             self.stack.set_visible_child(self.rb)
         else:
-            self.result_label.set_label("An error occurred sending the key.")
+            self.result_label.set_label(str(message))
             self.cancel_button.set_visible(True)
             self.ok_button.set_visible(False)
             self.redo_button.set_visible(True)

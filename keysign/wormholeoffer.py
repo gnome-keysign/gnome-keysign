@@ -1,11 +1,12 @@
 from textwrap import dedent
 from twisted.internet import reactor
 from wormhole.cli.public_relay import RENDEZVOUS_RELAY
+from wormhole.errors import TransferError
 import wormhole
 import logging
 import os
 from builtins import input
-from .util import encode_message
+from .util import encode_message, decode_message
 from .gpgmh import get_usable_keys, get_public_key_data
 import gi
 gi.require_version('Gtk', '3.0')
@@ -50,10 +51,8 @@ class WormholeOffer:
 
         self.w.get_unverified_key().addCallback(self._unverified)
 
-        d = self.w.get_verifier()
-        d.addCallback(self._verified)
-        # In this way we catch the WrongPasswordError
-        d.addErrback(self._handle_failure)
+        # With _handle_failure we catch the WrongPasswordError
+        self.w.get_verifier().addCallbacks(self._verified, self._handle_failure)
 
         key_data = get_public_key_data(self.key.fingerprint)
         kd_decoded = key_data.decode('utf-8')
@@ -65,6 +64,7 @@ class WormholeOffer:
         self.w.send_message(m)
 
         # wait for reply
+        # TODO add a timeout?
         self.w.get_message().addCallback(self._received)
 
     def _write_code(self, code_generated):
@@ -82,13 +82,43 @@ class WormholeOffer:
         log.info("Verified key: {}".format(verifier))
 
     def _handle_failure(self, f):
-        log.info(dedent(f.type.__doc__))
+        error = dedent(f.type.__doc__)
+        log.info(error)
+        if self.callback_receive:
+            GLib.idle_add(self.callback_receive, False, error)
+        # self.w.close()
 
     def _received(self, msg):
         log.info("Got data, %d bytes" % len(msg))
+        success, error_msg = self._check_received(msg)
         if self.callback_receive:
-            GLib.idle_add(self.callback_receive, msg, self.code, True)
+            GLib.idle_add(self.callback_receive, success, error_msg)
         self.w.close()
+
+    def _check_received(self, msg):
+        """If the received message has a field 'answer' that means that the transfer
+        successfully completed. Otherwise something went wrong or we received an
+        unexpected message."""
+        msg_dict = decode_message(msg)
+        if u"error" in msg_dict:
+            error_msg = "A remote error occurred: %s" % msg_dict["error"]
+            success = False
+            error = TransferError(error_msg)
+            log.info(error_msg)
+        elif u"answer" in msg_dict:
+            success = True
+            error = None
+        else:
+            success = False
+            error = "Unrecognized message %r" % (msg_dict,)
+            log.info(error)
+        return success, error
+
+    def _connection_error(self):
+        error = "Connection error, the receiver failed to reply. Please try again"
+        log.info(error)
+        if self.callback_receive:
+            GLib.idle_add(self.callback_receive, False, error)
 
     def stop(self):
         if self.w:
