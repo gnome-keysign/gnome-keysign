@@ -11,6 +11,7 @@ Changes
 
  * Translation support. Read keysign/locale/README.rst for details.
  * gpgme: Ignore KEY_CONSIDERED and CARDCTRL.
+ * gpgmh: Support for colons in UIDs.
 
 
 Resources
