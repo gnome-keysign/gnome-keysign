@@ -76,12 +76,6 @@ class SendApp:
         self.stack.remove(self.rb)
         self.key = None
         self.result_label = builder.get_object("result_label")
-        self.cancel_button = builder.get_object("cancel_download_button")
-        self.ok_button = builder.get_object("ok_download_button")
-        self.redo_button = builder.get_object("redo_download_button")
-        self.redo_button.connect("clicked", self.on_redo_button_clicked)
-        self.ok_button.connect("clicked", self.on_ok_button_clicked)
-        self.cancel_button.connect("clicked", self.on_cancel_button_clicked)
 
     def on_key_activated(self, widget, key):
         self.key = key
@@ -121,40 +115,21 @@ class SendApp:
 
         if success:
             self.result_label.set_label("Key successfully sent.\nYou should receive soon an email with the signature.")
-            self.cancel_button.set_visible(False)
-            self.ok_button.set_visible(True)
-            self.redo_button.set_visible(True)
             self.stack.set_visible_child(self.rb)
         else:
             self.result_label.set_label(str(message))
-            self.cancel_button.set_visible(True)
-            self.ok_button.set_visible(False)
-            self.redo_button.set_visible(True)
             self.stack.set_visible_child(self.rb)
-
-    def on_redo_button_clicked(self, button):
-        log.info("redo pressed")
-        self._set_saved_child_visible()
-        self.on_key_activated(None, self.key)
-
-    def on_ok_button_clicked(self, button):
-        log.info("ok pressed")
-        self._set_saved_child_visible()
-
-    def on_cancel_button_clicked(self, button):
-        log.info("cancel pressed")
-        self._set_saved_child_visible()
 
     def deactivate(self):
         self._deactivate_avahi_worm_offer()
 
         ####
         # Re-set stack to initial position
-        self._set_saved_child_visible()
+        self.set_saved_child_visible()
         self.stack.remove(self.kpw)
         self.kpw = None
 
-    def _set_saved_child_visible(self):
+    def set_saved_child_visible(self):
         self.stack.set_visible_child(self.stack_saved_visible_child)
         self.stack_saved_visible_child = None
 
