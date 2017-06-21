@@ -1,6 +1,6 @@
 from textwrap import dedent
 from wormhole.cli.public_relay import RENDEZVOUS_RELAY
-from wormhole.errors import TransferError
+from wormhole.errors import TransferError, WrongPasswordError
 import wormhole
 import logging
 import os
@@ -125,7 +125,12 @@ class WormholeOffer:
 
     def stop(self):
         if self.w:
-            self.w.close()
+            try:
+                yield self.w.close()
+            except WrongPasswordError as e:
+                # This error is already been handled in _handle_failure, so here
+                # we can safely ignore it
+                pass
 
 
 def main(args):
