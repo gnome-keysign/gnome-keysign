@@ -1,5 +1,4 @@
 from textwrap import dedent
-from twisted.internet import reactor
 from wormhole.cli.public_relay import RENDEZVOUS_RELAY
 from wormhole.errors import TransferError
 import wormhole
@@ -11,6 +10,10 @@ from .gpgmh import get_usable_keys, get_public_key_data
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
+if __name__ == "__main__":
+    from twisted.internet import gtk3reactor
+    gtk3reactor.install()
+from twisted.internet import reactor
 
 if __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -129,15 +132,29 @@ def main(args):
     if not args:
         raise ValueError("You must provide an argument to identify the key")
 
-    def code_generated(code):
+    def code_generated(code, wormhole_data):
         print("Discovery info: {}".format(code))
-        input("Press Enter to stop")
+        # Wait for the user without blocking everything
+        reactor.callInThread(cancel)
+
+    def cancel():
+        input("Press Enter to cancel")
         offer.stop()
+        reactor.callFromThread(reactor.stop)
+
+    def received(success, error_msg):
+        if success:
+            print("\nKey sent successfully")
+        else:
+            print("\nAn error occurred: {}".format(error_msg))
+        # We are still waiting for the user to press Enter
+        print("Press Enter to exit")
 
     key = get_usable_keys(pattern=args[0])[0]
-    offer = WormholeOffer(key, callback_code=code_generated)
+    offer = WormholeOffer(key, received, callback_code=code_generated)
     offer.start()
     print("Offering key: {}".format(key))
+    reactor.run()
 
 if __name__ == "__main__":
     import sys
