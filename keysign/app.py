@@ -145,6 +145,7 @@ class KeysignApp(Gtk.Application):
         klw.connect("key-activated", self.on_key_activated)
         klw.connect("map", self.on_keylist_mapped)
         klw.props.margin_left = klw.props.margin_right = 15
+        self.send.rb.connect('map', self.on_resultbox_mapped)
         self.send_stack = ss
         ## End of loading send part
 
@@ -228,12 +229,19 @@ class KeysignApp(Gtk.Application):
         # we could have possibly pressed this button, i.e.
         # from the keypresentwidget.
         log.debug("Send Headerbutton %r clicked! %r", button, args)
+        current = self.send.stack.get_visible_child()
         klw = self.send.klw
-        self.send_stack.set_visible_child(klw)
-        
-        self.send.deactivate()
-
-
+        kpw = self.send.kpw
+        # If we are in the keypresentwidget
+        if current == kpw:
+            self.send_stack.set_visible_child(klw)
+            self.send.deactivate()
+        # Else we are in the result page
+        else:
+            self.send.set_saved_child_visible()
+            self.send.on_key_activated(None, self.send.key)
+            # Immediately call the mapped method for show the back button
+            self.on_keypresent_mapped(self.send.kpw)
 
     def on_receive_header_button_clicked(self, button, *args):
         # Here we assume that there is only one place where
@@ -258,8 +266,12 @@ class KeysignApp(Gtk.Application):
             raise RuntimeError("We expected either send or receive stack "
                 "but got %r" % visible_child)
 
-
-
+    def on_resultbox_mapped(self, rb):
+        log.debug("Resultbox becomes visible!")
+        self.header_button.set_sensitive(True)
+        self.header_button.set_image(
+            Gtk.Image.new_from_icon_name("go-previous",
+                                         Gtk.IconSize.BUTTON))
 
     def on_keylist_mapped(self, keylistwidget):
         log.debug("Keylist becomes visible!")
