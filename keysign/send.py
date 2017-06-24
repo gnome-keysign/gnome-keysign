@@ -78,6 +78,7 @@ class SendApp:
         self.stack.remove(self.rb)
         self.key = None
         self.result_label = builder.get_object("result_label")
+        self.internet_spinner = builder.get_object("internet_spinner")
 
     def on_key_activated(self, widget, key):
         self.key = key
@@ -85,6 +86,9 @@ class SendApp:
         ####
         # Create and show widget for key
         kpw = KeyPresentWidget(key)
+        # FIXME for some strange reasons I'm unable to add a working new signal to KeyPresentWidget
+        # So right now I connect directly to the switch event
+        kpw.internet_switch.connect("state-set", self.on_switch_set)
         self.stack.add(kpw)
         self.stack_saved_visible_child = self.stack.get_visible_child()
         self.stack.set_visible_child(kpw)
@@ -93,11 +97,23 @@ class SendApp:
         ####
         # Start network services
         self.avahi_worm_offer = AvahiWormholeOffer(key, self.on_message_callback, self.on_code_generated)
-        self.avahi_worm_offer.start()
+        self.avahi_worm_offer.start_avahi()
 
-    def on_code_generated(self, worm_code, discovery_data):
-        self.kpw.set_wormhole_code(worm_code)
+    def on_switch_set(self, switch, state):
+        if state:
+            self.kpw.internet_spinner.start()
+            self.avahi_worm_offer.stop_avahi()
+            self.avahi_worm_offer.start_wormhole()
+        else:
+            self.kpw.internet_spinner.stop()
+            self.avahi_worm_offer.stop_wormhole()
+            self.avahi_worm_offer.start_avahi()
+
+    def on_code_generated(self, code, discovery_data):
+        self.kpw.internet_spinner.stop()
+        self.kpw.set_fingerprint_code(code)
         log.info("Use this for discovering the other key: %r", discovery_data)
+        # TODO what should we do with the qr? Alternate avahi and worm code?
         self.kpw.set_qrcode(discovery_data)
 
     def on_message_callback(self, success, message=None):
@@ -106,7 +122,6 @@ class SendApp:
             pass
         else:
             self.show_result(success, message)
-            # Deactivate wormhole and avahi?
 
     def show_result(self, success, message):
         self._deactivate_avahi_worm_offer()
