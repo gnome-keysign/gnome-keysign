@@ -52,8 +52,6 @@ class WormholeOffer:
             self.w.allocate_code()
             self.w.get_code().addCallback(self._write_code)
 
-        self.w.get_unverified_key().addCallback(self._unverified)
-
         # With _handle_failure we catch the WrongPasswordError
         self.w.get_verifier().addCallbacks(self._verified, self._handle_failure)
 
@@ -75,10 +73,6 @@ class WormholeOffer:
         wormhole_data = "WORM={0}".format(code_generated)
         if self.callback_code:
             GLib.idle_add(self.callback_code, code_generated, wormhole_data)
-
-    def _unverified(self, verifier):
-        # TODO this event may not be useful
-        log.info("Unverified key: {}".format(verifier))
 
     def _verified(self, verifier):
         # TODO maybe we can show it to the user and ask for a confirm that is the right one
@@ -126,8 +120,9 @@ class WormholeOffer:
     def stop(self):
         if self.w:
             try:
-                yield self.w.close()
-            except WrongPasswordError as e:
+                self.w.close()
+                self.w = None
+            except WrongPasswordError:
                 # This error is already been handled in _handle_failure, so here
                 # we can safely ignore it
                 pass
