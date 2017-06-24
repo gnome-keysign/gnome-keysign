@@ -69,7 +69,8 @@ class AvahiHTTPOffer:
     def stop(self):
         "Stops offering the key"
         log.info("Requesting to shutdown")
-        self.keyserver.shutdown()
+        if self.keyserver:
+            self.keyserver.shutdown()
 
 
 def main(args):

@@ -92,7 +92,8 @@ class KeyPresentWidget(Gtk.Widget):
         self.uids_label = self._builder.get_object("uidsLabel")
         self.fingerprint_label = self._builder.get_object("keyFingerprintLabel")
         self.qrcode_frame = self._builder.get_object("qrcode_frame")
-        self.wormhole_code = self._builder.get_object("wormhole_code_label")
+        self.internet_switch = self._builder.get_object("internet_switch")
+        self.internet_spinner = self._builder.get_object("internet_spinner")
 
         self.key_id_label.set_markup(
             format_fingerprint(key.fingerprint).replace('\n', '  '))
@@ -102,15 +103,17 @@ class KeyPresentWidget(Gtk.Widget):
                                         for uid
                                         in key.uidslist]))
         self.fingerprint_label.set_markup(format_fingerprint(key.fingerprint))
-        self.wormhole_code.set_label("")
         self.key_fingerprint = key.fingerprint
 
-    def set_wormhole_code(self, wormhole_code):
-        self.wormhole_code.set_label(wormhole_code)
+    def set_fingerprint_code(self, code):
+        self.fingerprint_label.set_markup(code)
 
     def set_qrcode(self, qrcodedata=None):
         if not qrcodedata:
             qrcodedata = "OPENPGP4FPR:" + self.key_fingerprint
+        qr = self.qrcode_frame.get_child()
+        if qr:
+            self.qrcode_frame.remove(self.qrcode_frame.get_child())
         self.qrcode_frame.add(QRImage(qrcodedata))
         self.qrcode_frame.show_all()
 
