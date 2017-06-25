@@ -8,15 +8,17 @@ from gi.repository import GLib
 
 class AvahiWormholeOffer:
     def __init__(self, key, callback_receive=None, callback_code=None, app_id=None, code=None):
-        self.fingerprint = key.fingerprint
-        self.avahi_offer = AvahiHTTPOffer(key)
+        self.key = key
         self.worm_offer = WormholeOffer(key, callback_receive, self._callback_code, app_id, code)
         self.callback_code = callback_code
+        self.avahi_offer = None
         self.avahi_discovery_data = ""
 
     def start_avahi(self):
+        if not self.avahi_offer:
+            self.avahi_offer = AvahiHTTPOffer(self.key)
         self.avahi_discovery_data = self.avahi_offer.start()
-        self._callback_code(format_fingerprint(self.fingerprint), self.avahi_discovery_data)
+        self._callback_code(format_fingerprint(self.key.fingerprint), self.avahi_discovery_data)
 
     def start_wormhole(self):
         self.worm_offer.start()
@@ -32,6 +34,7 @@ class AvahiWormholeOffer:
         self.avahi_discovery_data = ""
         if self.avahi_offer:
             self.avahi_offer.stop()
+            # We need to deallocate the avahi object or the used port will never be released
             self.avahi_offer = None
 
     def stop_wormhole(self):
