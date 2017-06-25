@@ -1,3 +1,4 @@
+from binascii import hexlify
 from textwrap import dedent
 from wormhole.cli.public_relay import RENDEZVOUS_RELAY
 from wormhole.errors import TransferError, WrongPasswordError
@@ -76,7 +77,8 @@ class WormholeOffer:
 
     def _verified(self, verifier):
         # TODO maybe we can show it to the user and ask for a confirm that is the right one
-        log.info("Verified key: {}".format(verifier))
+        ver_ascii = hexlify(verifier).decode("ascii")
+        log.info(u"Verified key: %s" % ver_ascii)
 
     def _handle_failure(self, f):
         error = dedent(f.type.__doc__)
