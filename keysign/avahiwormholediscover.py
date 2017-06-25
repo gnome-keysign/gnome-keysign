@@ -7,7 +7,7 @@ log = logging.getLogger(__name__)
 
 
 class AvahiWormholeDiscover:
-    def __init__(self, userdata, callback=None, app_id=None):
+    def __init__(self, userdata, discovery=None, callback=None, app_id=None):
         # Check if the given code is a barcode
         parsed = parse_barcode(userdata).get("WORM", [None])[0]
         if parsed:
@@ -19,7 +19,10 @@ class AvahiWormholeDiscover:
             self.userdata = userdata
         self.callback = callback
         self.app_id = app_id
-        self.discovery = AvahiKeysignDiscoveryWithMac()
+        if discovery:
+            self.discovery = discovery
+        else:
+            self.discovery = AvahiKeysignDiscoveryWithMac()
         self.worm = None
 
     def start(self):
