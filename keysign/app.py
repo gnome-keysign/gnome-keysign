@@ -223,9 +223,9 @@ class KeysignApp(Gtk.Application):
 
 
     def on_send_header_button_clicked(self, button, *args):
-        # Here we assume that there is only one place where
+        # Here we assume that there is only two places where
         # we could have possibly pressed this button, i.e.
-        # from the keypresentwidget.
+        # from the keypresentwidget or the result page
         log.debug("Send Headerbutton %r clicked! %r", button, args)
         current = self.send.stack.get_visible_child()
         klw = self.send.klw
