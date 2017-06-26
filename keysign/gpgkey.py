@@ -140,7 +140,10 @@ class UID(namedtuple("UID", "expiry uid name comment email")):
     @classmethod
     def from_gpgme(cls, uid):
         "Creates a new UID from a monkeysign key"
-        rawuid = uid.uid
+        # Weird. I would expect the uid to be raw bytes,
+        # because how would gpgme know what encoding to apply?
+        # Also, you can have invalid encodings.
+        rawuid = uid.uid.encode('utf-8', 'replace')
         name = uid.name
         comment = '' # FIXME: uid.comment
         email = uid.email
