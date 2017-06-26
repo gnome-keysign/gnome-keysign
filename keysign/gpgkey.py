@@ -23,8 +23,12 @@ import warnings
 
 log = logging.getLogger(__name__)
 
-def parse_uid(uid):
-    "Parses a GnuPG UID into it's name, comment, and email component"
+def parse_uid(uid, errors='replace'):
+    """Parses a GnuPG UID into it's name, comment, and email component
+    
+    It converts them to strings with the errors paramenter controlling
+    how to deal with encoding problems.
+    """
     # remove the comment from UID (if it exists)
     com_start = uid.find(b'(')
     if com_start != -1:
@@ -32,13 +36,18 @@ def parse_uid(uid):
         uid = uid[:com_start].strip() + uid[com_end+1:].strip()
 
     # FIXME: Actually parse the comment...
-    comment = ""
+    comment = b""
+    comment = comment.decode('utf-8', errors)
+
     # split into user's name and email
     tokens = uid.split(b'<')
     name = tokens[0].strip()
-    email = 'unknown'
+    name = name.decode('utf-8', errors)
+    email = b'unknown'
     if len(tokens) > 1:
-        email = tokens[1].replace(b'>','').strip()
+        log.debug("Parsing tokens: %r", tokens)
+        email = tokens[1].replace(b'>',b'').strip()
+    email = email.decode('utf-8', errors)
     
     log.debug("Parsed %r to name (%d): %r", uid, len(name), name)
     return (name, comment, email)
