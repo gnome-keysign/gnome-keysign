@@ -51,7 +51,7 @@ class AvahiHTTPOffer:
         self.key = key
         self.fingerprint = fingerprint = key.fingerprint
         self.keydata = keydata = get_public_key_data(fingerprint)
-        self.keyserver = Keyserver.ServeKeyThread(str(keydata), fingerprint)
+        self.keyserver = Keyserver.ServeKeyThread(keydata, fingerprint)
         self.mac = mac_generate(fingerprint.encode('ascii'), keydata)
 
     def start(self):
