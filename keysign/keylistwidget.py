@@ -43,11 +43,8 @@ class ListBoxRowWithKey(Gtk.ListBoxRow):
         "Returns a pango string for a gpgmh.UID"
         fmt = "{name}\t<i>{email}</i>\t<small>{expiry}</small>"
 
-        # This encode, decode dance looks funny, but when
-        # the UID contains surrogate, i.e. non-decodable bytes,
-        # Python will complain.
         items = ('name', 'email', 'expiry')
-        format_dict = {k: bytes(uid._asdict()[k]).decode('utf-8', 'replace')
+        format_dict = {k: ""+(uid._asdict()[k] or "")
                           for k in items}
         log.info("format dicT: %r", format_dict)
         d = {k: (log.debug("handling kv: %r %r", k, v),
