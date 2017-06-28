@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from binascii import hexlify
 from textwrap import dedent
 from wormhole.cli.public_relay import RENDEZVOUS_RELAY
@@ -40,7 +41,7 @@ class WormholeOffer:
             self.app_id = app_id
         else:
             # the following id is needed for interoperability with wormhole cli
-            self.app_id = u"lothar.com/wormhole/text-or-file-xfer"
+            self.app_id = "lothar.com/wormhole/text-or-file-xfer"
 
     def start(self):
         log.info("Wormhole: Sending a message")
@@ -78,7 +79,7 @@ class WormholeOffer:
     def _verified(self, verifier):
         # TODO maybe we can show it to the user and ask for a confirm that is the right one
         ver_ascii = hexlify(verifier).decode("ascii")
-        log.info(u"Verified key: %s" % ver_ascii)
+        log.info("Verified key: %s" % ver_ascii)
 
     def _handle_failure(self, f):
         error = dedent(f.type.__doc__)
@@ -99,12 +100,12 @@ class WormholeOffer:
         successfully completed. Otherwise something went wrong or we received an
         unexpected message."""
         msg_dict = decode_message(msg)
-        if u"error" in msg_dict:
+        if "error" in msg_dict:
             error_msg = "A remote error occurred: %s" % msg_dict["error"]
             success = False
             error = TransferError(error_msg)
             log.info(error_msg)
-        elif u"answer" in msg_dict:
+        elif "answer" in msg_dict:
             success = True
             error = None
         else:
