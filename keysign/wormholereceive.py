@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from twisted.internet import reactor
 from wormhole.cli.public_relay import RENDEZVOUS_RELAY
 import wormhole
@@ -27,7 +28,7 @@ class WormholeReceive:
             self.app_id = app_id
         else:
             # the following id is needed for interoperability with wormhole cli
-            self.app_id = u"lothar.com/wormhole/text-or-file-xfer"
+            self.app_id = "lothar.com/wormhole/text-or-file-xfer"
 
     def start(self):
         log.info("Wormhole: Trying to receive a message with code: {}".format(self.code))
@@ -35,7 +36,7 @@ class WormholeReceive:
         self.stop()
         self.w = wormhole.create(self.app_id, RENDEZVOUS_RELAY, reactor)
         # The following mod is required for Python 2 support
-        self.w.set_code(u"%s" % str(self.code))
+        self.w.set_code("%s" % str(self.code))
 
         # callback when we receive a message
         self.w.get_message().addCallback(self._received)
