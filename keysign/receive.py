@@ -46,7 +46,7 @@ from .avahidiscovery import AvahiKeysignDiscoveryWithMac
 from .keyfprscan import KeyFprScanWidget
 from .keyconfirm import PreSignWidget
 from .gpgmh import openpgpkey_from_data
-from .util import sign_keydata_and_send
+from .util import sign_keydata_and_send, fix_infobar
 from .wormholereceive import WormholeReceive
 from .avahiwormholediscover import AvahiWormholeDiscover
 
@@ -99,6 +99,7 @@ class ReceiveApp:
 
         self.discovery = AvahiKeysignDiscoveryWithMac()
         ib = builder.get_object('infobar_discovery')
+        fix_infobar(ib)
         self.discovery.connect('list-changed', self.on_list_changed, ib)
 
         self.aw_discovery = None
