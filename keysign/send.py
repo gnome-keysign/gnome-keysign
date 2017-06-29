@@ -102,7 +102,6 @@ class SendApp:
     def on_switch_set(self, switch, state):
         if state:
             self.kpw.internet_spinner.start()
-            self.avahi_worm_offer.stop_avahi()
             self.avahi_worm_offer.start_wormhole()
         else:
             self.kpw.internet_spinner.stop()
@@ -113,7 +112,6 @@ class SendApp:
         self.kpw.internet_spinner.stop()
         self.kpw.set_fingerprint_code(code)
         log.info("Use this for discovering the other key: %r", discovery_data)
-        # TODO what should we do with the qr? Alternate avahi and worm code?
         self.kpw.set_qrcode(discovery_data)
 
     def on_message_callback(self, success, message=None):
