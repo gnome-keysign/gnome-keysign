@@ -28,6 +28,7 @@ from gi.repository import Gtk, GLib
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 
+
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
                               "this script directly which is discouraged. " +
@@ -46,7 +47,7 @@ from .keyfprscan import KeyFprScanWidget
 from .keyconfirm import PreSignWidget
 from .gpgmh import openpgpkey_from_data
 from .i18n import _
-from .util import sign_keydata_and_send
+from .util import sign_keydata_and_send, fix_infobar
 from .wormholereceive import WormholeReceive
 from .avahiwormholediscover import AvahiWormholeDiscover
 
@@ -99,6 +100,7 @@ class ReceiveApp:
 
         self.discovery = AvahiKeysignDiscoveryWithMac()
         ib = builder.get_object('infobar_discovery')
+        fix_infobar(ib)
         self.discovery.connect('list-changed', self.on_list_changed, ib)
 
         self.aw_discovery = None
