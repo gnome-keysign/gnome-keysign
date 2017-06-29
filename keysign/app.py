@@ -238,6 +238,7 @@ class KeysignApp(Gtk.Application):
             self.send.deactivate()
         # Else we are in the result page
         else:
+            self.send_stack.remove(current)
             self.send.set_saved_child_visible()
             self.send.on_key_activated(None, self.send.key)
             # Immediately call the mapped method for show the back button
