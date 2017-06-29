@@ -25,6 +25,7 @@ from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
 from .avahiwormholeoffer import AvahiWormholeOffer
 from . import gpgmh
+from twisted.internet import reactor
 # We import i18n to have the locale set up for Glade
 from .i18n import _
 
@@ -79,6 +80,7 @@ class SendApp:
         self.key = None
         self.result_label = builder.get_object("result_label")
         self.internet_spinner = builder.get_object("internet_spinner")
+        self.notify = None
 
     def on_key_activated(self, widget, key):
         self.key = key
@@ -93,6 +95,7 @@ class SendApp:
         self.stack_saved_visible_child = self.stack.get_visible_child()
         self.stack.set_visible_child(kpw)
         log.debug('Setting kpw: %r', kpw)
+        kpw.ib.hide()
         self.kpw = kpw
         ####
         # Start network services
@@ -102,13 +105,23 @@ class SendApp:
     def on_switch_set(self, switch, state):
         if state:
             self.kpw.internet_spinner.start()
+            # After 10 seconds without a wormhole code we display an info bar
+            timer = 10
+            self.notify = reactor.callLater(timer, self.no_connection)
             self.avahi_worm_offer.start_wormhole()
         else:
             self.kpw.internet_spinner.stop()
+            self._deactivate_timer()
             self.avahi_worm_offer.stop_wormhole()
             self.avahi_worm_offer.start_avahi()
 
+    def no_connection(self):
+        self.kpw.ib.show()
+        log.info("Slow connection")
+
     def on_code_generated(self, code, discovery_data):
+        self._deactivate_timer()
+        self.kpw.ib.hide()
         self.kpw.internet_spinner.stop()
         self.kpw.set_fingerprint_code(code)
         log.info("Use this for discovering the other key: %r", discovery_data)
@@ -147,6 +160,11 @@ class SendApp:
     def set_saved_child_visible(self):
         self.stack.set_visible_child(self.stack_saved_visible_child)
         self.stack_saved_visible_child = None
+
+    def _deactivate_timer(self):
+        if self.notify and not self.notify.called:
+            self.notify.cancel()
+            self.notify = None
 
     def _deactivate_avahi_worm_offer(self):
         # Stop network services

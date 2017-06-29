@@ -33,7 +33,7 @@ except ImportError:
 
 import requests
 
-from gi.repository import GLib
+from gi.repository import Gtk, GLib
 
 from .gpgmh import fingerprint_from_keydata
 from .gpgmh import sign_keydata_and_encrypt
@@ -261,3 +261,13 @@ def is_code_complete(code, length=2):
     gc = wl.get_completions
     words = code.split("-", 1)[-1]
     return words in gc(words, length)
+
+
+def fix_infobar(infobar):
+    # Work around https://bugzilla.gnome.org/show_bug.cgi?id=710888
+    # Taken from here https://phabricator.freedesktop.org/D1103#34aa2703
+    def make_sure_revealer_does_nothing(widget):
+        if not isinstance(widget, Gtk.Revealer):
+            return
+        widget.set_transition_type(Gtk.RevealerTransitionType.NONE)
+    infobar.forall(make_sure_revealer_does_nothing)
