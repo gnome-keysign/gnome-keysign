@@ -122,13 +122,13 @@ class WormholeOffer:
 
     def stop(self):
         if self.w:
-            try:
-                self.w.close()
-                self.w = None
-            except WrongPasswordError as e:
-                # This error is already been handled in _handle_failure, so here
-                # we can safely ignore it
-                log.debug(e)
+            self.w.close().addErrback(self._error)
+            self.w = None
+
+    def _error(self, error):
+        # These errors should be already handled previously (e.g. in _handle_failure)
+        # so here we can safely ignore them
+        log.debug(error.type)
 
 
 def main(args):
