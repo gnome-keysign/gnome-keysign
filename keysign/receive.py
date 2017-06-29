@@ -50,6 +50,7 @@ from .i18n import _
 from .util import sign_keydata_and_send, fix_infobar
 from .wormholereceive import WormholeReceive
 from .avahiwormholediscover import AvahiWormholeDiscover
+from twisted.internet import reactor
 
 log = logging.getLogger(__name__)
 
@@ -216,10 +217,12 @@ def main(args=[]):
     Gst.init(None)
 
     app = App()
-    try:
-        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : app.quit(), None)
-    except AttributeError:
-        pass
+
+    def stop(signum, stackframe):
+        app.quit()
+        reactor.callFromThread(reactor.stop)
+
+    signal.signal(signal.SIGINT, stop)
     app.run(args)
 
 if __name__ == '__main__':

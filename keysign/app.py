@@ -308,9 +308,7 @@ class KeysignApp(Gtk.Application):
             Gtk.IconSize.BUTTON))
 
 
-
-
-def main(args = []):
+def main(args=[]):
     logging.basicConfig(
         level=logging.DEBUG,
         format='%(name)s (%(levelname)s): %(message)s')
@@ -321,10 +319,12 @@ def main(args = []):
     Gst.init(None)
 
     app = KeysignApp()
-    try:
-        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : app.quit(), None)
-    except AttributeError:
-        pass
+
+    def stop(signum, stackframe):
+        app.quit()
+        reactor.callFromThread(reactor.stop)
+
+    signal.signal(signal.SIGINT, stop)
     app.run(args)
 
 if __name__ == '__main__':
