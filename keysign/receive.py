@@ -48,7 +48,6 @@ from .keyconfirm import PreSignWidget
 from .gpgmh import openpgpkey_from_data
 from .i18n import _
 from .util import sign_keydata_and_send, fix_infobar
-from .wormholereceive import WormholeReceive
 from .avahiwormholediscover import AvahiWormholeDiscover
 from twisted.internet import reactor
 
