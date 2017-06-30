@@ -35,7 +35,7 @@ class WormholeReceive:
             self.app_id = "lothar.com/wormhole/text-or-file-xfer"
 
     def start(self):
-        log.info("Wormhole: Trying to receive a message with code: {}".format(self.code))
+        log.info("Wormhole: Trying to receive a message with code: %s", self.code)
 
         self.stop()
         self.w = wormhole.create(self.app_id, RENDEZVOUS_RELAY, reactor)
@@ -52,7 +52,7 @@ class WormholeReceive:
         if offer:
             key_data = offer.get("message", None)
         if key_data:
-            log.info("Message received: {}".format(key_data))
+            log.info("Message received: %s", key_data)
             if self.callback:
                 GLib.idle_add(self.callback, key_data.encode("utf-8"))
             # send a reply with a message ack, this also ensures wormhole cli interoperability
@@ -60,7 +60,7 @@ class WormholeReceive:
             reply_encoded = encode_message(reply)
             return self.w.send_message(reply_encoded)
         else:
-            log.info("Unrecognized message: {}".format(m))
+            log.info("Unrecognized message: %s", m)
             error_message = "Unrecognized message"
             success = False
             if self.callback:
