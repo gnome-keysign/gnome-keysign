@@ -73,7 +73,7 @@ class WormholeOffer:
         self.w.get_message().addCallback(self._received)
 
     def _write_code(self, code_generated):
-        log.info("Invitation Code: {}".format(code_generated))
+        log.info("Invitation Code: %s", code_generated)
         wormhole_data = "WORM={0}".format(code_generated)
         if self.callback_code:
             GLib.idle_add(self.callback_code, code_generated, wormhole_data)
@@ -81,7 +81,7 @@ class WormholeOffer:
     def _verified(self, verifier):
         # TODO maybe we can show it to the user and ask for a confirm that is the right one
         ver_ascii = hexlify(verifier).decode("ascii")
-        log.info("Verified key: %s" % ver_ascii)
+        log.info("Verified key: %s", ver_ascii)
 
     def _handle_failure(self, f):
         error = dedent(f.type.__doc__)
@@ -130,7 +130,7 @@ class WormholeOffer:
     def _error(self, error):
         # These errors should be already handled previously (e.g. in _handle_failure)
         # so here we can safely ignore them
-        log.debug(error.type)
+        log.debug("Error: %s", error.type)
 
 
 def main(args):

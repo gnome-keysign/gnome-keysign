@@ -30,11 +30,11 @@ class AvahiWormholeDiscover:
         # if the code may be a valid wormhole one we try to use wormhole.
         # Otherwise we use avahi
         if is_code_complete(self.userdata):
-            log.info("{} may be a good wormhole code".format(self.userdata))
+            log.info("%s may be a good wormhole code", self.userdata)
             self.worm = WormholeReceive(self.userdata, self.callback)
             self.worm.start()
         else:
-            log.info("{} is not a valid wormhole code".format(self.userdata))
+            log.info("%s is not a valid wormhole code", self.userdata)
             keydata = self.discovery.find_key(self.userdata)
             if keydata and self.callback:
                 self.callback(keydata, True)
