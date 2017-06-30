@@ -8,6 +8,10 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GLib  # for markup_escape_text
+if __name__ == "__main__":
+    from twisted.internet import gtk3reactor
+    gtk3reactor.install()
+from twisted.internet import reactor
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -25,7 +29,6 @@ from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
 from .avahiwormholeoffer import AvahiWormholeOffer
 from . import gpgmh
-from twisted.internet import reactor
 
 log = logging.getLogger(__name__)
 
@@ -185,6 +188,7 @@ class App(Gtk.Application):
         self.builder = Gtk.Builder.new_from_file(ui_file_path)
         window = self.builder.get_object("appwindow")
         assert window
+        window.connect("delete-event", self.on_delete_window)
         self.headerbar = self.builder.get_object("headerbar")
         hb = self.builder.get_object("headerbutton")
         hb.connect("clicked", self.on_headerbutton_clicked)
@@ -196,8 +200,12 @@ class App(Gtk.Application):
         window.show_all()
         self.add_window(window)
 
+        reactor.run()
 
-    
+    @staticmethod
+    def on_delete_window(*args):
+        reactor.callFromThread(reactor.stop)
+        Gtk.main_quit(*args)
 
     def on_key_activated(self, widget, key):
         ####
@@ -208,10 +216,8 @@ class App(Gtk.Application):
         # Making button clickable
         self.headerbutton.set_sensitive(True)
 
-
     def on_headerbutton_clicked(self, button):
         log.info("Headerbutton pressed: %r", button)
-        self.send_app.deactivate()
 
         # If we ever defer operations here, it seems that
         # the order of steps is somewhat important for the
@@ -223,17 +229,39 @@ class App(Gtk.Application):
         # For now, it doesn't matter, because we don't defer.
 
         ####
-        # Making button non-clickable
-        self.headerbutton.set_sensitive(False)
-        ####
         # Restoring subtitle
         self.headerbar.set_subtitle(self.headerbar_subtitle)
+
+        current = self.send_app.stack.get_visible_child()
+        klw = self.send_app.klw
+        kpw = self.send_app.kpw
+        # If we are in the keypresentwidget
+        if current == kpw:
+            self.send_app.stack.set_visible_child(klw)
+            self.send_app.deactivate()
+            self.headerbutton.set_sensitive(False)
+        # Else we are in the result page
+        else:
+            self.send_app.stack.remove(current)
+            self.send_app.set_saved_child_visible()
+            self.send_app.on_key_activated(None, self.send_app.key)
+            # Immediately call the mapped method for show the back button
+            self.on_keypresent_mapped(self.send_app.kpw)
+
+    def on_keypresent_mapped(self, kpw):
+        log.debug("keypresent becomes visible!")
+        self.headerbutton.set_sensitive(True)
+        self.headerbutton.set_image(
+            Gtk.Image.new_from_icon_name("go-previous",
+                                         Gtk.IconSize.BUTTON))
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     app = App()
-    try:
-        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : app.quit(), None)
-    except AttributeError:
-        pass
+
+    def stop(signum, stackframe):
+        app.quit()
+        reactor.callFromThread(reactor.stop)
+
+    signal.signal(signal.SIGINT, stop)
     app.run()
