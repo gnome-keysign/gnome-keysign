@@ -1,13 +1,13 @@
 from __future__ import unicode_literals
 from binascii import hexlify
 from textwrap import dedent
-from wormhole.cli.public_relay import RENDEZVOUS_RELAY
-from wormhole.errors import TransferError, WrongPasswordError
-import wormhole
 import logging
 import os
 from builtins import input
-from .gpgmh import get_usable_keys, get_public_key_data
+
+from wormhole.cli.public_relay import RENDEZVOUS_RELAY
+from wormhole.errors import TransferError
+import wormhole
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
@@ -15,6 +15,8 @@ if __name__ == "__main__":
     from twisted.internet import gtk3reactor
     gtk3reactor.install()
 from twisted.internet import reactor
+
+from .gpgmh import get_usable_keys, get_public_key_data
 from .util import encode_message, decode_message
 
 if __name__ == "__main__" and __package__ is None:

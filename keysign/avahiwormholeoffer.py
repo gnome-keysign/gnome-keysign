@@ -1,9 +1,6 @@
 from .util import format_fingerprint
 from .wormholeoffer import WormholeOffer
 from .avahioffer import AvahiHTTPOffer
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import GLib
 
 
 class AvahiWormholeOffer:

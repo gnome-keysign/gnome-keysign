@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
-from wormhole.cli.public_relay import RENDEZVOUS_RELAY
-import wormhole
 import logging
 
+from wormhole.cli.public_relay import RENDEZVOUS_RELAY
+import wormhole
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
@@ -10,6 +10,7 @@ if __name__ == "__main__":
     from twisted.internet import gtk3reactor
     gtk3reactor.install()
 from twisted.internet import reactor
+
 from .util import decode_message, encode_message, parse_barcode
 
 log = logging.getLogger(__name__)

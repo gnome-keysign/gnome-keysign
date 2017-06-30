@@ -1,4 +1,5 @@
 import logging
+
 from .wormholereceive import WormholeReceive
 from .avahidiscovery import AvahiKeysignDiscoveryWithMac
 from .util import is_code_complete, parse_barcode
