@@ -1,13 +1,16 @@
 from __future__ import unicode_literals
-from twisted.internet import reactor
 from wormhole.cli.public_relay import RENDEZVOUS_RELAY
 import wormhole
 import logging
 
-from .util import decode_message, encode_message, parse_barcode
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
+if __name__ == "__main__":
+    from twisted.internet import gtk3reactor
+    gtk3reactor.install()
+from twisted.internet import reactor
+from .util import decode_message, encode_message, parse_barcode
 
 log = logging.getLogger(__name__)
 
@@ -71,3 +74,27 @@ class WormholeReceive:
 
         if callback:
             GLib.idle_add(callback)
+
+
+def main(args):
+    log.debug('Running main with args: %s', args)
+    if not args:
+        raise ValueError("You must provide an argument with the wormhole code")
+
+    def received_callback(key_data, success=True, error_message=None):
+        if success:
+            print(key_data)
+        else:
+            print(error_message)
+
+        reactor.callFromThread(reactor.stop)
+
+    code = args[0]
+    receive = WormholeReceive(code, received_callback)
+    receive.start()
+    reactor.run()
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    import sys
+    main(sys.argv[1:])
