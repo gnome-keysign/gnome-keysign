@@ -16,9 +16,6 @@ if __name__ == "__main__":
     gtk3reactor.install()
 from twisted.internet import reactor
 
-from .gpgmh import get_usable_keys, get_public_key_data
-from .util import encode_message, decode_message
-
 if __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
                               "this script directly which is discouraged. " +
@@ -28,6 +25,8 @@ if __name__ == "__main__" and __package__ is None:
     os.sys.path.insert(0, os.path.join(parent_dir, 'monkeysign'))
     __package__ = str('keysign')
 
+from .gpgmh import get_usable_keys, get_public_key_data
+from .util import encode_message, decode_message
 
 log = logging.getLogger(__name__)
 
