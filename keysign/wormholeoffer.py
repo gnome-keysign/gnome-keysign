@@ -7,7 +7,6 @@ import wormhole
 import logging
 import os
 from builtins import input
-from .util import encode_message, decode_message
 from .gpgmh import get_usable_keys, get_public_key_data
 import gi
 gi.require_version('Gtk', '3.0')
@@ -16,6 +15,7 @@ if __name__ == "__main__":
     from twisted.internet import gtk3reactor
     gtk3reactor.install()
 from twisted.internet import reactor
+from .util import encode_message, decode_message
 
 if __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
