@@ -40,7 +40,7 @@ if  __name__ == "__main__" and __package__ is None:
 from .__init__ import __version__
 from .gpgmh import get_usable_keys
 from .QRCode import QRImage
-from .util import format_fingerprint, glib_markup_escape_rencoded_text, fix_infobar
+from .util import format_fingerprint, glib_markup_escape_rencoded_text
 
 
 log = logging.getLogger(__name__)
@@ -93,8 +93,6 @@ class KeyPresentWidget(Gtk.Widget):
         self.qrcode_frame = self._builder.get_object("qrcode_frame")
         self.internet_switch = self._builder.get_object("internet_switch")
         self.internet_spinner = self._builder.get_object("internet_spinner")
-        self.ib = self._builder.get_object('infobar_internet')
-        fix_infobar(self.ib)
 
         self.key_id_label.set_markup(
             format_fingerprint(key.fingerprint).replace('\n', '  '))
