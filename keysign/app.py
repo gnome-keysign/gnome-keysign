@@ -118,6 +118,8 @@ class KeysignApp(Gtk.Application):
         self.headerbar = window.get_titlebar()
         self.header_button = builder.get_object("back_refresh_button")
         self.header_button.connect('clicked', self.on_header_button_clicked)
+        self.internet_toggle = builder.get_object("internet_toggle")
+        self.internet_toggle.connect("toggled", self.on_toggle_clicked)
 
         sw = builder.get_object('stackswitcher1')
         # FIXME: I want to be able to press Alt+S and Alt+R respectively
@@ -202,9 +204,6 @@ class KeysignApp(Gtk.Application):
         # Saving subtitle
         self.headerbar_subtitle = self.headerbar.get_subtitle()
         self.headerbar.set_subtitle(_("Sending {}").format(key.fpr))
-        ####
-        # Making button clickable
-        self.header_button.set_sensitive(True)
 
     @staticmethod
     def on_delete_window(*args):
@@ -267,6 +266,10 @@ class KeysignApp(Gtk.Application):
             raise RuntimeError("We expected either send or receive stack "
                 "but got %r" % visible_child)
 
+    def on_toggle_clicked(self, toggle):
+        log.info("Internet toggled to: %s", toggle.get_active())
+        self.send.set_internet_option(toggle.get_active())
+
     def on_resultbox_mapped(self, rb):
         log.debug("Resultbox becomes visible!")
         self.header_button.set_sensitive(True)
@@ -281,7 +284,7 @@ class KeysignApp(Gtk.Application):
             Gtk.IconSize.BUTTON))
         # We don't support refreshing for now.
         self.header_button.set_sensitive(False)
-
+        self.internet_toggle.show()
 
     def on_send_stack_mapped(self, stack):
         log.debug("send stack becomes visible!")
@@ -292,6 +295,7 @@ class KeysignApp(Gtk.Application):
         self.header_button.set_image(
             Gtk.Image.new_from_icon_name("go-previous",
             Gtk.IconSize.BUTTON))
+        self.internet_toggle.hide()
 
     def on_scanner_mapped(self, scanner):
         log.debug("scanner becomes visible!")
@@ -299,6 +303,7 @@ class KeysignApp(Gtk.Application):
         self.header_button.set_image(
             Gtk.Image.new_from_icon_name("go-previous",
             Gtk.IconSize.BUTTON))
+        self.internet_toggle.hide()
 
     def on_presign_mapped(self, psw):
         log.debug("presign becomes visible!")
@@ -306,6 +311,7 @@ class KeysignApp(Gtk.Application):
         self.header_button.set_image(
             Gtk.Image.new_from_icon_name("go-previous",
             Gtk.IconSize.BUTTON))
+        self.internet_toggle.hide()
 
 
 def main(args=[]):

@@ -29,6 +29,7 @@ from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
 from .avahiwormholeoffer import AvahiWormholeOffer
 from . import gpgmh
+from .util import is_code_complete
 # We import i18n to have the locale set up for Glade
 from .i18n import _
 
@@ -82,53 +83,55 @@ class SendApp:
         self.stack.remove(self.rb)
         self.key = None
         self.result_label = builder.get_object("result_label")
-        self.internet_spinner = builder.get_object("internet_spinner")
         self.notify = None
+        self.internet_option = False
 
     def on_key_activated(self, widget, key):
+        # Deactivate any old connection attempt
+        self._deactivate_timer()
+        self.deactivate()
+        self.klw.ib.hide()
         self.key = key
         log.info("Activated key %r", key)
         ####
-        # Create and show widget for key
+        # Create widget for key
         kpw = KeyPresentWidget(key)
-        # FIXME for some strange reasons I'm unable to add a working new signal to KeyPresentWidget
-        # So right now I connect directly to the switch event
-        kpw.internet_switch.connect("state-set", self.on_switch_set)
-        self.stack.add(kpw)
-        self.stack_saved_visible_child = self.stack.get_visible_child()
-        self.stack.set_visible_child(kpw)
-        log.debug('Setting kpw: %r', kpw)
-        kpw.ib.hide()
         self.kpw = kpw
         ####
         # Start network services
+        self.klw.code_spinner.start()
         self.avahi_worm_offer = AvahiWormholeOffer(key, self.on_message_callback, self.on_code_generated)
-        self.avahi_worm_offer.start_avahi()
-
-    def on_switch_set(self, switch, state):
-        if state:
-            self.kpw.internet_spinner.start()
+        if self.internet_option:
+            #self.kpw.internet_spinner.start()
             # After 10 seconds without a wormhole code we display an info bar
             timer = 10
             self.notify = reactor.callLater(timer, self.no_connection)
-            self.avahi_worm_offer.start_wormhole()
+            self.avahi_worm_offer.start()
         else:
-            self.kpw.internet_spinner.stop()
-            self._deactivate_timer()
-            self.avahi_worm_offer.stop_wormhole()
             self.avahi_worm_offer.start_avahi()
 
     def no_connection(self):
-        self.kpw.ib.show()
+        self.klw.ib.show()
         log.info("Slow connection")
 
     def on_code_generated(self, code, discovery_data):
-        self._deactivate_timer()
-        self.kpw.ib.hide()
-        self.kpw.internet_spinner.stop()
-        self.kpw.set_fingerprint_code(code)
-        log.info("Use this for discovering the other key: %r", discovery_data)
-        self.kpw.set_qrcode(discovery_data)
+        # this method will be called from both avahi and wormhole.
+        # If the Internet toggle is active we need to display the wormhole
+        # code and we can safely ignore the avahi one.
+        if self.internet_option and is_code_complete(code) or not self.internet_option:
+            self._deactivate_timer()
+            self.kpw.set_fingerprint_code(code)
+            log.info("Use this for discovering the other key: %r", discovery_data)
+            self.kpw.set_qrcode(discovery_data)
+
+            ####
+            # Show widget for key
+            self.stack.add(self.kpw)
+            self.stack_saved_visible_child = self.stack.get_visible_child()
+            self.stack.set_visible_child(self.kpw)
+            log.debug('Setting kpw: %r', self.kpw)
+            self.klw.ib.hide()
+            self.klw.code_spinner.stop()
 
     def on_message_callback(self, success, message=None):
         # TODO use a better filter
@@ -157,12 +160,21 @@ class SendApp:
         ####
         # Re-set stack to initial position
         self.set_saved_child_visible()
-        self.stack.remove(self.kpw)
-        self.kpw = None
+        if self.kpw:
+            self.stack.remove(self.kpw)
+            self.kpw = None
 
     def set_saved_child_visible(self):
-        self.stack.set_visible_child(self.stack_saved_visible_child)
-        self.stack_saved_visible_child = None
+        if self.stack_saved_visible_child:
+            self.stack.set_visible_child(self.stack_saved_visible_child)
+            self.stack_saved_visible_child = None
+
+    def set_internet_option(self, value):
+        self._deactivate_timer()
+        self.deactivate()
+        self.klw.ib.hide()
+        self.klw.code_spinner.stop()
+        self.internet_option = value
 
     def _deactivate_timer(self):
         if self.notify and not self.notify.called:
@@ -195,6 +207,8 @@ class App(Gtk.Application):
         hb = self.builder.get_object("headerbutton")
         hb.connect("clicked", self.on_headerbutton_clicked)
         self.headerbutton = hb
+        self.internet_toggle = self.builder.get_object("internet_toggle")
+        self.internet_toggle.connect("toggled", self.on_toggle_clicked)
 
         self.send_app = SendApp(builder=self.builder)
         self.send_app.klw.connect("key-activated", self.on_key_activated)
@@ -209,15 +223,22 @@ class App(Gtk.Application):
         reactor.callFromThread(reactor.stop)
         Gtk.main_quit(*args)
 
+    def on_toggle_clicked(self, toggle):
+        log.info("Internet toggled to: %s", toggle.get_active())
+        self.send_app.set_internet_option(toggle.get_active())
+
     def on_key_activated(self, widget, key):
+        kpw = self.send_app.kpw
+        kpw.connect('map', self.on_keypresent_mapped)
+        log.debug("KPW to wait for map: %r (%r)", kpw, kpw.get_mapped())
+        if kpw.get_mapped():
+            # The widget is already visible. Let's quickly call our handler
+            self.on_keypresent_mapped(kpw)
+
         ####
         # Saving subtitle
         self.headerbar_subtitle = self.headerbar.get_subtitle()
         self.headerbar.set_subtitle("Sending {}".format(key.fpr))
-        ####
-        # Making button clickable
-        self.headerbutton.set_sensitive(True)
-
 
     def on_headerbutton_clicked(self, button):
         log.info("Headerbutton pressed: %r", button)
@@ -243,6 +264,7 @@ class App(Gtk.Application):
             self.send_app.stack.set_visible_child(klw)
             self.send_app.deactivate()
             self.headerbutton.set_sensitive(False)
+            self.internet_toggle.show()
         # Else we are in the result page
         else:
             self.send_app.stack.remove(current)
@@ -257,6 +279,7 @@ class App(Gtk.Application):
         self.headerbutton.set_image(
             Gtk.Image.new_from_icon_name("go-previous",
                                          Gtk.IconSize.BUTTON))
+        self.internet_toggle.hide()
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
