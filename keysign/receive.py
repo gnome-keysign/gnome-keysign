@@ -27,7 +27,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
-
+from twisted.internet import reactor
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -48,7 +48,6 @@ from .keyconfirm import PreSignWidget
 from .gpgmh import openpgpkey_from_data
 from .util import sign_keydata_and_send, fix_infobar
 from .avahiwormholediscover import AvahiWormholeDiscover
-from twisted.internet import reactor
 
 log = logging.getLogger(__name__)
 
