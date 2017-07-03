@@ -22,7 +22,8 @@ import argparse
 import logging
 import os
 
-
+from gi.repository import Gtk, GLib
+from gi.repository import GObject
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -39,7 +40,7 @@ if  __name__ == "__main__" and __package__ is None:
 from .__init__ import __version__
 from .gpgmh import get_usable_keys, get_public_key_data
 from .i18n import _
-from .util import mac_generate
+from .util import mac_generate, format_fingerprint
 from . import Keyserver
 
 log = logging.getLogger(__name__)
@@ -47,45 +48,52 @@ log = logging.getLogger(__name__)
 
 class AvahiHTTPOffer:
     "Spawns a local HTTP daemon and announces it via Avahi"
-    def __init__(self, key):
+    def __init__(self, key, callback_receive, callback_code):
         self.key = key
+        self.cr = callback_receive
+        self.cc = callback_code
         self.fingerprint = fingerprint = key.fingerprint
         self.keydata = keydata = get_public_key_data(fingerprint)
         self.keyserver = Keyserver.ServeKeyThread(keydata, fingerprint)
         self.mac = mac_generate(fingerprint.encode('ascii'), keydata)
 
     def start(self):
-        "Starts offering the key"
-        fingerprint = self.fingerprint.upper()
-        mac = self.mac.upper()
-        discovery_info = 'OPENPGP4FPR:{0}#MAC={1}'.format(
-                                fingerprint, mac)
-
+        """Starts offering the key"""
         log.info("Requesting to start")
         self.keyserver.start()
-
-        return discovery_info
+        self._generate_code()
 
     def stop(self):
         "Stops offering the key"
         log.info("Requesting to shutdown")
         self.keyserver.shutdown()
 
+    def _generate_code(self):
+        fingerprint = self.fingerprint.upper()
+        mac = self.mac.upper()
+        discovery_info = 'OPENPGP4FPR:{0}#MAC={1}'.format(
+            fingerprint, mac)
+        self.cc(format_fingerprint(self.key.fingerprint), discovery_info)
 
 def main(args):
     if not args:
         raise ValueError("You must provide an argument to identify the key")
 
     key = get_usable_keys(pattern=args[0])[0]
-    offer = AvahiHTTPOffer(key)
-    discovery_info = offer.start()
-    print (_("Offering key: {}").format(key))
-    print (_("Discovery info: {}").format(discovery_info))
-    print (_("Press Enter to stop"))
-    try: input_ = raw_input
-    except NameError: input_ = input
-    input_("Press Enter to stop")
-    offer.stop()
+
+    def generated_code(code, discovery_info):
+        print (_("Offering key: {}").format(key))
+        print (_("Discovery info: {}").format(discovery_info))
+        try:
+            input_ = raw_input
+        except NameError:
+            input_ = input
+        input_("Press Enter to stop")
+        offer.stop()
+
+    offer = AvahiHTTPOffer(key, None, generated_code)
+    offer.start()
+
 
 if __name__ == "__main__":
     import sys

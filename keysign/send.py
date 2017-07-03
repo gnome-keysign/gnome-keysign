@@ -115,23 +115,19 @@ class SendApp:
         log.info("Slow connection")
 
     def on_code_generated(self, code, discovery_data):
-        # this method will be called from both avahi and wormhole.
-        # If the Internet toggle is active we need to display the wormhole
-        # code and we can safely ignore the avahi one.
-        if self.internet_option and is_code_complete(code) or not self.internet_option:
-            self._deactivate_timer()
-            self.kpw.set_fingerprint_code(code)
-            log.info("Use this for discovering the other key: %r", discovery_data)
-            self.kpw.set_qrcode(discovery_data)
+        self._deactivate_timer()
+        self.kpw.set_fingerprint_code(code)
+        log.info("Use this for discovering the other key: %r", discovery_data)
+        self.kpw.set_qrcode(discovery_data)
 
-            ####
-            # Show widget for key
-            self.stack.add(self.kpw)
-            self.stack_saved_visible_child = self.stack.get_visible_child()
-            self.stack.set_visible_child(self.kpw)
-            log.debug('Setting kpw: %r', self.kpw)
-            self.klw.ib.hide()
-            self.klw.code_spinner.stop()
+        ####
+        # Show widget for key
+        self.stack.add(self.kpw)
+        self.stack_saved_visible_child = self.stack.get_visible_child()
+        self.stack.set_visible_child(self.kpw)
+        log.debug('Setting kpw: %r', self.kpw)
+        self.klw.ib.hide()
+        self.klw.code_spinner.stop()
 
     def on_message_callback(self, success, message=None):
         # TODO use a better filter
