@@ -5,7 +5,7 @@ from wormhole.cli.public_relay import RENDEZVOUS_RELAY
 import wormhole
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GLib
+from gi.repository import Gtk
 if __name__ == "__main__":
     from twisted.internet import gtk3reactor
     gtk3reactor.install()
@@ -54,7 +54,7 @@ class WormholeReceive:
         if key_data:
             log.info("Message received: %s", key_data)
             if self.callback:
-                GLib.idle_add(self.callback, key_data.encode("utf-8"))
+                self.callback(key_data.encode("utf-8"))
             # send a reply with a message ack, this also ensures wormhole cli interoperability
             reply = {"answer": {"message_ack": "ok"}}
             reply_encoded = encode_message(reply)
@@ -64,7 +64,7 @@ class WormholeReceive:
             error_message = "Unrecognized message"
             success = False
             if self.callback:
-                GLib.idle_add(self.callback, key_data, success, error_message)
+                self.callback(key_data, success, error_message)
             reply = {"error": error_message}
             reply_encoded = encode_message(reply)
             return self.w.send_message(reply_encoded)
@@ -74,7 +74,7 @@ class WormholeReceive:
             self.w.close()
 
         if callback:
-            GLib.idle_add(callback)
+            callback()
 
 
 def main(args):
