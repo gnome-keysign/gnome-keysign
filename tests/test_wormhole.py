@@ -1,13 +1,9 @@
 import os
 import logging
-
 import gi
 gi.require_version('Gtk', '3.0')
-from twisted.internet import gtk3reactor
-gtk3reactor.install()
 
 from nose.twistedtools import reactor
-
 from keysign.gpgmh import openpgpkey_from_data
 from keysign.wormholeoffer import WormholeOffer
 from keysign.wormholereceive import WormholeReceive
