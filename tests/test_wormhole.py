@@ -61,7 +61,8 @@ def test_wrmhl():
 def test_wrmhl_offline_code():
     data = read_fixture_file("seckey-no-pw-1.asc")
     key = openpgpkey_from_data(data)
-    code = "55-penguin-paw-print"
+    # We assume that this channel, at execution time, is free
+    code = "5556-penguin-paw-print"
 
     def callback_receive(self, downloaded_key_data):
         file_key_data = get_public_key_data(self.key.fingerprint)
