@@ -10,7 +10,7 @@ from wormhole.errors import TransferError
 import wormhole
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GLib
+from gi.repository import Gtk
 if __name__ == "__main__":
     from twisted.internet import gtk3reactor
     gtk3reactor.install()
@@ -75,7 +75,7 @@ class WormholeOffer:
         log.info("Invitation Code: %s", code_generated)
         wormhole_data = "WORM={0}".format(code_generated)
         if self.callback_code:
-            GLib.idle_add(self.callback_code, code_generated, wormhole_data)
+            self.callback_code(code_generated, wormhole_data)
 
     def _verified(self, verifier):
         # TODO maybe we can show it to the user and ask for a confirm that is the right one
@@ -86,14 +86,13 @@ class WormholeOffer:
         error = dedent(f.type.__doc__)
         log.info(error)
         if self.callback_receive:
-            GLib.idle_add(self.callback_receive, False, error)
-        # self.w.close()
+            self.callback_receive(False, error)
 
     def _received(self, msg):
         log.info("Got data, %d bytes" % len(msg))
         success, error_msg = self._check_received(msg)
         if self.callback_receive:
-            GLib.idle_add(self.callback_receive, success, error_msg)
+            self.callback_receive(success, error_msg)
         self.w.close()
 
     def _check_received(self, msg):
@@ -119,7 +118,7 @@ class WormholeOffer:
         error = "Connection error, the receiver failed to reply. Please try again"
         log.info(error)
         if self.callback_receive:
-            GLib.idle_add(self.callback_receive, False, error)
+            self.callback_receive(False, error)
 
     def stop(self):
         if self.w:
