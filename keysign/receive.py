@@ -27,6 +27,9 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
+if __name__ == "__main__":
+    from twisted.internet import gtk3reactor
+    gtk3reactor.install()
 from twisted.internet import reactor
 
 if  __name__ == "__main__" and __package__ is None:
@@ -186,7 +189,6 @@ class App(Gtk.Application):
         self.connect('activate', self.on_activate)
         self.log = logging.getLogger(__name__)
 
-
     def on_activate(self, app):
         ui_file = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
@@ -194,6 +196,7 @@ class App(Gtk.Application):
         builder = Gtk.Builder.new_from_file(ui_file)
 
         window = Gtk.ApplicationWindow()
+        window.connect("delete-event", self.on_delete_window)
         window.set_title(_("Receive"))
         # window.set_size_request(600, 400)
         #window = self.builder.get_object("appwindow")
@@ -205,6 +208,12 @@ class App(Gtk.Application):
         window.show_all()
         self.add_window(window)
 
+        reactor.run()
+
+    @staticmethod
+    def on_delete_window(*args):
+        reactor.callFromThread(reactor.stop)
+        Gtk.main_quit(*args)
 
 
 def main(args=[]):
