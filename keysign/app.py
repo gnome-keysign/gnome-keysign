@@ -143,11 +143,6 @@ class KeysignApp(Gtk.Application):
             p.remove(ss)
         ss.connect('notify::visible-child', self.on_send_stack_switch)
         ss.connect('map', self.on_send_stack_mapped)
-        klw = self.send.klw
-        klw.connect("key-activated", self.on_key_activated)
-        klw.connect("map", self.on_keylist_mapped)
-        klw.props.margin_left = klw.props.margin_right = 15
-        self.send.rb.connect('map', self.on_resultbox_mapped)
         self.send_stack = ss
         ## End of loading send part
 
@@ -186,25 +181,6 @@ class KeysignApp(Gtk.Application):
     def run(self, args=[]):
         super(KeysignApp, self).run()
 
-    def on_key_activated(self, widget, key):
-        log.info("Activated key %r", key)
-        # Ouf, we rely on the the SendApp to have reacted to
-        # the signal first, so that it sets up the keypresentwidget
-        # and so that we can access it here.  If it did, however,
-        # We might not be able to catch the mapped signal quickly
-        # enough. So we ask the widget wether it is already mapped.
-        kpw = self.send.kpw
-        kpw.connect('map', self.on_keypresent_mapped)
-        log.debug("KPW to wait for map: %r (%r)", kpw, kpw.get_mapped())
-        if kpw.get_mapped():
-            # The widget is already visible. Let's quickly call our handler
-            self.on_keypresent_mapped(kpw)
-
-        ####
-        # Saving subtitle
-        self.headerbar_subtitle = self.headerbar.get_subtitle()
-        self.headerbar.set_subtitle(_("Sending {}").format(key.fpr))
-
     @staticmethod
     def on_delete_window(*args):
         reactor.callFromThread(reactor.stop)
@@ -216,12 +192,20 @@ class KeysignApp(Gtk.Application):
 
     def on_send_stack_switch(self, stack, *args):
         log.debug("Switched Send Stack! %r", args)
-        #self.update_header_button()
+        current = self.send.stack.get_visible_child()
+        if current == self.send.klw:
+            log.debug("Key list page now visible")
+            self.on_keylist_mapped(self.send.klw)
+        elif current == self.send.kpw:
+            log.debug("Key present page now visible")
+            self.on_keypresent_mapped(self.send.kpw)
+        elif current == self.send.rb:
+            log.debug("Result page now visible")
+            self.on_resultbox_mapped(self.send.rb)
 
     def on_receive_stack_switch(self, stack, *args):
         log.debug("Switched Receive Stack! %r", args)
         #self.update_header_button()
-
 
     def on_send_header_button_clicked(self, button, *args):
         # Here we assume that there is only two places where
@@ -287,6 +271,8 @@ class KeysignApp(Gtk.Application):
 
     def on_send_stack_mapped(self, stack):
         log.debug("send stack becomes visible!")
+        # Adjust the top bar buttons
+        self.on_send_stack_switch(stack)
 
     def on_keypresent_mapped(self, kpw):
         log.debug("keypresent becomes visible!")

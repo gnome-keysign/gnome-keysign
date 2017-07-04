@@ -82,7 +82,7 @@ class KeyPresentWidget(Gtk.Widget):
         w.__class__ = cls
         return w
 
-    def __init__(self, key, qrcodedata=None, builder=None):
+    def __init__(self, key, code, qrcodedata=None, builder=None):
         """A new KeyPresentWidget shows the string you provide as qrcodedata
         in a qrcode. If it evaluates to False, the key's fingerprint will
         be shown. That is, "OPENPGP4FPR: + fingerprint.
@@ -103,10 +103,8 @@ class KeyPresentWidget(Gtk.Widget):
         self.fingerprint_label.set_markup(format_fingerprint(key.fingerprint))
         self.key_fingerprint = key.fingerprint
 
-    def set_fingerprint_code(self, code):
         self.fingerprint_label.set_markup(code)
 
-    def set_qrcode(self, qrcodedata=None):
         if not qrcodedata:
             qrcodedata = "OPENPGP4FPR:" + self.key_fingerprint
         qr = self.qrcode_frame.get_child()
