@@ -150,12 +150,16 @@ class ReceiveApp:
     def on_code_changed(self, scanner, entry):
         self.log.debug("Entry changed %r: %r", scanner, entry)
         text = entry.get_text()
+        if self.aw_discovery:
+            self.aw_discovery.stop()
         self.aw_discovery = AvahiWormholeDiscover(text, self.discovery, self.on_message_received)
         self.aw_discovery.start()
 
     def on_barcode(self, scanner, barcode, gstmessage, pixbuf):
         """ Should we prefer wormhole or avahi? Because with a barcode we have both """
         self.log.debug("Scanned barcode %r", barcode)
+        if self.aw_discovery:
+            self.aw_discovery.stop()
         self.aw_discovery = AvahiWormholeDiscover(barcode, self.discovery, self.on_message_received)
         self.aw_discovery.start()
 

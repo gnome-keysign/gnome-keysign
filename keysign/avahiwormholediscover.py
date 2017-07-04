@@ -42,4 +42,5 @@ class AvahiWormholeDiscover:
     def stop(self):
         """ WormholeReceive need to be stopped because right now after the 'start()'
         it continues trying to connect until it does or we stop it."""
-        self.worm.stop()
+        if self.worm:
+            self.worm.stop()
