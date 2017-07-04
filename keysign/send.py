@@ -257,15 +257,14 @@ class App(Gtk.Application):
         if current == kpw:
             self.send_app.stack.set_visible_child(klw)
             self.send_app.deactivate()
-            self.headerbutton.set_sensitive(False)
-            self.internet_toggle.show()
         # Else we are in the result page
         else:
             self.send_app.stack.remove(current)
             self.send_app.set_saved_child_visible()
             self.send_app.on_key_activated(None, self.send_app.key)
-            # Immediately call the mapped method for show the back button
-            self.on_keypresent_mapped(self.send_app.kpw)
+
+        self.headerbutton.set_sensitive(False)
+        self.internet_toggle.show()
 
     def on_keypresent_mapped(self, kpw):
         log.debug("keypresent becomes visible!")

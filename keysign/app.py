@@ -238,8 +238,6 @@ class KeysignApp(Gtk.Application):
             self.send_stack.remove(current)
             self.send.set_saved_child_visible()
             self.send.on_key_activated(None, self.send.key)
-            # Immediately call the mapped method for show the back button
-            self.on_keypresent_mapped(self.send.kpw)
 
     def on_receive_header_button_clicked(self, button, *args):
         # Here we assume that there is only one place where
@@ -274,6 +272,7 @@ class KeysignApp(Gtk.Application):
         self.header_button.set_image(
             Gtk.Image.new_from_icon_name("go-previous",
                                          Gtk.IconSize.BUTTON))
+        self.internet_toggle.hide()
 
     def on_keylist_mapped(self, keylistwidget):
         log.debug("Keylist becomes visible!")
