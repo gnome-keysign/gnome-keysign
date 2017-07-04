@@ -75,7 +75,7 @@ class SendApp:
         # code runs, it detaches itself from its parent, i.e. the stack.
         # We need need to instantiate the widget with key, however.
         fakekey = gpgmh.Key("","","")
-        kpw = KeyPresentWidget(fakekey, builder=builder)
+        kpw = KeyPresentWidget(fakekey, "", builder=builder)
 
         self.rb = builder.get_object('resultbox')
         self.stack.remove(self.rb)
@@ -91,10 +91,6 @@ class SendApp:
         self.klw.ib.hide()
         self.key = key
         log.info("Activated key %r", key)
-        ####
-        # Create widget for key
-        kpw = KeyPresentWidget(key)
-        self.kpw = kpw
         ####
         # Start network services
         self.klw.code_spinner.start()
@@ -114,9 +110,10 @@ class SendApp:
 
     def on_code_generated(self, code, discovery_data):
         self._deactivate_timer()
-        self.kpw.set_fingerprint_code(code)
         log.info("Use this for discovering the other key: %r", discovery_data)
-        self.kpw.set_qrcode(discovery_data)
+        ####
+        # Create widget for key
+        self.kpw = KeyPresentWidget(self.key, code, discovery_data)
 
         ####
         # Show widget for key
