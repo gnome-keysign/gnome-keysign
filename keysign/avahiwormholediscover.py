@@ -8,16 +8,13 @@ log = logging.getLogger(__name__)
 
 
 class AvahiWormholeDiscover:
-    def __init__(self, userdata, discovery=None, callback=None, app_id=None):
-        # Check if the given code is a barcode
-        parsed = parse_barcode(userdata).get("WORM", [None])[0]
-        if parsed:
-            # In this way if we have a barcode we directly only use the wormhole code.
-            # Maybe we should let the users choose the preferred method or try with one
-            # by default and fallback to the other if it fails
-            self.userdata = parsed
-        else:
-            self.userdata = userdata
+    def __init__(self, userdata, discovery, callback, app_id=None):
+        # if the userdata is a qr code we extract the wormhole code
+        self.worm_code = parse_barcode(userdata).get("WORM", [None])[0]
+        # check if userdata is a valid wormhole code
+        if is_code_complete(userdata):
+            self.worm_code = userdata
+        self.userdata = userdata
         self.callback = callback
         self.app_id = app_id
         if discovery:
@@ -27,17 +24,18 @@ class AvahiWormholeDiscover:
         self.worm = None
 
     def start(self):
-        # if the code may be a valid wormhole one we try to use wormhole.
-        # Otherwise we use avahi
-        if is_code_complete(self.userdata):
-            log.info("%s may be a good wormhole code", self.userdata)
-            self.worm = WormholeReceive(self.userdata, self.callback)
+        # First we try Avahi, and if it fails we fallback to Wormhole
+        # because the receiver may not be able to use Internet, so it is
+        # safer to try both
+        log.info("Trying to use this code with Avahi: %s", self.userdata)
+        keydata = self.discovery.find_key(self.userdata)
+        if keydata:
+            self.callback(keydata, True)
+        elif self.worm_code:
+            # We try the wormhole code, if we have it
+            log.info("Trying to use this code with Wormhole: %s", self.worm_code)
+            self.worm = WormholeReceive(self.worm_code, self.callback)
             self.worm.start()
-        else:
-            log.info("%s is not a valid wormhole code", self.userdata)
-            keydata = self.discovery.find_key(self.userdata)
-            if keydata and self.callback:
-                self.callback(keydata, True)
 
     def stop(self):
         """ WormholeReceive need to be stopped because right now after the 'start()'
