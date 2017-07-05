@@ -156,7 +156,6 @@ class ReceiveApp:
         self.aw_discovery.start()
 
     def on_barcode(self, scanner, barcode, gstmessage, pixbuf):
-        """ Should we prefer wormhole or avahi? Because with a barcode we have both """
         self.log.debug("Scanned barcode %r", barcode)
         if self.aw_discovery:
             self.aw_discovery.stop()
