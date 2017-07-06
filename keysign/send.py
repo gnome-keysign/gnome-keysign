@@ -8,7 +8,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GLib  # for markup_escape_text
-from wormhole.errors import ServerConnectionError
+from wormhole.errors import ServerConnectionError, LonelyError
 if __name__ == "__main__":
     from twisted.internet import gtk3reactor
     gtk3reactor.install()
@@ -134,8 +134,8 @@ class SendApp:
         self.klw.code_spinner.stop()
 
     def on_message_callback(self, success, message=None):
-        # TODO use a better filter
-        if message == 'wormhole.close() was called before the peer connection could be\n    established':
+        if message.type == LonelyError:
+            # This only means that we closed wormhole before a transfer
             pass
         elif message.type == ServerConnectionError:
             self._deactivate_timer()
