@@ -8,6 +8,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GLib  # for markup_escape_text
+from wormhole.errors import ServerConnectionError
 if __name__ == "__main__":
     from twisted.internet import gtk3reactor
     gtk3reactor.install()
@@ -101,14 +102,20 @@ class SendApp:
             #self.kpw.internet_spinner.start()
             # After 10 seconds without a wormhole code we display an info bar
             timer = 10
-            self.notify = reactor.callLater(timer, self.no_connection)
+            self.notify = reactor.callLater(timer, self.slow_connection)
             self.avahi_worm_offer.start()
         else:
             self.avahi_worm_offer.start_avahi()
 
-    def no_connection(self):
+    def slow_connection(self):
+        self.klw.label_ib.set_label("Very slow Internet connection!")
         self.klw.ib.show()
-        log.info("Slow connection")
+        log.info("Slow Internet connection")
+
+    def no_connection(self):
+        self.klw.label_ib.set_label("No Internet connection!")
+        self.klw.ib.show()
+        log.info("No Internet connection")
 
     def on_code_generated(self, code, discovery_data):
         self._deactivate_timer()
@@ -130,6 +137,11 @@ class SendApp:
         # TODO use a better filter
         if message == 'wormhole.close() was called before the peer connection could be\n    established':
             pass
+        elif message.type == ServerConnectionError:
+            self._deactivate_timer()
+            self.deactivate()
+            self.klw.code_spinner.stop()
+            self.no_connection()
         else:
             self.show_result(success, message)
 

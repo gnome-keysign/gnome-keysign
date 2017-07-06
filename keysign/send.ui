@@ -129,7 +129,7 @@ Please use, e.g. Seahorse to create one.</property>
                     <property name="can_focus">False</property>
                     <property name="spacing">16</property>
                     <child>
-                      <object class="GtkLabel">
+                      <object class="GtkLabel" id="label_internet">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Very slow or no Internet connection!</property>
@@ -584,11 +584,6 @@ You should receive soon an email with the signature.</property>
             <property name="use_stock">True</property>
             <property name="always_show_image">True</property>
           </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
         </child>
         <child>
           <object class="GtkToggleButton" id="internet_toggle">
