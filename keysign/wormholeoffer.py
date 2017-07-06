@@ -46,16 +46,15 @@ class WormholeOffer:
 
     def start(self):
         log.info("Wormhole: Sending a message")
-
-        self.stop()
         self.w = wormhole.create(self.app_id, RENDEZVOUS_RELAY, reactor)
         if self.code:
             self.w.set_code(self.code)
         else:
             self.w.allocate_code()
+            # ServerConnectionError will be caught with _handle_failure of get_verifier
             self.w.get_code().addCallback(self._write_code)
 
-        # With _handle_failure we catch the WrongPasswordError
+        # With _handle_failure we catch ServerConnectionError and WrongPasswordError
         self.w.get_verifier().addCallbacks(self._verified, self._handle_failure)
 
         key_data = get_public_key_data(self.key.fingerprint)
@@ -84,9 +83,9 @@ class WormholeOffer:
 
     def _handle_failure(self, f):
         error = dedent(f.type.__doc__)
-        log.info(error)
+        log.info("Error: %s" % error)
         if self.callback_receive:
-            self.callback_receive(False, error)
+            self.callback_receive(False, f)
 
     def _received(self, msg):
         log.info("Got data, %d bytes" % len(msg))
