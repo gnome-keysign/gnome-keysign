@@ -134,10 +134,10 @@ class SendApp:
         self.klw.code_spinner.stop()
 
     def on_message_callback(self, success, message=None):
-        if message.type == LonelyError:
+        if message and message.type == LonelyError:
             # This only means that we closed wormhole before a transfer
             pass
-        elif message.type == ServerConnectionError:
+        elif message and message.type == ServerConnectionError:
             self._deactivate_timer()
             self.deactivate()
             self.klw.code_spinner.stop()
