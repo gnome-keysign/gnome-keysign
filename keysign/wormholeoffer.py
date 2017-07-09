@@ -34,6 +34,7 @@ log = logging.getLogger(__name__)
 class WormholeOffer:
     def __init__(self, key, callback_receive=None, callback_code=None, app_id=None, code=None):
         self.w = None
+        self.message_def = None
         self.key = key
         self.callback_receive = callback_receive
         self.callback_code = callback_code
@@ -68,7 +69,14 @@ class WormholeOffer:
 
         # wait for reply
         # TODO add a timeout?
-        self.w.get_message().addCallback(self._received)
+        self.message_def = self.w.get_message()
+        # If an error occurred it should already be handled with _handle_failure.
+        # Here they should be only duplicates, so we simply log them
+        self.message_def.addCallbacks(self._received, self._log_error)
+
+    def get_last_deferred(self):
+        # right now this is only useful for nose tests
+        return self.message_def
 
     def _write_code(self, code_generated):
         log.info("Invitation Code: %s", code_generated)
@@ -86,6 +94,10 @@ class WormholeOffer:
         log.info("Error: %s" % error)
         if self.callback_receive:
             self.callback_receive(False, f)
+
+    def _log_error(self, f):
+        error = dedent(f.type.__doc__)
+        log.info("Error: %s" % error)
 
     def _received(self, msg):
         log.info("Got data, %d bytes" % len(msg))
