@@ -288,10 +288,9 @@ class App(Gtk.Application):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     app = App()
-
-    def stop(signum, stackframe):
-        app.quit()
-        reactor.callFromThread(reactor.stop)
-
-    signal.signal(signal.SIGINT, stop)
+    try:
+        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
+                                  lambda *args: (app.quit(), reactor.callFromThread(reactor.stop)), None)
+    except AttributeError:
+        pass
     app.run()
