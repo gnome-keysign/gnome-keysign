@@ -104,7 +104,7 @@ class WormholeOffer:
         success, error_msg = self._check_received(msg)
         if self.callback_receive:
             self.callback_receive(success, error_msg)
-        self.w.close()
+        self.stop()
 
     def _check_received(self, msg):
         """If the received message has a field 'answer' that means that the transfer
