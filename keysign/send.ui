@@ -547,6 +547,7 @@ You should receive soon an email with the signature.</property>
                 <property name="justify">center</property>
                 <property name="wrap">True</property>
                 <property name="wrap_mode">char</property>
+                <property name="selectable">True</property>
                 <attributes>
                   <attribute name="weight" value="heavy"/>
                 </attributes>
