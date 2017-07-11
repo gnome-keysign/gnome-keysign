@@ -8,7 +8,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GLib  # for markup_escape_text
-from wormhole.errors import ServerConnectionError, LonelyError
+from wormhole.errors import ServerConnectionError, LonelyError, WrongPasswordError
 if __name__ == "__main__":
     from twisted.internet import gtk3reactor
     gtk3reactor.install()
@@ -151,10 +151,16 @@ class SendApp:
         self.kpw = None
 
         if success:
-            self.result_label.set_label("Key successfully sent.\nYou should receive soon an email with the signature.")
+            self.result_label.set_label("Key successfully sent.\n"
+                                        "You should receive soon an email with the signature.")
             self.stack.set_visible_child(self.rb)
         else:
-            self.result_label.set_label(str(message))
+            if message.type == WrongPasswordError:
+                self.result_label.set_label("The security of the connection seems low.\n"
+                                            "Either your partner has entered a wrong code or"
+                                            "someone tried to intercept your connection")
+            else:
+                self.result_label.set_label("An unexpected error occurred:\n%s" % message)
             self.stack.set_visible_child(self.rb)
 
     def deactivate(self):
