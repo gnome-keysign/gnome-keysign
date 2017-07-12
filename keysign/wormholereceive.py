@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import logging
+from textwrap import dedent
 
 from wormhole.cli.public_relay import RENDEZVOUS_RELAY
 import wormhole
@@ -42,8 +43,8 @@ class WormholeReceive:
         # The following mod is required for Python 2 support
         self.w.set_code("%s" % str(self.code))
 
-        # callback when we receive a message
-        self.w.get_message().addCallback(self._received)
+        # callback when we receive a message, here we catch the WrongPasswordError
+        self.w.get_message().addCallbacks(self._received, self._handle_failure)
 
     def _received(self, message):
         m = decode_message(message)
@@ -68,6 +69,13 @@ class WormholeReceive:
             reply = {"error": error_message}
             reply_encoded = encode_message(reply)
             return self.w.send_message(reply_encoded)
+
+    def _handle_failure(self, f):
+        success = False
+        key_data = None
+        error_message = dedent(f.type.__doc__)
+        if self.callback:
+            self.callback(key_data, success, error_message)
 
     def stop(self, callback=None):
         if self.w:
