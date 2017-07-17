@@ -22,8 +22,7 @@ class AvahiWormholeOffer:
 
     def start_wormhole(self):
         if not self.w_offer:
-            self.w_offer = WormholeOffer(self.key, self.cr, self._callback_worm_code, self.app_id,
-                                         self.w_code)
+            self.w_offer = WormholeOffer(self.key, self.app_id)
         self.w_offer.start()
 
     def start(self):
