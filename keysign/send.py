@@ -13,6 +13,7 @@ if __name__ == "__main__":
     from twisted.internet import gtk3reactor
     gtk3reactor.install()
 from twisted.internet import reactor
+from twisted.internet.defer import inlineCallbacks
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -28,9 +29,11 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
+from .avahioffer import AvahiHTTPOffer
 from .avahiwormholeoffer import AvahiWormholeOffer
 from . import gpgmh
 from .util import is_code_complete
+from .wormholeoffer import WormholeOffer
 # We import i18n to have the locale set up for Glade
 from .i18n import _
 
@@ -47,7 +50,8 @@ class SendApp:
     call deactivate().
     """
     def __init__(self, builder=None):
-        self.avahi_worm_offer = None
+        self.avahi_offer = None
+        self.worm_offer = None
         self.stack = None
         self.stack_saved_visible_child = None
         self.klw = None
@@ -87,6 +91,7 @@ class SendApp:
         self.notify = None
         self.internet_option = False
 
+    @inlineCallbacks
     def on_key_activated(self, widget, key):
         # Deactivate any old connection attempt
         self._deactivate_timer()
@@ -97,15 +102,49 @@ class SendApp:
         ####
         # Start network services
         self.klw.code_spinner.start()
-        self.avahi_worm_offer = AvahiWormholeOffer(key, self.on_message_callback, self.on_code_generated)
+        self.avahi_offer = AvahiHTTPOffer(key)
         if self.internet_option:
             #self.kpw.internet_spinner.start()
             # After 10 seconds without a wormhole code we display an info bar
             timer = 10
             self.notify = reactor.callLater(timer, self.slow_connection)
-            self.avahi_worm_offer.start()
+            self.worm_offer = WormholeOffer(self.key)
+            try:
+                worm_info = yield self.worm_offer.allocate_code()
+            except ServerConnectionError:
+                self._deactivate_timer()
+                self.avahi_offer = None
+                self.worm_offer = None
+                self.klw.code_spinner.stop()
+                self.no_connection()
+                return
+
+            code, w_data = worm_info
+            avahi_info = self.avahi_offer.start()
+            # As design when we use both avahi and wormhole we only display
+            # the wormhole code
+            _, a_data = avahi_info
+            discovery_data = a_data + ";" + w_data
+
+            self.create_keypresent(code, discovery_data)
+
+            start_data = yield self.worm_offer.start()
+            success, message = start_data
+            if message and type(message) == LonelyError:
+                # This only means that we closed wormhole before a transfer
+                pass
+            elif message and type(message) == ServerConnectionError:
+                self._deactivate_timer()
+                self.deactivate()
+                self.klw.code_spinner.stop()
+                self.no_connection()
+            else:
+                self.show_result(success, message)
+
         else:
-            self.avahi_worm_offer.start_avahi()
+            avahi_info = self.avahi_offer.start()
+            a_code, a_data = avahi_info
+            self.create_keypresent(a_code, a_data)
 
     def slow_connection(self):
         self.klw.label_ib.set_label("Very slow Internet connection!")
@@ -117,7 +156,7 @@ class SendApp:
         self.klw.ib.show()
         log.info("No Internet connection")
 
-    def on_code_generated(self, code, discovery_data):
+    def create_keypresent(self, code, discovery_data):
         self._deactivate_timer()
         log.info("Use this for discovering the other key: %r", discovery_data)
         ####
@@ -133,18 +172,6 @@ class SendApp:
         self.klw.ib.hide()
         self.klw.code_spinner.stop()
 
-    def on_message_callback(self, success, message=None):
-        if message and message.type == LonelyError:
-            # This only means that we closed wormhole before a transfer
-            pass
-        elif message and message.type == ServerConnectionError:
-            self._deactivate_timer()
-            self.deactivate()
-            self.klw.code_spinner.stop()
-            self.no_connection()
-        else:
-            self.show_result(success, message)
-
     def show_result(self, success, message):
         self._deactivate_avahi_worm_offer()
 
@@ -157,9 +184,9 @@ class SendApp:
                                         "You should receive soon an email with the signature.")
             self.stack.set_visible_child(self.rb)
         else:
-            if message.type == WrongPasswordError:
+            if type(message) == WrongPasswordError:
                 self.result_label.set_label("The security of the connection seems low.\n"
-                                            "Either your partner has entered a wrong code or"
+                                            "Either your partner has entered a wrong code or "
                                             "someone tried to intercept your connection")
             else:
                 self.result_label.set_label("An unexpected error occurred:\n%s" % message)
@@ -194,9 +221,13 @@ class SendApp:
 
     def _deactivate_avahi_worm_offer(self):
         # Stop network services
-        if self.avahi_worm_offer:
-            self.avahi_worm_offer.stop()
-            self.avahi_worm_offer = None
+        if self.avahi_offer:
+            self.avahi_offer.stop()
+            self.avahi_offer = None
+        log.debug("stopped avahi")
+        if self.worm_offer:
+            self.worm_offer.stop()
+            self.worm_offer = None
 
 
 class App(Gtk.Application):

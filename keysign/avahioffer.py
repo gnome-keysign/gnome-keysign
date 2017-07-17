@@ -48,10 +48,8 @@ log = logging.getLogger(__name__)
 
 class AvahiHTTPOffer:
     "Spawns a local HTTP daemon and announces it via Avahi"
-    def __init__(self, key, callback_receive, callback_code):
+    def __init__(self, key):
         self.key = key
-        self.cr = callback_receive
-        self.cc = callback_code
         self.fingerprint = fingerprint = key.fingerprint
         self.keydata = keydata = get_public_key_data(fingerprint)
         self.keyserver = Keyserver.ServeKeyThread(keydata, fingerprint)
@@ -59,40 +57,35 @@ class AvahiHTTPOffer:
 
     def start(self):
         """Starts offering the key"""
+        fingerprint = self.fingerprint.upper()
+        mac = self.mac.upper()
+        discovery_info = 'OPENPGP4FPR:{0}#MAC={1}'.format(
+                                fingerprint, mac)
+
         log.info("Requesting to start")
         self.keyserver.start()
-        self._generate_code()
+
+        return format_fingerprint(self.key.fingerprint), discovery_info
 
     def stop(self):
         "Stops offering the key"
         log.info("Requesting to shutdown")
         self.keyserver.shutdown()
 
-    def _generate_code(self):
-        fingerprint = self.fingerprint.upper()
-        mac = self.mac.upper()
-        discovery_info = 'OPENPGP4FPR:{0}#MAC={1}'.format(
-            fingerprint, mac)
-        self.cc(format_fingerprint(self.key.fingerprint), discovery_info)
 
 def main(args):
     if not args:
         raise ValueError("You must provide an argument to identify the key")
 
     key = get_usable_keys(pattern=args[0])[0]
-
-    def generated_code(code, discovery_info):
-        print (_("Offering key: {}").format(key))
-        print (_("Discovery info: {}").format(discovery_info))
-        try:
-            input_ = raw_input
-        except NameError:
-            input_ = input
-        input_("Press Enter to stop")
-        offer.stop()
-
-    offer = AvahiHTTPOffer(key, None, generated_code)
-    offer.start()
+    offer = AvahiHTTPOffer(key)
+    discovery_info = offer.start()
+    print (_("Offering key: {}").format(key))
+    print (_("Discovery info: {}").format(discovery_info))
+    try: input_ = raw_input
+    except NameError: input_ = input
+    input_("Press Enter to stop")
+    offer.stop()
 
 
 if __name__ == "__main__":

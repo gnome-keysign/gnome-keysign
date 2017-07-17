@@ -6,7 +6,7 @@ import os
 from builtins import input
 
 from wormhole.cli.public_relay import RENDEZVOUS_RELAY
-from wormhole.errors import TransferError
+from wormhole.errors import TransferError, ServerConnectionError, WrongPasswordError, LonelyError
 import wormhole
 import gi
 gi.require_version('Gtk', '3.0')
@@ -15,6 +15,7 @@ if __name__ == "__main__":
     from twisted.internet import gtk3reactor
     gtk3reactor.install()
 from twisted.internet import reactor
+from twisted.internet.defer import inlineCallbacks, returnValue
 
 if __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -32,79 +33,70 @@ log = logging.getLogger(__name__)
 
 
 class WormholeOffer:
-    def __init__(self, key, callback_receive=None, callback_code=None, app_id=None, code=None):
-        self.w = None
+    def __init__(self, key, app_id=None):
         self.message_def = None
         self.key = key
-        self.callback_receive = callback_receive
-        self.callback_code = callback_code
-        self.code = code
-        if app_id:
-            self.app_id = app_id
-        else:
+        if not app_id:
             # the following id is needed for interoperability with wormhole cli
-            self.app_id = "lothar.com/wormhole/text-or-file-xfer"
+            app_id = "lothar.com/wormhole/text-or-file-xfer"
+        self.w = wormhole.create(app_id, RENDEZVOUS_RELAY, reactor)
 
+    @inlineCallbacks
+    def allocate_code(self, code=None):
+        if code:
+            self.w.set_code(code)
+        else:
+            # ServerConnectionError may be raised
+            self.w.allocate_code()
+            code = yield self.w.get_code()
+        log.info("Invitation Code: %s", code)
+        wormhole_data = "WORM={0}".format(code)
+        returnValue((code, wormhole_data))
+
+    @inlineCallbacks
     def start(self):
         log.info("Wormhole: Sending a message")
-        self.w = wormhole.create(self.app_id, RENDEZVOUS_RELAY, reactor)
-        if self.code:
-            self.w.set_code(self.code)
-        else:
-            self.w.allocate_code()
-            # ServerConnectionError will be caught with _handle_failure of get_verifier
-            self.w.get_code().addCallback(self._write_code)
+        try:
+            verifier = yield self.w.get_verifier()
+            # TODO maybe we can show it to the user and ask for a confirm that is the right one
+            ver_ascii = hexlify(verifier).decode("ascii")
+            log.info("Verified key: %s", ver_ascii)
 
-        # With _handle_failure we catch ServerConnectionError and WrongPasswordError
-        self.w.get_verifier().addCallbacks(self._verified, self._handle_failure)
+            key_data = get_public_key_data(self.key.fingerprint)
+            kd_decoded = key_data.decode('utf-8')
+            # The message needs to be encoded as a json with "message" and "offer" for ensures
+            # wormhole cli interoperability
+            offer = {"message": kd_decoded}
+            data = {"offer": offer}
+            m = encode_message(data)
+            self.w.send_message(m)
 
-        key_data = get_public_key_data(self.key.fingerprint)
-        kd_decoded = key_data.decode('utf-8')
-        # The message needs to be encoded as a json with "message" and "offer" for ensures
-        # wormhole cli interoperability
-        offer = {"message": kd_decoded}
-        data = {"offer": offer}
-        m = encode_message(data)
-        self.w.send_message(m)
+            # wait for reply
+            # TODO add a timeout?
+            msg = yield self.w.get_message()
 
-        # wait for reply
-        # TODO add a timeout?
-        self.message_def = self.w.get_message()
-        # If an error occurred it should already be handled with _handle_failure.
-        # Here they should be only duplicates, so we simply log them
-        self.message_def.addCallbacks(self._received, self._log_error)
+            log.info("Got data, %d bytes" % len(msg))
+            success, error_msg = self._check_received(msg)
+            self.stop()
+            returnValue((success, error_msg))
+
+        except (ServerConnectionError, WrongPasswordError) as e:
+            error = dedent(e.__doc__)
+            log.error("Error: %s" % error)
+            success = False
+            returnValue((success, e))
+        except LonelyError as le:
+            log.info("Lonely, close() was called before the peer connection could be established")
+            success = False
+            returnValue((success, le))
+        except Exception as e:
+            log.error(e)
+            success = False
+            returnValue((success, e))
 
     def get_last_deferred(self):
         # right now this is only useful for nose tests
         return self.message_def
-
-    def _write_code(self, code_generated):
-        log.info("Invitation Code: %s", code_generated)
-        wormhole_data = "WORM={0}".format(code_generated)
-        if self.callback_code:
-            self.callback_code(code_generated, wormhole_data)
-
-    def _verified(self, verifier):
-        # TODO maybe we can show it to the user and ask for a confirm that is the right one
-        ver_ascii = hexlify(verifier).decode("ascii")
-        log.info("Verified key: %s", ver_ascii)
-
-    def _handle_failure(self, f):
-        error = dedent(f.type.__doc__)
-        log.info("Error: %s" % error)
-        if self.callback_receive:
-            self.callback_receive(False, f)
-
-    def _log_error(self, f):
-        error = dedent(f.type.__doc__)
-        log.info("Error: %s" % error)
-
-    def _received(self, msg):
-        log.info("Got data, %d bytes" % len(msg))
-        success, error_msg = self._check_received(msg)
-        if self.callback_receive:
-            self.callback_receive(success, error_msg)
-        self.stop()
 
     def _check_received(self, msg):
         """If the received message has a field 'answer' that means that the transfer
@@ -125,21 +117,15 @@ class WormholeOffer:
             log.info(error)
         return success, error
 
-    def _connection_error(self):
-        error = "Connection error, the receiver failed to reply. Please try again"
-        log.info(error)
-        if self.callback_receive:
-            self.callback_receive(False, error)
-
     def stop(self):
         if self.w:
-            self.w.close().addErrback(self._error)
+            try:
+                self.w.close()
+            except (TransferError, ServerConnectionError, WrongPasswordError) as error:
+                # These errors should be already handled previously
+                # so here we can safely ignore them
+                log.debug("Error: %s", error.type)
             self.w = None
-
-    def _error(self, error):
-        # These errors should be already handled previously (e.g. in _handle_failure)
-        # so here we can safely ignore them
-        log.debug("Error: %s", error.type)
 
 
 def main(args):
