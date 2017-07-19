@@ -1,30 +1,3 @@
-Magic Wormhole progress
-=======================
-Magic Wormhole implementation now works with both Python 2 and Python 3.
-
-It is required the latest git version of Magic Wormhole.
-
-On Arch Linux it can be installed with the AUR package :code:`magic-wormhole-git`
-
-On Ubuntu it can be installed as following:
-
-.. code::
-
-   git clone https://github.com/warner/magic-wormhole.git
-   cd magic-wormhole
-   pip install -e .
-
-For Python 2 compatibility now the package :code:`python-future` is required.
-
-Current working examples:
-
-.. image:: http://imgur.com/KTFKMfi.gif
-
-It is also interoperable with the cli official version of Magic Wormhole.
-
-.. image:: http://imgur.com/3Pe6n3C.gif
-
-
 GNOME Keysign
 =============
 
