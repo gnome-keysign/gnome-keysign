@@ -66,22 +66,39 @@ The list of dependencies includes:
     * GStreamer with the good and bad plugins
     * GTK and Cairo
     * gobject introspection for those libraries
+    * Magic Wormhole
 
 
 openSUSE installation
-----------------------
+---------------------
 
 openSUSE has `packaged the application <https://build.opensuse.org/package/show/GNOME:Apps/gnome-keysign>`_
 so it should be easy for you to install it.
 
 
+Arch Linux installation
+-----------------------
+
+On Arch Linux you can find GNOME-Keysign in the AUR.
+For example you can install it with:
+
+.. code::
+
+    pacaur -y gnome-keysign
+
 
 Debian and Ubuntu dependencies
----------------------------------
+------------------------------
 
 This list of packages seems to make it work:
 
-    python  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad gstreamer1.0-plugins-good python-gi-cairo
+    python  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad gstreamer1.0-plugins-good python-gi-cairo python-future
+
+Magic Wormhole can be installed with pip:
+
+.. code::
+
+    pip install magic-wormhole
 
 In Ubuntu, the package
 gstreamer1.0-plugins-bad provides the zbar and the gtksink element, and
@@ -101,7 +118,7 @@ assuming that pip and git are already installed:
 .. code::
 
     sudo dnf install -y python-gobject python-avahi dbus-python gstreamer1-plugins-bad-free-gtk gstreamer1-plugins-good  gnupg
-
+    pip install magic-wormhole
 
 
 Installation with pip
