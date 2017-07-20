@@ -90,7 +90,8 @@ class WormholeOffer:
             success = False
             returnValue((success, le))
         except Exception as e:
-            log.error(e)
+            error = dedent(e.__doc__)
+            log.error("An unknown error occurred: %s" % error)
             success = False
             returnValue((success, e))
 
