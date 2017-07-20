@@ -211,12 +211,9 @@ class App(Gtk.Application):
         window.show_all()
         self.add_window(window)
 
-        reactor.run()
-
     @staticmethod
     def on_delete_window(*args):
         reactor.callFromThread(reactor.stop)
-        Gtk.main_quit(*args)
 
 
 def main(args=[]):
@@ -229,10 +226,11 @@ def main(args=[]):
     app = App()
     try:
         GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
-                                  lambda *args: (app.quit(), reactor.callFromThread(reactor.stop)), None)
+                                  lambda *args: reactor.callFromThread(reactor.stop), None)
     except AttributeError:
         pass
-    app.run(args)
+    reactor.registerGApplication(app)
+    reactor.run()
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG,

@@ -227,12 +227,9 @@ class App(Gtk.Application):
         window.show_all()
         self.add_window(window)
 
-        reactor.run()
-
     @staticmethod
     def on_delete_window(*args):
         reactor.callFromThread(reactor.stop)
-        Gtk.main_quit(*args)
 
     def on_toggle_clicked(self, toggle):
         log.info("Internet toggled to: %s", toggle.get_active())
@@ -296,7 +293,8 @@ if __name__ == "__main__":
     app = App()
     try:
         GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
-                                  lambda *args: (app.quit(), reactor.callFromThread(reactor.stop)), None)
+                                  lambda *args: reactor.callFromThread(reactor.stop), None)
     except AttributeError:
         pass
-    app.run()
+    reactor.registerGApplication(app)
+    reactor.run()
