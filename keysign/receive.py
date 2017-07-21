@@ -21,6 +21,7 @@ import re
 import os
 import signal
 import sys
+from textwrap import dedent
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -31,6 +32,8 @@ if __name__ == "__main__":
     from twisted.internet import gtk3reactor
     gtk3reactor.install()
 from twisted.internet import reactor
+from twisted.internet.defer import inlineCallbacks
+from wormhole.errors import WrongPasswordError, LonelyError
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -144,23 +147,32 @@ class ReceiveApp:
             self.on_keydata_downloaded(key_data)
         else:
             self.stack.add(self.rb)
-            self.result_label.set_label(str(message))
+            self.result_label.set_label(dedent(message.__doc__))
             self.stack.set_visible_child(self.rb)
 
     def on_code_changed(self, scanner, entry):
         self.log.debug("Entry changed %r: %r", scanner, entry)
         text = entry.get_text()
-        if self.aw_discovery:
-            self.aw_discovery.stop()
-        self.aw_discovery = AvahiWormholeDiscover(text, self.discovery, self.on_message_received)
-        self.aw_discovery.start()
+        self._receive(text)
 
     def on_barcode(self, scanner, barcode, gstmessage, pixbuf):
         self.log.debug("Scanned barcode %r", barcode)
+        self._receive(barcode)
+
+    @inlineCallbacks
+    def _receive(self, code):
         if self.aw_discovery:
             self.aw_discovery.stop()
-        self.aw_discovery = AvahiWormholeDiscover(barcode, self.discovery, self.on_message_received)
-        self.aw_discovery.start()
+        self.aw_discovery = AvahiWormholeDiscover(code, self.discovery)
+        msg_tuple = yield self.aw_discovery.start()
+        key_data, success, message = msg_tuple
+        if message == WrongPasswordError or message == LonelyError:
+            # If a wrong password has been provided or we closed the connection
+            # before a transfer. We do not display that to the user
+            log.info("Waiting for another code")
+            pass
+        else:
+            self.on_message_received(key_data, success, message)
 
     def on_sign_key_confirmed(self, keyPreSignWidget, key, keydata):
         self.log.debug ("Sign key confirmed! %r", key)

@@ -2,7 +2,9 @@ from __future__ import unicode_literals
 import logging
 from textwrap import dedent
 
+from twisted.internet.defer import inlineCallbacks, returnValue
 from wormhole.cli.public_relay import RENDEZVOUS_RELAY
+from wormhole.errors import WrongPasswordError, LonelyError, TransferError
 import wormhole
 import gi
 gi.require_version('Gtk', '3.0')
@@ -18,7 +20,7 @@ log = logging.getLogger(__name__)
 
 
 class WormholeReceive:
-    def __init__(self, code, callback=None, app_id=None):
+    def __init__(self, code, app_id=None):
         self.w = None
         # Check if the given code is a barcode or directly the wormhole code
         parsed = parse_barcode(code).get("WORM", [None])[0]
@@ -26,15 +28,13 @@ class WormholeReceive:
             self.code = parsed
         else:
             self.code = code
-
-        self.callback = callback
-
         if app_id:
             self.app_id = app_id
         else:
             # the following id is needed for interoperability with wormhole cli
             self.app_id = "lothar.com/wormhole/text-or-file-xfer"
 
+    @inlineCallbacks
     def start(self):
         log.info("Wormhole: Trying to receive a message with code: %s", self.code)
 
@@ -43,46 +43,50 @@ class WormholeReceive:
         # The following mod is required for Python 2 support
         self.w.set_code("%s" % str(self.code))
 
-        # callback when we receive a message, here we catch the WrongPasswordError
-        self.w.get_message().addCallbacks(self._received, self._handle_failure)
+        try:
+            message = yield self.w.get_message()
+            m = decode_message(message)
+            key_data = None
+            offer = m.get("offer", None)
+            if offer:
+                key_data = offer.get("message", None)
+            if key_data:
+                log.info("Message received: %s", key_data)
+                success = True
+                message = ""
+                # send a reply with a message ack, this also ensures wormhole cli interoperability
+                reply = {"answer": {"message_ack": "ok"}}
+                reply_encoded = encode_message(reply)
+                self.w.send_message(reply_encoded)
+                returnValue((key_data.encode("utf-8"), success, message))
+            else:
+                log.info("Unrecognized message: %s", m)
+                success = False
+                error_message = "Unrecognized message"
+                reply = {"error": error_message}
+                reply_encoded = encode_message(reply)
+                self.w.send_message(reply_encoded)
+                returnValue((key_data, success, TransferError))
+        except WrongPasswordError as wpe:
+            log.info("A wrong password has been used")
+            self._handle_failure(wpe)
+        except LonelyError as le:
+            log.info("Closed the connection before we found anyone")
+            self._handle_failure(le)
 
-    def _received(self, message):
-        m = decode_message(message)
-        key_data = None
-        offer = m.get("offer", None)
-        if offer:
-            key_data = offer.get("message", None)
-        if key_data:
-            log.info("Message received: %s", key_data)
-            if self.callback:
-                self.callback(key_data.encode("utf-8"))
-            # send a reply with a message ack, this also ensures wormhole cli interoperability
-            reply = {"answer": {"message_ack": "ok"}}
-            reply_encoded = encode_message(reply)
-            return self.w.send_message(reply_encoded)
-        else:
-            log.info("Unrecognized message: %s", m)
-            error_message = "Unrecognized message"
-            success = False
-            if self.callback:
-                self.callback(key_data, success, error_message)
-            reply = {"error": error_message}
-            reply_encoded = encode_message(reply)
-            return self.w.send_message(reply_encoded)
+    @inlineCallbacks
+    def stop(self):
+        if self.w:
+            try:
+                yield self.w.close()
+            except Exception as e:
+                print(e)
 
-    def _handle_failure(self, f):
+    @staticmethod
+    def _handle_failure(error):
         success = False
         key_data = None
-        error_message = dedent(f.type.__doc__)
-        if self.callback:
-            self.callback(key_data, success, error_message)
-
-    def stop(self, callback=None):
-        if self.w:
-            self.w.close()
-
-        if callback:
-            callback()
+        returnValue((key_data, success, type(error)))
 
 
 def main(args):
