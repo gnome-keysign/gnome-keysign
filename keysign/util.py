@@ -257,10 +257,13 @@ def decode_message(message):
 
 
 def is_code_complete(code, length=2):
-    wl = PGPWordList()
-    gc = wl.get_completions
-    words = code.split("-", 1)[-1]
-    return words in gc(words, length)
+    if code[:1].isdigit():
+        wl = PGPWordList()
+        gc = wl.get_completions
+        words = code.split("-", 1)[-1]
+        return words in gc(words, length)
+    else:
+        return False
 
 
 def fix_infobar(infobar):
