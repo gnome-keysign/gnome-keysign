@@ -73,7 +73,7 @@ assuming that pip and git are already installed:
 
 .. code::
 
-    sudo dnf install -y python-gobject python-avahi dbus-python gstreamer1-plugins-bad-free-extras gstreamer1-plugins-good  gnupg
+    sudo dnf install -y python-gobject python-avahi dbus-python gstreamer1-plugins-bad-free-gtk gstreamer1-plugins-good  gnupg
 
 
 
