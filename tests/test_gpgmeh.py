@@ -36,6 +36,8 @@ from keysign.gpgmeh import get_usable_secret_keys
 from keysign.gpgmeh import get_public_key_data
 from keysign.gpgmeh import sign_keydata_and_encrypt
 
+from keysign.gpgkey import to_valid_utf8_string
+
 log = logging.getLogger(__name__)
 thisdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.join(thisdir, "..")
@@ -381,8 +383,9 @@ def get_signatures_for_uids_on_key(ctx, key):
     # What happens if keylist returns multiple keys, e.g. because there
     # is another key with a UID named as the fpr?  How can I make sure I
     # get the signatures of any given key?
-    keys = list(ctx.keylist(key.fpr, mode=(gpg.constants.keylist.mode.LOCAL
-                                           |gpg.constants.keylist.mode.SIGS)))
+    ctx.set_keylist_mode(gpg.constants.keylist.mode.LOCAL
+                         | gpg.constants.keylist.mode.SIGS)
+    keys = list(ctx.keylist(key.fpr))
     assert len(keys) == 1
     uid_sigs = {uid.uid: [s for s in uid.signatures] for uid in keys[0].uids}
     log.info("Signatures: %r", uid_sigs)
@@ -501,9 +504,15 @@ class TestSignAndEncrypt:
                                     sender_key).values() for s in l]
         for uid, uid_enc in zip(uids_before, uid_encrypted):
             uid_enc_str = uid_enc[0].uid
+            log.info("Uid enc str: %r", uid_enc_str)
+            log.info("Uid name: %r", uid.name)
             # FIXME: assert_equals(uid, uid_enc[0])
-            assert_in(uid.name, uid_enc_str)
-            assert_in(uid.email, uid_enc_str)
+            # It's a bit weird to re-use the string treatment here.
+            # But gpgme may return unencodable bytes (and uid, here, is
+            # coming straight from gpgme).  We opted for our UID wrapper
+            # to return consumable strings, i.e. safe to encode
+            assert_in(to_valid_utf8_string(uid.name), uid_enc_str)
+            assert_in(to_valid_utf8_string(uid.email), uid_enc_str)
             ciphertext = uid_enc[1]
             log.debug("Decrypting %r", ciphertext)
             plaintext, result, vrfy = sender.decrypt(ciphertext)
