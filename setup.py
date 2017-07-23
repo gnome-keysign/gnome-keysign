@@ -63,6 +63,10 @@ setup(
         # avahi # Also no entry in the cheeseshop
         # dbus # dbus-python is in the cheeseshop but not pip-able
         ],
+    tests_require=[
+        "pgpy",
+        "nose",
+    ],
     license='GPLv3+',
     long_description=open('README.rst').read(),
     
