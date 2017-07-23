@@ -25,6 +25,8 @@ import os
 from gi.repository import Gtk, GLib
 from gi.repository import GObject
 
+_ = lambda x: x
+
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
                               "this script directly which is discouraged. " +
@@ -79,8 +81,9 @@ def main(args):
     key = get_usable_keys(pattern=args[0])[0]
     offer = AvahiHTTPOffer(key)
     discovery_info = offer.start()
-    print ("Offering key: {}".format(key))
-    print ("Discovery info: {}".format(discovery_info))
+    print (_("Offering key: {}").format(key))
+    print (_("Discovery info: {}").format(discovery_info))
+    print (_("Press Enter to stop"))
     try: input_ = raw_input
     except NameError: input_ = input
     input_("Press Enter to stop")

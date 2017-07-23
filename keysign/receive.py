@@ -28,6 +28,7 @@ from gi.repository import Gtk, GLib
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 
+_ = lambda x: x
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -163,7 +164,7 @@ class App(Gtk.Application):
         builder = Gtk.Builder.new_from_file(ui_file)
 
         window = Gtk.ApplicationWindow()
-        window.set_title("Receive")
+        window.set_title(_("Receive"))
         # window.set_size_request(600, 400)
         #window = self.builder.get_object("appwindow")
         
