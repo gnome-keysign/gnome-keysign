@@ -269,6 +269,9 @@ class TestSignAndEncrypt:
             kr = Keyring(homedir=self.sender_homedir)
             log.info("encrypted UID: %r", enc_uid)
             decrypted = kr.decrypt_data(signed_uid)
+            log.info("ctx out: %r", kr.context.stdout)
+            log.info("ctx err: %r", kr.context.stderr)
+            assert_true (decrypted, "Error decrypting %r" % signed_uid)
 
             # Now we have the signed UID. We want see if it really carries a signature.
             from tempfile import mkdtemp
@@ -287,7 +290,8 @@ class TestSignAndEncrypt:
             log.debug('Sigs before: %s', stdout_before)
             after_dir = mkdtemp()
             kr_after = Keyring(after_dir)
-            kr_after.import_data(decrypted)
+            import_result = kr_after.import_data(decrypted)
+            assert_true (import_result, "Error importing %r" % decrypted)
             kr_after.context.call_command('--list-sigs')
             stdout_after = kr_after.context.stdout
             log.debug('Sigs after: %s', stdout_after)
