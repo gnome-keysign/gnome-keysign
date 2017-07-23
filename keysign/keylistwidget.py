@@ -22,7 +22,6 @@ if  __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 from .gpgmh import get_usable_keys
-from .util import glib_markup_escape_rencoded_text
 
 log = logging.getLogger(__name__)
 
@@ -48,7 +47,7 @@ class ListBoxRowWithKey(Gtk.ListBoxRow):
                           for k in items}
         log.info("format dicT: %r", format_dict)
         d = {k: (log.debug("handling kv: %r %r", k, v),
-                  glib_markup_escape_rencoded_text(
+                  GLib.markup_escape_text(
                     "{}".format(v)))[1]
              for k, v in format_dict.items()}
         log.info("Formatting UID %r", d)

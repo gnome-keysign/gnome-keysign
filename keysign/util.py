@@ -31,8 +31,6 @@ except ImportError:
 
 import requests
 
-from gi.repository import GLib
-
 from .gpgmh import fingerprint_from_keydata
 from .gpgmh import sign_keydata_and_encrypt
 
@@ -222,23 +220,3 @@ def download_key_http(address, port):
     data = requests.get(url.geturl(), timeout=5).content
     log.debug("finished downloading %d bytes", len(data))
     return data
-
-
-def glib_markup_escape_rencoded_text(s, errors='replace'):
-    """Calls GLib.markup_escape and the re-encoded text.
-    The re-encoding is for getting rid of surrogates in unicode strings.
-    Those surrogates appear when the UID contains non UTF-8 bytes, e.g.
-    latin1. gpgme will return a unicode string with those surrogates.
-    Because surrogates cannot be encoded as utf-8, we replace the
-    errornous bytes (with '?').  You can control that behaviour via the
-    errors parameter.
-    You better pass a string here that we can `encode` in first place.
-    """
-    log.debug('markup rencode escape %s %r (%r)', type(s), s, errors)
-    encoded = s.encode('utf-8', errors)
-    decoded = encoded.decode('utf-8')
-    log.debug('Decoded: %r', decoded)
-    replaced = decoded.replace('\ufffd', '?')
-    escaped = GLib.markup_escape_text(replaced)
-    log.debug('escaped: %r', escaped)
-    return escaped

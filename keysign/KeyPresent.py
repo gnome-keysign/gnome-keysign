@@ -40,7 +40,7 @@ if  __name__ == "__main__" and __package__ is None:
 from .__init__ import __version__
 from .gpgmh import get_usable_keys
 from .QRCode import QRImage
-from .util import format_fingerprint, glib_markup_escape_rencoded_text
+from .util import format_fingerprint
 
 
 
@@ -96,8 +96,7 @@ class KeyPresentWidget(Gtk.Widget):
         self.key_id_label.set_markup(
             format_fingerprint(key.fingerprint).replace('\n', '  '))
         self.uids_label.set_markup("\n".join(
-                                        [glib_markup_escape_rencoded_text(
-                                            uid.uid.decode('utf-8', 'replace'))
+                                        [GLib.markup_escape_text(uid.uid)
                                         for uid
                                         in key.uidslist]))
         self.fingerprint_label.set_markup(format_fingerprint(key.fingerprint))

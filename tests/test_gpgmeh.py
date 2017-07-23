@@ -437,12 +437,15 @@ class TestSignAndEncrypt:
 
         sigs_before = [s for l in get_signatures_for_uids_on_key(sender,
                                     key).values() for s in l]
+        # FIXME: Refactor this a little bit.
+        # We have duplication of code with the other test below.
         for uid, uid_enc in zip(uids_before, uid_encrypted):
+            uid_enc_str = uid_enc[0].uid
             # The test doesn't work so well, because comments
             # are not rendered :-/
             # assert_equals(uid, uid_enc[0])
-            assert_in(uid.name, uid_enc[0].uid)
-            assert_in(uid.email, uid_enc[0].uid)
+            assert_in(uid.name, uid_enc_str)
+            assert_in(uid.email, uid_enc_str)
             ciphertext = uid_enc[1]
             log.debug("Decrypting %r", ciphertext)
             plaintext, result, vrfy = sender.decrypt(ciphertext)
@@ -497,9 +500,10 @@ class TestSignAndEncrypt:
         sigs_before = [s for l in get_signatures_for_uids_on_key(sender,
                                     sender_key).values() for s in l]
         for uid, uid_enc in zip(uids_before, uid_encrypted):
+            uid_enc_str = uid_enc[0].uid
             # FIXME: assert_equals(uid, uid_enc[0])
-            assert_in(uid.name, uid_enc[0].uid)
-            assert_in(uid.email, uid_enc[0].uid)
+            assert_in(uid.name, uid_enc_str)
+            assert_in(uid.email, uid_enc_str)
             ciphertext = uid_enc[1]
             log.debug("Decrypting %r", ciphertext)
             plaintext, result, vrfy = sender.decrypt(ciphertext)
