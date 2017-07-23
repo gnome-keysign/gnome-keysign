@@ -22,6 +22,7 @@ if  __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 from .gpgmh import get_usable_keys
+from .i18n import _
 
 log = logging.getLogger(__name__)
 
