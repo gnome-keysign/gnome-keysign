@@ -1,6 +1,6 @@
 GNOME Keysign is a tool to make signing OpenPGP keys as easy as possible.
-This is the v0.9 release which makes use of Glade based widgets and fixes
-a few important bugs.
+This is the v1.0 release which is much more stable for pathologic OpenPGP keys
+and brings support for translations.
 
 You can get the app from:
             
@@ -12,6 +12,7 @@ Changes
  * Translation support. Read keysign/locale/README.rst for details.
  * gpgme: Ignore KEY_CONSIDERED and CARDCTRL.
  * gpgmh: Support for colons in UIDs.
+ * avahioffer: Do not depend on Gtk, GLib, or GObject
 
 
 Resources
