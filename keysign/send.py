@@ -32,6 +32,7 @@ from .KeyPresent import KeyPresentWidget
 from .avahioffer import AvahiHTTPOffer
 from . import gpgmh
 from .wormholeoffer import WormholeOffer
+from .bluetoothoffer import BluetoothOffer
 
 log = logging.getLogger(__name__)
 
@@ -47,7 +48,7 @@ class SendApp:
     """
     def __init__(self, builder=None):
         self.avahi_offer = None
-        self.worm_offer = None
+        self.aw_offer = None
         self.stack = None
         self.stack_saved_visible_child = None
         self.klw = None
@@ -98,48 +99,44 @@ class SendApp:
         ####
         # Start network services
         self.klw.code_spinner.start()
-        self.avahi_offer = AvahiHTTPOffer(key)
         if self.internet_option:
             # After 10 seconds without a wormhole code we display an info bar
             timer = 10
             self.notify = reactor.callLater(timer, self.slow_connection)
-            self.worm_offer = WormholeOffer(self.key)
+            self.aw_offer = AvahiWormholeOffer(self.key)
             try:
-                worm_info = yield self.worm_offer.allocate_code()
+                info = yield self.aw_offer.allocate_code()
             except ServerConnectionError:
                 self._deactivate_timer()
-                self.avahi_offer = None
-                self.worm_offer = None
+                self.aw_offer = None
                 self.klw.code_spinner.stop()
                 self.no_connection()
                 return
 
-            code, w_data = worm_info
-            avahi_info = self.avahi_offer.start()
-            # As design when we use both avahi and wormhole we only display
-            # the wormhole code
-            _, a_data = avahi_info
-            discovery_data = a_data + ";" + w_data
-
+            code, discovery_data = info
             self.create_keypresent(code, discovery_data)
-
-            start_data = yield self.worm_offer.start()
-            success, message = start_data
-            if message and type(message) == LonelyError:
-                # This only means that we closed wormhole before a transfer
-                pass
-            elif message and type(message) == ServerConnectionError:
-                self._deactivate_timer()
-                self.deactivate()
-                self.klw.code_spinner.stop()
-                self.no_connection()
-            else:
-                self.show_result(success, message)
-
+            defers = self.aw_offer.start()
+            for de in defers:
+                # TODO handle errors here?
+                de.addCallback(self._received)
         else:
+            self.avahi_offer = AvahiHTTPOffer(self.key)
             avahi_info = self.avahi_offer.start()
             a_code, a_data = avahi_info
             self.create_keypresent(a_code, a_data)
+
+    def _received(self, start_data):
+        success, message = start_data
+        if message and type(message) == LonelyError:
+            # This only means that we closed wormhole before a transfer
+            pass
+        elif message and type(message) == ServerConnectionError:
+            self._deactivate_timer()
+            self.deactivate()
+            self.klw.code_spinner.stop()
+            self.no_connection()
+        else:
+            self.show_result(success, message)
 
     def slow_connection(self):
         self.klw.label_ib.set_label("Very slow Internet connection!")
@@ -216,13 +213,12 @@ class SendApp:
 
     def _deactivate_avahi_worm_offer(self):
         # Stop network services
+        if self.aw_offer:
+            self.aw_offer.stop()
         if self.avahi_offer:
             self.avahi_offer.stop()
             self.avahi_offer = None
         log.debug("stopped avahi")
-        if self.worm_offer:
-            self.worm_offer.stop()
-            self.worm_offer = None
 
 
 class App(Gtk.Application):

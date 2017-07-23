@@ -20,10 +20,11 @@ from __future__ import unicode_literals
 import hmac
 import json
 import logging
+import dbus
 from subprocess import call
 from string import Template
 from tempfile import NamedTemporaryFile
-from wormhole._wordlist import PGPWordList
+
 try:
     from urllib.parse import urlparse, parse_qs
     from urllib.parse import ParseResult
@@ -32,7 +33,7 @@ except ImportError:
     from urlparse import ParseResult
 
 import requests
-
+from wormhole._wordlist import PGPWordList
 from gi.repository import Gtk, GLib
 
 from .gpgmh import fingerprint_from_keydata
@@ -274,3 +275,10 @@ def fix_infobar(infobar):
             return
         widget.set_transition_type(Gtk.RevealerTransitionType.NONE)
     infobar.forall(make_sure_revealer_does_nothing)
+
+
+def get_local_bt_address(hci_number=0):
+    bus = dbus.SystemBus()
+    adapter = dbus.Interface(bus.get_object("org.bluez", "/org/bluez/hci%i" % hci_number),
+                             "org.freedesktop.DBus.Properties")
+    return adapter.Get("org.bluez.Adapter1", "Address")
