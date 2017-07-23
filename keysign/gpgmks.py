@@ -407,10 +407,14 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
     """
     tmpkeyring = TempKeyring()
     tmpkeyring.import_data(keydata)
+    fingerprint = fingerprint_from_keydata(keydata)
     tmpkeyring.context.set_option('always-trust')
     for (uid, signed_key) in sign_keydata(keydata,
         error_cb=error_cb, homedir=homedir):
             if not uid.revoked:
                 encrypted_key = tmpkeyring.encrypt_data(data=signed_key,
-                    recipient=uid.uid)
+                    # We use the fingerprint rather than the email address,
+                    # because we cannot get a reliable representation of the
+                    # UID, i.e. when it contains non-UTF-8 bytes.
+                    recipient=fingerprint)
                 yield (UID.from_monkeysign(uid), encrypted_key)
