@@ -22,8 +22,6 @@ import argparse
 import logging
 import os
 
-from gi.repository import Gtk, GLib
-from gi.repository import GObject
 
 
 if  __name__ == "__main__" and __package__ is None:
