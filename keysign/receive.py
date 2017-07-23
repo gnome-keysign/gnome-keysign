@@ -28,8 +28,6 @@ from gi.repository import Gtk, GLib
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 
-_ = lambda x: x
-
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
                               "this script directly which is discouraged. " +
@@ -47,6 +45,7 @@ from .avahidiscovery import AvahiKeysignDiscoveryWithMac
 from .keyfprscan import KeyFprScanWidget
 from .keyconfirm import PreSignWidget
 from .gpgmh import openpgpkey_from_data
+from .i18n import _
 from .util import sign_keydata_and_send
 
 log = logging.getLogger(__name__)
@@ -106,7 +105,7 @@ class ReceiveApp:
         psw = PreSignWidget(key, pixbuf)
         psw.connect('sign-key-confirmed',
             self.on_sign_key_confirmed, keydata)
-        self.stack.add_titled(psw, "presign", "Sign Key")
+        self.stack.add_titled(psw, "presign", _("Sign Key"))
         psw.set_name("presign")
         psw.show()
         self.psw = psw
