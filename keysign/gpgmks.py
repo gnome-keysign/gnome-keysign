@@ -59,7 +59,7 @@ def UIDExport(uid, keydata):
             if key_uid != uid:
                 log.info('Deleting UID %s from key %s', key_uid, fpr)
                 tmp.del_uid(fingerprint=fpr, pattern=key_uid)
-    only_uid = tmp.export_data(uid)
+    only_uid = tmp.export_data(fpr)
 
     return only_uid
 
@@ -277,6 +277,7 @@ def sign_keydata(keydata, error_cb=None, homedir=None):
     log.info('Signing with these keys: %s', secret_keys)
 
     stripped_key = MinimalExport(keydata)
+    assert stripped_key
     fingerprint = fingerprint_from_keydata(stripped_key)
 
     log.debug('Trying to import key\n%s', stripped_key)
@@ -322,7 +323,10 @@ def sign_keydata(keydata, error_cb=None, homedir=None):
 
             # 3.2. export and encrypt the signature
             # 3.3. mail the key to the user
-            signed_key = UIDExport(uid_str, tmpkeyring.export_data(uid_str))
+            exported_key = tmpkeyring.export_data(fingerprint)
+            assert exported_key
+            signed_key = UIDExport(uid_str, exported_key)
+            assert signed_key
             log.info("Exported %d bytes of signed key", len(signed_key))
             yield (uid, signed_key)
 
