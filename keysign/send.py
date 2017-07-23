@@ -8,6 +8,11 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GLib  # for markup_escape_text
+if __name__ == "__main__":
+    from twisted.internet import gtk3reactor
+    gtk3reactor.install()
+from twisted.internet import reactor
+from twisted.internet.defer import inlineCallbacks
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -25,6 +30,7 @@ from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
 from .avahioffer import AvahiHTTPOffer
 from . import gpgmh
+from .bluetoothoffer import BluetoothOffer
 # We import i18n to have the locale set up for Glade
 from .i18n import _
 
@@ -75,6 +81,7 @@ class SendApp:
         kpw = KeyPresentWidget(fakekey, builder=builder)
 
 
+    @inlineCallbacks
     def on_key_activated(self, widget, key):
         log.info("Activated key %r", key)
         ####
@@ -120,6 +127,7 @@ class App(Gtk.Application):
         self.builder = Gtk.Builder.new_from_file(ui_file_path)
         window = self.builder.get_object("appwindow")
         assert window
+        window.connect("delete-event", self.on_delete_window)
         self.headerbar = self.builder.get_object("headerbar")
         hb = self.builder.get_object("headerbutton")
         hb.connect("clicked", self.on_headerbutton_clicked)
@@ -131,6 +139,9 @@ class App(Gtk.Application):
         window.show_all()
         self.add_window(window)
 
+    @staticmethod
+    def on_delete_window(*args):
+        reactor.callFromThread(reactor.stop)
 
     
 
@@ -168,7 +179,9 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     app = App()
     try:
-        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : app.quit(), None)
+        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
+                                  lambda *args: reactor.callFromThread(reactor.stop), None)
     except AttributeError:
         pass
-    app.run()
+    reactor.registerGApplication(app)
+    reactor.run()
