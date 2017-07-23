@@ -56,7 +56,7 @@ class GladeParser(object):
                 self._queue = []
                 if done:
                     break
-        except expat.ExpatError, e:
+        except expat.ExpatError as e:
             msg = str(e)
             raise ParseError(msg, self.filename, e.lineno, e.offset)
 
