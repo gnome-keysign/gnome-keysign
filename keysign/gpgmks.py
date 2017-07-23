@@ -58,7 +58,9 @@ def UIDExport(uid, keydata):
             key_uid = decode_gpg_uid(u.uid)
             if key_uid != uid:
                 log.info('Deleting UID %s from key %s', key_uid, fpr)
-                tmp.del_uid(fingerprint=fpr, pattern=key_uid)
+                # As pattern we need to provide the unescaped one, otherwise monkeysign
+                # will hang trying to find the correct uid to delete
+                tmp.del_uid(fingerprint=fpr, pattern=u.uid)
     only_uid = tmp.export_data(fpr)
 
     return only_uid
