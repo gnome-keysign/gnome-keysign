@@ -3,6 +3,8 @@ from bluetooth import *
 import dbus
 import select
 if __name__ == "__main__":
+    import gi
+    gi.require_version('Gtk', '3.0')
     from twisted.internet import gtk3reactor
     gtk3reactor.install()
     from twisted.internet import reactor
