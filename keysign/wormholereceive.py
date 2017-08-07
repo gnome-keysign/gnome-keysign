@@ -93,20 +93,25 @@ def main(args):
     if not args:
         raise ValueError("You must provide an argument with the wormhole code")
 
-    def received_callback(result):
-        key_data, success, error_message = result
+    @inlineCallbacks
+    def receive_key(w_code):
+        receive = WormholeReceive(w_code)
+        msg_tuple = yield receive.start()
+        key_data, success, message = msg_tuple
         if success:
             print("key received:\n")
             print(key_data.decode("utf-8"))
         else:
-            print(error_message)
-
-        reactor.callFromThread(reactor.stop)
+            print(message)
+        # Workaround for the send_message reply (until we find a better solution).
+        # If we simply call reactor.stop() the send_message() will never be
+        # completed. I think this happens because we are always in the reactor
+        # thread and send_message is waiting for a context switch.
+        reactor.callLater(1, reactor.stop)
 
     print("Trying to download the key, please wait")
     code = args[0]
-    receive = WormholeReceive(code)
-    receive.start().addCallback(received_callback)
+    receive_key(code)
     reactor.run()
 
 if __name__ == "__main__":
