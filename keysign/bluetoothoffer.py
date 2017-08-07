@@ -42,8 +42,6 @@ class BluetoothOffer:
             success = False
             message = e
 
-        if client_socket:
-            client_socket.close()
         if not self.stopped:
             return success, message
 
