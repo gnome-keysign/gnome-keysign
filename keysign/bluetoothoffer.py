@@ -22,8 +22,8 @@ class BluetoothOffer:
     @inlineCallbacks
     def start(self):
         self.stopped = False
-        client_socket = None
         message = None
+        success = False
         if self.server_socket is None:
             self.server_socket = BluetoothSocket(RFCOMM)
             self.server_socket.bind(("", self.port))
@@ -31,12 +31,18 @@ class BluetoothOffer:
             backlog = 1
             self.server_socket.listen(backlog)
         try:
-            client_socket, address = yield threads.deferToThread(self.server_socket.accept)
-            key_data = get_public_key_data(self.key.fingerprint)
-            kd_decoded = key_data.decode('utf-8')
-            yield threads.deferToThread(client_socket.sendall, kd_decoded)
-            log.info("Key has been sent")
-            success = True
+            while not self.stopped and not success:
+                # server_socket.accept() is not stoppable. So with select we can call accept()
+                # only when we are sure that there is already a waiting connection
+                ready_to_read, ready_to_write, in_error = yield threads.deferToThread(
+                    select.select, [self.server_socket], [], [], True)
+                if ready_to_read:
+                    client_socket, address = yield threads.deferToThread(self.server_socket.accept)
+                    key_data = get_public_key_data(self.key.fingerprint)
+                    kd_decoded = key_data.decode('utf-8')
+                    yield threads.deferToThread(client_socket.sendall, kd_decoded)
+                    log.info("Key has been sent")
+                    success = True
         except Exception as e:
             log.error("An error occurred: %s" % e)
             success = False
