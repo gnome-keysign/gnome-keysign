@@ -21,7 +21,10 @@ class BluetoothReceive:
         self.client_socket = BluetoothSocket(RFCOMM)
         try:
             yield threads.deferToThread(self.client_socket.connect, (mac, self.port))
-            message = yield threads.deferToThread(self.client_socket.recv, self.size)
+            message = b""
+            while len(message) < 35 or message[-35:] != b"-----END PGP PUBLIC KEY BLOCK-----\n":
+                part_message = yield threads.deferToThread(self.client_socket.recv, self.size)
+                message += part_message
         except Exception as e:  # TODO better handling
             log.error("An error occurred connecting or receiving: %s" % e)
             key_data = None

@@ -34,7 +34,7 @@ class BluetoothOffer:
             client_socket, address = yield threads.deferToThread(self.server_socket.accept)
             key_data = get_public_key_data(self.key.fingerprint)
             kd_decoded = key_data.decode('utf-8')
-            yield threads.deferToThread(client_socket.send, kd_decoded)
+            yield threads.deferToThread(client_socket.sendall, kd_decoded)
             log.info("Key has been sent")
             success = True
         except Exception as e:
