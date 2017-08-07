@@ -133,7 +133,8 @@ def main(args):
     if not args:
         raise ValueError("You must provide an argument to identify the key")
 
-    def code_generated(code, wormhole_data):
+    def code_generated(result):
+        code, _ = result
         print("Discovery info: {}".format(code))
         # Wait for the user without blocking everything
         reactor.callInThread(cancel)
@@ -143,17 +144,19 @@ def main(args):
         offer.stop()
         reactor.callFromThread(reactor.stop)
 
-    def received(success, error_msg):
+    def received(result):
+        success, error_msg = result
         if success:
-            print("\nKey sent successfully")
+            print("\nKey successfully sent")
         else:
             print("\nAn error occurred: {}".format(error_msg))
         # We are still waiting for the user to press Enter
         print("Press Enter to exit")
 
     key = get_usable_keys(pattern=args[0])[0]
-    offer = WormholeOffer(key, received, callback_code=code_generated)
-    offer.start()
+    offer = WormholeOffer(key)
+    offer.allocate_code().addCallback(code_generated)
+    offer.start().addCallback(received)
     print("Offering key: {}".format(key))
     reactor.run()
 
