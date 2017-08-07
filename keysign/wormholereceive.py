@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 import logging
-from textwrap import dedent
 
 from twisted.internet.defer import inlineCallbacks, returnValue
 from wormhole.cli.public_relay import RENDEZVOUS_RELAY
@@ -94,20 +93,22 @@ def main(args):
     if not args:
         raise ValueError("You must provide an argument with the wormhole code")
 
-    def received_callback(key_data, success=True, error_message=None):
+    def received_callback(result):
+        key_data, success, error_message = result
         if success:
-            print(key_data)
+            print("key received:\n")
+            print(key_data.decode("utf-8"))
         else:
             print(error_message)
 
         reactor.callFromThread(reactor.stop)
 
+    print("Trying to download the key, please wait")
     code = args[0]
-    receive = WormholeReceive(code, received_callback)
-    receive.start()
+    receive = WormholeReceive(code)
+    receive.start().addCallback(received_callback)
     reactor.run()
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
     import sys
     main(sys.argv[1:])
