@@ -1,9 +1,24 @@
 import logging
 from bluetooth import *
+import dbus
+import select
+if __name__ == "__main__":
+    from twisted.internet import gtk3reactor
+    gtk3reactor.install()
+    from twisted.internet import reactor
 from twisted.internet import threads
-from twisted.internet.defer import inlineCallbacks
+from twisted.internet.defer import inlineCallbacks, returnValue
 
-from .gpgmh import get_public_key_data
+if __name__ == "__main__" and __package__ is None:
+    logging.getLogger().error("You seem to be trying to execute " +
+                              "this script directly which is discouraged. " +
+                              "Try python -m instead.")
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    os.sys.path.insert(0, parent_dir)
+    os.sys.path.insert(0, os.path.join(parent_dir, 'monkeysign'))
+    __package__ = str('keysign')
+
+from .gpgmh import get_public_key_data, get_usable_keys
 from .util import get_local_bt_address
 
 
@@ -18,6 +33,7 @@ class BluetoothOffer:
         self.server_socket = None
         self.message_def = None
         self.stopped = False
+        self.code = None
 
     @inlineCallbacks
     def start(self):
@@ -49,11 +65,18 @@ class BluetoothOffer:
             message = e
 
         if not self.stopped:
-            return success, message
+            returnValue((success, message))
 
-    @staticmethod
-    def generate_code():
-        code = get_local_bt_address().upper()
+    def generate_code(self):
+        try:
+            code = get_local_bt_address().upper()
+        except dbus.exceptions.DBusException as e:
+            if e.get_dbus_name() == "org.freedesktop.systemd1.NoSuchUnit":
+                log.info("No Bluetooth devices found")
+            else:
+                log.error("An unexpected error occurred %s", e.get_dbus_name())
+            self.code = None
+            return "", ""
         log.info("BT Code: %s", code)
         bt_data = "BT={0}".format(code)
         return code, bt_data
@@ -68,3 +91,37 @@ class BluetoothOffer:
         if self.server_socket:
             self.server_socket.close()
             self.server_socket = None
+
+
+def main(args):
+    if not args:
+        raise ValueError("You must provide an argument to identify the key")
+
+    def cancel():
+        input("Press Enter to cancel")
+        offer.stop()
+        reactor.callFromThread(reactor.stop)
+
+    def _received(result):
+        success, error_msg = result
+        if success:
+            print("\nKey successfully sent")
+        else:
+            print("\nAn error occurred: {}".format(error_msg))
+        # We are still waiting for the user to press Enter
+        print("Press Enter to exit")
+
+    key = get_usable_keys(pattern=args[0])[0]
+
+    offer = BluetoothOffer(key)
+    code, _ = offer.generate_code()
+    offer.start().addCallback(_received)
+    print("Offering key: {}".format(key))
+    print("Discovery info: {}".format(code))
+    # Wait for the user without blocking everything
+    reactor.callInThread(cancel)
+    reactor.run()
+
+if __name__ == "__main__":
+    import sys
+    main(sys.argv[1:])
