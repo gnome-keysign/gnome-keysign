@@ -247,13 +247,16 @@ class App(Gtk.Application):
         window.connect("delete-event", self.on_delete_window)
         self.headerbar = self.builder.get_object("headerbar")
         hb = self.builder.get_object("headerbutton")
-        hb.connect("clicked", self.on_headerbutton_clicked)
-        self.headerbutton = hb
+        hb.connect("clicked", self.on_header_button_clicked)
+        self.header_button = hb
         self.internet_toggle = self.builder.get_object("internet_toggle")
         self.internet_toggle.connect("toggled", self.on_toggle_clicked)
 
         self.send_app = SendApp(builder=self.builder)
-        self.send_app.klw.connect("key-activated", self.on_key_activated)
+        ss = self.send_app.stack
+        ss.connect('notify::visible-child', self.on_send_stack_switch)
+        ss.connect('map', self.on_send_stack_mapped)
+        self.send_stack = ss
 
         window.show_all()
         self.add_window(window)
@@ -266,58 +269,70 @@ class App(Gtk.Application):
         log.info("Internet toggled to: %s", toggle.get_active())
         self.send_app.set_internet_option(toggle.get_active())
 
-    def on_key_activated(self, widget, key):
-        kpw = self.send_app.kpw
-        kpw.connect('map', self.on_keypresent_mapped)
-        log.debug("KPW to wait for map: %r (%r)", kpw, kpw.get_mapped())
-        if kpw.get_mapped():
-            # The widget is already visible. Let's quickly call our handler
-            self.on_keypresent_mapped(kpw)
+    def on_send_stack_switch(self, stack, *args):
+        log.debug("Switched Send Stack! %r", args)
+        current = self.send_app.stack.get_visible_child()
+        if current == self.send_app.klw:
+            log.debug("Key list page now visible")
+            self.on_keylist_mapped(self.send_app.klw)
+        elif current == self.send_app.kpw:
+            log.debug("Key present page now visible")
+            self.on_keypresent_mapped(self.send_app.kpw)
+        elif current == self.send_app.rb:
+            log.debug("Result page now visible")
+            self.on_resultbox_mapped(self.send_app.rb)
 
-        ####
-        # Saving subtitle
-        self.headerbar_subtitle = self.headerbar.get_subtitle()
-        self.headerbar.set_subtitle("Sending {}".format(key.fpr))
+    def on_resultbox_mapped(self, rb):
+        log.debug("Resultbox becomes visible!")
+        self.header_button.set_sensitive(True)
+        self.header_button.set_image(
+            Gtk.Image.new_from_icon_name("go-previous",
+                                         Gtk.IconSize.BUTTON))
+        self.internet_toggle.hide()
 
-    def on_headerbutton_clicked(self, button):
-        log.info("Headerbutton pressed: %r", button)
+    def on_keylist_mapped(self, keylistwidget):
+        log.debug("Keylist becomes visible!")
+        self.header_button.set_image(
+            Gtk.Image.new_from_icon_name("view-refresh",
+            Gtk.IconSize.BUTTON))
+        # We don't support refreshing for now.
+        self.header_button.set_sensitive(False)
+        self.internet_toggle.show()
 
-        # If we ever defer operations here, it seems that
-        # the order of steps is somewhat important for the
-        # responsiveness of the UI.  It seems that shutting down
-        # the HTTPd takes ages to finish and blocks animations.
-        # So we want to do that first, because we can argue
-        # better that going back takes some time rather than having
-        # a half-baked switching animation.
-        # For now, it doesn't matter, because we don't defer.
+    def on_send_stack_mapped(self, stack):
+        log.debug("send stack becomes visible!")
+        # Adjust the top bar buttons
+        self.on_send_stack_switch(stack)
 
-        ####
-        # Restoring subtitle
-        self.headerbar.set_subtitle(self.headerbar_subtitle)
+    def on_keypresent_mapped(self, kpw):
+        log.debug("keypresent becomes visible!")
+        self.header_button.set_sensitive(True)
+        self.header_button.set_image(
+            Gtk.Image.new_from_icon_name("go-previous",
+            Gtk.IconSize.BUTTON))
+        self.internet_toggle.hide()
 
+    def on_send_header_button_clicked(self, button, *args):
+        # Here we assume that there is only two places where
+        # we could have possibly pressed this button, i.e.
+        # from the keypresentwidget or the result page
+        log.debug("Send Headerbutton %r clicked! %r", button, args)
         current = self.send_app.stack.get_visible_child()
         klw = self.send_app.klw
         kpw = self.send_app.kpw
         # If we are in the keypresentwidget
         if current == kpw:
-            self.send_app.stack.set_visible_child(klw)
+            self.send_stack.set_visible_child(klw)
             self.send_app.deactivate()
         # Else we are in the result page
         else:
-            self.send_app.stack.remove(current)
+            self.send_stack.remove(current)
             self.send_app.set_saved_child_visible()
             self.send_app.on_key_activated(None, self.send_app.key)
 
-        self.headerbutton.set_sensitive(False)
-        self.internet_toggle.show()
-
-    def on_keypresent_mapped(self, kpw):
-        log.debug("keypresent becomes visible!")
-        self.headerbutton.set_sensitive(True)
-        self.headerbutton.set_image(
-            Gtk.Image.new_from_icon_name("go-previous",
-                                         Gtk.IconSize.BUTTON))
-        self.internet_toggle.hide()
+    def on_header_button_clicked(self, button, *args):
+        log.debug("Headerbutton %r clicked! %r", button, args)
+        return self.on_send_header_button_clicked(button, *args)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
