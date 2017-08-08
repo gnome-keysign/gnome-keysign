@@ -28,7 +28,19 @@ class BluetoothReceive:
             while len(message) < 35 or message[-35:] != b"-----END PGP PUBLIC KEY BLOCK-----\n":
                 part_message = yield threads.deferToThread(self.client_socket.recv, self.size)
                 message += part_message
-        except Exception as e:  # TODO better handling
+        except BluetoothError as be:
+            if be.args[0] == "(113, 'No route to host')":
+                log.info("An error occurred with Bluetooth, if present probably the device is not powered")
+            elif be.args[0] == "(112, 'Host is down')":
+                log.info("The sender's Bluetooth is not available")
+            elif be.args[0] == "(16, 'Device or resource busy')":
+                log.info("Probably has been provided a partial bt mac")
+            else:
+                log.info("An unknown bt error occurred: %s" % be.args[0])
+            key_data = None
+            success = False
+            returnValue((key_data, success, be))
+        except Exception as e:
             log.error("An error occurred connecting or receiving: %s" % e)
             key_data = None
             success = False
