@@ -67,8 +67,6 @@ class BluetoothOffer:
             success = False
             message = e
 
-        #if not self.stopped:
-        #    returnValue((success, message))
         returnValue((success, message))
 
     def generate_code(self):
@@ -76,7 +74,9 @@ class BluetoothOffer:
             code = get_local_bt_address().upper()
         except dbus.exceptions.DBusException as e:
             if e.get_dbus_name() == "org.freedesktop.systemd1.NoSuchUnit":
-                log.info("No Bluetooth devices found")
+                log.info("No Bluetooth devices found, probably the bluetooth service is not running")
+            elif e.get_dbus_name() == "org.freedesktop.DBus.Error.UnknownObject":
+                log.info("No Bluetooth devices available")
             else:
                 log.error("An unexpected error occurred %s", e.get_dbus_name())
             self.code = None
