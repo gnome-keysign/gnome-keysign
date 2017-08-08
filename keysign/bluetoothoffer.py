@@ -40,7 +40,7 @@ class BluetoothOffer:
     @inlineCallbacks
     def start(self):
         self.stopped = False
-        message = None
+        message = "Back"
         success = False
         if self.server_socket is None:
             self.server_socket = BluetoothSocket(RFCOMM)
@@ -61,13 +61,15 @@ class BluetoothOffer:
                     yield threads.deferToThread(client_socket.sendall, kd_decoded)
                     log.info("Key has been sent")
                     success = True
+                    message = None
         except Exception as e:
             log.error("An error occurred: %s" % e)
             success = False
             message = e
 
-        if not self.stopped:
-            returnValue((success, message))
+        #if not self.stopped:
+        #    returnValue((success, message))
+        returnValue((success, message))
 
     def generate_code(self):
         try:
@@ -90,6 +92,7 @@ class BluetoothOffer:
         # FIXME right now it seems that even after stop()
         # the used port is not released
         log.debug("Stopping bt receive")
+        self.stopped = True
         if self.server_socket:
             self.server_socket.close()
             self.server_socket = None

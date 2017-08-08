@@ -130,6 +130,9 @@ class SendApp:
         if message and type(message) == LonelyError:
             # This only means that we closed wormhole before a transfer
             pass
+        elif message and message == "Back":
+            # Simply the return of the back button, no errors here
+            pass
         elif message and type(message) == ServerConnectionError:
             self._deactivate_timer()
             self.deactivate()
