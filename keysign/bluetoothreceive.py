@@ -29,12 +29,14 @@ class BluetoothReceive:
                 part_message = yield threads.deferToThread(self.client_socket.recv, self.size)
                 message += part_message
         except BluetoothError as be:
-            if be.args[0] == "(113, 'No route to host')":
-                log.info("An error occurred with Bluetooth, if present probably the device is not powered")
+            if be.args[0] == "(16, 'Device or resource busy')":
+                log.info("Probably has been provided a partial bt mac")
+            elif be.args[0] == "(111, 'Connection refused')":
+                log.info("The sender refused our connection attempt")
             elif be.args[0] == "(112, 'Host is down')":
                 log.info("The sender's Bluetooth is not available")
-            elif be.args[0] == "(16, 'Device or resource busy')":
-                log.info("Probably has been provided a partial bt mac")
+            elif be.args[0] == "(113, 'No route to host')":
+                log.info("An error occurred with Bluetooth, if present probably the device is not powered")
             else:
                 log.info("An unknown bt error occurred: %s" % be.args[0])
             key_data = None
