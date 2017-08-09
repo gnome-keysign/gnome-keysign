@@ -1,4 +1,5 @@
 import logging
+import select
 from bluetooth import *
 
 if __name__ == "__main__":
@@ -18,16 +19,31 @@ class BluetoothReceive:
         self.port = port
         self.size = size
         self.client_socket = None
+        self.stopped = False
 
     @inlineCallbacks
     def find_key(self, mac):
         self.client_socket = BluetoothSocket(RFCOMM)
+        message = b""
         try:
-            yield threads.deferToThread(self.client_socket.connect, (mac, self.port))
-            message = b""
-            while len(message) < 35 or message[-35:] != b"-----END PGP PUBLIC KEY BLOCK-----\n":
-                part_message = yield threads.deferToThread(self.client_socket.recv, self.size)
-                message += part_message
+            self.client_socket.setblocking(False)
+            try:
+                self.client_socket.connect((mac, self.port))
+            except BluetoothError as be:
+                if be.args[0] == "(115, 'Operation now in progress')":
+                    pass
+                else:
+                    raise be
+            success = False
+            while not self.stopped and not success:
+                r, w, e = yield threads.deferToThread(select.select, [self.client_socket], [], [], True)
+                if r:
+                    log.info("Connection established")
+                    self.client_socket.setblocking(True)
+                    success = True
+                    while len(message) < 35 or message[-35:] != b"-----END PGP PUBLIC KEY BLOCK-----\n":
+                        part_message = yield threads.deferToThread(self.client_socket.recv, self.size)
+                        message += part_message
         except BluetoothError as be:
             if be.args[0] == "(16, 'Device or resource busy')":
                 log.info("Probably has been provided a partial bt mac")
@@ -50,12 +66,14 @@ class BluetoothReceive:
 
         if self.client_socket:
             self.client_socket.close()
-
-        success = True
         returnValue((message.decode("utf-8"), success, None))
 
     def stop(self):
+        self.stopped = True
         if self.client_socket:
+            # Seems that is useless :/
+            #import socket
+            #self.client_socket.shutdown(socket.SHUT_RDWR)
             self.client_socket.close()
 
 
