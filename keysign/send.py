@@ -28,9 +28,8 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
-from .avahioffer import AvahiHTTPOffer
+from .offer import Offer
 from . import gpgmh
-from .bluetoothoffer import BluetoothOffer
 # We import i18n to have the locale set up for Glade
 from .i18n import _
 
@@ -47,7 +46,7 @@ class SendApp:
     call deactivate().
     """
     def __init__(self, builder=None):
-        self.avahi_offer = None
+        self.offer = None
         self.stack = None
         self.stack_saved_visible_child = None
         self.klw = None
@@ -80,14 +79,21 @@ class SendApp:
         fakekey = gpgmh.Key("","","")
         kpw = KeyPresentWidget(fakekey, builder=builder)
 
+        self.key = None
 
     @inlineCallbacks
     def on_key_activated(self, widget, key):
+        self.key = key
         log.info("Activated key %r", key)
         ####
         # Start network services
-        self.avahi_offer = AvahiHTTPOffer(key)
-        discovery_data = self.avahi_offer.start()
+        self.offer = Offer(self.key)
+        info = yield self.offer.allocate_code()
+        code, discovery_data = info
+        self.create_keypresent(code, discovery_data)
+        # We ignore the result of the defer because we don't have
+        # a result page
+        self.offer.start()
         log.info("Use this for discovering the other key: %r", discovery_data)
         ####
         # Create and show widget for key
@@ -99,6 +105,7 @@ class SendApp:
         self.kpw = kpw
 
     def deactivate(self):
+        self._deactivate_offer()
         ####
         # Stop network services
         avahi_offer = self.avahi_offer
@@ -111,6 +118,13 @@ class SendApp:
         self.stack.remove(self.kpw)
         self.kpw = None
         self.stack_saved_visible_child = None
+
+    def _deactivate_offer(self):
+        # Stop network services
+        if self.offer:
+            self.offer.stop()
+            self.offer = None
+        log.debug("Stopped network services")
 
 
 class App(Gtk.Application):
