@@ -29,10 +29,8 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
-from .avahioffer import AvahiHTTPOffer
+from .offer import Offer
 from . import gpgmh
-from .wormholeoffer import WormholeOffer
-from .bluetoothoffer import BluetoothOffer
 
 log = logging.getLogger(__name__)
 
@@ -47,8 +45,7 @@ class SendApp:
     call deactivate().
     """
     def __init__(self, builder=None):
-        self.avahi_offer = None
-        self.aw_offer = None
+        self.offer = None
         self.stack = None
         self.stack_saved_visible_child = None
         self.klw = None
@@ -100,30 +97,34 @@ class SendApp:
         # Start network services
         self.klw.code_spinner.start()
         if self.internet_option:
+            #self.kpw.internet_spinner.start()
             # After 10 seconds without a wormhole code we display an info bar
             timer = 10
             self.notify = reactor.callLater(timer, self.slow_connection)
-            self.aw_offer = AvahiWormholeOffer(self.key)
+            self.offer = Offer(self.key)
             try:
-                info = yield self.aw_offer.allocate_code()
+                info = yield self.offer.allocate_code(worm=True)
             except ServerConnectionError:
                 self._deactivate_timer()
-                self.aw_offer = None
+                self.offer = None
                 self.klw.code_spinner.stop()
                 self.no_connection()
                 return
 
             code, discovery_data = info
             self.create_keypresent(code, discovery_data)
-            defers = self.aw_offer.start()
+            defers = self.offer.start()
             for de in defers:
                 # TODO handle errors here?
                 de.addCallback(self._received)
         else:
-            self.avahi_offer = AvahiHTTPOffer(self.key)
-            avahi_info = self.avahi_offer.start()
-            a_code, a_data = avahi_info
-            self.create_keypresent(a_code, a_data)
+            self.offer = Offer(self.key)
+            info = yield self.offer.allocate_code(worm=False)
+            code, discovery_data = info
+            self.create_keypresent(code, discovery_data)
+            defers = self.offer.start()
+            for de in defers:
+                de.addCallback(self._received)
 
     def _received(self, start_data):
         success, message = start_data
@@ -168,7 +169,7 @@ class SendApp:
         self.klw.code_spinner.stop()
 
     def show_result(self, success, message):
-        self._deactivate_avahi_worm_offer()
+        self._deactivate_offer()
 
         self.stack.add(self.rb)
         self.stack.remove(self.kpw)
@@ -188,7 +189,7 @@ class SendApp:
             self.stack.set_visible_child(self.rb)
 
     def deactivate(self):
-        self._deactivate_avahi_worm_offer()
+        self._deactivate_offer()
 
         ####
         # Re-set stack to initial position
@@ -214,14 +215,12 @@ class SendApp:
             self.notify.cancel()
             self.notify = None
 
-    def _deactivate_avahi_worm_offer(self):
+    def _deactivate_offer(self):
         # Stop network services
-        if self.aw_offer:
-            self.aw_offer.stop()
-        if self.avahi_offer:
-            self.avahi_offer.stop()
-            self.avahi_offer = None
-        log.debug("stopped avahi")
+        if self.offer:
+            self.offer.stop()
+            self.offer = None
+        log.debug("Stopped network services")
 
 
 class App(Gtk.Application):
