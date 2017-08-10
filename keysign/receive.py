@@ -53,9 +53,10 @@ from .keyfprscan import KeyFprScanWidget
 from .keyconfirm import PreSignWidget
 from .gpgmh import openpgpkey_from_data
 from .util import sign_keydata_and_send, fix_infobar
-from .avahiwormholediscover import AvahiWormholeDiscover
+from .discover import Discover
 
 log = logging.getLogger(__name__)
+
 
 def remove_whitespace(s):
     cleaned = re.sub('[\s+]', '', s)
@@ -107,7 +108,7 @@ class ReceiveApp:
         fix_infobar(ib)
         self.discovery.connect('list-changed', self.on_list_changed, ib)
 
-        self.aw_discovery = None
+        self.discover = None
         self.rb = builder.get_object('box50')
         self.result_label = builder.get_object("error_download_label")
         self.cancel_button = builder.get_object("cancel_download_button")
@@ -118,13 +119,9 @@ class ReceiveApp:
         builder.get_object("label10").set_label("")
 
     def on_redo_button_clicked(self, button):
-        """ Right know the redo button is quite useless because the sender after
-        the first error it will never reuse the same wormhole code, even if the
-        user press the redo button. So trying a redo here with the same code will
-        never be success"""
         log.info("redo pressed")
         self.stack.remove(self.rb)
-        self.aw_discovery.start()
+        self.discover.start()
 
     def on_cancel_button_clicked(self, button):
         log.info("cancel pressed")
@@ -164,10 +161,10 @@ class ReceiveApp:
 
     @inlineCallbacks
     def _receive(self, code):
-        if self.aw_discovery:
-            self.aw_discovery.stop()
-        self.aw_discovery = AvahiWormholeDiscover(code, self.discovery)
-        msg_tuple = yield self.aw_discovery.start()
+        if self.discover:
+            self.discover.stop()
+        self.discover = Discover(code, self.discovery)
+        msg_tuple = yield self.discover.start()
         key_data, success, message = msg_tuple
         if message == WrongPasswordError or message == LonelyError:
             # If a wrong password has been provided or we closed the connection
@@ -197,7 +194,6 @@ class ReceiveApp:
             ib.show()
         elif ib.is_visible():
             ib.hide()
-
 
 
 class App(Gtk.Application):

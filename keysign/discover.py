@@ -12,7 +12,7 @@ from .util import is_code_complete, parse_barcode
 log = logging.getLogger(__name__)
 
 
-class AvahiWormholeDiscover:
+class Discover:
     def __init__(self, userdata, discovery, app_id=None):
         # if the userdata is a qr code we extract the wormhole and bluetooth codes
         self.worm_code = parse_barcode(userdata).get("WORM", [None])[0]
