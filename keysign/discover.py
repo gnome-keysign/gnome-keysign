@@ -14,6 +14,7 @@ class Discover:
     def __init__(self, userdata, discovery):
         # if the userdata is a qr code we extract the bluetooth code
         self.bt_code = parse_barcode(userdata).get("BT", [None])[0]
+        self.mac = parse_barcode(userdata).get("MAC", [None])[0]
         self.userdata = userdata
         if discovery:
             self.discovery = discovery
@@ -36,7 +37,7 @@ class Discover:
             # We try Bluetooth, if we have it
             log.info("Trying to connect to %s with Bluetooth", self.bt_code)
             self.bt = BluetoothReceive()
-            msg_tuple = yield self.bt.find_key(self.bt_code)
+            msg_tuple = yield self.bt.find_key(self.bt_code, self.mac)
             key_data, success, message = msg_tuple
             if key_data:
                 # If we found the key
