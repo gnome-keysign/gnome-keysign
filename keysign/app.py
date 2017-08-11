@@ -213,15 +213,18 @@ class KeysignApp(Gtk.Application):
         current = self.send.stack.get_visible_child()
         klw = self.send.klw
         kpw = self.send.kpw
+        rb = self.send.rb
         # If we are in the keypresentwidget
         if current == kpw:
             self.send_stack.set_visible_child(klw)
             self.send.deactivate()
-        # Else we are in the result page
-        else:
+        # If we are in the result page
+        elif current == rb:
             self.send_stack.remove(current)
             self.send.set_saved_child_visible()
             self.send.on_key_activated(None, self.send.key)
+        else:
+            log.error("Header button pressed in an unexpected page: %s", current)
 
     def on_receive_header_button_clicked(self, button, *args):
         # Here we assume that there is only one place where
