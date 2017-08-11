@@ -30,9 +30,7 @@ if  __name__ == "__main__" and __package__ is None:
 from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
 from .avahioffer import AvahiHTTPOffer
-from .avahiwormholeoffer import AvahiWormholeOffer
 from . import gpgmh
-from .util import is_code_complete
 from .wormholeoffer import WormholeOffer
 
 log = logging.getLogger(__name__)
