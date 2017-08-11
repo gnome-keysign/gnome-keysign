@@ -11,6 +11,21 @@ if __name__ == "__main__":
 from twisted.internet import threads
 from twisted.internet.defer import inlineCallbacks, returnValue
 
+if __name__ == "__main__" and __package__ is None:
+    logging.getLogger().error("You seem to be trying to execute " +
+                              "this script directly which is discouraged. " +
+                              "Try python -m instead.")
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    os.sys.path.insert(0, parent_dir)
+    os.sys.path.insert(0, os.path.join(parent_dir, 'monkeysign'))
+    import keysign
+    #mod = __import__('keysign')
+    #sys.modules["keysign"] = mod
+    __package__ = str('keysign')
+
+from .gpgmh import fingerprint_from_keydata
+from .util import mac_verify
+
 log = logging.getLogger(__name__)
 
 
@@ -22,13 +37,13 @@ class BluetoothReceive:
         self.stopped = False
 
     @inlineCallbacks
-    def find_key(self, mac):
+    def find_key(self, bt_mac, mac):
         self.client_socket = BluetoothSocket(RFCOMM)
         message = b""
         try:
             self.client_socket.setblocking(False)
             try:
-                self.client_socket.connect((mac, self.port))
+                self.client_socket.connect((bt_mac, self.port))
             except BluetoothError as be:
                 if be.args[0] == "(115, 'Operation now in progress')":
                     pass
@@ -44,6 +59,16 @@ class BluetoothReceive:
                     while len(message) < 35 or message[-35:] != b"-----END PGP PUBLIC KEY BLOCK-----\n":
                         part_message = yield threads.deferToThread(self.client_socket.recv, self.size)
                         message += part_message
+            mac_key = fingerprint_from_keydata(message)
+            verified = None
+            if mac:
+                verified = mac_verify(mac_key.encode('ascii'), message, mac)
+            if verified:
+                success = True
+            else:
+                log.info("MAC validation failed: %r", verified)
+                success = False
+                message = b""
         except BluetoothError as be:
             if be.args[0] == "(16, 'Device or resource busy')":
                 log.info("Probably has been provided a partial bt mac")
