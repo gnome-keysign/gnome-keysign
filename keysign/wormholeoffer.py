@@ -95,10 +95,6 @@ class WormholeOffer:
             success = False
             returnValue((success, e))
 
-    def get_last_deferred(self):
-        # right now this is only useful for nose tests
-        return self.message_def
-
     def _check_received(self, msg):
         """If the received message has a field 'answer' that means that the transfer
         successfully completed. Otherwise something went wrong or we received an
