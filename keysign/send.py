@@ -102,7 +102,6 @@ class SendApp:
         self.klw.code_spinner.start()
         self.avahi_offer = AvahiHTTPOffer(key)
         if self.internet_option:
-            #self.kpw.internet_spinner.start()
             # After 10 seconds without a wormhole code we display an info bar
             timer = 10
             self.notify = reactor.callLater(timer, self.slow_connection)

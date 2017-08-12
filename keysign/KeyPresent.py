@@ -91,8 +91,6 @@ class KeyPresentWidget(Gtk.Widget):
         self.uids_label = self._builder.get_object("uidsLabel")
         self.fingerprint_label = self._builder.get_object("keyFingerprintLabel")
         self.qrcode_frame = self._builder.get_object("qrcode_frame")
-        self.internet_switch = self._builder.get_object("internet_switch")
-        self.internet_spinner = self._builder.get_object("internet_spinner")
 
         self.key_id_label.set_markup(
             format_fingerprint(key.fingerprint).replace('\n', '  '))
