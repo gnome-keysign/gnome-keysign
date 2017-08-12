@@ -145,7 +145,10 @@ class ReceiveApp:
     def on_message_received(self, key_data, success=True, message=None):
         if success:
             self.log.debug("message received")
-            self.on_keydata_downloaded(key_data)
+            try:
+                self.on_keydata_downloaded(key_data)
+            except ValueError as ve:
+                log.error(ve.args[0])
         else:
             self.stack.add(self.rb)
             self.result_label.set_label(dedent(message.__doc__))
