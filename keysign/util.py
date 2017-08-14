@@ -16,6 +16,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
+import hashlib
 import hmac
 import logging
 from subprocess import call
@@ -29,9 +30,11 @@ log = logging.getLogger(__name__)
 
 
 def mac_generate(key, data):
-    mac = hmac.new(key, data).hexdigest().upper()
+    mac = hmac.new(key, data, hashlib.sha256).hexdigest().upper()
     log.info("MAC of %r is %r", data[:20], mac[:20])
-    return mac
+    # Arbitrary truncation to avoid a QR code size increase
+    return mac[:20]
+
 
 def mac_verify(key, data, mac):
     computed_mac = mac_generate(key, data)
