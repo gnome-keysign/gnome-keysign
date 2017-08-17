@@ -40,6 +40,7 @@ The list of dependencies includes:
     * GTK and Cairo
     * gobject introspection for those libraries
     * Magic Wormhole
+    * PyBluez (optional)
 
 
 openSUSE installation
@@ -79,7 +80,7 @@ gstreamer1.0-plugins-good provides the autovideosrc element.
 
 These packages should be optional:
 
-    python-requests monkeysign python-qrcode
+    python-requests monkeysign python-qrcode python-bluez
 
 
 Fedora dependencies
@@ -93,6 +94,11 @@ assuming that pip and git are already installed:
     sudo dnf install -y python-gobject python-avahi dbus-python gstreamer1-plugins-bad-free-extras gstreamer1-plugins-good  gnupg
     pip install magic-wormhole
 
+As optional:
+
+.. code::
+
+    sudo dnf install -y pybluez
 
 
 Installation with pip

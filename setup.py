@@ -65,6 +65,9 @@ setup(
         # avahi # Also no entry in the cheeseshop
         # dbus # dbus-python is in the cheeseshop but not pip-able
         ],
+    extras_require={
+        'bluetooth': ['pybluez>=0.22'],
+    },
     license='GPLv3+',
     long_description=open('README.rst').read(),
     
