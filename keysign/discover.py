@@ -4,10 +4,13 @@ from twisted.internet import threads
 from twisted.internet.defer import inlineCallbacks, returnValue
 from wormhole.errors import LonelyError
 
-from .bluetoothreceive import BluetoothReceive
 from .wormholereceive import WormholeReceive
 from .avahidiscovery import AvahiKeysignDiscoveryWithMac
 from .util import is_code_complete, parse_barcode
+try:
+    from .bluetoothreceive import BluetoothReceive
+except ImportError:
+    BluetoothReceive = None
 
 log = logging.getLogger(__name__)
 
@@ -41,7 +44,7 @@ class Discover:
             success = True
             message = ""
             returnValue((key_data, success, message))
-        if self.bt_code and not self.stopped:
+        if self.bt_code and BluetoothReceive and not self.stopped:
             # We try Bluetooth, if we have it
             log.info("Trying to connect to %s with Bluetooth", self.bt_code)
             self.bt = BluetoothReceive()
