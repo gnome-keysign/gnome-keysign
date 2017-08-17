@@ -30,7 +30,7 @@ class Offer:
         else:
             w_data = ""
         self.bt_offer = BluetoothOffer(self.key)
-        _, self.b_data = self.bt_offer.generate_code()
+        _, self.b_data = self.bt_offer.allocate_code()
         discovery_data = a_data + ";" + w_data + ";" + self.b_data
         # As design when we use both avahi and wormhole we only display
         # the wormhole code
@@ -65,7 +65,7 @@ class Offer:
 
     def stop_bt(self):
         if self.bt_offer:
-            self.bt_offer.stop_receive()
+            self.bt_offer.stop()
             self.bt_offer = None
 
     def stop(self):
