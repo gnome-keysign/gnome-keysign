@@ -39,10 +39,11 @@ The list of dependencies includes:
     * GStreamer with the good and bad plugins
     * GTK and Cairo
     * gobject introspection for those libraries
+    * PyBluez (optional)
 
 
 openSUSE installation
-----------------------
+---------------------
 
 openSUSE has `packaged the application <https://build.opensuse.org/package/show/GNOME:Apps/gnome-keysign>`_
 so it should be easy for you to install it.
@@ -50,7 +51,7 @@ so it should be easy for you to install it.
 
 
 Debian and Ubuntu dependencies
----------------------------------
+------------------------------
 
 This list of packages seems to make it work:
 
@@ -62,7 +63,7 @@ gstreamer1.0-plugins-good provides the autovideosrc element.
 
 These packages should be optional:
 
-    python-requests monkeysign python-qrcode
+    python-requests monkeysign python-qrcode python-bluez
 
 
 Fedora dependencies
@@ -75,6 +76,11 @@ assuming that pip and git are already installed:
 
     sudo dnf install -y python-gobject python-avahi dbus-python gstreamer1-plugins-bad-free-gtk gstreamer1-plugins-good  gnupg
 
+As optional:
+
+.. code::
+
+    sudo dnf install -y pybluez
 
 
 Installation with pip
