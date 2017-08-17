@@ -1,8 +1,11 @@
 import logging
 from twisted.internet.defer import returnValue
 
-from .bluetoothoffer import BluetoothOffer
 from .avahioffer import AvahiHTTPOffer
+try:
+    from .bluetoothoffer import BluetoothOffer
+except ImportError:
+    BluetoothOffer = None
 
 log = logging.getLogger(__name__)
 
@@ -18,8 +21,9 @@ class Offer:
         self.a_offer = AvahiHTTPOffer(self.key)
         a_info = self.a_offer.start()
         code, a_data = a_info
-        self.bt_offer = BluetoothOffer(self.key)
-        _, self.b_data = self.bt_offer.allocate_code()
+        if BluetoothOffer:
+            self.bt_offer = BluetoothOffer(self.key)
+            _, self.b_data = self.bt_offer.allocate_code()
         discovery_data = a_data + ";" + self.b_data
         # As design when we use both avahi and wormhole we only display
         # the wormhole code

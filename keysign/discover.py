@@ -3,9 +3,12 @@ import logging
 from twisted.internet import threads
 from twisted.internet.defer import inlineCallbacks, returnValue
 
-from .bluetoothreceive import BluetoothReceive
 from .avahidiscovery import AvahiKeysignDiscoveryWithMac
 from .util import parse_barcode
+try:
+    from .bluetoothreceive import BluetoothReceive
+except ImportError:
+    BluetoothReceive = None
 
 log = logging.getLogger(__name__)
 
