@@ -69,7 +69,7 @@ class BluetoothOffer:
 
         returnValue((success, message))
 
-    def generate_code(self):
+    def allocate_code(self):
         try:
             code = get_local_bt_address().upper()
         except dbus.exceptions.DBusException as e:
@@ -86,11 +86,6 @@ class BluetoothOffer:
         return code, bt_data
 
     def stop(self):
-        self.stopped = True
-
-    def stop_receive(self):
-        # FIXME right now it seems that even after stop()
-        # the used port is not released
         log.debug("Stopping bt receive")
         self.stopped = True
         if self.server_socket:
@@ -119,7 +114,7 @@ def main(args):
     key = get_usable_keys(pattern=args[0])[0]
 
     offer = BluetoothOffer(key)
-    code, _ = offer.generate_code()
+    code, _ = offer.allocate_code()
     offer.start().addCallback(_received)
     print("Offering key: {}".format(key))
     print("Discovery info: {}".format(code))
