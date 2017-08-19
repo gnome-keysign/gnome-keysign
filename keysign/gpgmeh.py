@@ -381,7 +381,7 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
         # There is op_keysign, but it's only available with gpg 2.1.12
         ctx.interact(key, GenEdit(sign_key(error_cb=error_cb)).edit_cb, sink=sink)
         sink.seek(0, 0)
-        log.debug("Sink after signing: %s", sink.read())
+        log.debug("Sink after signing: %r", sink.read())
 
         signed_sink = gpg.Data()
         ctx.set_keylist_mode(gpg.constants.KEYLIST_MODE_SIGS)

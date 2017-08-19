@@ -81,7 +81,7 @@ class ThreadedKeyserver(ThreadingMixIn, HTTPServer):
 
     def __init__(self, server_address, *args, **kwargs):
         if issubclass(self.__class__, object):
-            super(ThreadedKeyserver, self).__init__(*args, **kwargs)
+            super(ThreadedKeyserver, self).__init__(server_address, *args, **kwargs)
         else:
             HTTPServer.__init__(self, server_address, *args, **kwargs)
             # WTF? There is no __init__..?
@@ -219,12 +219,12 @@ if __name__ == '__main__':
     import sys
     if len(sys.argv) >= 2:
         fname = sys.argv[1]
-        KEYDATA = open(fname, 'r').read()
+        KEYDATA = open(fname, 'rb').read()
         # FIXME: Someone needs to determine the fingerprint
         #        of the data just read
         fpr = fingerprint_from_keydata(KEYDATA)
     else:
-        KEYDATA = 'Example data'
+        KEYDATA = b'Example data'
         fpr = ''.join('F289 F7BA 977D F414 3AE9  FDFB F70A 0290 6C30 1813'.split())
 
     if len(sys.argv) >= 3:

@@ -35,8 +35,9 @@ DBusGMainLoop( set_as_default=True )
 # Unfortunately, upstream seems rather inactive.
 if getattr(avahi, 'txt_array_to_dict', None) is None:
     # This has been taken from Gajim
-    # http://hg.gajim.org/gajim/file/4a3f896130ad/src/common/zeroconf/zeroconf_avahi.py
+    # https://dev.gajim.org/gajim/gajim/blob/master/src/common/zeroconf/zeroconf_avahi.py
     # it is licensed under the GPLv3.
+    # https://github.com/lathiat/avahi/pull/133
     def txt_array_to_dict(txt_array):
         txt_dict = {}
         for els in txt_array:
@@ -56,7 +57,7 @@ if getattr(avahi, 'txt_array_to_dict', None) is None:
                         val += c
             if val is None: # missing '='
                 val = ''
-            txt_dict[key] = val.decode('utf-8')
+            txt_dict[key] = val
         return txt_dict
 
     setattr(avahi, 'txt_array_to_dict', txt_array_to_dict)

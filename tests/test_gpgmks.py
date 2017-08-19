@@ -281,6 +281,11 @@ class TestSignAndEncrypt:
             kr = Keyring(homedir=self.sender_homedir)
             log.info("encrypted UID: %r", enc_uid)
             decrypted = kr.decrypt_data(signed_uid)
+            log.info("ctx out: %r", kr.context.stdout)
+            log.info("ctx err: %r", kr.context.stderr)
+            assert_true (decrypted, "Error decrypting %r" % signed_uid)
+
+            # Now we have the signed UID. We want see if it really carries a signature.
             pgpykeys = pgpy.PGPKey.from_blob(decrypted)
             log.info("Loaded Signed Keys: %r", pgpykeys)
             k = pgpykeys[0]
@@ -292,7 +297,6 @@ class TestSignAndEncrypt:
             # Now we have the signed UID. We want see if it really carries a signature.
             signatures_after[uidstr] = uid._signatures
             assert_less(len(signatures_before[uidstr]), len(signatures_after[uidstr]))
-
 
 
 class TestLatin1(TestSignAndEncrypt):

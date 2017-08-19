@@ -117,9 +117,9 @@ def sign_keydata_and_send(keydata, error_cb=None):
     # and spawn an email client.
     log.info("About to create signatures for key with fpr %r", fingerprint)
     for uid, encrypted_key in list(sign_keydata_and_encrypt(keydata, error_cb)):
-            # FIXME: get rid of this redundant assignment
-            log.info("formatting UID: %r", uid)
-            uid_str = b"{}".format(uid).decode('utf-8', 'replace')
+            log.info("Using UID: %r", uid)
+            # We expect uid.uid to be a consumable string
+            uid_str = uid.uid
             ctx = {
                 'uid' : uid_str,
                 'fingerprint': fingerprint,

@@ -23,8 +23,28 @@ import warnings
 
 log = logging.getLogger(__name__)
 
-def parse_uid(uid):
-    "Parses a GnuPG UID into it's name, comment, and email component"
+
+def to_valid_utf8_string(s, errors='replace', replacement='?'):
+    """Takes a string and returns a valid utf8 encodable string
+
+    Not every Python string is utf-8 encodable.
+    Take 'fo\udcf6e\udce9ba <foo@bma.d>' for example.
+    This function replaces undecodable characters with a '?'
+    """
+    try:
+        safe = s.encode('utf-8', errors=errors).decode('utf-8', errors=errors)
+    except UnicodeDecodeError:
+        # This is the Python 2 way...
+        safe = s.decode('utf-8', errors=errors).replace(u"\uFFFD", replacement)
+    return safe
+
+
+def parse_uid(uid, errors='replace'):
+    """Parses a GnuPG UID into it's name, comment, and email component
+    
+    It converts them to strings with the errors paramenter controlling
+    how to deal with encoding problems.
+    """
     # remove the comment from UID (if it exists)
     com_start = uid.find(b'(')
     if com_start != -1:
@@ -32,13 +52,18 @@ def parse_uid(uid):
         uid = uid[:com_start].strip() + uid[com_end+1:].strip()
 
     # FIXME: Actually parse the comment...
-    comment = ""
+    comment = b""
+    comment = comment.decode('utf-8', errors)
+
     # split into user's name and email
     tokens = uid.split(b'<')
     name = tokens[0].strip()
-    email = 'unknown'
+    name = name.decode('utf-8', errors)
+    email = b'unknown'
     if len(tokens) > 1:
-        email = tokens[1].replace('>','').strip()
+        log.debug("Parsing tokens: %r", tokens)
+        email = tokens[1].replace(b'>',b'').strip()
+    email = email.decode('utf-8', errors)
     
     log.debug("Parsed %r to name (%d): %r", uid, len(name), name)
     return (name, comment, email)
@@ -104,7 +129,7 @@ class Key(namedtuple("Key", ["expiry", "fingerprint", "uidslist"])):
 
     @classmethod
     def from_gpgme(cls, key):
-        "Creates a new Key from an existing monkeysign key"
+        "Creates a new Key from an existing gpgme key"
         uids = [UID.from_gpgme(uid) for uid in  key.uids]
         expiry = parse_expiry(key.subkeys[0].expires)
         fingerprint = key.fpr
@@ -112,7 +137,7 @@ class Key(namedtuple("Key", ["expiry", "fingerprint", "uidslist"])):
 
 
 
-class UID(namedtuple("UID", "expiry name comment email")):
+class UID(namedtuple("UID", "expiry uid name comment email")):
     "Represents an OpenPGP UID - at least to the extent we care about it"
 
     @classmethod
@@ -121,39 +146,32 @@ class UID(namedtuple("UID", "expiry name comment email")):
         # We expect to get raw bytes.
         # While RFC4880 demands UTF-8 encoded data,
         # real-life has produced non UTF-8 keys...
-        uidstr = uid.uid
-        log.debug("UidStr (%d): %r", len(uidstr), uidstr)
-        name, comment, email = parse_uid(uidstr)
+        rawuid = to_valid_utf8_string(uid.uid).encode('utf-8')
+        log.debug("UidStr (%d): %r", len(rawuid), rawuid)
+        name, comment, email = parse_uid(rawuid)
         expiry = parse_expiry(uid.expire)
 
-        return cls(expiry, name, comment, email)
+        return cls(expiry, rawuid.decode('utf-8'),
+                   name, comment, email)
 
     @classmethod
     def from_gpgme(cls, uid):
-        "Creates a new UID from a monkeysign key"
-        uidstr = uid.uid
-        name = uid.name
+        "Creates a new UID from a gpgme UID"
+        # Weird. I would expect the uid to be raw bytes,
+        # because how would gpgme know what encoding to apply?
+        # Also, you can have invalid encodings.
+        # Turns out, that Python strings can be encoded according to PEP 383
+        # which basically encodes invalid bytes as 0xDC80 + byte.
+        # That's the "surrogateescape" error handler available in Python 3.
+        # Here, we don't care about that, though. We are in the user facing
+        # abstraction for a UID. As such, we ensure that it can be rendered.
+        # So we take the string we get from gpgme and try to convert it to
+        # to utf-8 bytes.
+        log.debug("UID from gpgme: %r", uid.uid)
+        rawuid = to_valid_utf8_string(uid.uid)
+        name = to_valid_utf8_string(uid.name)
         comment = '' # FIXME: uid.comment
-        email = uid.email
+        email = to_valid_utf8_string(uid.email)
         expiry = None  #  FIXME: Maybe UIDs don't expire themselves but via the binding signature
 
-        return cls(expiry, name, comment, email)
-
-
-    def __format__(self, arg):
-        if self.comment:
-            s = b"{name} ({comment}) <{email}>"
-        else:
-            s = b"{name} <{email}>"
-        return s.format(**self._asdict())
-
-    def __str__(self):
-        return b"{}".format(self)
-
-    @property
-    def uid(self):
-        "Legacy compatibility, use str() instead"
-        warnings.warn("Legacy uid, use '{}'.format() instead",
-                      DeprecationWarning)
-        return b"{}".format(self)
-
+        return cls(expiry, rawuid, name, comment, email)

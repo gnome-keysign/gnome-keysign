@@ -69,7 +69,7 @@ def format_key_header(fpr, length='2048', creation_time=None):
 def format_uidslist(uidslist):
     result = ""
     for uid in uidslist:
-        uidstr = GLib.markup_escape_text(str(uid))
+        uidstr = GLib.markup_escape_text(uid.uid)
         result += ("{}\n".format(uidstr))
 
     return result

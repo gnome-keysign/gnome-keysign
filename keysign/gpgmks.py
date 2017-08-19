@@ -51,8 +51,9 @@ def UIDExport(uid, keydata):
     # a stray "gpg: checking the trustdb" which confuses the gnupg library
     tmp.context.set_option('always-trust')
     tmp.import_data(keydata)
-    log.debug("Looking for %r", uid)
-    for fpr, key in tmp.get_keys(uid).items():
+    fpr = fingerprint_from_keydata(keydata)
+    log.debug("Looking for %r", fpr)
+    for fpr, key in tmp.get_keys(fpr).items():
         for u in key.uidslist:
             key_uid = decode_gpg_uid(u.uid)
             if key_uid != uid:
@@ -60,7 +61,7 @@ def UIDExport(uid, keydata):
                 # As pattern we need to provide the unescaped one, otherwise monkeysign
                 # will hang trying to find the correct uid to delete
                 tmp.del_uid(fingerprint=fpr, pattern=u.uid)
-    only_uid = tmp.export_data(uid)
+    only_uid = tmp.export_data(fpr)
 
     return only_uid
 
@@ -278,6 +279,7 @@ def sign_keydata(keydata, error_cb=None, homedir=None):
     log.info('Signing with these keys: %s', secret_keys)
 
     stripped_key = MinimalExport(keydata)
+    assert stripped_key
     fingerprint = fingerprint_from_keydata(stripped_key)
 
     log.debug('Trying to import key\n%s', stripped_key)
@@ -323,7 +325,10 @@ def sign_keydata(keydata, error_cb=None, homedir=None):
 
             # 3.2. export and encrypt the signature
             # 3.3. mail the key to the user
-            signed_key = UIDExport(uid_str, tmpkeyring.export_data(uid_str))
+            exported_key = tmpkeyring.export_data(fingerprint)
+            assert exported_key
+            signed_key = UIDExport(uid_str, exported_key)
+            assert signed_key
             log.info("Exported %d bytes of signed key", len(signed_key))
             yield (uid, signed_key)
 
@@ -409,12 +414,16 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
     """
     tmpkeyring = TempKeyring()
     tmpkeyring.import_data(keydata)
+    fingerprint = fingerprint_from_keydata(keydata)
     tmpkeyring.context.set_option('always-trust')
     for (uid, signed_key) in sign_keydata(keydata,
         error_cb=error_cb, homedir=homedir):
             if not uid.revoked:
                 encrypted_key = tmpkeyring.encrypt_data(data=signed_key,
-                    recipient=uid.uid)
+                    # We use the fingerprint rather than the email address,
+                    # because we cannot get a reliable representation of the
+                    # UID, i.e. when it contains non-UTF-8 bytes.
+                    recipient=fingerprint)
                 yield (UID.from_monkeysign(uid), encrypted_key)
 
 
