@@ -18,6 +18,7 @@ if __name__ == "__main__" and __package__ is None:
     parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     os.sys.path.insert(0, parent_dir)
     os.sys.path.insert(0, os.path.join(parent_dir, 'monkeysign'))
+    import keysign
     __package__ = str('keysign')
 
 from .gpgmh import get_public_key_data, get_usable_keys
