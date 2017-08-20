@@ -48,11 +48,11 @@ class Discover:
             if key_data:
                 # If we found the key
                 returnValue((key_data, success, message))
-        else:
-            key_data = None
-            success = False
-            message = ""
-            returnValue((key_data, success, message))
+
+        key_data = None
+        success = False
+        message = ""
+        returnValue((key_data, success, message))
 
     def stop(self):
         self.stopped = True
