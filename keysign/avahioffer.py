@@ -39,7 +39,7 @@ if  __name__ == "__main__" and __package__ is None:
 from .__init__ import __version__
 from .gpgmh import get_usable_keys, get_public_key_data
 from .i18n import _
-from .util import mac_generate
+from .util import mac_generate, format_fingerprint
 from . import Keyserver
 
 log = logging.getLogger(__name__)
@@ -64,7 +64,7 @@ class AvahiHTTPOffer:
         log.info("Requesting to start")
         self.keyserver.start()
 
-        return discovery_info
+        return format_fingerprint(self.key.fingerprint), discovery_info
 
     def stop(self):
         "Stops offering the key"
