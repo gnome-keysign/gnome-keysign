@@ -1,6 +1,7 @@
 import logging
 import select
 from bluetooth import BluetoothSocket, BluetoothError, RFCOMM
+import socket
 
 if __name__ == "__main__":
     import gi
@@ -97,9 +98,7 @@ class BluetoothReceive:
     def stop(self):
         self.stopped = True
         if self.client_socket:
-            # Seems that is useless :/
-            #import socket
-            #self.client_socket.shutdown(socket.SHUT_RDWR)
+            self.client_socket.shutdown(socket.SHUT_RDWR)
             self.client_socket.close()
 
 

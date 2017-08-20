@@ -2,6 +2,7 @@ import logging
 from bluetooth import BluetoothSocket, RFCOMM
 import dbus
 import select
+import socket
 if __name__ == "__main__":
     import gi
     gi.require_version('Gtk', '3.0')
@@ -92,6 +93,7 @@ class BluetoothOffer:
         log.debug("Stopping bt receive")
         self.stopped = True
         if self.server_socket:
+            self.server_socket.shutdown(socket.SHUT_RDWR)
             self.server_socket.close()
             self.server_socket = None
 
