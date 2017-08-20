@@ -1,5 +1,5 @@
 import logging
-from bluetooth import *
+from bluetooth import BluetoothSocket, RFCOMM
 import dbus
 import select
 if __name__ == "__main__":
@@ -15,6 +15,7 @@ if __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
                               "this script directly which is discouraged. " +
                               "Try python -m instead.")
+    import os
     parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     os.sys.path.insert(0, parent_dir)
     os.sys.path.insert(0, os.path.join(parent_dir, 'monkeysign'))
