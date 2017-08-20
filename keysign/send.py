@@ -99,7 +99,8 @@ class SendApp:
         if BluetoothOffer:
             self.bt_offer = BluetoothOffer(self.key)
             _, bt_data = self.bt_offer.allocate_code()
-            discovery_list.append(bt_data)
+            if bt_data:
+                discovery_list.append(bt_data)
         discovery_data = ";".join(discovery_list)
         if bt_data:
             # We ignore the result of the defer because we don't have
