@@ -53,9 +53,11 @@ class BluetoothOffer:
                 # server_socket.accept() is not stoppable. So with select we can call accept()
                 # only when we are sure that there is already a waiting connection
                 ready_to_read, ready_to_write, in_error = yield threads.deferToThread(
-                    select.select, [self.server_socket], [], [], True)
+                    select.select, [self.server_socket], [], [], 0.5)
                 if ready_to_read:
-                    client_socket, address = yield threads.deferToThread(self.server_socket.accept)
+                    # We are sure that a connection is available, so we can call
+                    # accept() without deferring it to a thread
+                    client_socket, address = self.server_socket.accept()
                     key_data = get_public_key_data(self.key.fingerprint)
                     kd_decoded = key_data.decode('utf-8')
                     yield threads.deferToThread(client_socket.sendall, kd_decoded)
