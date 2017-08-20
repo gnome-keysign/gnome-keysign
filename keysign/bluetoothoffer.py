@@ -22,8 +22,7 @@ if __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 from .gpgmh import get_public_key_data, get_usable_keys
-from .util import get_local_bt_address
-
+from .util import get_local_bt_address, mac_generate
 
 log = logging.getLogger(__name__)
 
@@ -113,12 +112,14 @@ def main(args):
         print("Press Enter to exit")
 
     key = get_usable_keys(pattern=args[0])[0]
-
+    file_key_data = get_public_key_data(key.fingerprint)
+    hmac = mac_generate(key.fingerprint.encode('ascii'), file_key_data)
     offer = BluetoothOffer(key)
     code, _ = offer.allocate_code()
     offer.start().addCallback(_received)
     print("Offering key: {}".format(key))
     print("Discovery info: {}".format(code))
+    print("HMAC: {}".format(hmac))
     # Wait for the user without blocking everything
     reactor.callInThread(cancel)
     reactor.run()
