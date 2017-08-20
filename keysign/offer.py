@@ -17,13 +17,16 @@ class Offer:
         self.b_data = ""
 
     def allocate_code(self):
+        discovery_list = []
         self.a_offer = AvahiHTTPOffer(self.key)
         a_info = self.a_offer.start()
         code, a_data = a_info
+        discovery_list.append(a_data)
         if BluetoothOffer:
             self.bt_offer = BluetoothOffer(self.key)
             _, self.b_data = self.bt_offer.allocate_code()
-        discovery_data = a_data + ";" + self.b_data
+            discovery_list.append(self.b_data)
+        discovery_data = ";".join(discovery_list)
         return code, discovery_data
 
     def start(self):
