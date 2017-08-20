@@ -28,7 +28,10 @@ from gi.repository import Gtk, GLib
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 from gi.repository import Gdk
+from twisted.internet import gtk3reactor
+gtk3reactor.install()
 
+from twisted.internet import reactor
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -110,6 +113,7 @@ class KeysignApp(Gtk.Application):
         window = builder.get_object(appwindow)
         window.set_wmclass ("GNOME Keysign", "GNOME Keysign")
         window.set_title("GNOME Keysign")
+        window.connect("delete-event", self.on_delete_window)
         self.headerbar = window.get_titlebar()
         self.header_button = builder.get_object("back_refresh_button")
         self.header_button.connect('clicked', self.on_header_button_clicked)
@@ -174,9 +178,12 @@ class KeysignApp(Gtk.Application):
         window.show_all()
         self.add_window(window)
 
-
     def run(self, args=[]):
         super(KeysignApp, self).run()
+
+    @staticmethod
+    def on_delete_window(*args):
+        reactor.callFromThread(reactor.stop)
 
     def on_key_activated(self, widget, key):
         log.info("Activated key %r", key)
@@ -303,10 +310,12 @@ def main(args = []):
 
     app = KeysignApp()
     try:
-        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : app.quit(), None)
+        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
+                                  lambda *args: reactor.callFromThread(reactor.stop), None)
     except AttributeError:
         pass
-    app.run(args)
+    reactor.registerGApplication(app)
+    reactor.run()
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG,
