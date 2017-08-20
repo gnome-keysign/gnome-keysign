@@ -82,7 +82,7 @@ class ReceiveApp:
         old_scanner_parent = old_scanner.get_parent()
 
         scanner = KeyFprScanWidget() #builder=builder)
-        scanner.connect("changed", self.on_scanner_changed)
+        scanner.connect("changed", self.on_code_changed)
         scanner.connect("barcode", self.on_barcode)
 
         if old_scanner_parent:
