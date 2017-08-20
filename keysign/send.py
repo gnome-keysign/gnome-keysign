@@ -12,7 +12,6 @@ if __name__ == "__main__":
     from twisted.internet import gtk3reactor
     gtk3reactor.install()
 from twisted.internet import reactor
-from twisted.internet.defer import inlineCallbacks
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -86,7 +85,6 @@ class SendApp:
 
         self.key = None
 
-    @inlineCallbacks
     def on_key_activated(self, widget, key):
         self.key = key
         log.info("Activated key %r", key)
