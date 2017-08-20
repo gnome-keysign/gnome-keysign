@@ -17,9 +17,10 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 
+import dbus
 import hmac
-import json
 import logging
+import requests
 from subprocess import call
 from string import Template
 from tempfile import NamedTemporaryFile
@@ -29,8 +30,6 @@ try:
 except ImportError:
     from urlparse import urlparse, parse_qs
     from urlparse import ParseResult
-
-import requests
 
 from gi.repository import Gtk, GLib
 
