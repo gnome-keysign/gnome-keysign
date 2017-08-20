@@ -28,10 +28,14 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
-from .offer import Offer
+from .avahioffer import AvahiHTTPOffer
 from . import gpgmh
 # We import i18n to have the locale set up for Glade
 from .i18n import _
+try:
+    from .bluetoothoffer import BluetoothOffer
+except ImportError:
+    BluetoothOffer = None
 
 log = logging.getLogger(__name__)
 
@@ -46,7 +50,8 @@ class SendApp:
     call deactivate().
     """
     def __init__(self, builder=None):
-        self.offer = None
+        self.a_offer = None
+        self.bt_offer = None
         self.stack = None
         self.stack_saved_visible_child = None
         self.klw = None
@@ -87,12 +92,23 @@ class SendApp:
         log.info("Activated key %r", key)
         ####
         # Start network services
-        self.offer = Offer(self.key)
-        info = yield self.offer.allocate_code()
-        code, discovery_data = info
-        # We ignore the result of the defer because we don't have
-        # a result page
-        self.offer.start()
+        discovery_list = []
+        self.a_offer = AvahiHTTPOffer(self.key)
+        a_info = self.a_offer.start()
+        code, a_data = a_info
+        discovery_list.append(a_data)
+        bt_data = None
+        if BluetoothOffer:
+            self.bt_offer = BluetoothOffer(self.key)
+            _, bt_data = self.bt_offer.allocate_code()
+            discovery_list.append(bt_data)
+        discovery_data = ";".join(discovery_list)
+        if bt_data:
+            # We ignore the result of the defer because we don't have
+            # a result page
+            self.bt_offer.start()
+        else:
+            log.info("Bluetooth as been skipped")
         log.info("Use this for discovering the other key: %r", discovery_data)
         ####
         # Create and show widget for key
@@ -115,9 +131,13 @@ class SendApp:
 
     def _deactivate_offer(self):
         # Stop network services
-        if self.offer:
-            self.offer.stop()
-            self.offer = None
+        if self.a_offer:
+            self.a_offer.stop()
+            # We need to deallocate the avahi object or the used port will never be released
+            self.a_offer = None
+        if self.bt_offer:
+            self.bt_offer.stop()
+            self.bt_offer = None
         log.debug("Stopped network services")
 
 
