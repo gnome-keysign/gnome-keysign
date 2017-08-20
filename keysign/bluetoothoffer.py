@@ -44,12 +44,6 @@ class BluetoothOffer:
         self.stopped = False
         message = "Back"
         success = False
-        if self.server_socket is None:
-            self.server_socket = BluetoothSocket(RFCOMM)
-            self.server_socket.bind(("", self.port))
-            # Number of unaccepted connections that the system will allow before refusing new connections
-            backlog = 1
-            self.server_socket.listen(backlog)
         try:
             while not self.stopped and not success:
                 # server_socket.accept() is not stoppable. So with select we can call accept()
@@ -84,9 +78,16 @@ class BluetoothOffer:
             else:
                 log.error("An unexpected error occurred %s", e.get_dbus_name())
             self.code = None
-            return "", ""
-        log.info("BT Code: %s", code)
-        bt_data = "BT={0}".format(code)
+            return None, None
+        if self.server_socket is None:
+            self.server_socket = BluetoothSocket(RFCOMM)
+            self.server_socket.bind(("", 0))
+            # Number of unaccepted connections that the system will allow before refusing new connections
+            backlog = 1
+            self.server_socket.listen(backlog)
+        port = self.server_socket.getsockname()[1]
+        log.info("BT Code: %s %s", code, port)
+        bt_data = "BT={0};PT={1}".format(code, port)
         return code, bt_data
 
     def stop(self):
