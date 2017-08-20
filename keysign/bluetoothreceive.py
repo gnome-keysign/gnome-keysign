@@ -104,8 +104,8 @@ class BluetoothReceive:
 
 def main(args):
     log.debug('Running main with args: %s', args)
-    if not len(args) == 2:
-        raise ValueError("You must provide two arguments: bluetooth code and hmac")
+    if not len(args) == 3:
+        raise ValueError("You must provide three arguments: bluetooth code, hmac and port")
 
     def _received(result):
         key_data, success, error_message = result
@@ -119,7 +119,8 @@ def main(args):
     print("Trying to download the key, please wait")
     bt_mac = args[0]
     hmac = args[1]
-    receive = BluetoothReceive()
+    port = int(args[2])
+    receive = BluetoothReceive(port)
     d = receive.find_key(bt_mac, hmac)
     d.addCallback(_received)
     reactor.run()

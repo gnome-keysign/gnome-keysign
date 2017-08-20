@@ -121,14 +121,19 @@ def main(args):
     file_key_data = get_public_key_data(key.fingerprint)
     hmac = mac_generate(key.fingerprint.encode('ascii'), file_key_data)
     offer = BluetoothOffer(key)
-    code, _ = offer.allocate_code()
-    offer.start().addCallback(_received)
-    print("Offering key: {}".format(key))
-    print("Discovery info: {}".format(code))
-    print("HMAC: {}".format(hmac))
-    # Wait for the user without blocking everything
-    reactor.callInThread(cancel)
-    reactor.run()
+    code, data = offer.allocate_code()
+    if data:
+        port = data.rsplit("=", 1)[1]
+        offer.start().addCallback(_received)
+        print("Offering key: {}".format(key))
+        print("Discovery info: {}".format(code))
+        print("HMAC: {}".format(hmac))
+        print("Port: {}".format(port))
+        # Wait for the user without blocking everything
+        reactor.callInThread(cancel)
+        reactor.run()
+    else:
+        print("Bluetooth not available")
 
 if __name__ == "__main__":
     import sys

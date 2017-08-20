@@ -46,9 +46,10 @@ def test_bt():
     # Start offering the key
     offer = BluetoothOffer(key)
     info = yield offer.allocate_code()
-    code, _ = info
+    code, data = info
+    port = int(data.rsplit("=", 1)[1])
     offer.start()
-    receive = BluetoothReceive()
+    receive = BluetoothReceive(port)
     msg_tuple = yield receive.find_key(code, hmac)
     downloaded_key_data, success, _ = msg_tuple
     assert_true(success)
