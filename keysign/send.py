@@ -90,7 +90,6 @@ class SendApp:
         self.offer = Offer(self.key)
         info = yield self.offer.allocate_code()
         code, discovery_data = info
-        self.create_keypresent(code, discovery_data)
         # We ignore the result of the defer because we don't have
         # a result page
         self.offer.start()
