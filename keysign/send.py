@@ -106,11 +106,6 @@ class SendApp:
 
     def deactivate(self):
         self._deactivate_offer()
-        ####
-        # Stop network services
-        avahi_offer = self.avahi_offer
-        avahi_offer.stop()
-        self.avahi_offer = None
 
         ####
         # Re-set stack to inital position
