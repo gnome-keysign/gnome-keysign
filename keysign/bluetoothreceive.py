@@ -105,8 +105,14 @@ class BluetoothReceive:
     def stop(self):
         self.stopped = True
         if self.client_socket:
-            self.client_socket.shutdown(socket.SHUT_RDWR)
-            self.client_socket.close()
+            try:
+                self.client_socket.shutdown(socket.SHUT_RDWR)
+                self.client_socket.close()
+            except BluetoothError as be:
+                if be.args[0] == "(9, 'Bad file descriptor')":
+                    log.info("The old Bluetooth connection was already closed")
+                else:
+                    log.warning("An unknown bt error occurred: %s" % be.args[0])
 
 
 def main(args):
