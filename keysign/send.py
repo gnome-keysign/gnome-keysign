@@ -102,9 +102,7 @@ class SendApp:
                 discovery_list.append(bt_data)
         discovery_data = ";".join(discovery_list)
         if bt_data:
-            # We ignore the result of the defer because we don't have
-            # a result page
-            self.bt_offer.start()
+            self.bt_offer.start().addCallback(self._restart_bluetooth)
         else:
             log.info("Bluetooth as been skipped")
         log.info("Use this for discovering the other key: %r", discovery_data)
@@ -137,6 +135,10 @@ class SendApp:
             self.bt_offer.stop()
             self.bt_offer = None
         log.debug("Stopped network services")
+
+    def _restart_bluetooth(self, _):
+        log.info("Bluetooth as been restarted")
+        self.bt_offer.start().addCallback(self._restart_bluetooth)
 
 
 class App(Gtk.Application):
