@@ -45,8 +45,10 @@ def test_bt():
     hmac = mac_generate(key.fingerprint.encode('ascii'), file_key_data)
     # Start offering the key
     offer = BluetoothOffer(key)
-    info = yield offer.allocate_code()
-    code, data = info
+    data = yield offer.allocate_code()
+    # getting the code from "BT=code;...."
+    code = data.split("=", 1)[1]
+    code = code.split(";", 1)[0]
     port = int(data.rsplit("=", 1)[1])
     offer.start()
     receive = BluetoothReceive(port)

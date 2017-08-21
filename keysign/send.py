@@ -92,13 +92,12 @@ class SendApp:
         # Start network services
         discovery_list = []
         self.a_offer = AvahiHTTPOffer(self.key)
-        a_info = self.a_offer.start()
-        code, a_data = a_info
+        a_data = self.a_offer.start()
         discovery_list.append(a_data)
         bt_data = None
         if BluetoothOffer:
             self.bt_offer = BluetoothOffer(self.key)
-            _, bt_data = self.bt_offer.allocate_code()
+            bt_data = self.bt_offer.allocate_code()
             if bt_data:
                 discovery_list.append(bt_data)
         discovery_data = ";".join(discovery_list)

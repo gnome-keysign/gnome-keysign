@@ -78,7 +78,7 @@ class BluetoothOffer:
             else:
                 log.error("An unexpected error occurred %s", e.get_dbus_name())
             self.code = None
-            return None, None
+            return None
         if self.server_socket is None:
             self.server_socket = BluetoothSocket(RFCOMM)
             self.server_socket.bind(("", 0))
@@ -88,7 +88,7 @@ class BluetoothOffer:
         port = self.server_socket.getsockname()[1]
         log.info("BT Code: %s %s", code, port)
         bt_data = "BT={0};PT={1}".format(code, port)
-        return code, bt_data
+        return bt_data
 
     def stop(self):
         log.debug("Stopping bt receive")
@@ -121,8 +121,11 @@ def main(args):
     file_key_data = get_public_key_data(key.fingerprint)
     hmac = mac_generate(key.fingerprint.encode('ascii'), file_key_data)
     offer = BluetoothOffer(key)
-    code, data = offer.allocate_code()
+    data = offer.allocate_code()
     if data:
+        # getting the code from "BT=code;...."
+        code = data.split("=", 1)[1]
+        code = code.split(";", 1)[0]
         port = data.rsplit("=", 1)[1]
         offer.start().addCallback(_received)
         print("Offering key: {}".format(key))
