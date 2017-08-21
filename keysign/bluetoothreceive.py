@@ -61,7 +61,7 @@ class BluetoothReceive:
                     # try to receive until the sender closes the connection
                     try:
                         while True:
-                            part_message = yield threads.deferToThread(self.client_socket.recv, self.size)
+                            part_message = self.client_socket.recv(self.size)
                             message += part_message
                     except BluetoothError as be:
                         if be.args[0] == "(104, 'Connection reset by peer')":
