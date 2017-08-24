@@ -1,5 +1,5 @@
 import logging
-from bluetooth import BluetoothSocket, RFCOMM
+from bluetooth import BluetoothSocket, RFCOMM, PORT_ANY
 import dbus
 import select
 import socket
@@ -81,7 +81,9 @@ class BluetoothOffer:
             return None
         if self.server_socket is None:
             self.server_socket = BluetoothSocket(RFCOMM)
-            self.server_socket.bind(("", 0))
+            # We can also bind only the mac found with get_local_bt_address(), anyway
+            # even with multiple bt in a single system BDADDR_ANY is not a problem
+            self.server_socket.bind((socket.BDADDR_ANY, PORT_ANY))
             # Number of unaccepted connections that the system will allow before refusing new connections
             backlog = 1
             self.server_socket.listen(backlog)
