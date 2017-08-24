@@ -37,7 +37,6 @@ if getattr(avahi, 'txt_array_to_dict', None) is None:
     # This has been taken from Gajim
     # https://dev.gajim.org/gajim/gajim/blob/master/src/common/zeroconf/zeroconf_avahi.py
     # it is licensed under the GPLv3.
-    # https://github.com/lathiat/avahi/pull/133
     def txt_array_to_dict(txt_array):
         txt_dict = {}
         for els in txt_array:

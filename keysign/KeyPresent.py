@@ -40,8 +40,7 @@ if  __name__ == "__main__" and __package__ is None:
 from .__init__ import __version__
 from .gpgmh import get_usable_keys
 from .QRCode import QRImage
-from .util import format_fingerprint
-
+from .util import format_fingerprint, glib_markup_escape_rencoded_text
 
 
 log = logging.getLogger(__name__)
@@ -83,7 +82,7 @@ class KeyPresentWidget(Gtk.Widget):
         w.__class__ = cls
         return w
 
-    def __init__(self, key, qrcodedata=None, builder=None):
+    def __init__(self, key, code, qrcodedata=None, builder=None):
         """A new KeyPresentWidget shows the string you provide as qrcodedata
         in a qrcode. If it evaluates to False, the key's fingerprint will
         be shown. That is, "OPENPGP4FPR: + fingerprint.
@@ -100,15 +99,17 @@ class KeyPresentWidget(Gtk.Widget):
                                         for uid
                                         in key.uidslist]))
         self.fingerprint_label.set_markup(format_fingerprint(key.fingerprint))
+        self.key_fingerprint = key.fingerprint
+
+        self.fingerprint_label.set_markup(code)
+
         if not qrcodedata:
-            qrcodedata = "OPENPGP4FPR:" + key.fingerprint
+            qrcodedata = "OPENPGP4FPR:" + self.key_fingerprint
+        qr = self.qrcode_frame.get_child()
+        if qr:
+            self.qrcode_frame.remove(self.qrcode_frame.get_child())
         self.qrcode_frame.add(QRImage(qrcodedata))
         self.qrcode_frame.show_all()
-
-
-
-
-
 
 
 class KeyPresent(Gtk.Application):

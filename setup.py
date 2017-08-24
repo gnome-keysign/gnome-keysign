@@ -112,6 +112,8 @@ setup(
         'requests>=2.6',
         
         'qrcode',
+        'future',
+        'magic-wormhole>=0.10.2'
         #'monkeysign', # Apparently not in the cheeseshop
         # avahi # Also no entry in the cheeseshop
         # dbus # dbus-python is in the cheeseshop but not pip-able

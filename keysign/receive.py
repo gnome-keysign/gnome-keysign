@@ -21,12 +21,19 @@ import re
 import os
 import signal
 import sys
+from textwrap import dedent
 
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
+if __name__ == "__main__":
+    from twisted.internet import gtk3reactor
+    gtk3reactor.install()
+from twisted.internet import reactor
+from twisted.internet.defer import inlineCallbacks
+from wormhole.errors import WrongPasswordError, LonelyError
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -46,7 +53,8 @@ from .keyfprscan import KeyFprScanWidget
 from .keyconfirm import PreSignWidget
 from .gpgmh import openpgpkey_from_data
 from .i18n import _
-from .util import sign_keydata_and_send
+from .util import sign_keydata_and_send, fix_infobar
+from .avahiwormholediscover import AvahiWormholeDiscover
 
 log = logging.getLogger(__name__)
 
@@ -76,7 +84,7 @@ class ReceiveApp:
         old_scanner_parent = old_scanner.get_parent()
 
         scanner = KeyFprScanWidget() #builder=builder)
-        scanner.connect("changed", self.on_scanner_changed)
+        scanner.connect("changed", self.on_code_changed)
         scanner.connect("barcode", self.on_barcode)
 
         if old_scanner_parent:
@@ -97,8 +105,31 @@ class ReceiveApp:
 
         self.discovery = AvahiKeysignDiscoveryWithMac()
         ib = builder.get_object('infobar_discovery')
+        fix_infobar(ib)
         self.discovery.connect('list-changed', self.on_list_changed, ib)
 
+        self.aw_discovery = None
+        self.rb = builder.get_object('box50')
+        self.result_label = builder.get_object("error_download_label")
+        self.cancel_button = builder.get_object("cancel_download_button")
+        self.redo_button = builder.get_object("redo_download_button")
+        self.redo_button.connect("clicked", self.on_redo_button_clicked)
+        self.cancel_button.connect("clicked", self.on_cancel_button_clicked)
+        # Clear the "downloading" label
+        builder.get_object("label10").set_label("")
+
+    def on_redo_button_clicked(self, button):
+        """ Right know the redo button is quite useless because the sender after
+        the first error it will never reuse the same wormhole code, even if the
+        user press the redo button. So trying a redo here with the same code will
+        never be success"""
+        log.info("redo pressed")
+        self.stack.remove(self.rb)
+        self.aw_discovery.start()
+
+    def on_cancel_button_clicked(self, button):
+        log.info("cancel pressed")
+        self.stack.remove(self.rb)
 
     def on_keydata_downloaded(self, keydata, pixbuf=None):
         key = openpgpkey_from_data(keydata)
@@ -111,18 +142,41 @@ class ReceiveApp:
         self.psw = psw
         self.stack.set_visible_child(self.psw)
 
-    def on_scanner_changed(self, scanner, entry):
+    def on_message_received(self, key_data, success=True, message=None):
+        if success:
+            self.log.debug("message received")
+            try:
+                self.on_keydata_downloaded(key_data)
+            except ValueError as ve:
+                log.error(ve.args[0])
+        else:
+            self.stack.add(self.rb)
+            self.result_label.set_label(dedent(message.__doc__))
+            self.stack.set_visible_child(self.rb)
+
+    def on_code_changed(self, scanner, entry):
         self.log.debug("Entry changed %r: %r", scanner, entry)
         text = entry.get_text()
-        keydata = self.discovery.find_key(text)
-        if keydata:
-            self.on_keydata_downloaded(keydata)
+        self._receive(text)
 
     def on_barcode(self, scanner, barcode, gstmessage, pixbuf):
         self.log.debug("Scanned barcode %r", barcode)
-        keydata = self.discovery.find_key(barcode)
-        if keydata:
-            self.on_keydata_downloaded(keydata, pixbuf)
+        self._receive(barcode)
+
+    @inlineCallbacks
+    def _receive(self, code):
+        if self.aw_discovery:
+            self.aw_discovery.stop()
+        self.aw_discovery = AvahiWormholeDiscover(code, self.discovery)
+        msg_tuple = yield self.aw_discovery.start()
+        key_data, success, message = msg_tuple
+        if message == WrongPasswordError or message == LonelyError:
+            # If a wrong password has been provided or we closed the connection
+            # before a transfer. We do not display that to the user
+            log.info("Waiting for another code")
+            pass
+        else:
+            self.on_message_received(key_data, success, message)
 
     def on_sign_key_confirmed(self, keyPreSignWidget, key, keydata):
         self.log.debug ("Sign key confirmed! %r", key)
@@ -137,8 +191,6 @@ class ReceiveApp:
         log.debug ("Signed the key: %r", self.tmpfiles)
         self.stack.set_visible_child_name("scanner")
         # Do we also want to add an infobar message or so..?
-
-
 
     def on_list_changed(self, discovery, number, userdata):
         ib = userdata
@@ -155,7 +207,6 @@ class App(Gtk.Application):
         self.connect('activate', self.on_activate)
         self.log = logging.getLogger(__name__)
 
-
     def on_activate(self, app):
         ui_file = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
@@ -163,6 +214,7 @@ class App(Gtk.Application):
         builder = Gtk.Builder.new_from_file(ui_file)
 
         window = Gtk.ApplicationWindow()
+        window.connect("delete-event", self.on_delete_window)
         window.set_title(_("Receive"))
         # window.set_size_request(600, 400)
         #window = self.builder.get_object("appwindow")
@@ -174,6 +226,9 @@ class App(Gtk.Application):
         window.show_all()
         self.add_window(window)
 
+    @staticmethod
+    def on_delete_window(*args):
+        reactor.callFromThread(reactor.stop)
 
 
 def main(args=[]):
@@ -185,10 +240,12 @@ def main(args=[]):
 
     app = App()
     try:
-        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : app.quit(), None)
+        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
+                                  lambda *args: reactor.callFromThread(reactor.stop), None)
     except AttributeError:
         pass
-    app.run(args)
+    reactor.registerGApplication(app)
+    reactor.run()
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG,

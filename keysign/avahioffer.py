@@ -22,7 +22,8 @@ import argparse
 import logging
 import os
 
-
+from gi.repository import Gtk, GLib
+from gi.repository import GObject
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -39,7 +40,7 @@ if  __name__ == "__main__" and __package__ is None:
 from .__init__ import __version__
 from .gpgmh import get_usable_keys, get_public_key_data
 from .i18n import _
-from .util import mac_generate
+from .util import mac_generate, format_fingerprint
 from . import Keyserver
 
 log = logging.getLogger(__name__)
@@ -55,7 +56,7 @@ class AvahiHTTPOffer:
         self.mac = mac_generate(fingerprint.encode('ascii'), keydata)
 
     def start(self):
-        "Starts offering the key"
+        """Starts offering the key"""
         fingerprint = self.fingerprint.upper()
         mac = self.mac.upper()
         discovery_info = 'OPENPGP4FPR:{0}#MAC={1}'.format(
@@ -64,7 +65,7 @@ class AvahiHTTPOffer:
         log.info("Requesting to start")
         self.keyserver.start()
 
-        return discovery_info
+        return format_fingerprint(self.key.fingerprint), discovery_info
 
     def stop(self):
         "Stops offering the key"
@@ -81,11 +82,11 @@ def main(args):
     discovery_info = offer.start()
     print (_("Offering key: {}").format(key))
     print (_("Discovery info: {}").format(discovery_info))
-    print (_("Press Enter to stop"))
     try: input_ = raw_input
     except NameError: input_ = input
     input_("Press Enter to stop")
     offer.stop()
+
 
 if __name__ == "__main__":
     import sys
