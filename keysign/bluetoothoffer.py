@@ -59,6 +59,8 @@ class BluetoothOffer:
                     kd_decoded = key_data.decode('utf-8')
                     yield threads.deferToThread(client_socket.sendall, kd_decoded)
                     log.info("Key has been sent")
+                    client_socket.shutdown(socket.SHUT_RDWR)
+                    client_socket.close()
                     success = True
                     message = None
         except Exception as e:
