@@ -24,6 +24,7 @@ if __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 from .gpgmh import get_public_key_data, get_usable_keys
+from .i18n import _
 from .util import get_local_bt_address, mac_generate
 
 log = logging.getLogger(__name__)
@@ -113,11 +114,11 @@ def main(args):
     def _received(result):
         success, error_msg = result
         if success:
-            print("\nKey successfully sent")
+            print(_("\nKey successfully sent"))
         else:
-            print("\nAn error occurred: {}".format(error_msg))
+            print(_("\nAn error occurred: {}").format(error_msg))
         # We are still waiting for the user to press Enter
-        print("Press Enter to exit")
+        print(_("Press Enter to exit"))
 
     key = get_usable_keys(pattern=args[0])[0]
     file_key_data = get_public_key_data(key.fingerprint)
@@ -130,15 +131,15 @@ def main(args):
         code = code.split(";", 1)[0]
         port = data.rsplit("=", 1)[1]
         offer.start().addCallback(_received)
-        print("Offering key: {}".format(key))
-        print("Discovery info: {}".format(code))
-        print("HMAC: {}".format(hmac))
-        print("Port: {}".format(port))
+        print(_("Offering key: {}").format(key))
+        print(_("Discovery info: {}").format(code))
+        print(_("HMAC: {}").format(hmac))
+        print(_("Port: {}").format(port))
         # Wait for the user without blocking everything
         reactor.callInThread(cancel)
         reactor.run()
     else:
-        print("Bluetooth not available")
+        print(_("Bluetooth not available"))
 
 if __name__ == "__main__":
     import sys

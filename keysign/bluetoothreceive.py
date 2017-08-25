@@ -26,6 +26,7 @@ if __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 from .gpgmh import fingerprint_from_keydata
+from .i18n import _
 from .util import mac_verify
 
 log = logging.getLogger(__name__)
@@ -129,7 +130,7 @@ def main(args):
 
         reactor.callFromThread(reactor.stop)
 
-    print("Trying to download the key, please wait")
+    print(_("Trying to download the key, please wait"))
     bt_mac = args[0]
     hmac = args[1]
     port = int(args[2])
