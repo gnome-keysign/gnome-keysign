@@ -61,6 +61,28 @@ def test_bt():
 
 @deferred(timeout=15)
 @inlineCallbacks
+def test_bt_wrong_hmac():
+    """This test requires two working Bluetooth devices"""
+    data = read_fixture_file("seckey-no-pw-1.asc")
+    key = openpgpkey_from_data(data)
+    log.info("Running with key %r", key)
+    hmac = "wrong_hmac_eg_tampered_key"
+    # Start offering the key
+    offer = BluetoothOffer(key)
+    data = yield offer.allocate_code()
+    # getting the code from "BT=code;...."
+    code = data.split("=", 1)[1]
+    code = code.split(";", 1)[0]
+    port = int(data.rsplit("=", 1)[1])
+    offer.start()
+    receive = BluetoothReceive(port)
+    msg_tuple = yield receive.find_key(code, hmac)
+    downloaded_key_data, success, _ = msg_tuple
+    assert_false(success)
+
+
+@deferred(timeout=15)
+@inlineCallbacks
 def test_bt_wrong_mac():
     """This test requires one working Bluetooth device"""
     receive = BluetoothReceive()
