@@ -13,4 +13,4 @@
 .tox/
 cover/
 **.flatpak-builder/
-
+/coverage/
