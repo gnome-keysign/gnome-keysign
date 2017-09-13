@@ -90,6 +90,7 @@ class BluetoothOffer:
             # Number of unaccepted connections that the system will allow before refusing new connections
             backlog = 1
             self.server_socket.listen(backlog)
+            log.info("sockname: %r", self.server_socket.getsockname())
         port = self.server_socket.getsockname()[1]
         log.info("BT Code: %s %s", code, port)
         bt_data = "BT={0};PT={1}".format(code, port)
@@ -142,4 +143,5 @@ def main(args):
 
 if __name__ == "__main__":
     import sys
+    logging.basicConfig(level=logging.DEBUG)
     main(sys.argv[1:])
