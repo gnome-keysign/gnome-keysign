@@ -3,6 +3,8 @@ from bluetooth import BluetoothSocket, RFCOMM
 import dbus
 import select
 import socket
+import sys
+
 if __name__ == "__main__":
     import gi
     gi.require_version('Gtk', '3.0')
@@ -11,6 +13,9 @@ if __name__ == "__main__":
     from twisted.internet import reactor
 from twisted.internet import threads
 from twisted.internet.defer import inlineCallbacks, returnValue
+
+if sys.version < '3':
+    input = raw_input
 
 if __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
