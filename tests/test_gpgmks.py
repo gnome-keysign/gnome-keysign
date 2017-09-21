@@ -312,5 +312,5 @@ class TestMultipleUID(TestSignAndEncrypt):
     RECEIVER_KEY = "seckey-2.asc"
 
 class TestUtf8(TestSignAndEncrypt):
-    SENDER_KEY = "seckey-utf8.asc"
-    RECEIVER_KEY = "pubkey-utf8.asc"
+    SENDER_KEY = "pubkey-utf8.asc"
+    RECEIVER_KEY = "seckey-utf8.asc"
