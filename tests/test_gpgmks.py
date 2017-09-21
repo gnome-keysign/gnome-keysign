@@ -249,6 +249,9 @@ class TestSignAndEncrypt:
 
     def test_sign_and_encrypt(self):
         keydata = open(self.sender_key, "rb").read()
+        # for some reason pgpy does not like the stray data before
+        # https://github.com/SecurityInnovation/PGPy/issues/218
+        keydata = keydata[keydata.index('-----'):]
         keys = get_usable_keys(homedir=self.sender_homedir)
         assert_equals(1, len(keys))
         key = keys[0]
