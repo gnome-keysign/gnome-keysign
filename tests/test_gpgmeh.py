@@ -543,3 +543,8 @@ class TestColon(TestSignAndEncrypt):
 class TestMultipleUID(TestSignAndEncrypt):
     SENDER_KEY = "seckey-multiple-uid-colon.asc"
     RECEIVER_KEY = "seckey-2.asc"
+
+
+class TestUtf8(TestSignAndEncrypt):
+    SENDER_KEY = "pubkey-utf8.asc"
+    RECEIVER_KEY = "seckey-utf8.asc"
