@@ -249,7 +249,7 @@ class TestSignAndEncrypt:
 
     def test_sign_and_encrypt(self):
         keydata = open(self.sender_key, "rb").read()
-        keys = get_usable_secret_keys(homedir=self.sender_homedir)
+        keys = get_usable_keys(homedir=self.sender_homedir)
         assert_equals(1, len(keys))
         key = keys[0]
         uids = key.uidslist
