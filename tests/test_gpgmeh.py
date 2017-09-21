@@ -413,10 +413,12 @@ class TestSignAndEncrypt:
         pass
 
     def test_sign_and_encrypt(self):
-        secret_keydata = open(self.key_sender_key, "rb").read()
+        # This might be a secret key, too, so we import and export to
+        # get hold of the public portion.
+        keydata = open(self.key_sender_key, "rb").read()
         # We get the public portion of the key
         sender = TempContext()
-        sender.op_import(secret_keydata)
+        sender.op_import(keydata)
         result = sender.op_import_result()
         fpr = result.imports[0].fpr
         sink = gpg.Data()
@@ -425,7 +427,7 @@ class TestSignAndEncrypt:
         # This is the key that we will sign
         public_sender_key = sink.read()
 
-        keys = get_usable_secret_keys(homedir=self.key_sender_homedir)
+        keys = get_usable_keys(homedir=self.key_sender_homedir)
         assert_equals(1, len(keys))
         key = keys[0]
         uids = key.uidslist
