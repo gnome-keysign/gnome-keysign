@@ -101,6 +101,7 @@ def del_uids(uids):
 
 def sign_key(uid=0, sign_cmd=u"sign", expire=False, check=3,
              error_cb=None):
+    log.info("Signing key uid %r", uid)
     status, prompt = yield None
     assert status == gpg.constants.STATUS_GET_LINE
     assert prompt == u"keyedit.prompt"
@@ -125,9 +126,9 @@ def sign_key(uid=0, sign_cmd=u"sign", expire=False, check=3,
             status, prompt = yield '%d' % check
         elif prompt == 'sign_uid.okay':
             status, prompt = yield 'Y'
-        elif status == gpg.constants.STATUS_INV_SGNR:
+        #elif status == gpg.constants.STATUS_INV_SGNR:
             # When does this actually happen?
-            status, prompt = yield None
+        #    status, prompt = yield None
         elif status == gpg.constants.STATUS_PINENTRY_LAUNCHED:
             status, prompt = yield None
         elif status == gpg.constants.STATUS_GOT_IT:
