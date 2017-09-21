@@ -344,7 +344,7 @@ class TestGetUsableKeys:
 
 class TestGetUsableSecretKeys:
     def setup(self):
-        self.fname = get_fixture_file("seckey-1.asc")
+        self.fname = get_fixture_file("seckey-no-pw-1.asc")
         original = open(self.fname, 'rb').read()
         # This should be a new, empty directory
         self.homedir = tempfile.mkdtemp()

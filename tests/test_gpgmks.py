@@ -201,7 +201,7 @@ def import_fixture_file_in_random_directory(filename):
 
 class TestGetUsableSecretKeys:
     def setup(self):
-        homedir, key = import_fixture_file_in_random_directory("seckey-1.asc")
+        homedir, key = import_fixture_file_in_random_directory("seckey-no-pw-1.asc")
         self.homedir = homedir
         self.originalkey = key
 
