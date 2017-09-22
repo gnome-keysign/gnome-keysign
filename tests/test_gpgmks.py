@@ -201,7 +201,7 @@ def import_fixture_file_in_random_directory(filename):
 
 class TestGetUsableSecretKeys:
     def setup(self):
-        homedir, key = import_fixture_file_in_random_directory("seckey-1.asc")
+        homedir, key = import_fixture_file_in_random_directory("seckey-no-pw-1.asc")
         self.homedir = homedir
         self.originalkey = key
 
@@ -248,11 +248,21 @@ class TestSignAndEncrypt:
         pass
 
     def test_sign_and_encrypt(self):
+        # Let's imagine we've just got sent the key from the key-sending side
         keydata = open(self.sender_key, "rb").read()
-        keys = get_usable_secret_keys(homedir=self.sender_homedir)
+        # for some reason pgpy does not like the stray data before
+        # https://github.com/SecurityInnovation/PGPy/issues/218
+        keydata = keydata[keydata.index('-----'):]
+        
+        # We find out what UIDs the sender key has
+        keys = get_usable_keys(homedir=self.sender_homedir)
         assert_equals(1, len(keys))
         key = keys[0]
         uids = key.uidslist
+        del key
+        del keys
+        
+        # We are the receiver and we sign the sender's key.
         # This is a tuple (uid, encrypted)
         uid_encrypted = list(sign_keydata_and_encrypt(keydata,
             error_cb=None, homedir=self.receiver_homedir))
@@ -278,6 +288,7 @@ class TestSignAndEncrypt:
 
             # Decrypt...
             from monkeysign.gpg import Keyring
+            # We sent back the key to the key-sending side
             kr = Keyring(homedir=self.sender_homedir)
             log.info("encrypted UID: %r", enc_uid)
             decrypted = kr.decrypt_data(signed_uid)
@@ -310,3 +321,7 @@ class TestColon(TestSignAndEncrypt):
 class TestMultipleUID(TestSignAndEncrypt):
     SENDER_KEY = "seckey-multiple-uid-colon.asc"
     RECEIVER_KEY = "seckey-2.asc"
+
+class TestUtf8(TestSignAndEncrypt):
+    SENDER_KEY = "seckey-utf8.asc"
+    RECEIVER_KEY = "seckey-utf8-2.asc"
