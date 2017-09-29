@@ -1,0 +1,30 @@
+<Project xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+         xmlns:foaf="http://xmlns.com/foaf/0.1/"
+         xmlns:gnome="http://api.gnome.org/doap-extensions#"
+         xmlns="http://usefulinc.com/ns/doap#">
+
+  <name xml:lang="en">gnome-keysign</name>
+  <shortdesc xml:lang="en">An OpenPGP Keysigning helper</shortdesc>
+  <description>GNOME Keysign is a tool for signing OpenPGP keys.
+It exchanges a key directly between two instances of the app and
+follows best practices when producing and sending the signatures.
+</description>
+  <homepage rdf:resource="https://wiki.gnome.org/Apps/Keysign" />
+  <!-- 
+       mailing-list rdf:resource="https://mail.gnome.org/mailman/listinfo/YOUR_MAILINGLIST"
+  / -->
+  <download-page rdf:resource="https://gitlab.gnome.org/GNOME/gnome-keysign/tags" />
+  <bug-database rdf:resource="https://gitlab.gnome.org/GNOME/gnome-keysign/issues" />
+  <category rdf:resource="http://api.gnome.org/doap-extensions#deprecated" />
+  <programming-language>Python</programming-language>
+
+  <maintainer>
+    <foaf:Person>
+      <foaf:name>Tobias Mueller</foaf:name>
+      <gnome:userid>tobiasmue</gnome:userid>
+    </foaf:Person>
+  </maintainer>
+</Project>
+
+
