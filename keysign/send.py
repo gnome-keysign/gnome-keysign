@@ -7,7 +7,7 @@ import signal
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from gi.repository import GLib  # for markup_escape_text
+from gi.repository import GLib
 if __name__ == "__main__":
     from twisted.internet import gtk3reactor
     gtk3reactor.install()

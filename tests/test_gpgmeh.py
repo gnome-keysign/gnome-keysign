@@ -344,7 +344,7 @@ class TestGetUsableKeys:
 
 class TestGetUsableSecretKeys:
     def setup(self):
-        self.fname = get_fixture_file("seckey-1.asc")
+        self.fname = get_fixture_file("seckey-no-pw-1.asc")
         original = open(self.fname, 'rb').read()
         # This should be a new, empty directory
         self.homedir = tempfile.mkdtemp()
@@ -383,9 +383,20 @@ def get_signatures_for_uids_on_key(ctx, key):
     # What happens if keylist returns multiple keys, e.g. because there
     # is another key with a UID named as the fpr?  How can I make sure I
     # get the signatures of any given key?
-    ctx.set_keylist_mode(gpg.constants.keylist.mode.LOCAL
-                         | gpg.constants.keylist.mode.SIGS)
-    keys = list(ctx.keylist(key.fpr))
+    
+    # *sigh* gpgme is killing me. With gpgme 1.8 we have to
+    # set_keylist_mode before we can call keylist.  With gpgme 1.9
+    # keylist takes a mode argument and overrides whatever has been
+    # set before.  In order to come with something compatible with both
+    # 1.8 and 1.9 we have to set_keylist_mode and NOT call ctx.keylist
+    # but rather the bare op_keylist_all.  In 1.8 that requires two
+    # arguments.
+    mode = gpg.constants.keylist.mode.LOCAL | gpg.constants.keylist.mode.SIGS
+    secret = False
+    ctx.set_keylist_mode(mode)
+    keys = list(ctx.op_keylist_all(key.fpr, secret))
+    # With gpgme 1.9 we can simply do:
+    # keys = list(ctx.keylist(key.fpr), mode=mode)
     assert len(keys) == 1
     uid_sigs = {uid.uid: [s for s in uid.signatures] for uid in keys[0].uids}
     log.info("Signatures: %r", uid_sigs)
@@ -413,10 +424,12 @@ class TestSignAndEncrypt:
         pass
 
     def test_sign_and_encrypt(self):
-        secret_keydata = open(self.key_sender_key, "rb").read()
+        # This might be a secret key, too, so we import and export to
+        # get hold of the public portion.
+        keydata = open(self.key_sender_key, "rb").read()
         # We get the public portion of the key
         sender = TempContext()
-        sender.op_import(secret_keydata)
+        sender.op_import(keydata)
         result = sender.op_import_result()
         fpr = result.imports[0].fpr
         sink = gpg.Data()
@@ -425,7 +438,7 @@ class TestSignAndEncrypt:
         # This is the key that we will sign
         public_sender_key = sink.read()
 
-        keys = get_usable_secret_keys(homedir=self.key_sender_homedir)
+        keys = get_usable_keys(homedir=self.key_sender_homedir)
         assert_equals(1, len(keys))
         key = keys[0]
         uids = key.uidslist
@@ -543,3 +556,8 @@ class TestColon(TestSignAndEncrypt):
 class TestMultipleUID(TestSignAndEncrypt):
     SENDER_KEY = "seckey-multiple-uid-colon.asc"
     RECEIVER_KEY = "seckey-2.asc"
+
+
+class TestUtf8(TestSignAndEncrypt):
+    SENDER_KEY = "seckey-utf8.asc"
+    RECEIVER_KEY = "seckey-utf8-2.asc"
