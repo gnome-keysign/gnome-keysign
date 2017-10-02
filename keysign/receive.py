@@ -51,7 +51,7 @@ from .keyfprscan import KeyFprScanWidget
 from .keyconfirm import PreSignWidget
 from .gpgmh import openpgpkey_from_data
 from .i18n import _
-from .util import sign_keydata_and_send, fix_infobar
+from .util import sign_keydata_and_send, fix_infobar, is_bt_available
 from .discover import Discover
 
 log = logging.getLogger(__name__)
@@ -162,8 +162,10 @@ class ReceiveApp:
         # Do we also want to add an infobar message or so..?
 
     def on_list_changed(self, discovery, number, userdata):
+        """We show an infobar if we can only receive with Avahi and
+        there are zero nearby servers"""
         ib = userdata
-        if number == 0:
+        if number == 0 and not is_bt_available():
             ib.show()
         elif ib.is_visible():
             ib.hide()

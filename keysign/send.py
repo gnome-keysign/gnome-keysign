@@ -7,7 +7,7 @@ import signal
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from gi.repository import GLib  # for markup_escape_text
+from gi.repository import GLib
 if __name__ == "__main__":
     from twisted.internet import gtk3reactor
     gtk3reactor.install()
@@ -92,20 +92,17 @@ class SendApp:
         # Start network services
         discovery_list = []
         self.a_offer = AvahiHTTPOffer(self.key)
-        a_info = self.a_offer.start()
-        code, a_data = a_info
+        a_data = self.a_offer.start()
         discovery_list.append(a_data)
         bt_data = None
         if BluetoothOffer:
             self.bt_offer = BluetoothOffer(self.key)
-            _, bt_data = self.bt_offer.allocate_code()
+            bt_data = self.bt_offer.allocate_code()
             if bt_data:
                 discovery_list.append(bt_data)
         discovery_data = ";".join(discovery_list)
         if bt_data:
-            # We ignore the result of the defer because we don't have
-            # a result page
-            self.bt_offer.start()
+            self.bt_offer.start().addCallback(self._restart_bluetooth)
         else:
             log.info("Bluetooth as been skipped")
         log.info("Use this for discovering the other key: %r", discovery_data)
@@ -138,6 +135,10 @@ class SendApp:
             self.bt_offer.stop()
             self.bt_offer = None
         log.debug("Stopped network services")
+
+    def _restart_bluetooth(self, _):
+        log.info("Bluetooth as been restarted")
+        self.bt_offer.start().addCallback(self._restart_bluetooth)
 
 
 class App(Gtk.Application):

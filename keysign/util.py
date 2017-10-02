@@ -239,3 +239,15 @@ def get_local_bt_address(hci_number=0):
     adapter = dbus.Interface(bus.get_object("org.bluez", "/org/bluez/hci%i" % hci_number),
                              "org.freedesktop.DBus.Properties")
     return adapter.Get("org.bluez.Adapter1", "Address")
+
+
+def is_bt_available(hci_number=0):
+    """If the bluez object is available it means that there is a working Bluetooth"""
+    bus = dbus.SystemBus()
+    try:
+        dbus.Interface(bus.get_object("org.bluez", "/org/bluez/hci%i" % hci_number),
+                             "org.freedesktop.DBus.Properties")
+        return True
+    except dbus.exceptions.DBusException as e:
+        log.debug("Bluetooth is not available: %s", e)
+        return False
