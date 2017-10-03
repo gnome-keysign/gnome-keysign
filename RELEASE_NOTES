@@ -12,6 +12,7 @@ Changes
  * Translation support. Read keysign/locale/README.rst for details.
  * gpgme: Ignore KEY_CONSIDERED and CARDCTRL.
  * gpgmh: Support for colons in UIDs.
+ * gpgmh: Default to gpgmeh
  * avahioffer: Do not depend on Gtk, GLib, or GObject
 
 
