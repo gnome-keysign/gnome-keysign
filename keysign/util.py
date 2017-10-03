@@ -17,8 +17,10 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 
+import dbus
 import hmac
 import logging
+import requests
 from subprocess import call
 from string import Template
 from tempfile import NamedTemporaryFile
@@ -29,7 +31,7 @@ except ImportError:
     from urlparse import urlparse, parse_qs
     from urlparse import ParseResult
 
-import requests
+from gi.repository import Gtk, GLib
 
 from .gpgmh import fingerprint_from_keydata
 from .gpgmh import sign_keydata_and_encrypt
@@ -220,3 +222,32 @@ def download_key_http(address, port):
     data = requests.get(url.geturl(), timeout=5).content
     log.debug("finished downloading %d bytes", len(data))
     return data
+
+
+def fix_infobar(infobar):
+    # Work around https://bugzilla.gnome.org/show_bug.cgi?id=710888
+    # Taken from here https://phabricator.freedesktop.org/D1103#34aa2703
+    def make_sure_revealer_does_nothing(widget):
+        if not isinstance(widget, Gtk.Revealer):
+            return
+        widget.set_transition_type(Gtk.RevealerTransitionType.NONE)
+    infobar.forall(make_sure_revealer_does_nothing)
+
+
+def get_local_bt_address(hci_number=0):
+    bus = dbus.SystemBus()
+    adapter = dbus.Interface(bus.get_object("org.bluez", "/org/bluez/hci%i" % hci_number),
+                             "org.freedesktop.DBus.Properties")
+    return adapter.Get("org.bluez.Adapter1", "Address")
+
+
+def is_bt_available(hci_number=0):
+    """If the bluez object is available it means that there is a working Bluetooth"""
+    bus = dbus.SystemBus()
+    try:
+        dbus.Interface(bus.get_object("org.bluez", "/org/bluez/hci%i" % hci_number),
+                             "org.freedesktop.DBus.Properties")
+        return True
+    except dbus.exceptions.DBusException as e:
+        log.debug("Bluetooth is not available: %s", e)
+        return False

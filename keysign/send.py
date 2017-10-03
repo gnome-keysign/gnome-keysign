@@ -8,6 +8,10 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GLib
+if __name__ == "__main__":
+    from twisted.internet import gtk3reactor
+    gtk3reactor.install()
+from twisted.internet import reactor
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -27,6 +31,10 @@ from .avahioffer import AvahiHTTPOffer
 from . import gpgmh
 # We import i18n to have the locale set up for Glade
 from .i18n import _
+try:
+    from .bluetoothoffer import BluetoothOffer
+except ImportError:
+    BluetoothOffer = None
 
 log = logging.getLogger(__name__)
 
@@ -41,7 +49,8 @@ class SendApp:
     call deactivate().
     """
     def __init__(self, builder=None):
-        self.avahi_offer = None
+        self.a_offer = None
+        self.bt_offer = None
         self.stack = None
         self.stack_saved_visible_child = None
         self.klw = None
@@ -74,13 +83,28 @@ class SendApp:
         fakekey = gpgmh.Key("","","")
         kpw = KeyPresentWidget(fakekey, builder=builder)
 
+        self.key = None
 
     def on_key_activated(self, widget, key):
+        self.key = key
         log.info("Activated key %r", key)
         ####
         # Start network services
-        self.avahi_offer = AvahiHTTPOffer(key)
-        discovery_data = self.avahi_offer.start()
+        discovery_list = []
+        self.a_offer = AvahiHTTPOffer(self.key)
+        a_data = self.a_offer.start()
+        discovery_list.append(a_data)
+        bt_data = None
+        if BluetoothOffer:
+            self.bt_offer = BluetoothOffer(self.key)
+            bt_data = self.bt_offer.allocate_code()
+            if bt_data:
+                discovery_list.append(bt_data)
+        discovery_data = ";".join(discovery_list)
+        if bt_data:
+            self.bt_offer.start().addCallback(self._restart_bluetooth)
+        else:
+            log.info("Bluetooth as been skipped")
         log.info("Use this for discovering the other key: %r", discovery_data)
         ####
         # Create and show widget for key
@@ -92,11 +116,7 @@ class SendApp:
         self.kpw = kpw
 
     def deactivate(self):
-        ####
-        # Stop network services
-        avahi_offer = self.avahi_offer
-        avahi_offer.stop()
-        self.avahi_offer = None
+        self._deactivate_offer()
 
         ####
         # Re-set stack to inital position
@@ -104,6 +124,21 @@ class SendApp:
         self.stack.remove(self.kpw)
         self.kpw = None
         self.stack_saved_visible_child = None
+
+    def _deactivate_offer(self):
+        # Stop network services
+        if self.a_offer:
+            self.a_offer.stop()
+            # We need to deallocate the avahi object or the used port will never be released
+            self.a_offer = None
+        if self.bt_offer:
+            self.bt_offer.stop()
+            self.bt_offer = None
+        log.debug("Stopped network services")
+
+    def _restart_bluetooth(self, _):
+        log.info("Bluetooth as been restarted")
+        self.bt_offer.start().addCallback(self._restart_bluetooth)
 
 
 class App(Gtk.Application):
@@ -120,6 +155,7 @@ class App(Gtk.Application):
         self.builder = Gtk.Builder.new_from_file(ui_file_path)
         window = self.builder.get_object("appwindow")
         assert window
+        window.connect("delete-event", self.on_delete_window)
         self.headerbar = self.builder.get_object("headerbar")
         hb = self.builder.get_object("headerbutton")
         hb.connect("clicked", self.on_headerbutton_clicked)
@@ -131,6 +167,9 @@ class App(Gtk.Application):
         window.show_all()
         self.add_window(window)
 
+    @staticmethod
+    def on_delete_window(*args):
+        reactor.callFromThread(reactor.stop)
 
     
 
@@ -168,7 +207,9 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     app = App()
     try:
-        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : app.quit(), None)
+        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
+                                  lambda *args: reactor.callFromThread(reactor.stop), None)
     except AttributeError:
         pass
-    app.run()
+    reactor.registerGApplication(app)
+    reactor.run()

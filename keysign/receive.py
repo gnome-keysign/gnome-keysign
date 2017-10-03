@@ -27,6 +27,11 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
+if __name__ == "__main__":
+    from twisted.internet import gtk3reactor
+    gtk3reactor.install()
+from twisted.internet import reactor
+from twisted.internet.defer import inlineCallbacks
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -46,7 +51,8 @@ from .keyfprscan import KeyFprScanWidget
 from .keyconfirm import PreSignWidget
 from .gpgmh import openpgpkey_from_data
 from .i18n import _
-from .util import sign_keydata_and_send
+from .util import sign_keydata_and_send, fix_infobar, is_bt_available
+from .discover import Discover
 
 log = logging.getLogger(__name__)
 
@@ -76,7 +82,7 @@ class ReceiveApp:
         old_scanner_parent = old_scanner.get_parent()
 
         scanner = KeyFprScanWidget() #builder=builder)
-        scanner.connect("changed", self.on_scanner_changed)
+        scanner.connect("changed", self.on_code_changed)
         scanner.connect("barcode", self.on_barcode)
 
         if old_scanner_parent:
@@ -97,7 +103,10 @@ class ReceiveApp:
 
         self.discovery = AvahiKeysignDiscoveryWithMac()
         ib = builder.get_object('infobar_discovery')
+        fix_infobar(ib)
         self.discovery.connect('list-changed', self.on_list_changed, ib)
+
+        self.discover = None
 
 
     def on_keydata_downloaded(self, keydata, pixbuf=None):
@@ -111,18 +120,32 @@ class ReceiveApp:
         self.psw = psw
         self.stack.set_visible_child(self.psw)
 
-    def on_scanner_changed(self, scanner, entry):
+    def on_message_received(self, key_data, success=True, message=None):
+        if success:
+            self.log.debug("message received")
+            try:
+                self.on_keydata_downloaded(key_data)
+            except ValueError as ve:
+                log.error(ve.args[0])
+
+    def on_code_changed(self, scanner, entry):
         self.log.debug("Entry changed %r: %r", scanner, entry)
         text = entry.get_text()
-        keydata = self.discovery.find_key(text)
-        if keydata:
-            self.on_keydata_downloaded(keydata)
+        self._receive(text)
 
     def on_barcode(self, scanner, barcode, gstmessage, pixbuf):
         self.log.debug("Scanned barcode %r", barcode)
-        keydata = self.discovery.find_key(barcode)
-        if keydata:
-            self.on_keydata_downloaded(keydata, pixbuf)
+        self._receive(barcode)
+
+    @inlineCallbacks
+    def _receive(self, code):
+        if self.discover:
+            self.discover.stop()
+        self.discover = Discover(code, self.discovery)
+        msg_tuple = yield self.discover.start()
+        key_data, success, message = msg_tuple
+        if success:
+            self.on_message_received(key_data, success, message)
 
     def on_sign_key_confirmed(self, keyPreSignWidget, key, keydata):
         self.log.debug ("Sign key confirmed! %r", key)
@@ -138,11 +161,11 @@ class ReceiveApp:
         self.stack.set_visible_child_name("scanner")
         # Do we also want to add an infobar message or so..?
 
-
-
     def on_list_changed(self, discovery, number, userdata):
+        """We show an infobar if we can only receive with Avahi and
+        there are zero nearby servers"""
         ib = userdata
-        if number == 0:
+        if number == 0 and not is_bt_available():
             ib.show()
         elif ib.is_visible():
             ib.hide()
@@ -155,7 +178,6 @@ class App(Gtk.Application):
         self.connect('activate', self.on_activate)
         self.log = logging.getLogger(__name__)
 
-
     def on_activate(self, app):
         ui_file = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
@@ -163,6 +185,7 @@ class App(Gtk.Application):
         builder = Gtk.Builder.new_from_file(ui_file)
 
         window = Gtk.ApplicationWindow()
+        window.connect("delete-event", self.on_delete_window)
         window.set_title(_("Receive"))
         # window.set_size_request(600, 400)
         #window = self.builder.get_object("appwindow")
@@ -174,6 +197,9 @@ class App(Gtk.Application):
         window.show_all()
         self.add_window(window)
 
+    @staticmethod
+    def on_delete_window(*args):
+        reactor.callFromThread(reactor.stop)
 
 
 def main(args=[]):
@@ -185,10 +211,12 @@ def main(args=[]):
 
     app = App()
     try:
-        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : app.quit(), None)
+        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
+                                  lambda *args: reactor.callFromThread(reactor.stop), None)
     except AttributeError:
         pass
-    app.run(args)
+    reactor.registerGApplication(app)
+    reactor.run()
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG,
