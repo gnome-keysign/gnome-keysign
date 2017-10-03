@@ -1,6 +1,7 @@
 GNOME Keysign is a tool to make signing OpenPGP keys as easy as possible.
-This is the v1.0 release which is much more stable for pathologic OpenPGP keys
-and brings support for translations.
+This is the v0.9.5 release which is much more stable for pathologic OpenPGP keys
+and brings support for translations.  It also supports transferring file
+via Bluetooth instead of the local network.
 
 You can get the app from:
             
@@ -14,6 +15,8 @@ Changes
  * gpgmh: Support for colons in UIDs.
  * gpgmh: Default to gpgmeh
  * avahioffer: Do not depend on Gtk, GLib, or GObject
+ * Added Bluetooth support
+ * Much better Python 3 support
 
 
 Resources
