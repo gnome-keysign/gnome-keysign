@@ -49,9 +49,12 @@ Check the output of  locale -a  to determine which locales you have installed.
 Starting a new translation
 ---------------------------
 
-For providing a new language, the initial .po file can be created using:
+For providing a new language, the .pot file has to be generated (or 
+updated) using:
+
+    python setup.py extract_messages
+    
+Now, the initial .po file can be created using the command below,
+replacing "en" with the language code you want to translate to:
 
     python setup.py init_catalog --locale en
-
-
-
