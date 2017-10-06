@@ -113,3 +113,18 @@ def extract_glade(fileobj, keywords, comment_tags, options):
             else:
                 yield (lineno, None, message, [])
     return get_messages()
+
+
+
+def extract_desktop(fileobj, keywords, comment_tags, options):
+    for lineno, line in enumerate(fileobj, 1):
+        comments = []
+        if line.strip().startswith('_'):
+            l = line.split('=', 1)
+            funcname, message = l[0:2]
+            funcname = funcname.lstrip('_')
+            comments.append(funcname)
+            funcname = '' # FIXME: Why can I not assign that name to funcname?
+            yield (lineno, funcname, message.strip(), comments)
+
+

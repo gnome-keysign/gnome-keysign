@@ -175,6 +175,9 @@ setup(
         'Topic :: Software Development :: Libraries :: Python Modules',
         ],
         message_extractors = {
+            '': [
+               ('**.desktop', 'babelglade:extract_desktop', None),
+            ],
             'keysign': [
                 ('**.py', 'python', None),
                 ('**.ui', 'babelglade:extract_glade', None),
