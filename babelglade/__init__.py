@@ -116,15 +116,30 @@ def extract_glade(fileobj, keywords, comment_tags, options):
 
 
 
+
+# All localestrings from https://specifications.freedesktop.org/desktop-entry-spec/latest/ar01s05.html
+TRANSLATABLE = (
+    'Name',
+    'GenericName',
+    'Comment',
+    'Icon',
+    'Keywords',
+)
+
 def extract_desktop(fileobj, keywords, comment_tags, options):
     for lineno, line in enumerate(fileobj, 1):
-        comments = []
-        if line.strip().startswith('_'):
-            l = line.split('=', 1)
-            funcname, message = l[0:2]
-            funcname = funcname.lstrip('_')
-            comments.append(funcname)
-            funcname = '' # FIXME: Why can I not assign that name to funcname?
-            yield (lineno, funcname, message.strip(), comments)
+        for t in TRANSLATABLE:
+            if not line.startswith(t):
+                continue
+            else:
+                comments = []
+                key_value = line.split('=', 1)
+                key, value = key_value[0:2]
+
+                funcname = key # FIXME: Why can I not assign that name to funcname?
+                funcname = ''
+                message = value
+                comments.append(key)
+                yield (lineno, funcname, message.strip(), comments)
 
 
