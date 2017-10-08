@@ -12,6 +12,7 @@
 #
 # Please view LICENSE for additional licensing information.
 # =============================================================================
+from __future__ import unicode_literals
 
 from xml.parsers import expat
 
@@ -128,12 +129,16 @@ TRANSLATABLE = (
 
 def extract_desktop(fileobj, keywords, comment_tags, options):
     for lineno, line in enumerate(fileobj, 1):
+        if line.startswith(b'[Desktop Entry]'):
+            continue
+
         for t in TRANSLATABLE:
-            if not line.startswith(t):
+            if not line.startswith(t.encode('utf-8')):
                 continue
             else:
+                l = line.decode('utf-8')
                 comments = []
-                key_value = line.split('=', 1)
+                key_value = l.split('=', 1)
                 key, value = key_value[0:2]
 
                 funcname = key # FIXME: Why can I not assign that name to funcname?
