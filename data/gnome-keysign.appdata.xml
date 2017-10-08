@@ -1,24 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<application>
- <id type="desktop">gnome-keysign.desktop</id>
- <licence>CC0</licence>
- <description>
-   <_p>
-     GNOME-Keysign allows signing OpenPGP keys comfortably.
-  </_p>
-  <_p>
+<component type="desktop">
+  <id>org.gnome.Keysign</id>
+  <metadata_license>CC0</metadata_license>
+  <project_license>GPL-3.0+</project_license>
+  <name>Keysign</name>
+  <summary>OpenPGP Keysigning helper</summary>
+  
+  <description>
+   <p>
+     GNOME-Keysign allows signing OpenPGP keys comfortably and securely
+     via the local network or Bluetooth.
+   </p>
+   <p>
     It can scan another key's barcode and transfer the key securely,
     allowing for casual two-party key signing sessions.
     It follows best practises by sending the encrypted signatures
     to the UIDs of a key using the Email client the user configured
     to use.
-  </_p>
- </description>
- <screenshots>
-    <screenshot type="default">https://wiki.gnome.org/GnomeKeysign?action=AttachFile&amp;do=get&amp;target=UI.png</screenshot>
- </screenshots>
+   </p>
+  </description>
+  
+​  <launchable type="desktop-id">org.gnome.Keysign.desktop</launchable>
+
+  <screenshots>
+    <screenshot type="default">
+      <image width="529" height="646">https://wiki.gnome.org/Apps/Keysign?action=AttachFile&amp;do=get&amp;target=send.png</image>
+    </screenshot>
+    <screenshot>
+      <image width="529" height="646">https://wiki.gnome.org/Apps/Keysign?action=AttachFile&amp;do=get&amp;target=receive.png</image>
+    </screenshot>
+  </screenshots>
+
+  <kudos>
+    <kudo>HiDpiIcon</kudo>
+    <kudo>ModernToolkit</kudo>
+  </kudos>
+
  <url type="homepage">https://wiki.gnome.org/GnomeKeysign</url>
- <updatecontact>tobiasmue@gnome.org</updatecontact>
-</application>
+ <url type="bugtracker">https://github.com/gnome-keysign/gnome-keysign/issues</url>
+​ <!-- "Metainfo files may only contain 'stock' icons, icons of kind 'remote' are not allowed"...
+  icon type="remote">https://gitlab.gnome.org/GNOME/gnome-keysign/raw/master/data/gnome-keysign.svg</icon -->
+ <project_group>GNOME</project_group>
+
+  <releases>
+​    <release version="0.9.5" date="2017-10-03">
+​      <description>
+​        <p>Add Bluetooth support</p>
+​        <p>Default to gpgme</p>
+​      </description>
+​    </release>
+​  </releases>
+   
+ <update_contact>tobiasmue@gnome.org</update_contact>
+ <translation type="gettext">gnome-keysign</translation>
+
+ <content_rating type="oars-1.0">
+    <content_attribute id="violence-cartoon">none</content_attribute>
+    <content_attribute id="violence-fantasy">none</content_attribute>
+    <content_attribute id="violence-realistic">none</content_attribute>
+    <content_attribute id="violence-bloodshed">none</content_attribute>
+    <content_attribute id="violence-sexual">none</content_attribute>
+    <content_attribute id="drugs-alcohol">none</content_attribute>
+    <content_attribute id="drugs-narcotics">none</content_attribute>
+    <content_attribute id="drugs-tobacco">none</content_attribute>
+    <content_attribute id="sex-nudity">none</content_attribute>
+    <content_attribute id="sex-themes">none</content_attribute>
+    <content_attribute id="language-profanity">none</content_attribute>
+    <content_attribute id="language-humor">none</content_attribute>
+    <content_attribute id="language-discrimination">none</content_attribute>
+    <content_attribute id="social-chat">none</content_attribute>
+    <content_attribute id="social-info">none</content_attribute>
+    <content_attribute id="social-audio">none</content_attribute>
+    <content_attribute id="social-location">none</content_attribute>
+    <content_attribute id="social-contacts">intense</content_attribute>
+    <content_attribute id="money-purchasing">none</content_attribute>
+    <content_attribute id="money-gambling">none</content_attribute>
+ </content_rating>
+</component>
 
 
