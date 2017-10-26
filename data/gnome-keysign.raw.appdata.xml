@@ -7,17 +7,17 @@
   <summary>OpenPGP Keysigning helper</summary>
   
   <description>
-   <p>
-     GNOME-Keysign allows signing OpenPGP keys comfortably and securely
-     via the local network or Bluetooth.
-   </p>
-   <p>
-    It can scan another key's barcode and transfer the key securely,
-    allowing for casual two-party key signing sessions.
-    It follows best practises by sending the encrypted signatures
-    to the UIDs of a key using the Email client the user configured
-    to use.
-   </p>
+    <p translatable="yes">
+      GNOME-Keysign allows signing OpenPGP keys comfortably and securely
+      via the local network or Bluetooth.
+    </p>
+    <p translatable="yes">
+      It can scan another key's barcode and transfer the key securely,
+      allowing for casual two-party key signing sessions.
+      It follows best practises by sending the encrypted signatures
+      to the UIDs of a key using the Email client the user configured
+      to use.
+    </p>
   </description>
   
 ​  <launchable type="desktop-id">org.gnome.Keysign.desktop</launchable>

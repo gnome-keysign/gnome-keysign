@@ -68,6 +68,33 @@ def translate_desktop_file(infile, outfile, localedir):
         outfp.writelines((outline+'\n' for outline in ([line] + additional_lines)))
 
 
+def translate_appdata_file(infile, outfile, localedir):
+    from lxml import etree
+    catalogs = get_catalogs(localedir)
+    parser = etree.XMLParser(remove_blank_text=True)
+    tree = etree.parse(infile, parser)
+    root = tree.getroot()
+    for elem in root.iter():
+        # We remove any possible tailing whitespaces to allow lxml to format the output
+        elem.tail = None
+        if elem.get("translatable") == "yes":
+            elem.attrib.pop("translatable", None)
+            elem.attrib.pop("comments", None)  # Are comments allowed?
+            message = elem.text
+            parent = elem.getparent()
+            pos = parent.getchildren().index(elem) + 1
+            for locale, catalog in catalogs.items():
+                translated = catalog.get(message)
+                if translated and translated.string \
+                        and translated.string != message:
+                    logging.debug("Translated [%s]%r: %r (%r)",
+                                  locale, message, translated, translated.string)
+                    tr = etree.Element(elem.tag)
+                    attrib = tr.attrib
+                    attrib["{http://www.w3.org/XML/1998/namespace}lang"] = str(locale)
+                    tr.text = translated.string
+                    parent.insert(pos, tr)
+    tree.write(outfile, encoding='utf-8', pretty_print=True)
 
 
 def get_catalogs(localedir):
@@ -101,6 +128,7 @@ class BuildWithCompile(build):
 
     def run(self):
         translate_desktop_file('data/gnome-keysign.raw.desktop', 'data/gnome-keysign.desktop', 'keysign/locale')
+        translate_appdata_file('data/gnome-keysign.raw.appdata.xml', 'data/gnome-keysign.appdata.xml', 'keysign/locale')
         build.run(self)
 
 
@@ -205,6 +233,7 @@ setup(
     },
     setup_requires=[
         "babel",
+        "lxml",
     ],
     tests_require=[
         "pgpy",
@@ -260,6 +289,7 @@ setup(
         message_extractors = {
             '': [
                ('**.raw.desktop', 'babelglade:extract_desktop', None),
+               ('**.raw.appdata.xml', 'babelglade:extract_glade', None),
             ],
             'keysign': [
                 ('**.py', 'python', None),
