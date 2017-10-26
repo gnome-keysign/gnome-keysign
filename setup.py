@@ -28,32 +28,11 @@ with open(os.path.join('keysign', '_version.py')) as f:
     exec(f.read())
 
 
-
 def translate_desktop_file(infile, outfile, localedir):
-    # We import it here rather than globally because
-    # we don't have a guarantee for babel to be available
-    # globally. The setup_requires can only be evaluated after
-    # this file has been loaded. And it can't load if the import
-    # cannot be resolved.
-    from babel.messages.pofile import read_po
     infp = codecs.open(infile, 'rb', encoding='utf-8')
     outfp = codecs.open(outfile, 'wb', encoding='utf-8')
-    # glob in Python 3.5 takes ** syntax
-    # pofiles = glob.glob(os.path.join(localedir, '**.po', recursive=True))
-    pofiles = [os.path.join(dirpath, f)
-        for dirpath, dirnames, files in os.walk(localedir)
-        for f in files if f.endswith('.po')]
 
-    logging.debug('Loading %r', pofiles)
-    catalogs = {}
-
-    for pofile in pofiles:
-        catalog = read_po(open(pofile, 'r'))
-        catalogs[catalog.locale] = catalog
-        logging.info("Found %d strings for %s", len(catalog), catalog.locale)
-        # logging.debug("Strings for %r", catalog, catalog.values())
-    if not catalogs:
-        logging.warning("Could not find pofiles in %r: %r", localedir, pofiles)
+    catalogs = get_catalogs(localedir)
 
     for line in (x.strip() for x in infp):
         logging.debug('Found in original (%s): %r', type(line), line)
@@ -87,6 +66,34 @@ def translate_desktop_file(infile, outfile, localedir):
         # Write the new file.
         # First the original line found it in the file, then the translations.
         outfp.writelines((outline+'\n' for outline in ([line] + additional_lines)))
+
+
+
+
+def get_catalogs(localedir):
+    # We import it here rather than globally because
+    # we don't have a guarantee for babel to be available
+    # globally. The setup_requires can only be evaluated after
+    # this file has been loaded. And it can't load if the import
+    # cannot be resolved.
+    from babel.messages.pofile import read_po
+
+    # glob in Python 3.5 takes ** syntax
+    # pofiles = glob.glob(os.path.join(localedir, '**.po', recursive=True))
+    pofiles = [os.path.join(dirpath, f)
+               for dirpath, dirnames, files in os.walk(localedir)
+               for f in files if f.endswith('.po')]
+    logging.debug('Loading %r', pofiles)
+    catalogs = {}
+
+    for pofile in pofiles:
+        catalog = read_po(open(pofile, 'r'))
+        catalogs[catalog.locale] = catalog
+        logging.info("Found %d strings for %s", len(catalog), catalog.locale)
+        # logging.debug("Strings for %r", catalog, catalog.values())
+    if not catalogs:
+        logging.warning("Could not find pofiles in %r", pofiles)
+    return catalogs
 
 
 class BuildWithCompile(build):
