@@ -349,6 +349,59 @@
             ]
         },
         {
+            "name": "python2-babel",
+            "buildsystem": "simple",
+            "build-commands": [
+                "pip2 install --prefix=/app Babel-2.4.0-py2.py3-none-any.whl"
+            ],
+            "sources": [
+                {
+                    "type": "file",
+                    "url": "https://pypi.python.org/packages/5f/cf/17935db603f7044d188ce3e3a6545c4b4500dbaa8835d50da2934b738111/Babel-2.4.0-py2.py3-none-any.whl",
+                    "sha256": "e86ca5a3a6bb64b9bbb62b9dac37225ec0ab5dfaae3c2492ebd648266468042f"
+                }
+            ]
+        },
+        {
+            "name": "babel",
+            "_buildsystem": "simple",
+            "build-options": {
+                "env": {
+                    "PYTHONUSERBASE" : "/app"
+                }
+            },
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://pypi.python.org/packages/5a/22/63f1dbb8514bb7e0d0c8a85cc9b14506599a075e231985f98afd70430e1f/Babel-2.5.1.tar.gz",
+                    "sha256": "6007daf714d0cd5524bbe436e2d42b3c20e68da66289559341e48d2cd6d25811",
+                    "_url": "https://github.com/python-babel/babel/archive/v2.5.1.tar.gz",
+                    "_sha256": "78f5e290909a99fc77b7a8076c154189eb2b43761f4d10a4798e521920c2db60"
+                },
+                {
+                    "_type": "file",
+                    "_url": "http://unicode.org/Public/cldr/29/core.zip",
+                    "_sha256": "b3308f8d3b4a80045ce4262b2784ac8d99775e80aaacafbf1277833f6b28ffda"
+                },
+                {
+                    "type": "script",
+                    "dest-filename": "configure",
+                    "commands": [
+                        "echo   just so that a configure file exists"
+                    ]
+                },
+                {
+                    "type": "file",
+                    "path": "pip-Makefile",
+                    "dest-filename": "Makefile"
+                }
+            ],
+            "_build-commands": [
+
+                "python2 setup.py install --prefix /app"
+            ]
+        },
+        {
             "name": "six",
             "build-options": {
                 "env": {
