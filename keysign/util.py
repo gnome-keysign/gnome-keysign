@@ -34,7 +34,7 @@ except ImportError:
     from urlparse import urlparse, parse_qs
     from urlparse import ParseResult
 
-from gi.repository import Gtk, GLib
+from gi.repository import Gtk, Gdk, GLib
 
 from .gpgmh import fingerprint_from_keydata
 from .gpgmh import sign_keydata_and_encrypt
@@ -76,6 +76,26 @@ def email_portal(to, subject=None, body=None, files=None):
     opts = {"subject": subject, "address": to, "body": body, "attachment_fds": attrs}
     ret = email.ComposeEmail(parent_window, opts)
     return ret
+
+
+def email_mailto(to, subject=None, body=None, files=None):
+    url = "mailto:"
+    url += "\"{0}\"".format(to)
+    # Apparently we don't need to use urllib.parse.quote_plus
+    if subject:
+        url += "?subject={0}".format(subject)
+    if body:
+        if "?" in url:
+            url += "&body={0}".format(body)
+        else:
+            url += "?body={0}".format(body)
+    for file in files:
+        if "?" in url:
+            url += "&attach={0}".format(file)
+        else:
+            url += "?attach={0}".format(file)
+    Gtk.show_uri(None, url, Gdk.CURRENT_TIME)
+
 
 def email_file(to, from_=None, subject=None,
                body=None,
@@ -166,6 +186,7 @@ def sign_keydata_and_send(keydata, error_cb=None):
 
             subject = Template(SUBJECT).safe_substitute(ctx)
             body = Template(BODY).safe_substitute(ctx)
+            email_portal(uid.email, subject, body, [filename])
             email_file (to=uid.email, subject=subject,
                         body=body, files=[filename])
             yield tmpfile
