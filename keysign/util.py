@@ -21,6 +21,8 @@ import dbus
 import hashlib
 import hmac
 import logging
+
+import os
 import requests
 from subprocess import call
 from string import Template
@@ -55,6 +57,25 @@ def mac_verify(key, data, mac):
     return result
 
 
+def email_portal(to, subject=None, body=None, files=None):
+    name = "org.freedesktop.portal.Desktop"
+    path = "/org/freedesktop/portal/desktop"
+    bus = dbus.SessionBus()
+    try:
+        proxy = bus.get_object(name, path)
+    except dbus.exceptions.DBusException:
+        # The portal is not available
+        return None
+    iface = "org.freedesktop.portal.Email"
+    email = dbus.Interface(proxy, iface)
+    parent_window = ""
+    attrs = []
+    for file in files:
+        fd = os.open(file, os.O_PATH | os.O_CLOEXEC)
+        attrs.append(dbus.types.UnixFd(fd))
+    opts = {"subject": subject, "address": to, "body": body, "attachment_fds": attrs}
+    ret = email.ComposeEmail(parent_window, opts)
+    return ret
 
 def email_file(to, from_=None, subject=None,
                body=None,
