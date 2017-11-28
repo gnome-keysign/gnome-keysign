@@ -2,6 +2,7 @@ import os
 import logging
 import select
 import socket
+import unittest
 import gi
 gi.require_version('Gtk', '3.0')
 
@@ -10,8 +11,12 @@ from nose.tools import *
 from twisted.internet import threads
 from twisted.internet.defer import inlineCallbacks
 
-from keysign.bluetoothoffer import BluetoothOffer
-from keysign.bluetoothreceive import BluetoothReceive
+try:
+    from keysign.bluetoothoffer import BluetoothOffer
+    from keysign.bluetoothreceive import BluetoothReceive
+    HAVE_BT = True
+except:
+    HAVE_BT = False
 from keysign.gpgmh import get_public_key_data, openpgpkey_from_data
 from keysign.util import mac_generate
 
@@ -21,16 +26,19 @@ thisdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.join(thisdir, "..")
 
 
+@unittest.skipUnless(HAVE_BT, "requires bluetooth module")
 def get_fixture_dir(fixture=""):
     dname = os.path.join(thisdir, "fixtures", fixture)
     return dname
 
 
+@unittest.skipUnless(HAVE_BT, "requires bluetooth module")
 def get_fixture_file(fixture):
     fname = os.path.join(get_fixture_dir(), fixture)
     return fname
 
 
+@unittest.skipUnless(HAVE_BT, "requires bluetooth module")
 def read_fixture_file(fixture):
     fname = get_fixture_file(fixture)
     data = open(fname, 'rb').read()
@@ -39,6 +47,7 @@ def read_fixture_file(fixture):
 
 @deferred(timeout=15)
 @inlineCallbacks
+@unittest.skipUnless(HAVE_BT, "requires bluetooth module")
 def test_bt():
     """This test requires two working Bluetooth devices"""
     data = read_fixture_file("seckey-no-pw-1.asc")
@@ -64,6 +73,7 @@ def test_bt():
 
 @deferred(timeout=15)
 @inlineCallbacks
+@unittest.skipUnless(HAVE_BT, "requires bluetooth module")
 def test_bt_wrong_hmac():
     """This test requires two working Bluetooth devices"""
     data = read_fixture_file("seckey-no-pw-1.asc")
@@ -86,6 +96,7 @@ def test_bt_wrong_hmac():
 
 @deferred(timeout=15)
 @inlineCallbacks
+@unittest.skipUnless(HAVE_BT, "requires bluetooth module")
 def test_bt_wrong_mac():
     """This test requires one working Bluetooth device"""
     receive = BluetoothReceive()
@@ -98,6 +109,7 @@ def test_bt_wrong_mac():
 
 @deferred(timeout=15)
 @inlineCallbacks
+@unittest.skipUnless(HAVE_BT, "requires bluetooth module")
 def test_bt_corrupted_key():
     """This test requires two working Bluetooth devices"""
 
