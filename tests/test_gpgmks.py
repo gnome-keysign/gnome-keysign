@@ -20,6 +20,7 @@ import logging
 import os, sys
 from subprocess import CalledProcessError, check_call
 import tempfile
+import unittest
 
 from nose.tools import *
 
@@ -27,23 +28,34 @@ thisdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.join(thisdir, "..")
 sys.path.insert(0, os.sep.join((parentdir, 'monkeysign')))
 
-from keysign.gpgmks import openpgpkey_from_data
-from keysign.gpgmks import fingerprint_from_keydata
-from keysign.gpgmks import get_public_key_data
-from keysign.gpgmks import get_usable_keys
-from keysign.gpgmks import get_usable_secret_keys
-from keysign.gpgmks import sign_keydata_and_encrypt
+try:
+    from keysign.gpgmks import openpgpkey_from_data
+    from keysign.gpgmks import fingerprint_from_keydata
+    from keysign.gpgmks import get_public_key_data
+    from keysign.gpgmks import get_usable_keys
+    from keysign.gpgmks import get_usable_secret_keys
+    from keysign.gpgmks import sign_keydata_and_encrypt
+    HAVE_MKS = True
+except:
+    HAVE_MKS = False
+
 
 log = logging.getLogger(__name__)
 
+
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def get_fixture_dir(fixture=""):
     dname = os.path.join(thisdir, "fixtures", fixture)
     return dname
 
+
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def get_fixture_file(fixture):
     fname = os.path.join(get_fixture_dir(), fixture)
     return fname
 
+
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def read_fixture_file(fixture):
     fname = get_fixture_file(fixture)
     data = open(fname, 'rb').read()
@@ -51,22 +63,26 @@ def read_fixture_file(fixture):
 
 
 @raises(ValueError)
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def test_openpgpkey_from_no_data():
     r = openpgpkey_from_data(None)
     assert False
 
 @raises(ValueError)
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def test_openpgpkey_from_empty_data():
     r = openpgpkey_from_data("")
     assert False
 
 
 @raises(ValueError)
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def test_openpgpkey_from_wrong_data():
     r = openpgpkey_from_data("this is no key!!1")
     assert False
 
 
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def test_fingerprint_from_data():
     data = read_fixture_file("pubkey-1.asc")
     fingerprint = fingerprint_from_keydata(data)
@@ -75,11 +91,13 @@ def test_fingerprint_from_data():
 
 
 @raises(ValueError)
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def test_fingerprint_from_data():
     fingerprint = fingerprint_from_keydata("This is not a key...")
     assert False
 
 
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 class TestKey1:
     def setup(self):
         data = read_fixture_file("pubkey-1.asc")
@@ -99,11 +117,14 @@ class TestKey1:
                       uid.email)
 
 @raises(ValueError)
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def test_get_public_key_no_data():
     tmp = tempfile.mkdtemp()
     d = get_public_key_data(None, homedir=tmp)
     assert_equals("", d)
 
+
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 class TestGetPublicKeyData:
     def setup(self):
         self.fname = get_fixture_file("pubkey-1.asc")
@@ -145,12 +166,14 @@ class TestGetPublicKeyData:
         assert False
 
 
-
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def test_get_empty_usable_keys():
     homedir = tempfile.mkdtemp()
     keys = get_usable_keys(homedir=homedir)
     assert_equals(0, len(keys))
 
+
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 class TestGetUsableKeys:
     def setup(self):
         self.fname = get_fixture_file("pubkey-1.asc")
@@ -199,6 +222,7 @@ def import_fixture_file_in_random_directory(filename):
     return homedir, originalkey
 
 
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 class TestGetUsableSecretKeys:
     def setup(self):
         homedir, key = import_fixture_file_in_random_directory("seckey-no-pw-1.asc")
@@ -224,9 +248,7 @@ class TestGetUsableSecretKeys:
         assert_equals(fpr, self.originalkey.fingerprint)
 
 
-
-
-
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 class TestSignAndEncrypt:
     SENDER_KEY = "seckey-no-pw-2.asc"
     RECEIVER_KEY = "seckey-2.asc"
@@ -310,18 +332,25 @@ class TestSignAndEncrypt:
             assert_less(len(signatures_before[uidstr]), len(signatures_after[uidstr]))
 
 
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 class TestLatin1(TestSignAndEncrypt):
     SENDER_KEY = "seckey-latin1.asc"
     RECEIVER_KEY = "seckey-2.asc"
 
+
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 class TestColon(TestSignAndEncrypt):
     SENDER_KEY = "seckey-colon.asc"
     RECEIVER_KEY = "seckey-2.asc"
 
+
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 class TestMultipleUID(TestSignAndEncrypt):
     SENDER_KEY = "seckey-multiple-uid-colon.asc"
     RECEIVER_KEY = "seckey-2.asc"
 
+
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 class TestUtf8(TestSignAndEncrypt):
     SENDER_KEY = "seckey-utf8.asc"
     RECEIVER_KEY = "seckey-utf8-2.asc"
