@@ -48,5 +48,3 @@ def extract_desktop(fileobj, keywords, comment_tags, options):
                 message = value
                 comments.append(key)
                 yield (lineno, funcname, message.strip(), comments)
-
-
