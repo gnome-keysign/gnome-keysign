@@ -36,7 +36,7 @@ try:
     from keysign.gpgmks import get_usable_secret_keys
     from keysign.gpgmks import sign_keydata_and_encrypt
     HAVE_MKS = True
-except:
+except ImportError:
     HAVE_MKS = False
 
 

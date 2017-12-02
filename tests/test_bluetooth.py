@@ -15,7 +15,7 @@ try:
     from keysign.bluetoothoffer import BluetoothOffer
     from keysign.bluetoothreceive import BluetoothReceive
     HAVE_BT = True
-except:
+except ImportError:
     HAVE_BT = False
 from keysign.gpgmh import get_public_key_data, openpgpkey_from_data
 from keysign.util import mac_generate
