@@ -50,7 +50,7 @@ class NoseTestCommand(TestCommand):
     def run_tests(self):
         # Run nose ensuring that argv simulates running nosetests directly
         import nose
-        nose.run_exit(argv=['nosetests'])
+        nose.run_exit(argv=['nosetests' , 'tests'])
 
 
 setup(
@@ -185,4 +185,5 @@ setup(
             #'install': InstallWithCompile,
             'test': NoseTestCommand,
         },
+        # test_suite = 'nose.collector',
     )
