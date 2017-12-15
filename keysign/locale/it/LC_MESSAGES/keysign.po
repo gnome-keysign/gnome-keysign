@@ -98,7 +98,6 @@ msgstr ""
 
 #: keysign/bluetoothoffer.py:129
 #, fuzzy
-#| msgid "Press Enter to stop"
 msgid "Press Enter to exit"
 msgstr "Premi Invio per annullare"
 

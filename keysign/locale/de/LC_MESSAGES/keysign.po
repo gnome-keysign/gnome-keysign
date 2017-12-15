@@ -25,7 +25,10 @@ msgid ""
 "      GNOME-Keysign allows signing OpenPGP keys comfortably and securely\n"
 "      via the local network or Bluetooth.\n"
 "    "
-msgstr "GNOME-Keysign signiert OpenPGP-Schlüssel einfach und sicher unter Benutzung von des lokalen Netzwekes oder Bluetooth."
+msgstr ""
+"\n"
+"GNOME-Keysign signiert OpenPGP-Schlüssel einfach und sicher unter "
+"Benutzung von des lokalen Netzwekes oder Bluetooth."
 
 #: data/gnome-keysign.raw.appdata.xml:14
 msgid ""
@@ -36,7 +39,13 @@ msgid ""
 "      to the UIDs of a key using the Email client the user configured\n"
 "      to use.\n"
 "    "
-msgstr "Das Programm scannt den Barcode eines anderen Schlüssels und überträgt den Schlüssel sicher, was ad-hoc Keysigning-Parties ermöglicht.  Es hält sich dabei an best-practices. So schickt es die generierten Signaturen als verschlüsselten Email-Anhang unter Benutzung des Email-Clients, den der Benutzer schon eingerichtet hat."
+msgstr ""
+"\n"
+"Das Programm scannt den Barcode eines anderen Schlüssels und überträgt "
+"den Schlüssel sicher, was ad-hoc Keysigning-Parties ermöglicht.  Es hält "
+"sich dabei an best-practices. So schickt es die generierten Signaturen "
+"als verschlüsselten Email-Anhang unter Benutzung des Email-Clients, den "
+"der Benutzer schon eingerichtet hat."
 
 #. Name
 #: data/gnome-keysign.raw.desktop:2
@@ -48,7 +57,9 @@ msgstr "Keysign"
 msgid ""
 "A keysigning helper to enable you to comfortably exchange OpenPGP keys "
 "with a friend"
-msgstr "Ein Helferprogramm um komfortabel OpenPGP-Schlüssel mit einem Freund zu signieren"
+msgstr ""
+"Ein Helferprogramm um komfortabel OpenPGP-Schlüssel mit einem Freund zu "
+"signieren"
 
 #. Keywords
 #: data/gnome-keysign.raw.desktop:4
@@ -88,17 +99,20 @@ msgstr "Drücke Enter um zu Stoppen"
 msgid ""
 "\n"
 "Key successfully sent"
-msgstr "Schlüssel erfolgreich gesendet"
+msgstr ""
+"\n"
+"Schlüssel erfolgreich gesendet"
 
 #: keysign/bluetoothoffer.py:127
 msgid ""
 "\n"
 "An error occurred: {}"
-msgstr "Es ist ein Fehler aufgetreten: {}"
+msgstr ""
+"\n"
+"Es ist ein Fehler aufgetreten: {}"
 
 #: keysign/bluetoothoffer.py:129
 #, fuzzy
-#| msgid "Press Enter to stop"
 msgid "Press Enter to exit"
 msgstr "Drücke Enter um zu Stoppen"
 
@@ -330,7 +344,6 @@ msgstr ""
 
 #: keysign/send.ui:437
 #, fuzzy
-#| msgid "Select and send key"
 msgid "Select and Send key"
 msgstr "Key Auswählen und Senden"
 
