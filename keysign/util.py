@@ -17,13 +17,10 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 
-import dbus
 import hashlib
 import hmac
 import logging
-
 import os
-import requests
 from subprocess import call
 from string import Template
 from tempfile import NamedTemporaryFile
@@ -36,6 +33,8 @@ except ImportError:
     from urlparse import ParseResult
     from urllib2 import quote
 
+import requests
+import dbus
 from gi.repository import Gtk, Gdk, GLib
 
 from .gpgmh import fingerprint_from_keydata
@@ -191,31 +190,31 @@ def sign_keydata_and_send(keydata, error_cb=None):
     # and spawn an email client.
     log.info("About to create signatures for key with fpr %r", fingerprint)
     for uid, encrypted_key in list(sign_keydata_and_encrypt(keydata, error_cb)):
-            log.info("Using UID: %r", uid)
-            # We expect uid.uid to be a consumable string
-            uid_str = uid.uid
-            ctx = {
-                'uid' : uid_str,
-                'fingerprint': fingerprint,
-                'keyid': keyid,
-            }
-            tmpfile = NamedTemporaryFile(prefix='gnome-keysign-',
-                                         suffix='.asc',
-                                         delete=True)
-            filename = tmpfile.name
-            log.info('Writing keydata to %s', filename)
-            tmpfile.write(encrypted_key)
-            # Interesting, sometimes it would not write the
-            # whole thing out, so we better flush here
-            tmpfile.flush()
-            # If we close the actual file descriptor to free
-            # resources. Calling tmpfile.close would get the file deleted.
-            tmpfile.file.close()
+        log.info("Using UID: %r", uid)
+        # We expect uid.uid to be a consumable string
+        uid_str = uid.uid
+        ctx = {
+            'uid' : uid_str,
+            'fingerprint': fingerprint,
+            'keyid': keyid,
+        }
+        tmpfile = NamedTemporaryFile(prefix='gnome-keysign-',
+                                     suffix='.asc',
+                                     delete=True)
+        filename = tmpfile.name
+        log.info('Writing keydata to %s', filename)
+        tmpfile.write(encrypted_key)
+        # Interesting, sometimes it would not write the
+        # whole thing out, so we better flush here
+        tmpfile.flush()
+        # If we close the actual file descriptor to free
+        # resources. Calling tmpfile.close would get the file deleted.
+        tmpfile.file.close()
 
-            subject = Template(SUBJECT).safe_substitute(ctx)
-            body = Template(BODY).safe_substitute(ctx)
-            send_email(uid.email, subject, body, [filename])
-            yield tmpfile
+        subject = Template(SUBJECT).safe_substitute(ctx)
+        body = Template(BODY).safe_substitute(ctx)
+        send_email(uid.email, subject, body, [filename])
+        yield tmpfile
 
 
 def format_fingerprint(fpr):
