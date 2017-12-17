@@ -68,8 +68,14 @@ def email_portal(to, subject=None, body=None, files=None):
         return None
     iface = "org.freedesktop.portal.Email"
     email = dbus.Interface(proxy, iface)
+    # Apparently we are unable to get the parent window XID from the receive class.
+    # Until this is sorted out, we leave the parent window empty.
     parent_window = ""
     attrs = []
+    # Even if we don't close the file descriptor it should not be a problem because
+    # eventually at runtime it will be automatically closed.
+    # Designing this class we took the recipes one as reference
+    # https://gitlab.gnome.org/GNOME/recipes/blob/4afc9df6/src/gr-mail.c#L293
     for file in files:
         fd = os.open(file, os.O_PATH | os.O_CLOEXEC)
         attrs.append(dbus.types.UnixFd(fd))
