@@ -59,14 +59,14 @@ def mac_verify(key, data, mac):
     return result
 
 
-def email_portal(to, subject=None, body=None, files=None):
+def _email_portal(to, subject=None, body=None, files=None):
     name = "org.freedesktop.portal.Desktop"
     path = "/org/freedesktop/portal/desktop"
     bus = dbus.SessionBus()
     try:
         proxy = bus.get_object(name, path)
     except dbus.exceptions.DBusException:
-        # The portal is not available
+        log.debug("Desktop portal is not available")
         return None
     iface = "org.freedesktop.portal.Email"
     email = dbus.Interface(proxy, iface)
@@ -78,15 +78,20 @@ def email_portal(to, subject=None, body=None, files=None):
     # eventually at runtime it will be automatically closed.
     # Designing this class we took the recipes one as reference
     # https://gitlab.gnome.org/GNOME/recipes/blob/4afc9df6/src/gr-mail.c#L293
-    for file in files:
-        fd = os.open(file, os.O_PATH | os.O_CLOEXEC)
-        attrs.append(dbus.types.UnixFd(fd))
+    if files:
+        for file in files:
+            fd = os.open(file, os.O_PATH | os.O_CLOEXEC)
+            attrs.append(dbus.types.UnixFd(fd))
     opts = {"subject": subject, "address": to, "body": body, "attachment_fds": attrs}
-    ret = email.ComposeEmail(parent_window, opts)
-    return ret
+    try:
+        ret = email.ComposeEmail(parent_window, opts)
+        return ret
+    except TypeError:
+        log.debug("Email portal is not available")
+        return None
 
 
-def email_mailto(to, subject=None, body=None, files=None):
+def _email_mailto(to, subject=None, body=None, files=None):
     url = "mailto:"
     url += "\"{0}\"".format(to)
     # Apparently we don't need to use urllib.parse.quote_plus
@@ -102,14 +107,19 @@ def email_mailto(to, subject=None, body=None, files=None):
             url += "&attach={0}".format(file)
         else:
             url += "?attach={0}".format(file)
-    Gtk.show_uri(None, url, Gdk.CURRENT_TIME)
+    try:
+        Gtk.show_uri(None, url, Gdk.CURRENT_TIME)
+        return True
+    except GLib.GError as e:
+        log.debug("mailto URI is probably not available: %s", e.message)
+        return None
 
 
-def email_file(to, from_=None, subject=None,
-               body=None,
-               ccs=None, bccs=None,
-               files=None, utf8=True):
-    "Calls xdg-email with the appriopriate options"
+def _email_file(to, from_=None, subject=None,
+                body=None,
+                ccs=None, bccs=None,
+                files=None, utf8=True):
+    """Calls xdg-email with the appropriate options"""
     cmd = ['xdg-email']
     if utf8:
         cmd += ['--utf8']
@@ -130,6 +140,16 @@ def email_file(to, from_=None, subject=None,
     retval = call(cmd)
     return retval
 
+
+def send_email(to, subject=None, body=None, files=None):
+    """Tries to send the email using firstly the portal, then the mailto
+    uri and as a last attempt the xdg-email"""
+    if _email_portal(to, subject, body, files):
+        return
+    elif _email_mailto(to, subject, body, files):
+        return
+    else:
+        _email_file(to=to, subject=subject, body=body, files=files)
 
 
 SUBJECT = 'Your signed key $fingerprint'
@@ -155,7 +175,7 @@ def sign_keydata_and_send(keydata, error_cb=None):
     onto sign_keydata_and_encrypt.
     
     For the resulting signatures, emails are created and
-    sent via email_file.
+    sent via send_email.
     
     Return value:  NamedTemporaryFiles used for saving the signatures.
     If you let them go out of scope they should get deleted.
@@ -194,9 +214,7 @@ def sign_keydata_and_send(keydata, error_cb=None):
 
             subject = Template(SUBJECT).safe_substitute(ctx)
             body = Template(BODY).safe_substitute(ctx)
-            email_portal(uid.email, subject, body, [filename])
-            email_file (to=uid.email, subject=subject,
-                        body=body, files=[filename])
+            send_email(uid.email, subject, body, [filename])
             yield tmpfile
 
 
