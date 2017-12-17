@@ -30,9 +30,11 @@ from tempfile import NamedTemporaryFile
 try:
     from urllib.parse import urlparse, parse_qs
     from urllib.parse import ParseResult
+    from urllib.request import quote
 except ImportError:
     from urlparse import urlparse, parse_qs
     from urlparse import ParseResult
+    from urllib2 import quote
 
 from gi.repository import Gtk, Gdk, GLib
 
@@ -92,9 +94,9 @@ def email_mailto(to, subject=None, body=None, files=None):
         url += "?subject={0}".format(subject)
     if body:
         if "?" in url:
-            url += "&body={0}".format(body)
+            url += "&body={0}".format(quote(body))
         else:
-            url += "?body={0}".format(body)
+            url += "?body={0}".format(quote(body))
     for file in files:
         if "?" in url:
             url += "&attach={0}".format(file)
