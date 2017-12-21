@@ -176,14 +176,8 @@ setup(
         'keysign.compat',
         'keysign.network',
         ],
-    py_modules = [
-        'monkeysign.msgfmt',
-        'monkeysign.translation',
-        'monkeysign.gpg',
-    ],
     package_dir={
         'keysign': 'keysign',
-        'monkeysign': 'monkeysign/monkeysign'
     },
     package_data={
         'keysign': [
