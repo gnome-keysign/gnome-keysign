@@ -888,6 +888,35 @@
             ]
         },
         {
+            "name": "lxml",
+            "build-options": {
+                "env": {
+                    "PYTHONUSERBASE": "/app",
+                    "XSLT_CONFIG": "pkg-config libxslt"
+                }
+            },
+            "ensure-writable": "/app/lib/python2.7/site-packages/easy-install.pth",
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://pypi.python.org/packages/e1/4c/d83979fbc66a2154850f472e69405572d89d2e6a6daee30d18e83e39ef3a/lxml-4.1.1.tar.gz",
+                    "sha256": "940caef1ec7c78e0c34b0f6b94fe42d0f2022915ffc78643d28538a5cfd0f40e"
+                },
+                {
+                    "type": "script",
+                    "dest-filename": "configure",
+                    "commands": [
+                        "echo just so that a configure file exists"
+                    ]
+                },
+                {
+                    "type": "file",
+                    "path": "pip-Makefile",
+                    "dest-filename": "Makefile"
+                }
+            ]
+        },
+        {
             "name": "gnome-keysign",
             "no-autogen": true,
             "build-options": {
