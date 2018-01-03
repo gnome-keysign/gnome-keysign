@@ -127,8 +127,8 @@ class BuildWithCompile(build):
     sub_commands = [('compile_catalog', None)] + build.sub_commands
 
     def run(self):
-        translate_desktop_file('data/gnome-keysign.raw.desktop', 'data/gnome-keysign.desktop', 'keysign/locale')
-        translate_appdata_file('data/gnome-keysign.raw.appdata.xml', 'data/gnome-keysign.appdata.xml', 'keysign/locale')
+        translate_desktop_file('data/org.gnomeKeysign.raw.desktop', 'data/org.gnome.Keysign.desktop', 'keysign/locale')
+        translate_appdata_file('data/org.gnome.Keysign.raw.appdata.xml', 'data/org.gnome.Keysign.appdata.xml', 'keysign/locale')
         build.run(self)
 
 
@@ -191,11 +191,11 @@ setup(
     include_package_data = True,
     data_files=[
         ( 'share/applications',
-            ['data/gnome-keysign.desktop']),
+            ['data/org.gnome.Keysign.desktop']),
         ( 'share/appdata',
-            ['data/gnome-keysign.appdata.xml']),
+            ['data/org.gnome.Keysign.appdata.xml']),
         ( 'share/icons/hicolor/scalable/apps',
-            ['data/gnome-keysign.svg']),
+            ['data/org.gnome.Keysign.svg']),
         #( 'share/locale/',
         # # We cannot use the glob below, because it only copies the file
         # # into the directory mentioned above, i.e. keysign.po, rather
