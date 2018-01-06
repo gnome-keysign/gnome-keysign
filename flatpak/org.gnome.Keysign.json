@@ -290,7 +290,7 @@
                             "sources": [
                                 {
                                     "type": "archive",
-                                    "url": "https://www.imagemagick.org/download/ImageMagick-6.9.9-27.tar.xz",
+                                    "url": "https://fossies.org/linux/misc/legacy/ImageMagick-6.9.9-27.tar.xz",
                                     "sha256": "27d0090b6a019eb038d254a9eb8d8939ac0d225b5dc651abc9212bb7c257e17c"
                                 }
                             ]
