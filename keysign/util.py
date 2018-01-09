@@ -146,7 +146,7 @@ def _email_file(to, from_=None, subject=None,
 
 
 def _fix_path_flatpak(files):
-    """If we are using flatpak the temporary files will be placed in /var/tmp, a
+    """With flatpak the temporary files will be placed in /var/tmp, a
     special path inside the sandbox. To be able to use the files from the host
     we change the path to the absolute one. This fix in the future may not be
     necessary because the portals should be able to automatically handle it."""
@@ -165,7 +165,10 @@ def _fix_path_flatpak(files):
 def send_email(to, subject=None, body=None, files=None):
     """Tries to send the email using firstly the portal, then the mailto
     uri and as a last attempt the xdg-email"""
-    files = _fix_path_flatpak(files)
+    # If we are using flatpak
+    if os.path.exists("/.flatpak-info"):
+        files = _fix_path_flatpak(files)
+
     if _email_portal(to, subject, body, files):
         return
     elif _email_mailto(to, subject, body, files):
