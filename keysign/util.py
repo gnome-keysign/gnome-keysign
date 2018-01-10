@@ -145,6 +145,11 @@ def _email_file(to, from_=None, subject=None,
     return retval
 
 
+def _using_flatpak():
+    """Check if we are inside flatpak"""
+    return os.path.exists("/.flatpak-info")
+
+
 def _fix_path_flatpak(files):
     """With flatpak the temporary files will be placed in /var/tmp, a
     special path inside the sandbox. To be able to use the files from the host
@@ -165,8 +170,7 @@ def _fix_path_flatpak(files):
 def send_email(to, subject=None, body=None, files=None):
     """Tries to send the email using firstly the portal, then the mailto
     uri and as a last attempt the xdg-email"""
-    # If we are using flatpak
-    if os.path.exists("/.flatpak-info"):
+    if _using_flatpak():
         files = _fix_path_flatpak(files)
 
     if _email_portal(to, subject, body, files):
