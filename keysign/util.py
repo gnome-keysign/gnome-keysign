@@ -155,13 +155,16 @@ def _fix_path_flatpak(files):
     special path inside the sandbox. To be able to use the files from the host
     we change the path to the absolute one. This fix in the future may not be
     necessary because the portals should be able to automatically handle it."""
+    tmp_flat = "/var/tmp/"
+    part_1 = os.path.expanduser("~/.var/app/")
     app_id = "org.gnome.Keysign"
-    flatpak_path = os.path.expanduser("~/.var/app/" + app_id + "/cache/tmp/")
+    part_2 = "cache/tmp/"
+    flatpak_path = os.path.join(part_1, app_id, part_2)
     fixed_files = []
     if files:
         for file in files:
-            if file.startswith("/var/tmp/"):
-                fixed_files.append(flatpak_path + file[9:])
+            if file.startswith(tmp_flat):
+                fixed_files.append(flatpak_path + file[len(tmp_flat):])
             else:
                 fixed_files.append(file)
     return fixed_files
