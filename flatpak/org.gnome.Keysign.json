@@ -92,6 +92,7 @@
         {
             "name": "pycairo",
             "buildsystem": "simple",
+            "ensure-writable": ["easy-install.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -161,6 +162,7 @@
         },
         {
             "name": "dbus-python",
+            "ensure-writable": ["easy-install.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -189,6 +191,7 @@
                 "--disable-pygtk",
                 "--disable-gdbm"
             ],
+            "ensure-writable": ["easy-install.pth"],
             "_cleanup": [ "*" ],
             "sources": [
                 {
@@ -335,6 +338,7 @@
                     "PYTHONUSERBASE" : "/app"
                 }
             },
+            "ensure-writable": ["easy-install.pth"],
             "sources": [
                 {
                     "type": "file",
@@ -355,6 +359,7 @@
             "build-commands": [
                 "pip2 install --prefix=/app Babel-2.4.0-py2.py3-none-any.whl"
             ],
+            "ensure-writable": ["easy-install.pth"],
             "sources": [
                 {
                     "type": "file",
@@ -371,6 +376,7 @@
                     "PYTHONUSERBASE" : "/app"
                 }
             },
+            "ensure-writable": ["easy-install.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -409,6 +415,7 @@
                     "PYTHONUSERBASE" : "/app"
                 }
             },
+            "ensure-writable": ["easy-install.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -463,6 +470,7 @@
                     "PYTHONUSERBASE" : "/app"
                 }
             },
+            "ensure-writable": ["easy-install.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -526,6 +534,7 @@
                     "PYTHONUSERBASE" : "/app"
                 }
             },
+            "ensure-writable": ["easy-install.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -595,6 +604,7 @@
                     "PYTHONUSERBASE": "/app"
                 }
             },
+            "ensure-writable": ["easy-install.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -622,6 +632,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
+                    "ensure-writable": ["easy-install.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -649,6 +660,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
+                    "ensure-writable": ["easy-install.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -676,6 +688,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
+                    "ensure-writable": ["easy-install.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -703,6 +716,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
+                    "ensure-writable": ["easy-install.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -730,6 +744,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
+                    "ensure-writable": ["easy-install.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -811,6 +826,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
+                    "ensure-writable": ["easy-install.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -865,6 +881,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
+                    "ensure-writable": ["easy-install.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -895,7 +912,7 @@
                     "XSLT_CONFIG": "pkg-config libxslt"
                 }
             },
-            "ensure-writable": "/app/lib/python2.7/site-packages/easy-install.pth",
+            "ensure-writable": ["easy-install.pth"],
             "sources": [
                 {
                     "type": "archive",
