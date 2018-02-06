@@ -55,6 +55,7 @@ from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
 from .gpgmh import openpgpkey_from_data
 from . import gpgmh
+from .i18n import _
 from .receive import ReceiveApp
 from .send import SendApp
 from .util import sign_keydata_and_send
@@ -159,10 +160,11 @@ class KeysignApp(Gtk.Application):
         self.receive_stack = rs
 
 
+        # Hm. Leaving comments for translators does not seem to work
         self.send_receive_stack.add_titled(self.send_stack,
-            "send_stack", "Send")
+            "send_stack", _("Send"))
         self.send_receive_stack.add_titled(rs,
-            "receive_stack", "Receive")
+            "receive_stack", _("Receive"))
 
         # These properties must be set after the stacks has been added to the window
         # because they require a window element that "receive.ui" file doesn't provide.
@@ -204,7 +206,7 @@ class KeysignApp(Gtk.Application):
         #self.update_header_button()
 
     def on_send_header_button_clicked(self, button, *args):
-        # Here we assume that there is only two places where
+        # Here we assume that there are only two places where
         # we could have possibly pressed this button, i.e.
         # from the keypresentwidget or the result page
         log.debug("Send Headerbutton %r clicked! %r", button, args)

@@ -52,7 +52,8 @@ from .avahidiscovery import AvahiKeysignDiscoveryWithMac
 from .keyfprscan import KeyFprScanWidget
 from .keyconfirm import PreSignWidget
 from .gpgmh import openpgpkey_from_data
-from .util import sign_keydata_and_send, fix_infobar
+from .i18n import _
+from .util import sign_keydata_and_send, fix_infobar, is_bt_available
 from .discover import Discover
 
 log = logging.getLogger(__name__)
@@ -132,7 +133,7 @@ class ReceiveApp:
         psw = PreSignWidget(key, pixbuf)
         psw.connect('sign-key-confirmed',
             self.on_sign_key_confirmed, keydata)
-        self.stack.add_titled(psw, "presign", "Sign Key")
+        self.stack.add_titled(psw, "presign", _("Sign Key"))
         psw.set_name("presign")
         psw.show()
         self.psw = psw
@@ -189,8 +190,10 @@ class ReceiveApp:
         # Do we also want to add an infobar message or so..?
 
     def on_list_changed(self, discovery, number, userdata):
+        """We show an infobar if we can only receive with Avahi and
+        there are zero nearby servers"""
         ib = userdata
-        if number == 0:
+        if number == 0 and not is_bt_available():
             ib.show()
         elif ib.is_visible():
             ib.hide()
@@ -210,7 +213,7 @@ class App(Gtk.Application):
 
         window = Gtk.ApplicationWindow()
         window.connect("delete-event", self.on_delete_window)
-        window.set_title("Receive")
+        window.set_title(_("Receive"))
         # window.set_size_request(600, 400)
         #window = self.builder.get_object("appwindow")
         

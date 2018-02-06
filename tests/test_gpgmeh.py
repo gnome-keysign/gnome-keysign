@@ -36,6 +36,8 @@ from keysign.gpgmeh import get_usable_secret_keys
 from keysign.gpgmeh import get_public_key_data
 from keysign.gpgmeh import sign_keydata_and_encrypt
 
+from keysign.gpgkey import to_valid_utf8_string
+
 log = logging.getLogger(__name__)
 thisdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.join(thisdir, "..")
@@ -342,7 +344,7 @@ class TestGetUsableKeys:
 
 class TestGetUsableSecretKeys:
     def setup(self):
-        self.fname = get_fixture_file("seckey-1.asc")
+        self.fname = get_fixture_file("seckey-no-pw-1.asc")
         original = open(self.fname, 'rb').read()
         # This should be a new, empty directory
         self.homedir = tempfile.mkdtemp()
@@ -381,8 +383,20 @@ def get_signatures_for_uids_on_key(ctx, key):
     # What happens if keylist returns multiple keys, e.g. because there
     # is another key with a UID named as the fpr?  How can I make sure I
     # get the signatures of any given key?
-    keys = list(ctx.keylist(key.fpr, mode=(gpg.constants.keylist.mode.LOCAL
-                                           |gpg.constants.keylist.mode.SIGS)))
+    
+    # *sigh* gpgme is killing me. With gpgme 1.8 we have to
+    # set_keylist_mode before we can call keylist.  With gpgme 1.9
+    # keylist takes a mode argument and overrides whatever has been
+    # set before.  In order to come with something compatible with both
+    # 1.8 and 1.9 we have to set_keylist_mode and NOT call ctx.keylist
+    # but rather the bare op_keylist_all.  In 1.8 that requires two
+    # arguments.
+    mode = gpg.constants.keylist.mode.LOCAL | gpg.constants.keylist.mode.SIGS
+    secret = False
+    ctx.set_keylist_mode(mode)
+    keys = list(ctx.op_keylist_all(key.fpr, secret))
+    # With gpgme 1.9 we can simply do:
+    # keys = list(ctx.keylist(key.fpr), mode=mode)
     assert len(keys) == 1
     uid_sigs = {uid.uid: [s for s in uid.signatures] for uid in keys[0].uids}
     log.info("Signatures: %r", uid_sigs)
@@ -410,10 +424,12 @@ class TestSignAndEncrypt:
         pass
 
     def test_sign_and_encrypt(self):
-        secret_keydata = open(self.key_sender_key, "rb").read()
+        # This might be a secret key, too, so we import and export to
+        # get hold of the public portion.
+        keydata = open(self.key_sender_key, "rb").read()
         # We get the public portion of the key
         sender = TempContext()
-        sender.op_import(secret_keydata)
+        sender.op_import(keydata)
         result = sender.op_import_result()
         fpr = result.imports[0].fpr
         sink = gpg.Data()
@@ -422,7 +438,7 @@ class TestSignAndEncrypt:
         # This is the key that we will sign
         public_sender_key = sink.read()
 
-        keys = get_usable_secret_keys(homedir=self.key_sender_homedir)
+        keys = get_usable_keys(homedir=self.key_sender_homedir)
         assert_equals(1, len(keys))
         key = keys[0]
         uids = key.uidslist
@@ -437,12 +453,15 @@ class TestSignAndEncrypt:
 
         sigs_before = [s for l in get_signatures_for_uids_on_key(sender,
                                     key).values() for s in l]
+        # FIXME: Refactor this a little bit.
+        # We have duplication of code with the other test below.
         for uid, uid_enc in zip(uids_before, uid_encrypted):
+            uid_enc_str = uid_enc[0].uid
             # The test doesn't work so well, because comments
             # are not rendered :-/
             # assert_equals(uid, uid_enc[0])
-            assert_in(uid.name, uid_enc[0].uid)
-            assert_in(uid.email, uid_enc[0].uid)
+            assert_in(uid.name, uid_enc_str)
+            assert_in(uid.email, uid_enc_str)
             ciphertext = uid_enc[1]
             log.debug("Decrypting %r", ciphertext)
             plaintext, result, vrfy = sender.decrypt(ciphertext)
@@ -497,9 +516,16 @@ class TestSignAndEncrypt:
         sigs_before = [s for l in get_signatures_for_uids_on_key(sender,
                                     sender_key).values() for s in l]
         for uid, uid_enc in zip(uids_before, uid_encrypted):
+            uid_enc_str = uid_enc[0].uid
+            log.info("Uid enc str: %r", uid_enc_str)
+            log.info("Uid name: %r", uid.name)
             # FIXME: assert_equals(uid, uid_enc[0])
-            assert_in(uid.name, uid_enc[0].uid)
-            assert_in(uid.email, uid_enc[0].uid)
+            # It's a bit weird to re-use the string treatment here.
+            # But gpgme may return unencodable bytes (and uid, here, is
+            # coming straight from gpgme).  We opted for our UID wrapper
+            # to return consumable strings, i.e. safe to encode
+            assert_in(to_valid_utf8_string(uid.name), uid_enc_str)
+            assert_in(to_valid_utf8_string(uid.email), uid_enc_str)
             ciphertext = uid_enc[1]
             log.debug("Decrypting %r", ciphertext)
             plaintext, result, vrfy = sender.decrypt(ciphertext)
@@ -522,3 +548,16 @@ class TestSignAndEncrypt:
 class TestLatin1(TestSignAndEncrypt):
     SENDER_KEY = "seckey-latin1.asc"
     RECEIVER_KEY = "seckey-2.asc"
+
+class TestColon(TestSignAndEncrypt):
+    SENDER_KEY = "seckey-colon.asc"
+    RECEIVER_KEY = "seckey-2.asc"
+
+class TestMultipleUID(TestSignAndEncrypt):
+    SENDER_KEY = "seckey-multiple-uid-colon.asc"
+    RECEIVER_KEY = "seckey-2.asc"
+
+
+class TestUtf8(TestSignAndEncrypt):
+    SENDER_KEY = "seckey-utf8.asc"
+    RECEIVER_KEY = "seckey-utf8-2.asc"

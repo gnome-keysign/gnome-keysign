@@ -1,3 +1,6 @@
+*.mo
+*.pot
+.eggs/
 *.swp
 *.pyc
 *.bak
@@ -10,5 +13,6 @@
 .tox/
 cover/
 **.flatpak-builder/
+/coverage/
 .idea/
 *.ui~

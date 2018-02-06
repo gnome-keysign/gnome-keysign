@@ -7,7 +7,7 @@ import signal
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from gi.repository import GLib  # for markup_escape_text
+from gi.repository import GLib
 from wormhole.errors import ServerConnectionError, LonelyError, WrongPasswordError
 if __name__ == "__main__":
     from twisted.internet import gtk3reactor
@@ -31,6 +31,8 @@ from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
 from .offer import Offer
 from . import gpgmh
+# We import i18n to have the locale set up for Glade
+from .i18n import _
 
 log = logging.getLogger(__name__)
 

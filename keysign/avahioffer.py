@@ -39,6 +39,7 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .__init__ import __version__
 from .gpgmh import get_usable_keys, get_public_key_data
+from .i18n import _
 from .util import mac_generate, format_fingerprint
 from . import Keyserver
 
@@ -79,8 +80,9 @@ def main(args):
     key = get_usable_keys(pattern=args[0])[0]
     offer = AvahiHTTPOffer(key)
     discovery_info = offer.start()
-    print ("Offering key: {}".format(key))
-    print ("Discovery info: {}".format(discovery_info))
+    print (_("Offering key: {}").format(key))
+    print (_("Discovery info: {}").format(discovery_info))
+    print (_("Press Enter to stop"))
     try: input_ = raw_input
     except NameError: input_ = input
     input_("Press Enter to stop")

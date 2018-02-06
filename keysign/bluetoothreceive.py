@@ -1,6 +1,7 @@
 import logging
 import select
-from bluetooth import *
+from bluetooth import BluetoothSocket, BluetoothError, RFCOMM
+import socket
 
 if __name__ == "__main__":
     import gi
@@ -15,6 +16,7 @@ if __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
                               "this script directly which is discouraged. " +
                               "Try python -m instead.")
+    import os
     parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     os.sys.path.insert(0, parent_dir)
     os.sys.path.insert(0, os.path.join(parent_dir, 'monkeysign'))
@@ -24,6 +26,7 @@ if __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 from .gpgmh import fingerprint_from_keydata
+from .i18n import _
 from .util import mac_verify
 
 log = logging.getLogger(__name__)
@@ -51,14 +54,21 @@ class BluetoothReceive:
                     raise be
             success = False
             while not self.stopped and not success:
-                r, w, e = yield threads.deferToThread(select.select, [self.client_socket], [], [], True)
+                r, w, e = yield threads.deferToThread(select.select, [self.client_socket], [], [], 0.5)
                 if r:
                     log.info("Connection established")
                     self.client_socket.setblocking(True)
                     success = True
-                    while len(message) < 35 or message[-35:] != b"-----END PGP PUBLIC KEY BLOCK-----\n":
-                        part_message = yield threads.deferToThread(self.client_socket.recv, self.size)
-                        message += part_message
+                    # try to receive until the sender closes the connection
+                    try:
+                        while True:
+                            part_message = self.client_socket.recv(self.size)
+                            message += part_message
+                    except BluetoothError as be:
+                        if be.args[0] == "(104, 'Connection reset by peer')":
+                            log.info("Bluetooth connection closed, let's check if we downloaded the key")
+                        else:
+                            raise be
             mac_key = fingerprint_from_keydata(message)
             verified = None
             if mac:
@@ -96,16 +106,20 @@ class BluetoothReceive:
     def stop(self):
         self.stopped = True
         if self.client_socket:
-            # Seems that is useless :/
-            #import socket
-            #self.client_socket.shutdown(socket.SHUT_RDWR)
-            self.client_socket.close()
+            try:
+                self.client_socket.shutdown(socket.SHUT_RDWR)
+                self.client_socket.close()
+            except BluetoothError as be:
+                if be.args[0] == "(9, 'Bad file descriptor')":
+                    log.info("The old Bluetooth connection was already closed")
+                else:
+                    log.warning("An unknown bt error occurred: %s" % be.args[0])
 
 
 def main(args):
     log.debug('Running main with args: %s', args)
-    if not args:
-        raise ValueError("You must provide an argument with the bluetooth code")
+    if not len(args) == 3:
+        raise ValueError("You must provide three arguments: bluetooth code, hmac and port")
 
     def _received(result):
         key_data, success, error_message = result
@@ -116,10 +130,12 @@ def main(args):
 
         reactor.callFromThread(reactor.stop)
 
-    print("Trying to download the key, please wait")
+    print(_("Trying to download the key, please wait"))
     bt_mac = args[0]
-    receive = BluetoothReceive()
-    d = receive.find_key(bt_mac)
+    hmac = args[1]
+    port = int(args[2])
+    receive = BluetoothReceive(port)
+    d = receive.find_key(bt_mac, hmac)
     d.addCallback(_received)
     reactor.run()
 

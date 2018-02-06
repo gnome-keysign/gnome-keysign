@@ -20,6 +20,7 @@ import logging
 import os, sys
 from subprocess import CalledProcessError, check_call
 import tempfile
+import unittest
 
 from nose.tools import *
 
@@ -27,23 +28,34 @@ thisdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.join(thisdir, "..")
 sys.path.insert(0, os.sep.join((parentdir, 'monkeysign')))
 
-from keysign.gpgmks import openpgpkey_from_data
-from keysign.gpgmks import fingerprint_from_keydata
-from keysign.gpgmks import get_public_key_data
-from keysign.gpgmks import get_usable_keys
-from keysign.gpgmks import get_usable_secret_keys
-from keysign.gpgmks import sign_keydata_and_encrypt
+try:
+    from keysign.gpgmks import openpgpkey_from_data
+    from keysign.gpgmks import fingerprint_from_keydata
+    from keysign.gpgmks import get_public_key_data
+    from keysign.gpgmks import get_usable_keys
+    from keysign.gpgmks import get_usable_secret_keys
+    from keysign.gpgmks import sign_keydata_and_encrypt
+    HAVE_MKS = True
+except ImportError:
+    HAVE_MKS = False
+
 
 log = logging.getLogger(__name__)
 
+
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def get_fixture_dir(fixture=""):
     dname = os.path.join(thisdir, "fixtures", fixture)
     return dname
 
+
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def get_fixture_file(fixture):
     fname = os.path.join(get_fixture_dir(), fixture)
     return fname
 
+
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def read_fixture_file(fixture):
     fname = get_fixture_file(fixture)
     data = open(fname, 'rb').read()
@@ -51,22 +63,26 @@ def read_fixture_file(fixture):
 
 
 @raises(ValueError)
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def test_openpgpkey_from_no_data():
     r = openpgpkey_from_data(None)
     assert False
 
 @raises(ValueError)
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def test_openpgpkey_from_empty_data():
     r = openpgpkey_from_data("")
     assert False
 
 
 @raises(ValueError)
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def test_openpgpkey_from_wrong_data():
     r = openpgpkey_from_data("this is no key!!1")
     assert False
 
 
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def test_fingerprint_from_data():
     data = read_fixture_file("pubkey-1.asc")
     fingerprint = fingerprint_from_keydata(data)
@@ -75,11 +91,13 @@ def test_fingerprint_from_data():
 
 
 @raises(ValueError)
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def test_fingerprint_from_data():
     fingerprint = fingerprint_from_keydata("This is not a key...")
     assert False
 
 
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 class TestKey1:
     def setup(self):
         data = read_fixture_file("pubkey-1.asc")
@@ -99,11 +117,14 @@ class TestKey1:
                       uid.email)
 
 @raises(ValueError)
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def test_get_public_key_no_data():
     tmp = tempfile.mkdtemp()
     d = get_public_key_data(None, homedir=tmp)
     assert_equals("", d)
 
+
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 class TestGetPublicKeyData:
     def setup(self):
         self.fname = get_fixture_file("pubkey-1.asc")
@@ -145,12 +166,14 @@ class TestGetPublicKeyData:
         assert False
 
 
-
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 def test_get_empty_usable_keys():
     homedir = tempfile.mkdtemp()
     keys = get_usable_keys(homedir=homedir)
     assert_equals(0, len(keys))
 
+
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 class TestGetUsableKeys:
     def setup(self):
         self.fname = get_fixture_file("pubkey-1.asc")
@@ -199,9 +222,10 @@ def import_fixture_file_in_random_directory(filename):
     return homedir, originalkey
 
 
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 class TestGetUsableSecretKeys:
     def setup(self):
-        homedir, key = import_fixture_file_in_random_directory("seckey-1.asc")
+        homedir, key = import_fixture_file_in_random_directory("seckey-no-pw-1.asc")
         self.homedir = homedir
         self.originalkey = key
 
@@ -224,9 +248,7 @@ class TestGetUsableSecretKeys:
         assert_equals(fpr, self.originalkey.fingerprint)
 
 
-
-
-
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 class TestSignAndEncrypt:
     SENDER_KEY = "seckey-no-pw-2.asc"
     RECEIVER_KEY = "seckey-2.asc"
@@ -248,15 +270,37 @@ class TestSignAndEncrypt:
         pass
 
     def test_sign_and_encrypt(self):
+        # Let's imagine we've just got sent the key from the key-sending side
         keydata = open(self.sender_key, "rb").read()
-        keys = get_usable_secret_keys(homedir=self.sender_homedir)
+        # for some reason pgpy does not like the stray data before
+        # https://github.com/SecurityInnovation/PGPy/issues/218
+        keydata = keydata[keydata.index('-----'):]
+        
+        # We find out what UIDs the sender key has
+        keys = get_usable_keys(homedir=self.sender_homedir)
         assert_equals(1, len(keys))
         key = keys[0]
         uids = key.uidslist
+        del key
+        del keys
+        
+        # We are the receiver and we sign the sender's key.
         # This is a tuple (uid, encrypted)
         uid_encrypted = list(sign_keydata_and_encrypt(keydata,
             error_cb=None, homedir=self.receiver_homedir))
         assert_equals(len(uids), len(uid_encrypted))
+        signatures_before = {}
+        signatures_after = {}
+        import pgpy
+        pgpykeys = pgpy.PGPKey.from_blob(keydata)
+        log.info("Loaded Keys: %r", pgpykeys)
+        k = pgpykeys[0]
+        for uid in k.userids:
+            # We make the UID a string, because we might not get the
+            # very same object back later. And I don't know whether
+            # the dict uses "is" or "eq" for finding members
+            signatures_before[u"{}".format(uid)] = uid._signatures
+        
         for plain_uid, enc_uid in zip(uids, uid_encrypted):
             uid_from_signing = enc_uid[0]
             signed_uid = enc_uid[1]
@@ -266,35 +310,47 @@ class TestSignAndEncrypt:
 
             # Decrypt...
             from monkeysign.gpg import Keyring
+            # We sent back the key to the key-sending side
             kr = Keyring(homedir=self.sender_homedir)
             log.info("encrypted UID: %r", enc_uid)
             decrypted = kr.decrypt_data(signed_uid)
+            log.info("ctx out: %r", kr.context.stdout)
+            log.info("ctx err: %r", kr.context.stderr)
+            assert_true (decrypted, "Error decrypting %r" % signed_uid)
 
             # Now we have the signed UID. We want see if it really carries a signature.
-            from tempfile import mkdtemp
-            current_uid = plain_uid.uid
-            # This is a bit dirty. We should probably rather single out the UID.
-            # Right now we're calling list-sigs on the proper keyring.
-            # The output includes all UIDs and their signatures.
-            # We may get a minimized version from the sign_and_encrypt call.
-            # Or only email addresses but not photo UIDs.
-            # Currently this tests simply checks for the number of signature on a key.
-            # And we expect more after the signing process.
-            # But our test is not reliable because the result of sign_and_encrypt
-            # may be smaller due to, e.g. the photo UIDs mentioned above.
-            kr.context.call_command(b'--list-sigs', current_uid)
-            stdout_before = kr.context.stdout
-            log.debug('Sigs before: %s', stdout_before)
-            after_dir = mkdtemp()
-            kr_after = Keyring(after_dir)
-            kr_after.import_data(decrypted)
-            kr_after.context.call_command('--list-sigs')
-            stdout_after = kr_after.context.stdout
-            log.debug('Sigs after: %s', stdout_after)
-
-            assert_less(len(stdout_before), len(stdout_after))
+            pgpykeys = pgpy.PGPKey.from_blob(decrypted)
+            log.info("Loaded Signed Keys: %r", pgpykeys)
+            k = pgpykeys[0]
+            # assert_equal(uid_from_signing, k.userids[0])
+            assert_equal(len(k.userids), 1)
+            uid = k.userids[0]
+            uidstr = u"{}".format(uid)
+            assert_in(uidstr, signatures_before)
+            # Now we have the signed UID. We want see if it really carries a signature.
+            signatures_after[uidstr] = uid._signatures
+            assert_less(len(signatures_before[uidstr]), len(signatures_after[uidstr]))
 
 
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
 class TestLatin1(TestSignAndEncrypt):
     SENDER_KEY = "seckey-latin1.asc"
     RECEIVER_KEY = "seckey-2.asc"
+
+
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
+class TestColon(TestSignAndEncrypt):
+    SENDER_KEY = "seckey-colon.asc"
+    RECEIVER_KEY = "seckey-2.asc"
+
+
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
+class TestMultipleUID(TestSignAndEncrypt):
+    SENDER_KEY = "seckey-multiple-uid-colon.asc"
+    RECEIVER_KEY = "seckey-2.asc"
+
+
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
+class TestUtf8(TestSignAndEncrypt):
+    SENDER_KEY = "seckey-utf8.asc"
+    RECEIVER_KEY = "seckey-utf8-2.asc"

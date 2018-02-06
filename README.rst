@@ -64,9 +64,13 @@ For example you can install it with:
 Debian and Ubuntu dependencies
 ------------------------------
 
-This list of packages seems to make it work:
+Some versions of Debian/Ubuntu have `packaged the application <https://packages.debian.org/gnome-keysign>`_
+so it should be easy for you to install it.
 
-    python  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad gstreamer1.0-plugins-good python-gi-cairo python-future
+If your version is older than that,
+this list of packages seems to make it work:
+
+    python  python-lxml  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad gstreamer1.0-plugins-good python-gi-cairo python-future
 
 Magic Wormhole can be installed with pip:
 
@@ -91,7 +95,7 @@ assuming that pip and git are already installed:
 
 .. code::
 
-    sudo dnf install -y python-gobject python-avahi dbus-python gstreamer1-plugins-bad-free-extras gstreamer1-plugins-good  gnupg
+    sudo dnf install -y python-lxml python-gobject python-avahi dbus-python gstreamer1-plugins-bad-free-gtk gstreamer1-plugins-good  gnupg
     pip install magic-wormhole
 
 As optional:

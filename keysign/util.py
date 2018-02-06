@@ -17,10 +17,12 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 
+import dbus
+import hashlib
 import hmac
 import json
 import logging
-import dbus
+import requests
 from subprocess import call
 from string import Template
 from tempfile import NamedTemporaryFile
@@ -43,9 +45,11 @@ log = logging.getLogger(__name__)
 
 
 def mac_generate(key, data):
-    mac = hmac.new(key, data).hexdigest().upper()
+    mac = hmac.new(key, data, hashlib.sha256).hexdigest().upper()
     log.info("MAC of %r is %r", data[:20], mac[:20])
-    return mac
+    # Arbitrary truncation to avoid a QR code size increase
+    return mac[:20]
+
 
 def mac_verify(key, data, mac):
     computed_mac = mac_generate(key, data)
@@ -122,9 +126,9 @@ def sign_keydata_and_send(keydata, error_cb=None):
     # and spawn an email client.
     log.info("About to create signatures for key with fpr %r", fingerprint)
     for uid, encrypted_key in list(sign_keydata_and_encrypt(keydata, error_cb)):
-            log.info("formatting UID: %r", uid)
-            # We expect uid.uid to be bytes rather than a string
-            uid_str = uid.uid.decode('utf-8', 'replace')
+            log.info("Using UID: %r", uid)
+            # We expect uid.uid to be a consumable string
+            uid_str = uid.uid
             ctx = {
                 'uid' : uid_str,
                 'fingerprint': fingerprint,
@@ -282,3 +286,15 @@ def get_local_bt_address(hci_number=0):
     adapter = dbus.Interface(bus.get_object("org.bluez", "/org/bluez/hci%i" % hci_number),
                              "org.freedesktop.DBus.Properties")
     return adapter.Get("org.bluez.Adapter1", "Address")
+
+
+def is_bt_available(hci_number=0):
+    """If the bluez object is available it means that there is a working Bluetooth"""
+    bus = dbus.SystemBus()
+    try:
+        dbus.Interface(bus.get_object("org.bluez", "/org/bluez/hci%i" % hci_number),
+                             "org.freedesktop.DBus.Properties")
+        return True
+    except dbus.exceptions.DBusException as e:
+        log.debug("Bluetooth is not available: %s", e)
+        return False

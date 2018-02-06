@@ -20,6 +20,9 @@ class Discover:
         # if the userdata is a qr code we extract the wormhole and bluetooth codes
         self.worm_code = parse_barcode(userdata).get("WORM", [None])[0]
         self.bt_code = parse_barcode(userdata).get("BT", [None])[0]
+        self.bt_port = parse_barcode(userdata).get("PT", [None])[0]
+        if self.bt_port:
+            self.bt_port = int(self.bt_port)
         self.mac = parse_barcode(userdata).get("MAC", [None])[0]
         # check if userdata is a valid wormhole code
         if is_code_complete(userdata):
@@ -47,7 +50,7 @@ class Discover:
         if self.bt_code and BluetoothReceive and not self.stopped:
             # We try Bluetooth, if we have it
             log.info("Trying to connect to %s with Bluetooth", self.bt_code)
-            self.bt = BluetoothReceive()
+            self.bt = BluetoothReceive(self.bt_port)
             msg_tuple = yield self.bt.find_key(self.bt_code, self.mac)
             key_data, success, message = msg_tuple
             if key_data:

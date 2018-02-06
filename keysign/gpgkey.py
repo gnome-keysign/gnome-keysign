@@ -23,6 +23,22 @@ import warnings
 
 log = logging.getLogger(__name__)
 
+
+def to_valid_utf8_string(s, errors='replace', replacement='?'):
+    """Takes a string and returns a valid utf8 encodable string
+
+    Not every Python string is utf-8 encodable.
+    Take 'fo\udcf6e\udce9ba <foo@bma.d>' for example.
+    This function replaces undecodable characters with a '?'
+    """
+    try:
+        safe = s.encode('utf-8', errors=errors).decode('utf-8', errors=errors)
+    except UnicodeDecodeError:
+        # This is the Python 2 way...
+        safe = s.decode('utf-8', errors=errors).replace(u"\uFFFD", replacement)
+    return safe
+
+
 def parse_uid(uid, errors='replace'):
     """Parses a GnuPG UID into it's name, comment, and email component
     
@@ -113,7 +129,7 @@ class Key(namedtuple("Key", ["expiry", "fingerprint", "uidslist"])):
 
     @classmethod
     def from_gpgme(cls, key):
-        "Creates a new Key from an existing monkeysign key"
+        "Creates a new Key from an existing gpgme key"
         uids = [UID.from_gpgme(uid) for uid in  key.uids]
         expiry = parse_expiry(key.subkeys[0].expires)
         fingerprint = key.fpr
@@ -130,23 +146,32 @@ class UID(namedtuple("UID", "expiry uid name comment email")):
         # We expect to get raw bytes.
         # While RFC4880 demands UTF-8 encoded data,
         # real-life has produced non UTF-8 keys...
-        rawuid = uid.uid
+        rawuid = to_valid_utf8_string(uid.uid).encode('utf-8')
         log.debug("UidStr (%d): %r", len(rawuid), rawuid)
         name, comment, email = parse_uid(rawuid)
         expiry = parse_expiry(uid.expire)
 
-        return cls(expiry, rawuid, name, comment, email)
+        return cls(expiry, rawuid.decode('utf-8'),
+                   name, comment, email)
 
     @classmethod
     def from_gpgme(cls, uid):
-        "Creates a new UID from a monkeysign key"
+        "Creates a new UID from a gpgme UID"
         # Weird. I would expect the uid to be raw bytes,
         # because how would gpgme know what encoding to apply?
         # Also, you can have invalid encodings.
-        rawuid = uid.uid.encode('utf-8', 'replace')
-        name = uid.name
+        # Turns out, that Python strings can be encoded according to PEP 383
+        # which basically encodes invalid bytes as 0xDC80 + byte.
+        # That's the "surrogateescape" error handler available in Python 3.
+        # Here, we don't care about that, though. We are in the user facing
+        # abstraction for a UID. As such, we ensure that it can be rendered.
+        # So we take the string we get from gpgme and try to convert it to
+        # to utf-8 bytes.
+        log.debug("UID from gpgme: %r", uid.uid)
+        rawuid = to_valid_utf8_string(uid.uid)
+        name = to_valid_utf8_string(uid.name)
         comment = '' # FIXME: uid.comment
-        email = uid.email
+        email = to_valid_utf8_string(uid.email)
         expiry = None  #  FIXME: Maybe UIDs don't expire themselves but via the binding signature
 
         return cls(expiry, rawuid, name, comment, email)

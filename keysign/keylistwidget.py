@@ -22,6 +22,7 @@ if  __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 from .gpgmh import get_usable_keys
+from .i18n import _
 from .util import glib_markup_escape_rencoded_text, fix_infobar
 
 log = logging.getLogger(__name__)
@@ -37,6 +38,22 @@ class ListBoxRowWithKey(Gtk.ListBoxRow):
         label = Gtk.Label(s, use_markup=True, xalign=0)
         self.add(label)
 
+    @staticmethod
+    def glib_markup_escape_text_to_text(s):
+        """A helper function to return the text type
+        markup_escape_text returns a "str" which is
+        a binary type in python2.
+        This function tries to decode the returned
+        str object.  It will fail in Python3.
+        """
+        m = GLib.markup_escape_text(s)
+        try:
+            ret = m.decode('utf-8')
+        except AttributeError:
+            # We are in Python3 land. All is fine.
+            ret = m
+        return ret
+        
 
     @classmethod
     def format_uid(cls, uid):
@@ -48,7 +65,7 @@ class ListBoxRowWithKey(Gtk.ListBoxRow):
                           for k in items}
         log.info("format dicT: %r", format_dict)
         d = {k: (log.debug("handling kv: %r %r", k, v),
-                  glib_markup_escape_rencoded_text(
+                  cls.glib_markup_escape_text_to_text(
                     "{}".format(v)))[1]
              for k, v in format_dict.items()}
         log.info("Formatting UID %r", d)
@@ -63,7 +80,7 @@ class ListBoxRowWithKey(Gtk.ListBoxRow):
         fmt  = "{created} "
         fmt  = "<b>{fingerprint}</b>\n"
         fmt += "\n".join((cls.format_uid(uid) for uid in key.uidslist))
-        fmt += "\n<small>Expires {expiry}</small>"
+        fmt += "\n<small>" + _("Expires: ") + " {expiry}</small>"
 
         d = {k: GLib.markup_escape_text("{}".format(v))
              for k,v in key._asdict().items()}

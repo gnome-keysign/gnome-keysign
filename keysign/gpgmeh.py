@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 
 import logging
 import os  # The SigningKeyring uses os.symlink for the agent
+from subprocess import check_output
 import sys
 from tempfile import mkdtemp
 
@@ -101,6 +102,7 @@ def del_uids(uids):
 
 def sign_key(uid=0, sign_cmd=u"sign", expire=False, check=3,
              error_cb=None):
+    log.info("Signing key uid %r", uid)
     status, prompt = yield None
     assert status == gpg.constants.STATUS_GET_LINE
     assert prompt == u"keyedit.prompt"
@@ -125,9 +127,9 @@ def sign_key(uid=0, sign_cmd=u"sign", expire=False, check=3,
             status, prompt = yield '%d' % check
         elif prompt == 'sign_uid.okay':
             status, prompt = yield 'Y'
-        elif status == gpg.constants.STATUS_INV_SGNR:
+        #elif status == gpg.constants.STATUS_INV_SGNR:
             # When does this actually happen?
-            status, prompt = yield None
+        #    status, prompt = yield None
         elif status == gpg.constants.STATUS_PINENTRY_LAUNCHED:
             status, prompt = yield None
         elif status == gpg.constants.STATUS_GOT_IT:
@@ -236,10 +238,23 @@ class TempContext(DirectoryContext):
         except:
             log.exception("During cleanup of %r", self.homedir)
 
+def get_agent_socket_path_for_homedir(homedir):
+	cmd = ["gpgconf",
+	       "--homedir", homedir,
+	       "--list-dirs", "agent-socket"]
+	path = check_output(cmd).strip()
+	log.info("Path for %r: %r", homedir, path)
+	return path
+
+
 class TempContextWithAgent(TempContext):
     def __init__(self, oldctx):
         super(TempContextWithAgent, self).__init__()
         homedir = self.homedir
+        log.info("new homedir: %r", homedir)
+        assert (len(list(self.keylist())) == 0)
+        assert (len(list(self.keylist(secret=True))) == 0)
+
 
         if oldctx:
             old_homedir = oldctx.engine_info.home_dir
@@ -249,14 +264,17 @@ class TempContextWithAgent(TempContext):
             old_homedir = os.path.join(os.path.expanduser("~"), ".gnupg")
 
         log.info("Old homedir: %r", old_homedir)
-        old_agent_path = os.path.expanduser(os.path.join(old_homedir, "S.gpg-agent"))
-        new_agent_path = os.path.expanduser(os.path.join(homedir, "S.gpg-agent"))
+        old_agent_path = get_agent_socket_path_for_homedir(old_homedir)
+        new_agent_path = get_agent_socket_path_for_homedir(homedir)
         os.symlink(old_agent_path, new_agent_path)
 
         assert len(list(self.keylist())) == 0
+        assert len(list(self.keylist(secret=True))) == 0
 
         secret_keys = list(oldctx.keylist(secret=True))
+        log.info("old secret keys: %r", secret_keys)
         for key in secret_keys:
+            log.debug("Making %r known in new ctx", key)
             def export_key(fpr):
                 # FIXME: The Context should really be able to export()
                 public_key = gpg.Data()
@@ -265,9 +283,22 @@ class TempContextWithAgent(TempContext):
                 return public_key
             keydata = export_key(key.subkeys[0].fpr)
             self.op_import(keydata)
-            # FIXME: I guess we should assert on the result
+            result = self.op_import_result()
+            # Hrm. Only gpgme>=1.9 has a repr for the result, I think
+            log.debug("Import result: %r", result)
+            log.debug("Import result imports: %r", result.imports)
+            log.debug("Import result considered: %r", result.considered)
+            assert len(result.imports) >= 1
+            i = result.imports[0]
+            # 0 is success, I guess.
+            assert i.result == 0
+            log.debug("Import result i result status: %r %r %r", i.result, i.status, i.fpr)
+            log.debug("Import result GPGME_IMPORT_NEW: %r", i.status & gpg.constants.IMPORT_NEW)
+
 
         assert len(list(self.keylist())) == len(secret_keys)
+        log.info("new secret keys: %r", list(self.keylist(secret=True)))
+        assert len(secret_keys) == len(list(self.keylist(secret=True)))
 
 
 
@@ -366,6 +397,7 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
     # We're trying to sign with all available secret keys
     available_secret_keys = [key for key in ctx.keylist(secret=True)
         if not key.disabled or key.revoked or key.invalid or key.expired]
+    log.debug('Setting available sec keys to: %r', available_secret_keys)
     ctx.signers = available_secret_keys
 
     ctx.op_import(minimise_key(keydata))
@@ -381,7 +413,7 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
         # There is op_keysign, but it's only available with gpg 2.1.12
         ctx.interact(key, GenEdit(sign_key(error_cb=error_cb)).edit_cb, sink=sink)
         sink.seek(0, 0)
-        log.debug("Sink after signing: %s", sink.read())
+        log.debug("Sink after signing: %r", sink.read())
 
         signed_sink = gpg.Data()
         ctx.set_keylist_mode(gpg.constants.KEYLIST_MODE_SIGS)

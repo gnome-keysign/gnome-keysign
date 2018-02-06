@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-"""We want our customs UID wrapper to return raw bytes for the raw UID
-but decoded strings for email, name, and comment component.
+"""We want our custom UID wrapper to return encodable and displayable
+strings, rather than raw bytes, for the raw UID, email, name,
+and comment component.
 """
 from __future__ import unicode_literals
 
@@ -25,18 +26,18 @@ class FakeMKSUID:
 def test_mks_utf8_uid():
     "The normal case"
     uid = FakeMKSUID()
-    uid.uid = b'foo bar <foo@bar.com>'
+    uid.uid = 'foo bar <foo@bar.com>'
     u = gpgkey.UID.from_monkeysign(uid)
     assert_string(u.name)
     assert_string(u.comment)
     assert_string(u.email)
-    assert_bytes(u.uid)
+    assert_string(u.uid)
 
 def test_mks_latin_uid():
     uid = FakeMKSUID()
-    uid.uid = b"fo\xf6\x65\xe9\x62a"
+    uid.uid = 'fo\udcf6e\udce9ba <foo@bma.d>'
     u = gpgkey.UID.from_monkeysign(uid)
     assert_string(u.name)
     assert_string(u.comment)
     assert_string(u.email)
-    assert_bytes(u.uid)
+    assert_string(u.uid)
