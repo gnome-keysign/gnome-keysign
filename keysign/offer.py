@@ -19,23 +19,26 @@ class Offer:
         self.w_offer = None
         self.a_offer = None
         self.bt_offer = None
-        self.b_data = ""
+        self.b_data = None
 
     @inlineCallbacks
     def allocate_code(self, worm=True):
         self.a_offer = AvahiHTTPOffer(self.key)
         a_info = self.a_offer.start()
         code, a_data = a_info
+        discovery_data = [a_data]
         if worm:
             self.w_offer = WormholeOffer(self.key)
             w_info = yield self.w_offer.allocate_code()
             code, w_data = w_info
-        else:
-            w_data = ""
+            if w_data:
+                discovery_data.append(w_data)
         if BluetoothOffer:
             self.bt_offer = BluetoothOffer(self.key)
-            _, self.b_data = self.bt_offer.allocate_code()
-        discovery_data = a_data + ";" + w_data + ";" + self.b_data
+            self.b_data = self.bt_offer.allocate_code()
+            if self.b_data:
+                discovery_data.append(self.b_data)
+        discovery_data = ";".join(discovery_data)
         # As design when we use both avahi and wormhole we only display
         # the wormhole code
         returnValue((code, discovery_data))
@@ -49,7 +52,7 @@ class Offer:
             d.append(w_d)
         # If we have a Bluetooth code, so if the Bluetooth has been
         # correctly initialized
-        if self.b_data == "":
+        if not self.b_data:
             log.info("Bluetooth as been skipped")
         else:
             bt_d = self.bt_offer.start()
