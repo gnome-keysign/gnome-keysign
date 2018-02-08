@@ -37,7 +37,7 @@
                     "PYTHONUSERBASE" : "/app"
                 }
             },
-            "ensure-writable": ["easy-install.pth"],
+            "ensure-writable": ["easy-install.pth", "setuptools.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -68,7 +68,7 @@
                     "PYTHONUSERBASE" : "/app"
                 }
             },
-            "ensure-writable": ["easy-install.pth"],
+            "ensure-writable": ["easy-install.pth", "setuptools.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -94,7 +94,7 @@
         {
             "name": "pycairo",
             "buildsystem": "simple",
-            "ensure-writable": ["easy-install.pth"],
+            "ensure-writable": ["easy-install.pth", "setuptools.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -114,7 +114,7 @@
                     "PYTHONUSERBASE" : "/app"
                 }
             },
-            "ensure-writable": ["easy-install.pth"],
+            "ensure-writable": ["easy-install.pth", "setuptools.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -142,7 +142,7 @@
                     "PYTHON": "python2"
                 }
             },
-            "ensure-writable": ["easy-install.pth"],
+            "ensure-writable": ["easy-install.pth", "setuptools.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -166,7 +166,7 @@
         },
         {
             "name": "dbus-python",
-            "ensure-writable": ["easy-install.pth"],
+            "ensure-writable": ["easy-install.pth", "setuptools.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -195,7 +195,7 @@
                 "--disable-pygtk",
                 "--disable-gdbm"
             ],
-            "ensure-writable": ["easy-install.pth"],
+            "ensure-writable": ["easy-install.pth", "setuptools.pth"],
             "_cleanup": [ "*" ],
             "sources": [
                 {
@@ -320,7 +320,7 @@
         {
             "name": "gst-python",
             "config-opts": ["--with-pygi-overrides-dir=/app/lib/python3.4/site-packages/gi/overrides/"],
-            "ensure-writable": ["easy-install.pth"],
+            "ensure-writable": ["easy-install.pth", "setuptools.pth"],
             "sources": [
                 {
                     "_type": "git",
@@ -343,7 +343,7 @@
                     "PYTHONUSERBASE" : "/app"
                 }
             },
-            "ensure-writable": ["easy-install.pth"],
+            "ensure-writable": ["easy-install.pth", "setuptools.pth"],
             "sources": [
                 {
                     "type": "file",
@@ -364,7 +364,7 @@
             "build-commands": [
                 "pip2 install --prefix=/app Babel-2.4.0-py2.py3-none-any.whl"
             ],
-            "ensure-writable": ["easy-install.pth"],
+            "ensure-writable": ["easy-install.pth", "setuptools.pth"],
             "sources": [
                 {
                     "type": "file",
@@ -381,7 +381,7 @@
                     "PYTHONUSERBASE" : "/app"
                 }
             },
-            "ensure-writable": ["easy-install.pth"],
+            "ensure-writable": ["easy-install.pth", "setuptools.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -420,7 +420,7 @@
                     "PYTHONUSERBASE" : "/app"
                 }
             },
-            "ensure-writable": ["easy-install.pth"],
+            "ensure-writable": ["easy-install.pth", "setuptools.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -448,7 +448,7 @@
                     "PYTHONUSERBASE" : "/app"
                 }
             },
-            "ensure-writable": ["easy-install.pth"],
+            "ensure-writable": ["easy-install.pth", "setuptools.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -476,7 +476,7 @@
                     "PYTHONUSERBASE" : "/app"
                 }
             },
-            "ensure-writable": ["easy-install.pth"],
+            "ensure-writable": ["easy-install.pth", "setuptools.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -540,7 +540,7 @@
                     "PYTHONUSERBASE" : "/app"
                 }
             },
-            "ensure-writable": ["easy-install.pth"],
+            "ensure-writable": ["easy-install.pth", "setuptools.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -610,7 +610,7 @@
                     "PYTHONUSERBASE": "/app"
                 }
             },
-            "ensure-writable": ["easy-install.pth"],
+            "ensure-writable": ["easy-install.pth", "setuptools.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -638,7 +638,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
-                    "ensure-writable": ["easy-install.pth"],
+                    "ensure-writable": ["easy-install.pth", "setuptools.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -666,7 +666,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
-                    "ensure-writable": ["easy-install.pth"],
+                    "ensure-writable": ["easy-install.pth", "setuptools.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -694,7 +694,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
-                    "ensure-writable": ["easy-install.pth"],
+                    "ensure-writable": ["easy-install.pth", "setuptools.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -722,7 +722,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
-                    "ensure-writable": ["easy-install.pth"],
+                    "ensure-writable": ["easy-install.pth", "setuptools.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -750,7 +750,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
-                    "ensure-writable": ["easy-install.pth"],
+                    "ensure-writable": ["easy-install.pth", "setuptools.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -778,7 +778,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
-                    "ensure-writable": ["easy-install.pth"],
+                    "ensure-writable": ["easy-install.pth", "setuptools.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -806,7 +806,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
-                    "ensure-writable": ["easy-install.pth"],
+                    "ensure-writable": ["easy-install.pth", "setuptools.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -834,7 +834,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
-                    "ensure-writable": ["easy-install.pth"],
+                    "ensure-writable": ["easy-install.pth", "setuptools.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -862,7 +862,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
-                    "ensure-writable": ["easy-install.pth"],
+                    "ensure-writable": ["easy-install.pth", "setuptools.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -890,7 +890,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
-                    "ensure-writable": ["easy-install.pth"],
+                    "ensure-writable": ["easy-install.pth", "setuptools.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -921,7 +921,7 @@
                     "XSLT_CONFIG": "pkg-config libxslt"
                 }
             },
-            "ensure-writable": ["easy-install.pth"],
+            "ensure-writable": ["easy-install.pth", "setuptools.pth"],
             "sources": [
                 {
                     "type": "archive",
