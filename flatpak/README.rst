@@ -30,14 +30,26 @@ To create a bundle file, use something like the following:
 Installation
 --------------
 
-Before you can install an application, you need to install a runtime.
-For now, we use the GNOME 3.20 runtime.
-If you haven't installed it yet, you can get it by running the following commands:
+Several options for installing a flatpaked application exist.
 
-    wget https://sdk.gnome.org/keys/gnome-sdk.gpg
-    flatpak --user remote-add --gpg-import=gnome-sdk.gpg gnome https://sdk.gnome.org/repo/
-    flatpak --user remote-add --gpg-import=gnome-sdk.gpg gnome-apps https://sdk.gnome.org/repo-apps/
-    flatpak --user install gnome org.gnome.Platform 3.20
+With a flatpakref you can have an application as well as its runtime
+installed with little effort.
+
+    flatpak install --from https://muelli.cryptobitch.de/tmp/2017-01-29-keysign.flatpakref
+
+
+If that does not work or you would like to install the application manually,
+e.g. because you want to install a particular version,
+you need to install a runtime first.
+We use a GNOME runtime which you can get from Flathub.
+In order to add flathub to your repositories, you can execute the following:
+
+    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+
+Then you can try to install the runtime with the following command:
+
+    flatpak --user install --runtime flathub org.gnome.Platform//3.26
+
 
 
 Then, if you have a bundle file of GNOME Keysign, you can do
