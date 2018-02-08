@@ -534,34 +534,6 @@
             ]
         },
         {
-            "name": "gpg",
-            "build-options": {
-                "env": {
-                    "PYTHONUSERBASE" : "/app"
-                }
-            },
-            "ensure-writable": ["easy-install.pth", "setuptools.pth"],
-            "sources": [
-                {
-                    "type": "archive",
-                    "url": "https://pypi.python.org/packages/9f/46/4f6b63d1b5b82bac52b5b7723df8cd66a4864dc29861aa14d2d2de4a57f5/gpg-1.8.0.tar.gz",
-                    "sha256": "cd26e8a77c907e0d9f14a627bf71729456fd26aa2d1f4d275b808d70b089e4f4"
-                },
-                {
-                    "type": "script",
-                    "dest-filename": "configure",
-                    "commands": [
-                        "echo   just so that a configure file exists"
-                    ]
-                },
-                {
-                    "type": "file",
-                    "path": "pip-Makefile",
-                    "dest-filename": "Makefile"
-                }
-            ]
-        },
-        {
             "name": "gnupg",
             "sources": [
                 {
