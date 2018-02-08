@@ -262,7 +262,7 @@ setup(
         # I think we are only 2.7 compatible
         'Programming Language :: Python :: 2.7',
         # We're still lacking support for 3
-        #'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3',
 
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
