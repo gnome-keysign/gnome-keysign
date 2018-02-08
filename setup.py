@@ -127,7 +127,7 @@ class BuildWithCompile(build):
     sub_commands = [('compile_catalog', None)] + build.sub_commands
 
     def run(self):
-        translate_desktop_file('data/org.gnomeKeysign.raw.desktop', 'data/org.gnome.Keysign.desktop', 'keysign/locale')
+        translate_desktop_file('data/org.gnome.Keysign.raw.desktop', 'data/org.gnome.Keysign.desktop', 'keysign/locale')
         translate_appdata_file('data/org.gnome.Keysign.raw.appdata.xml', 'data/org.gnome.Keysign.appdata.xml', 'keysign/locale')
         build.run(self)
 
