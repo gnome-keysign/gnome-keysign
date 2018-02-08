@@ -37,6 +37,7 @@
                     "PYTHONUSERBASE" : "/app"
                 }
             },
+            "ensure-writable": ["easy-install.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -67,6 +68,7 @@
                     "PYTHONUSERBASE" : "/app"
                 }
             },
+            "ensure-writable": ["easy-install.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -112,6 +114,7 @@
                     "PYTHONUSERBASE" : "/app"
                 }
             },
+            "ensure-writable": ["easy-install.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -139,6 +142,7 @@
                     "PYTHON": "python2"
                 }
             },
+            "ensure-writable": ["easy-install.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -316,6 +320,7 @@
         {
             "name": "gst-python",
             "config-opts": ["--with-pygi-overrides-dir=/app/lib/python3.4/site-packages/gi/overrides/"],
+            "ensure-writable": ["easy-install.pth"],
             "sources": [
                 {
                     "_type": "git",
@@ -443,6 +448,7 @@
                     "PYTHONUSERBASE" : "/app"
                 }
             },
+            "ensure-writable": ["easy-install.pth"],
             "sources": [
                 {
                     "type": "archive",
@@ -772,6 +778,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
+                    "ensure-writable": ["easy-install.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -799,6 +806,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
+                    "ensure-writable": ["easy-install.pth"],
                     "sources": [
                         {
                             "type": "archive",
@@ -854,6 +862,7 @@
                             "PYTHONUSERBASE": "/app"
                         }
                     },
+                    "ensure-writable": ["easy-install.pth"],
                     "sources": [
                         {
                             "type": "archive",
