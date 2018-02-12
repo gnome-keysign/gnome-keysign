@@ -239,12 +239,12 @@ class TempContext(DirectoryContext):
             log.exception("During cleanup of %r", self.homedir)
 
 def get_agent_socket_path_for_homedir(homedir):
-	cmd = ["gpgconf",
-	       "--homedir", homedir,
-	       "--list-dirs", "agent-socket"]
-	path = check_output(cmd).strip()
-	log.info("Path for %r: %r", homedir, path)
-	return path
+    homedir_cmd = ["--homedir", homedir] if homedir else []
+    cmd = ["gpgconf"] + homedir_cmd + \
+          ["--list-dirs", "agent-socket"]
+    path = check_output(cmd).strip()
+    log.info("Path for %r: %r", homedir, path)
+    return path
 
 
 class TempContextWithAgent(TempContext):
@@ -256,12 +256,7 @@ class TempContextWithAgent(TempContext):
         assert (len(list(self.keylist(secret=True))) == 0)
 
 
-        if oldctx:
-            old_homedir = oldctx.engine_info.home_dir
-            if not old_homedir:
-                old_homedir = os.path.join(os.path.expanduser("~"), ".gnupg")
-        else:
-            old_homedir = os.path.join(os.path.expanduser("~"), ".gnupg")
+        old_homedir = oldctx.engine_info.home_dir if oldctx else None
 
         log.info("Old homedir: %r", old_homedir)
         old_agent_path = get_agent_socket_path_for_homedir(old_homedir)
