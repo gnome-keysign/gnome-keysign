@@ -75,6 +75,9 @@ def email_file(to, from_=None, subject=None,
     for file_ in files or []:
         cmd += ['--attach', file_]
 
+    if not to:
+        log.error("email_file: We are seeing an empty 'to': %r", to)
+
     cmd += [to]
 
     log.info("Running %s", cmd)
