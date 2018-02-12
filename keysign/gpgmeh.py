@@ -127,9 +127,17 @@ def sign_key(uid=0, sign_cmd=u"sign", expire=False, check=3,
             status, prompt = yield '%d' % check
         elif prompt == 'sign_uid.okay':
             status, prompt = yield 'Y'
-        #elif status == gpg.constants.STATUS_INV_SGNR:
-            # When does this actually happen?
-        #    status, prompt = yield None
+        elif status == gpg.constants.STATUS_INV_SGNR:
+            # seems to happen if you have an expired
+            # (or otherwise unsuable) signing key.
+            # The CONSIDERED line should have been issued
+            # with details.
+            # We don't maintain that state at the moment which is
+            # a bit unfortunate as we cannot properly detect
+            # when we have no usable key at all rather than
+            # one key being expired.
+            log.warn("INV_SGNR: %r", prompt)
+            status, prompt = yield None
         elif status == gpg.constants.STATUS_PINENTRY_LAUNCHED:
             status, prompt = yield None
         elif status == gpg.constants.STATUS_GOT_IT:
