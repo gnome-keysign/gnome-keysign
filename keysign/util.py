@@ -171,17 +171,24 @@ def _fix_path_flatpak(files):
 
 
 def send_email(to, subject=None, body=None, files=None):
-    """Tries to send the email using firstly the portal, then the mailto
-    uri and as a last attempt the xdg-email"""
+    """Tries to send the email using firstly the portal, then the xdg-email
+    and as a last attempt the mailto uri"""
     if _using_flatpak():
         files = _fix_path_flatpak(files)
 
     if _email_portal(to, subject, body, files):
         return
-    elif _email_mailto(to, subject, body, files):
-        return
-    else:
+
+    try:
         _email_file(to=to, subject=subject, body=body, files=files)
+        return
+    except FileNotFoundError:
+        log.debug("xdg-email is not available")
+
+    if _email_mailto(to, subject, body, files):
+        return
+
+    log.error("An error occurred trying to compose the email")
 
 
 SUBJECT = 'Your signed key $fingerprint'
