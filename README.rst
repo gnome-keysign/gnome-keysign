@@ -59,7 +59,7 @@ so it should be easy for you to install it.
 If your version is older than that,
 this list of packages seems to make it work:
 
-    python  python-lxml  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad gstreamer1.0-plugins-good python-gi-cairo python-gpg
+    python  python-lxml  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad gstreamer1.0-plugins-good python-gi-cairo python-gpg twisted zope
 
 In Ubuntu, the package
 gstreamer1.0-plugins-bad provides the zbar and the gtksink element, and
