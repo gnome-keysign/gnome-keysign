@@ -12,6 +12,7 @@ pytest
 pytest-xdist
 pylint
 pep8
+twisted 
 
 # Distribution packages
 # python2
