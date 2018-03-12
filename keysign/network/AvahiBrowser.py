@@ -19,7 +19,11 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import print_function
 import avahi, dbus
-from dbus import DBusException
+try:
+    from dbus import DBusException
+    import dbus.glib
+except ImportError as e:
+	pass
 from dbus.mainloop.glib import DBusGMainLoop
 
 from gi.repository import Gio
