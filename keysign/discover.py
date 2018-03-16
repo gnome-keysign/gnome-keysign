@@ -42,11 +42,11 @@ class Discover:
         if self.bt_code and not self.stopped:
             # We try Bluetooth, if we have it
             log.info("Trying to connect to %s with Bluetooth", self.bt_code)
-            try:
-                if self.bt is not None:
-                   self.bt = BluetoothReceive(self.bt_port)
-             except ImportError:
-                print("You are probably missing pybuez ")
+            if self.bt is not None:
+                try:
+                    self.bt = BluetoothReceive(self.bt_port)
+                except ImportError:
+                    print("You are probably missing pybuez ")
             msg_tuple = yield self.bt.find_key(self.bt_code, self.mac)
             key_data, success, message = msg_tuple
             if key_data:
