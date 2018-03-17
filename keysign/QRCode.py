@@ -74,7 +74,6 @@ class QRImage(Gtk.DrawingArea):
             self.add_events(
                 Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.BUTTON_PRESS_MASK)
 
-
     def on_button_released(self, widget, event):
         self.log.info('Event %s', dir(event))
         if event.button == 1:
@@ -82,7 +81,6 @@ class QRImage(Gtk.DrawingArea):
             top_level_window = self.get_toplevel()
             if top_level_window.is_toplevel():
                 w.set_transient_for(top_level_window)
-
 
     def do_size_allocate(self, event):
         """This is the event handler for the resizing event, i.e.
@@ -196,7 +194,6 @@ class QRImage(Gtk.DrawingArea):
 
     data = GObject.property(getter=get_data, setter=set_data)
 
-
 def fullscreen_at_monitor(window, n):
     """Fullscreens a given window on the n-th monitor
 
@@ -213,7 +210,6 @@ def fullscreen_at_monitor(window, n):
     window.move(x,y)
 
     window.fullscreen()
-
 
 class FullscreenQRImageWindow(Gtk.Window):
     '''Displays a QRImage in a fullscreen window
