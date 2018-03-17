@@ -49,8 +49,8 @@ class Discover:
                 if key_data:
                 # If we found the key
                     returnValue((key_data, success, message))
-            
-    log.info("PyBluez is probably missing.")
+            else:
+                log.info("PyBluez is probably missing.")
     key_data = None
     success = False
     message = ""
