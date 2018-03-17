@@ -42,14 +42,16 @@ class Discover:
         if self.bt_code and not self.stopped:
             # We try Bluetooth, if we have it
             log.info("Trying to connect to %s with Bluetooth", self.bt_code)
-            if BluetoothReceive is not None:
+            # We try to see if Bluetooth was imported,
+            # else we log an event of missing Pybluez.
+            try:
                 self.bt = BluetoothReceive(self.bt_port)
                 msg_tuple = yield self.bt.find_key(self.bt_code, self.mac)
                 key_data, success, message = msg_tuple
                 if key_data:
-                # If we found the key
+                    # If we found the key
                     returnValue((key_data, success, message))
-            else:
+            except:
                 log.info("PyBluez is probably missing.")
         key_data = None
         success = False
