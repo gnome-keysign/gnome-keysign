@@ -20,6 +20,7 @@ import logging
 
 import gi
 gi.require_version('Gtk', '3.0')
+gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk, Gtk, GObject
 import qrcode
 
@@ -39,19 +40,19 @@ class QRImage(Gtk.DrawingArea):
     """An Image encoding data as a QR Code.
     The image tries to scale as big as possible.
     """
-    
+
     def __init__(self, data='Default String', handle_events=True,
                        background=0xff, *args, **kwargs):
         """The QRImage widget inherits from Gtk.Image,
         but it probably cannot be used as one, as there
         is an event handler for resizing events which will
         overwrite to currently loaded image.
-        
+
         You made set data now, or later simply via the property.
-        
+
         handle_events can be set to False if the fullscreen
         window should not be created on click.
-        
+
         The background can be set to 0x00 (or 0xff) creating a
         black (or white) background onto which the code is rendered.
         """
@@ -187,7 +188,7 @@ class QRImage(Gtk.DrawingArea):
         self.set_size_request(size, size)
 
         self.queue_draw()
-        
+
         self.set_tooltip_text(data)
 
     def get_data(self):
@@ -216,7 +217,7 @@ def fullscreen_at_monitor(window, n):
 
 class FullscreenQRImageWindow(Gtk.Window):
     '''Displays a QRImage in a fullscreen window
-    
+
     The window is supposed to close itself when a button is
     clicked.'''
 
@@ -229,11 +230,11 @@ class FullscreenQRImageWindow(Gtk.Window):
             Gtk.Window.__init__(*args, **kwargs)
 
         self.fullscreen()
-        
+
         self.qrimage = QRImage(data=data, handle_events=False)
         self.qrimage.set_has_tooltip(False)
         self.add(self.qrimage)
-        
+
         self.connect('button-release-event', self.on_button_released)
         self.connect('key-release-event', self.on_key_released)
         self.add_events(
@@ -242,7 +243,6 @@ class FullscreenQRImageWindow(Gtk.Window):
             )
 
         self.show_all()
-
 
     def on_button_released(self, widget, event):
         '''Connected to the button-release-event and closes this
@@ -288,7 +288,6 @@ class FullscreenQRImageWindow(Gtk.Window):
                 # https://bugzilla.gnome.org/show_bug.cgi?id=752677
                 # self.fullscreen_on_monitor(self.get_screen(), new_n)
 
-
 def main(data):
     w = Gtk.Window()
     w.connect("delete-event", Gtk.main_quit)
@@ -300,14 +299,14 @@ def main(data):
 
     def on_released(widget, event):
         global fullscreen
- 
+
         if event.button == 1:
             fullscreen = not fullscreen
             if fullscreen:
                 w.fullscreen()
             else:
                 w.unfullscreen()
-        
+
     #qr.connect('button-release-event', on_released)
     #qr.add_events(Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.BUTTON_PRESS_MASK)
     w.add(qr)
@@ -317,5 +316,8 @@ def main(data):
 if __name__ == '__main__':
     import sys
     logging.basicConfig(level=logging.DEBUG)
-    data = sys.argv[1]
+    try:
+        data = sys.argv[1]
+    except:
+        raise ValueError("Not Enough Arguments passed as data for the QR code encoding")
     main(data)
