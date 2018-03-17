@@ -49,12 +49,12 @@ class Discover:
                 if key_data:
                 # If we found the key
                     returnValue((key_data, success, message))
-            else:
-                log.info("PyBluez is probably missing.")
-                key_data = None
-                success = False
-                message = ""
-                returnValue((key_data, success, message))
+            
+    log.info("PyBluez is probably missing.")
+    key_data = None
+    success = False
+    message = ""
+    returnValue((key_data, success, message))
 
     def stop(self):
         self.stopped = True
