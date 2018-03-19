@@ -46,13 +46,13 @@ class Discover:
             # else we log an event of missing Pybluez.
             try:
                 self.bt = BluetoothReceive(self.bt_port)
-            except:
-                log.exception("PyBluez is probably missing.")
-            msg_tuple = yield self.bt.find_key(self.bt_code, self.mac)
-            key_data, success, message = msg_tuple
-            if key_data:
-                # If we found the key
-                returnValue((key_data, success, message))
+                msg_tuple = yield self.bt.find_key(self.bt_code, self.mac)
+                key_data, success, message = msg_tuple
+                if key_data:
+                    # If we found the key
+                    returnValue((key_data, success, message))
+            except Exception as e:
+                log.exception("An Exception Occurred: %s " % e)
         key_data = None
         success = False
         message = ""
