@@ -159,9 +159,6 @@ def _fix_path_flatpak(files):
     To be able to use the files from the host we change the path to the absolute one.
     This fix in the future may not be necessary because the portals should be able
     to automatically handle it."""
-    tmp_flat = "/tmp"
-    var_flat = "/var"
-    var_tmp_flat = "/var/tmp"
     part_1 = os.path.expanduser("~/.var/app/")
     app_id = "org.gnome.Keysign"
     part_2 = "cache/tmp/"
@@ -169,15 +166,10 @@ def _fix_path_flatpak(files):
     fixed_files = []
     if files:
         for file in files:
-            if file.startswith(tmp_flat):
-                shutil.move(file, var_flat + file)
-                fixed_files.append(flatpak_path + file[len(var_flat)+1:])
-            elif file.startswith(var_tmp_flat):
-                # This is a legacy check because in the older versions of flatpak the temp
-                # files where placed under /var/tmp/ instead of /tmp/
-                fixed_files.append(flatpak_path + file[len(tmp_flat)+1:])
-            else:
-                fixed_files.append(file)
+            base = os.path.basename(file)
+            new_path = os.path.join(flatpak_path, base)
+            shutil.move(file, new_path)
+            fixed_files.append(new_path)
     return fixed_files
 
 
