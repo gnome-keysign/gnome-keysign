@@ -49,6 +49,7 @@ class SendApp:
     call deactivate().
     """
     def __init__(self, builder=None):
+        self.stopped = True
         self.a_offer = None
         self.bt_offer = None
         self.stack = None
@@ -86,6 +87,7 @@ class SendApp:
         self.key = None
 
     def on_key_activated(self, widget, key):
+        self.stopped = False
         self.key = key
         log.info("Activated key %r", key)
         ####
@@ -116,6 +118,7 @@ class SendApp:
         self.kpw = kpw
 
     def deactivate(self):
+        self.stopped = True
         self._deactivate_offer()
 
         ####
@@ -137,8 +140,11 @@ class SendApp:
         log.debug("Stopped network services")
 
     def _restart_bluetooth(self, _):
-        log.info("Bluetooth as been restarted")
-        self.bt_offer.start().addCallback(self._restart_bluetooth)
+        # If a BT transfer ends, we need to start again the service
+        # in order to accept new connections
+        if not self.stopped:
+            log.info("Bluetooth as been restarted")
+            self.bt_offer.start().addCallback(self._restart_bluetooth)
 
 
 class App(Gtk.Application):

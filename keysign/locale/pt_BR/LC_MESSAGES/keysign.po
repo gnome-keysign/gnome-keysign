@@ -1,23 +1,63 @@
 # Portuguese (Brazil) translations for gnome-keysign.
 # Copyright (C) 2017 Tobias Mueller
-# This file is distributed under the same license as the gnome-keysign project.
+# This file is distributed under the same license as the gnome-keysign
+# project.
 # Rafael Fontenelle <rafaelff@gnome.org>, 2017.
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign 0.9.5\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2017-10-04 06:41-0300\n"
+"POT-Creation-Date: 2017-12-15 13:39+0100\n"
 "PO-Revision-Date: 2017-10-04 09:49-0300\n"
 "Last-Translator: Rafael Fontenelle <rafaelff@gnome.org>\n"
-"Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
 "Language: pt_BR\n"
+"Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Virtaal 1.0.0-beta1\n"
 "Generated-By: Babel 2.5.1\n"
-"X-Project-Style: gnome\n"
+
+#: data/gnome-keysign.raw.appdata.xml:10
+msgid ""
+"\n"
+"      GNOME-Keysign allows signing OpenPGP keys comfortably and securely\n"
+"      via the local network or Bluetooth.\n"
+"    "
+msgstr ""
+
+#: data/gnome-keysign.raw.appdata.xml:14
+msgid ""
+"\n"
+"      It can scan another key's barcode and transfer the key securely,\n"
+"      allowing for casual two-party key signing sessions.\n"
+"      It follows best practises by sending the encrypted signatures\n"
+"      to the UIDs of a key using the Email client the user configured\n"
+"      to use.\n"
+"    "
+msgstr ""
+
+#. Name
+#: data/gnome-keysign.raw.desktop:2
+msgid "Keysign"
+msgstr ""
+
+#. Comment
+#: data/gnome-keysign.raw.desktop:3
+msgid ""
+"A keysigning helper to enable you to comfortably exchange OpenPGP keys "
+"with a friend"
+msgstr ""
+
+#. Keywords
+#: data/gnome-keysign.raw.desktop:4
+msgid "python;gpg;gnupg;key;openpgp;"
+msgstr ""
+
+#. Icon
+#: data/gnome-keysign.raw.desktop:7
+msgid "gnome-keysign"
+msgstr ""
 
 #: keysign/app.py:166
 msgid "Send"
@@ -103,8 +143,8 @@ msgstr ""
 "Você pode ser capaz de ignorar esse erro e seguir usando, mas você pode "
 "obter resultados inesperados.\n"
 "\n"
-"Por favor, avise aos desenvolvedores sobre isso usando o rastreador de erros "
-"caso isso ainda não tenha sido relatado por outra pessoa."
+"Por favor, avise aos desenvolvedores sobre isso usando o rastreador de "
+"erros caso isso ainda não tenha sido relatado por outra pessoa."
 
 #: keysign/gtkexcepthook.py:187
 msgid "Search Tracker..."
@@ -190,7 +230,7 @@ msgstr "Expira: "
 msgid "Sign Key"
 msgstr "Assinar chave"
 
-#: keysign/receive.ui:56
+#: keysign/receive.ui:53
 msgid ""
 "No GNOME Keysign servers around :-(\n"
 "Find a friend to use GNOME Keysign with.\n"
@@ -201,8 +241,8 @@ msgstr ""
 "Nenhum servidor do GNOME Keysign por aí :-(\n"
 "Encontre um amigo para usar GNOME Keysign com.\n"
 "Você também pode sofrer de problemas de conectividade.\n"
-"Para mais informações, clique <a href=\""
-"https://wiki.gnome.org/Apps/Keysign/Doc/NoServers/1\">aqui</a>."
+"Para mais informações, clique <a "
+"href=\"https://wiki.gnome.org/Apps/Keysign/Doc/NoServers/1\">aqui</a>."
 
 #: keysign/receive.ui:105
 msgid "<small>To sign someone's key, scan their QR or enter security code</small>"
@@ -213,6 +253,10 @@ msgstr ""
 #: keysign/receive.ui:124
 msgid "<b>Camera</b>"
 msgstr "<b>Câmera</b>"
+
+#: keysign/receive.ui:139
+msgid "Integrated Web Cam"
+msgstr ""
 
 #: keysign/receive.ui:176 keysign/send.ui:341
 msgid "<b>Security Code</b>"
@@ -234,15 +278,15 @@ msgstr "Obtenção da chave foi interrompida!"
 msgid "page1"
 msgstr "página1"
 
-#: keysign/receive.ui:335
+#: keysign/receive.ui:334
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
 "signing process."
 msgstr ""
 "Para assinar a chave, confirme que você deseja assinar a chave a seguir.\n"
-"Isso vai gerar um e-mail que deve ser enviado para completar o processo de "
-"assinatura."
+"Isso vai gerar um e-mail que deve ser enviado para completar o processo "
+"de assinatura."
 
 #: keysign/receive.ui:362
 msgid "Key"
@@ -272,7 +316,7 @@ msgstr "página3"
 msgid "Select and send key"
 msgstr "Selecionar e enviar a chave"
 
-#: keysign/send.ui:59
+#: keysign/send.ui:58
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
@@ -297,8 +341,8 @@ msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
 msgstr ""
-"<small>Para ter uma chave assinada, a outra pessoa deve digitar o código de "
-"segurança ou ler o código QR</small>"
+"<small>Para ter uma chave assinada, a outra pessoa deve digitar o código "
+"de segurança ou ler o código QR</small>"
 
 #: keysign/send.ui:229
 msgid "<b>Key Details</b>"
@@ -315,3 +359,4 @@ msgstr "<b>Código QR</b>"
 #: keysign/send.ui:437
 msgid "Select and Send key"
 msgstr "Selecionar e enviar chave"
+

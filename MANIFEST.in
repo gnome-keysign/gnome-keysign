@@ -4,7 +4,7 @@
 recursive-include keysign/locale *.po
 #recursive-include keysign/locale *.mo
 # include keysign/locale/*/*/*.mo
-include data/gnome-keysign.desktop data/gnome-keysign.svg data/gnome-keysign.appdata.xml
+include data/org.gnome.Keysign.desktop data/org.gnome.Keysign.svg data/org.gnome.Keysign.appdata.xml
 include keysign/*.ui
 include COPYING
 include README.rst
