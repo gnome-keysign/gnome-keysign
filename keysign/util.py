@@ -21,6 +21,7 @@ import hashlib
 import hmac
 import logging
 import os
+import shutil
 from subprocess import call
 from string import Template
 from tempfile import NamedTemporaryFile
@@ -138,6 +139,7 @@ def _email_file(to, from_=None, subject=None,
     for file_ in files or []:
         cmd += ['--attach', file_]
 
+
     cmd += [to]
 
     log.info("Running %s", cmd)
@@ -151,11 +153,13 @@ def _using_flatpak():
 
 
 def _fix_path_flatpak(files):
-    """With flatpak the temporary files will be placed in /var/tmp, a
-    special path inside the sandbox. To be able to use the files from the host
-    we change the path to the absolute one. This fix in the future may not be
-    necessary because the portals should be able to automatically handle it."""
-    tmp_flat = "/var/tmp/"
+    """In Flatpak the only special path visible also from outside is /var/tmp/
+    To be able to use the files from the host we change the path to the absolute one.
+    This fix in the future may not be necessary because the portals should be able
+    to automatically handle it."""
+    tmp_flat = "/tmp"
+    var_flat = "/var"
+    var_tmp_flat = "/var/tmp"
     part_1 = os.path.expanduser("~/.var/app/")
     app_id = "org.gnome.Keysign"
     part_2 = "cache/tmp/"
@@ -164,7 +168,12 @@ def _fix_path_flatpak(files):
     if files:
         for file in files:
             if file.startswith(tmp_flat):
-                fixed_files.append(flatpak_path + file[len(tmp_flat):])
+                shutil.move(file, var_flat + file)
+                fixed_files.append(flatpak_path + file[len(var_flat)+1:])
+            elif file.startswith(var_tmp_flat):
+                # This is a legacy check because in the older versions of flatpak the temp
+                # files where placed under /var/tmp/ instead of /tmp/
+                fixed_files.append(flatpak_path + file[len(tmp_flat)+1:])
             else:
                 fixed_files.append(file)
     return fixed_files
