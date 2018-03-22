@@ -104,6 +104,14 @@ def sign_key(uid=0, sign_cmd=u"sign", expire=False, check=3,
              error_cb=None):
     log.info("Signing key uid %r", uid)
     status, prompt = yield None
+    if status == u"status_code_lost": # Yeah, such a constant does not exist *sigh*
+        # We are here, because the agent on the host is too old for
+        # what the guest, e.g. the flatpaked app, expects.
+        # Let's hope we can just ignore that.
+        log.info("Agent on the host might be too old: %s %s",
+            status, prompt)
+        status, prompt = yield None
+
     assert status == gpg.constants.STATUS_GET_LINE, "Expected status to be GET_LINE, but is %r" % status
     assert prompt == u"keyedit.prompt"
 
