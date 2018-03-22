@@ -127,7 +127,7 @@ class BuildWithCompile(build):
     sub_commands = [('compile_catalog', None)] + build.sub_commands
 
     def run(self):
-        translate_desktop_file('data/org.gnomeKeysign.raw.desktop', 'data/org.gnome.Keysign.desktop', 'keysign/locale')
+        translate_desktop_file('data/org.gnome.Keysign.raw.desktop', 'data/org.gnome.Keysign.desktop', 'keysign/locale')
         translate_appdata_file('data/org.gnome.Keysign.raw.appdata.xml', 'data/org.gnome.Keysign.appdata.xml', 'keysign/locale')
         build.run(self)
 
@@ -265,7 +265,7 @@ setup(
         # I think we are only 2.7 compatible
         'Programming Language :: Python :: 2.7',
         # We're still lacking support for 3
-        #'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3',
 
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
