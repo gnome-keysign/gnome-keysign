@@ -104,7 +104,15 @@ def sign_key(uid=0, sign_cmd=u"sign", expire=False, check=3,
              error_cb=None):
     log.info("Signing key uid %r", uid)
     status, prompt = yield None
-    assert status == gpg.constants.STATUS_GET_LINE
+    if status == u"status_code_lost": # Yeah, such a constant does not exist *sigh*
+        # We are here, because the agent on the host is too old for
+        # what the guest, e.g. the flatpaked app, expects.
+        # Let's hope we can just ignore that.
+        log.info("Agent on the host might be too old: %s %s",
+            status, prompt)
+        status, prompt = yield None
+
+    assert status == gpg.constants.STATUS_GET_LINE, "Expected status to be GET_LINE, but is %r" % status
     assert prompt == u"keyedit.prompt"
 
     status, prompt = yield u"uid %d" % uid
@@ -127,9 +135,17 @@ def sign_key(uid=0, sign_cmd=u"sign", expire=False, check=3,
             status, prompt = yield '%d' % check
         elif prompt == 'sign_uid.okay':
             status, prompt = yield 'Y'
-        #elif status == gpg.constants.STATUS_INV_SGNR:
-            # When does this actually happen?
-        #    status, prompt = yield None
+        elif status == gpg.constants.STATUS_INV_SGNR:
+            # seems to happen if you have an expired
+            # (or otherwise unsuable) signing key.
+            # The CONSIDERED line should have been issued
+            # with details.
+            # We don't maintain that state at the moment which is
+            # a bit unfortunate as we cannot properly detect
+            # when we have no usable key at all rather than
+            # one key being expired.
+            log.warn("INV_SGNR: %r", prompt)
+            status, prompt = yield None
         elif status == gpg.constants.STATUS_PINENTRY_LAUNCHED:
             status, prompt = yield None
         elif status == gpg.constants.STATUS_GOT_IT:
@@ -239,12 +255,12 @@ class TempContext(DirectoryContext):
             log.exception("During cleanup of %r", self.homedir)
 
 def get_agent_socket_path_for_homedir(homedir):
-	cmd = ["gpgconf",
-	       "--homedir", homedir,
-	       "--list-dirs", "agent-socket"]
-	path = check_output(cmd).strip()
-	log.info("Path for %r: %r", homedir, path)
-	return path
+    homedir_cmd = ["--homedir", homedir] if homedir else []
+    cmd = ["gpgconf"] + homedir_cmd + \
+          ["--list-dirs", "agent-socket"]
+    path = check_output(cmd).strip()
+    log.info("Path for %r: %r", homedir, path)
+    return path
 
 
 class TempContextWithAgent(TempContext):
@@ -256,12 +272,7 @@ class TempContextWithAgent(TempContext):
         assert (len(list(self.keylist(secret=True))) == 0)
 
 
-        if oldctx:
-            old_homedir = oldctx.engine_info.home_dir
-            if not old_homedir:
-                old_homedir = os.path.join(os.path.expanduser("~"), ".gnupg")
-        else:
-            old_homedir = os.path.join(os.path.expanduser("~"), ".gnupg")
+        old_homedir = oldctx.engine_info.home_dir if oldctx else None
 
         log.info("Old homedir: %r", old_homedir)
         old_agent_path = get_agent_socket_path_for_homedir(old_homedir)
