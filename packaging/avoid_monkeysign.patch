@@ -1,0 +1,24 @@
+--- gnome-keysign-0.9.5.orig/setup.py	2017-10-03 13:19:46.000000000 +0200
++++ gnome-keysign-0.9.5.new/setup.py	2017-10-03 15:26:18.639867432 +0200
+@@ -65,14 +65,14 @@
+         'keysign.compat',
+         'keysign.network',
+         ],
+-    py_modules = [
+-        'monkeysign.msgfmt',
+-        'monkeysign.translation',
+-        'monkeysign.gpg',
+-    ],
++    #py_modules = [
++    #    'monkeysign.msgfmt',
++    #    'monkeysign.translation',
++    #    'monkeysign.gpg',
++    #],
+     package_dir={
+-        'keysign': 'keysign',
+-        'monkeysign': 'monkeysign/monkeysign'
++        'keysign': 'keysign'
++    #    'monkeysign': 'monkeysign/monkeysign'
+     },
+     package_data={
+         'keysign': [

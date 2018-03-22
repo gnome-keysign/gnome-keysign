@@ -17,12 +17,10 @@
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
-import argparse
 import logging
 import signal
 import sys
 
-import cairo
 import gi
 gi.require_version('Gst', '1.0')
 gi.require_version('GstVideo', '1.0')
@@ -30,201 +28,15 @@ from gi.repository import GObject
 from gi.repository import Gst
 from gi.repository import Gtk, GLib
 # Because of https://bugzilla.gnome.org/show_bug.cgi?id=698005
-from gi.repository import Gtk, GdkX11, GdkPixbuf
-# Needed for window.get_xid(), xvimagesink.set_window_handle(), respectively:
-from gi.repository import GdkX11, GstVideo
+from gi.repository import Gtk, GdkPixbuf
+from gi.repository import GstVideo
 from gi.repository import Gdk
 
 log = logging.getLogger(__name__)
 
 
 
-
-
-class BarcodeReader(object):
-
-    def __init__(self, *args, **kwargs):
-        self.timestamp = None
-        self.scanned_barcode = None
-        self.zbar_message = None
-
-        return super(BarcodeReader, self).__init__(*args, **kwargs)
-
-
-    def on_barcode(self, barcode, message, image):
-        '''This is called when a barcode is available
-        with barcode being the decoded barcode.
-        Message is the GStreamer message containing
-        the barcode.'''
-        return barcode
-
-    def on_message(self, bus, message):
-        log.debug("Message: %s", message)
-        if message:
-            struct = message.get_structure()
-            if struct:
-                struct_name = struct.get_name()
-                log.debug('Message name: %s', struct_name)
-
-                if struct_name == 'GstMessageError':
-                    err, debug = message.parse_error()
-                    log.error('GstError: %s, %s', err, debug)
-    
-                elif struct_name == 'barcode':
-                    self.timestamp = struct.get_clock_time("timestamp")[1]
-                    log.debug ("at %s", self.timestamp)
-
-                    assert struct.has_field('symbol')
-                    barcode = struct.get_string('symbol')
-                    log.info("Read Barcode: {}".format(barcode)) 
-
-                    pixbuf = None
-                    if struct.has_field ("frame"):
-                        # This is the new zbar, which posts the frame along
-                        # with the barcode.  It might be too new for users.
-                        sample = struct.get_value ("frame")
-                        pixbuf = gst_sample_to_pixbuf(sample)
-                        self.on_barcode(barcode, message, pixbuf)
-                    else:
-                        # If we do not see the newer zbar, we save the
-                        # barcode symbol now along with its timestamp.
-                        # There should be a pixbuf on the bus with
-                        # the same timestamp which we will then collect.
-                        self.timestamp = struct.get_clock_time("timestamp")[1]
-                        self.scanned_barcode = barcode
-                        self.zbar_message = message
-                        
-                elif struct_name == 'pixbuf':
-                    # Here we check whether the pixbuf is unsolicitated,
-                    # e.g. a "regular" pixbuf or the one belonging to the
-                    # barcode we have just scanned.  Note that if we
-                    # haven't scanned a barcode yet, self.timestamp
-                    # should be None.  We also use None instead of just
-                    # if self.timestamp because the timestamp might be 0.
-                    if self.timestamp is not None:
-                        pixbuf_timestamp = struct.get_clock_time("timestamp")[1]
-                        if pixbuf_timestamp == self.timestamp:
-                            log.debug('Pixbuf %r matches barcode seen at %r',
-                                      struct, pixbuf_timestamp)
-
-                            if not struct.has_field("pixbuf"):
-                                log.error("Why does the pixbuf message not "
-                                          "contain a pixbuf field? %r", struct)
-                                for i in range(struct.n_fields()):
-                                    log.debug("Struct field %d name: %s",
-                                              i, struct.nth_field_name(i))
-                            else:
-                                pixbuf = struct.get_value("pixbuf")
-                                barcode = self.scanned_barcode
-                                message = self.zbar_message
-                                self.timestamp = None
-                                self.scanned_barcode = None
-                                self.zbar_message = None
-                                self.set_pixbuf_post_messages(False)
-                                self.on_barcode(barcode, message, pixbuf)
-                    
-
-
-    def run(self):
-        p = "v4l2src \n"
-        ## FIXME: When using an image, the recorded frame is somewhat
-        ##        greenish.  I think we need to investigate that at some stage.
-        #p = "uridecodebin uri=file:///tmp/qr.png "
-        p += " ! tee name=t \n"
-        p += "       t. ! queue ! videoconvert \n"
-        p += "                  ! zbar cache=true %(attach_frame)s \n"
-        p += "       t. ! queue ! videoconvert \n"
-        p += "                  ! xvimagesink name=imagesink \n"
-
-        # It's getting ugly down here.  What these lines do is trying to
-        # detect whether we have a new enough GStreamer, i.e. 1.6+, where
-        # the zbar element has the required "attach-frame" property.
-        # If the element does not have such a property, parse_launch will
-        # fail.  We try to detect our special case to not break other
-        # error messages.  If we detect an old GStreamer version,
-        # we simply discard "attach-frame" and work around the limitation
-        # of the zbar element.
-        pipeline_s = p % {
-              # Without the fakesink the zbar element seems to not work
-              'attach_frame':'attach-frame=true !  fakesink \n'
-        }
-        try:
-            log.info("Launching pipeline %s", pipeline_s)
-            pipeline = Gst.parse_launch(pipeline_s)
-        except GLib.Error as e:
-            if 'no property "attach-frame" in element' in e.message:
-                # We assume that the zbar element has no attach-frame
-                # property, because GStramer is too old.
-                # The property was introduced with GStreamer 1.6 with
-                # 1246d93f3e32a13c95c70cf3ba0f26b224de5e58
-                # https://bugzilla.gnome.org/show_bug.cgi?id=747557
-                log.info('Running with GStreamer <1.5.1, '
-                         'using a (slow) pixbufsink')
-                pipeline_s = p % {
-                    'attach_frame':'  ! videoconvert  \n'
-                                   '  ! gdkpixbufsink name=pixbufsink \n'
-                                   '                  post-messages=false \n'
-                }
-                try:
-                    log.info("Launching pipeline %s", pipeline_s)
-                    pipeline = Gst.parse_launch(pipeline_s)
-                except:
-                    raise
-                else:
-                    # We install this handler only if we do not
-                    # have the newer GStreamer version
-                    pipeline.get_bus().set_sync_handler(self.bus_sync_handler)
-            else:
-                raise
-            
-        self.bus = bus = pipeline.get_bus()
-        self.imagesink = pipeline.get_by_name('imagesink')
-        self.pipeline = pipeline
-
-        bus.connect('message', self.on_message)
-        bus.connect('sync-message::element', self.on_sync_message)
-        bus.add_signal_watch()
-        
-        pipeline.set_state(Gst.State.PLAYING)
-        self.running = True
-
-
-    def bus_sync_handler(self, bus, message, data=None):
-        '''A simple handler which only checks for the message being
-        from the zbar element and then makes the pixbufsink post messages
-        
-        This is to save some computing costs for the pixbuf conversion.
-        Some performance impact is measurable, but only a couple of
-        percent CPU usage.
-        
-        Always returns Gst.BusSyncReply.PASS so that messages
-        will be dispatched as usual.
-        '''
-        log.info('Sync handler for message %r', message)
-        if message:
-            struct = message.get_structure()
-            if struct:
-                struct_name = struct.get_name()
-                if struct_name == 'barcode':
-                    self.set_pixbuf_post_messages(True)
-
-        return Gst.BusSyncReply.PASS
-
-
-    def on_sync_message(self, bus, message):
-        log.debug("Sync Message!")
-        pass
-
-
-    def set_pixbuf_post_messages(self, value):
-        'Locates the element with the name "pixbufsink" and sets post-messages'
-        pixbufsink = self.pipeline.get_by_name('pixbufsink')
-        assert(pixbufsink is not None)
-        return pixbufsink.set_property('post-messages', value)
-
-
-#class BarcodeReaderGTK(Gtk.DrawingArea, BarcodeReader):
-class BarcodeReaderGTK(BarcodeReader, Gtk.DrawingArea):
+class BarcodeReaderGTK(Gtk.Box):
 
     __gsignals__ = {
         str('barcode'): (GObject.SIGNAL_RUN_LAST, None,
@@ -239,62 +51,95 @@ class BarcodeReaderGTK(BarcodeReader, Gtk.DrawingArea):
 
     def __init__(self, *args, **kwargs):
         super(BarcodeReaderGTK, self).__init__(*args, **kwargs)
-
-
-    @property
-    def x_window_id(self, *args, **kwargs):
-        window = self.get_property('window')
-        # If you have not requested a size, the window might not exist
-        assert window, "Window is %s (%s), but not a window" % (window, type(window))
-        if "X11" in window.__format__(""):
-            xid = window.get_xid()
-        elif "Wayland" in window.__format__(""):
-            self.window_xid = 0
-        else:
-            log.warning("Don't know how to handle windowing system %r",
-                        window.__format__(""))
-            self.window_xid = 0
-
-
-        self._x_window_id = xid
-        return xid
-
-    def on_message(self, bus, message):
-        log.debug("Message: %s %r", message, message.type)
-        struct = message.get_structure()
-        if not struct:
-            log.debug('Message has no struct')
-        else:
-            name = struct.get_name()
-            log.debug("Name: %s", name)
-            if name == "prepare-window-handle":
-                log.debug('XWindow ID')
-                message.src.set_window_handle(self.x_window_id)
-
-                return
-
-        return super(BarcodeReaderGTK, self).on_message(bus, message)
-
-
-    def do_realize(self, *args, **kwargs):
-        #super(BarcodeReaderGTK, self).do_realize(*args, **kwargs)
-        # ^^^^ does not work :-\
-        Gtk.DrawingArea.do_realize(self)
-        #self.run()
-        #self.connect('hide', self.on_hide)
         self.connect('unmap', self.on_unmap)
         self.connect('map', self.on_map)
+
+
+
+    def on_message(self, bus, message):
+        #log.debug("Message: %s", message)
+        if message:
+            struct = message.get_structure()
+            if struct:
+                struct_name = struct.get_name()
+                #log.debug('Message name: %s', struct_name)
+
+                if struct_name == 'GstMessageError':
+                    err, debug = message.parse_error()
+                    log.error('GstError: %s, %s', err, debug)
+                elif struct_name == 'GstMessageWarning':
+                    err, debug = message.parse_warning()
+                    log.warning('GstWarning: %s, %s', err, debug)
+    
+                elif struct_name == 'barcode':
+                    self.timestamp = struct.get_clock_time("timestamp")[1]
+                    log.debug ("at %s", self.timestamp)
+
+                    assert struct.has_field('symbol')
+                    barcode = struct.get_string('symbol')
+                    log.info("Read Barcode: {}".format(barcode))
+
+                    pixbuf = None
+                    if struct.has_field ("frame"):
+                        # This is the new zbar, which posts the frame along
+                        # with the barcode.
+                        sample = struct.get_value ("frame")
+                        pixbuf = gst_sample_to_pixbuf(sample)
+                        self.emit("barcode", barcode, message, pixbuf)
+                    else:
+                        # If we do not see the zbar < 1.6, we raise
+                        raise
+
+
+    def run(self):
+        p = "autovideosrc  \n"
+        #p = "uridecodebin uri=file:///tmp/qr.png "
+        #p = "uridecodebin uri=file:///tmp/v.webm "
+        p += " ! tee name=t \n"
+        p += "       t. ! queue ! videoconvert \n"
+        p += "                  ! zbar cache=true attach_frame=true \n"
+        p += "                  ! fakesink \n"
+        p += "       t. ! queue ! videoconvert \n"
+        p += ("                 ! gtksink "
+            "sync=false "
+            "name=imagesink "
+            #"max-lateness=2000000000000  "
+            "enable-last-sample=false "
+            "\n"
+            )
+
+        pipeline = p
+        log.info("Launching pipeline %s", pipeline)
+        pipeline = Gst.parse_launch(pipeline)
+
+        self.imagesink = pipeline.get_by_name('imagesink')
+        self.gtksink_widget = self.imagesink.get_property("widget")
+        log.info("About to remove children from %r", self)
+        for child in self.get_children():
+            log.info("About to remove child: %r", child)
+            self.remove(child)
+        # self.gtksink_widget.set_property("expand", False)
+        log.info("Adding sink widget: %r", self.gtksink_widget)
+        #self.add(self.gtksink_widget)
+        self.pack_start(self.gtksink_widget, True, True, 0)
+        self.gtksink_widget.show()
+
+        self.pipeline = pipeline
+
+        bus = pipeline.get_bus()
+        bus.connect('message', self.on_message)
+        bus.add_signal_watch()
+
+        pipeline.set_state(Gst.State.PLAYING)
+
+
+    def pause(self):
+        self.pipeline.set_state(Gst.State.PAUSED)
 
 
     def on_map(self, *args, **kwargs):
         '''It seems this is called when the widget is becoming visible'''
         self.run()
-
-    def do_unrealize(self, *args, **kwargs):
-        '''This appears to be called when the app is destroyed,
-        not when a tab is hidden.'''
-        self.pipeline.set_state(Gst.State.NULL)
-        Gtk.DrawingArea.do_unrealize(self)
 
 
     def on_unmap(self, *args, **kwargs):
@@ -311,13 +156,6 @@ class BarcodeReaderGTK(BarcodeReader, Gtk.DrawingArea):
                   barcode, message, image)
 
 
-    def on_barcode(self, barcode, message, image):
-        '''You can implement this function to
-        get notified when a new barcode has been read.
-        If you do, you will not get the GObject "barcode" signal
-        as it is emitted from here.'''
-        log.debug("About to emit barcode signal: %s", barcode)
-        self.emit('barcode', barcode, message, image)
 
 
 
@@ -367,11 +205,15 @@ class SimpleInterface(ReaderApp):
         reader = BarcodeReaderGTK()
         reader.connect('barcode', self.on_barcode)
         vbox.pack_start(reader, True, True, 0)
-        self.playing = False
+        self.reader = reader
 
         #self.image = Gtk.Image()
+        # FIXME: We could show a default image like "no barcode scanned just yet"
         self.image = ScalingImage()
-        vbox.pack_end(self.image, True, True, 0)
+        self.imagebox = Gtk.Box() #expand=True)
+        self.imagebox.add(self.image)
+        self.imagebox.show()
+        vbox.pack_end(self.imagebox, True, True, 0)
 
 
         self.playButtonImage = Gtk.Image()
@@ -386,33 +228,26 @@ class SimpleInterface(ReaderApp):
 
 
     def playToggled(self, w):
-        self.run()
-
-
-    def on_sync_message(self, bus, message):
-        if message.structure is None:
-            return
-        if message.structure.get_name() == 'prepare-window-handle':
-            #self.videoslot.set_sink(message.src)
-            message.src.set_window_handle(self.xid)
-
-
-    def on_message(self, bus, message):
-        log.debug("Message: %s", message)
-        struct = message.get_structure()
-        assert struct
-        name = struct.get_name()
-        log.debug("Name: %s", name)
-        if name == "prepare-window-handle":
-            log.debug('XWindow ID')
-            #self.videoslot.set_sink(message.src)
-            message.src.set_window_handle(self.xid)
-        else:
-            return super(SimpleInterface, self).on_message(bus, message)
+        self.reader.pause()
 
 
     def on_barcode(self, reader, barcode, message, pixbuf):
+        log.info("Barcode!!1 %r", barcode)
+
+        # Hrm. Somehow, the Gst Widget is allocating
+        # space relatively aggressively.  Our imagebox on
+        # the right side does not get any space.
+        #self.imagebox.remove(self.image)
+        #self.image = ScalingImage(pixbuf)
+        #self.imagebox.pack_start(self.image, True, True, 0)
+        #self.image.set_property('expand', True)
+        #self.image.show()
         self.image.set_from_pixbuf(pixbuf)
+
+        # So we just show a window instead...
+        w = Gtk.Window()
+        w.add(ScalingImage(pixbuf))
+        w.show_all()
         return False
 
 
@@ -460,16 +295,23 @@ class ScalingImage(Gtk.DrawingArea):
 
     def __init__(self, pixbuf=None, width=None, height=None, rowstride=None):
         self.pixbuf = pixbuf
-        self.width = width or None
-        self.height = height or None
         self.rowstride = rowstride or None
         super(ScalingImage, self).__init__()
+        #self.set_property("width_request", 400)
+        #self.set_property("height_request", 400)
+        #self.set_property("margin", 10)
+        self.set_property("expand", True)
     
     
     def set_from_pixbuf(self, pixbuf):
         self.pixbuf = pixbuf
         self.queue_draw()
 
+
+#    def do_size_allocate(self, allocation):
+#        log.debug("Size Allocate  %r", allocation)
+#        log.debug("w: %r  h: %r",  allocation.width, allocation.height)
+#        self.queue_draw()
 
     def do_draw(self, cr, pixbuf=None):
         log.debug('Drawing ScalingImage! %r', self)
@@ -492,16 +334,18 @@ class ScalingImage(Gtk.DrawingArea):
             
             # I think we might not need this calculation
             #widget_size = min(widget_width, widget_height)
-            #log.info('Allocated size: %s, %s', widget_width, widget_height)
+            log.info('Allocated size: %s, %s', widget_width, widget_height)
             
             # Fill in background
             cr.save()
-            cr.set_source_rgb(1, 1, 1)
-            cr.paint()
+            #Gtk.render_background(self.get_style_context(),
+            #       cr, 0, 0, widget_width, widget_height)
+            #cr.set_source_rgb(1, 1, 1)
+            #cr.paint()
             
             # Centering and scaling the image to fit the widget
             cr.translate(widget_width / 2.0, widget_height / 2.0)
-            scale = min(widget_width / float(original_width), widget_width / float(original_width))
+            scale = min(widget_width / float(original_width), widget_height / float(original_height))
             cr.scale(scale, scale)
             
             cr.translate(-original_width / 2.0, -original_height / 2.0)

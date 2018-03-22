@@ -25,14 +25,29 @@ except ImportError:
     from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
     from SocketServer import ThreadingMixIn
 import logging
+import os
 import socket
 from threading import Thread
 
 # This is probably really bad...  But doing relative imports only
 # works for modules.  However, I want to be able to call this Keyserver.py
 # for testing purposes.
-from __init__ import __version__
-from network.AvahiPublisher import AvahiPublisher
+if  __name__ == "__main__" and __package__ is None:
+    logging.getLogger().error("You seem to be trying to execute " +
+                              "this script directly which is discouraged. " +
+                              "Try python -m instead.")
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    os.sys.path.insert(0, parent_dir)
+    os.sys.path.insert(0, os.path.join(parent_dir, 'monkeysign'))
+    import keysign
+    #mod = __import__('keysign')
+    #sys.modules["keysign"] = mod
+    __package__ = str('keysign')
+
+from .__init__ import __version__
+from .network.AvahiPublisher import AvahiPublisher
+
+from .gpgmh import fingerprint_from_keydata
 
 log = logging.getLogger(__name__)
 
@@ -42,9 +57,11 @@ class KeyRequestHandlerBase(BaseHTTPRequestHandler):
     but create a use one inheriting from this class. The subclass
     must also define a keydata field.
     '''
-    server_version = 'Geysign/' + 'FIXME-Version'
+    server_version = 'GNOME-Keysign/' + '%s' % __version__
 
-    ctype = 'application/openpgpkey' # FIXME: What the mimetype of an OpenPGP key?
+    # As per RFC 2015 Section 7
+    # https://tools.ietf.org/html/rfc2015#section-7
+    ctype = 'application/pgp-keys'
 
     def do_GET(self):
         f = self.send_head(self.keydata)
@@ -64,7 +81,7 @@ class ThreadedKeyserver(ThreadingMixIn, HTTPServer):
 
     def __init__(self, server_address, *args, **kwargs):
         if issubclass(self.__class__, object):
-            super(ThreadedKeyserver, self).__init__(*args, **kwargs)
+            super(ThreadedKeyserver, self).__init__(server_address, *args, **kwargs)
         else:
             HTTPServer.__init__(self, server_address, *args, **kwargs)
             # WTF? There is no __init__..?
@@ -138,8 +155,8 @@ class ServeKeyThread(Thread):
                     service_port = port_i,
                     service_name = 'HTTP Keyserver %s' % fpr,
                     service_txt = service_txt,
-                    # self.keydata is too big for Avahi; it chrashes
-                    service_type = '_geysign._tcp',
+                    # self.keydata is too big for Avahi; it crashes
+                    service_type = '_gnome-keysign._tcp',
                 )
                 log.info('Trying to add Avahi Service')
                 ap.add_service()
@@ -159,7 +176,7 @@ class ServeKeyThread(Thread):
         super(ServeKeyThread, self).start(*args, **kwargs)
 
 
-    def serve_key(self):
+    def serve_key(self, poll_interval=0.15):
         '''An HTTPd is started and being put to serve_forever.
         You need to call shutdown() in order to stop
         serving.
@@ -169,7 +186,7 @@ class ServeKeyThread(Thread):
         try:
             log.info('Serving now on %s, this is probably blocking...',
                      self.httpd.socket.getsockname())
-            self.httpd.serve_forever()
+            self.httpd.serve_forever(poll_interval=poll_interval)
         finally:
             log.info('finished serving')
             #httpd.dispose()
@@ -202,12 +219,12 @@ if __name__ == '__main__':
     import sys
     if len(sys.argv) >= 2:
         fname = sys.argv[1]
-        KEYDATA = open(fname, 'r').read()
+        KEYDATA = open(fname, 'rb').read()
         # FIXME: Someone needs to determine the fingerprint
         #        of the data just read
-        fpr = ''.join('F289 F7BA 977D F414 3AE9  FDFB F70A 0290 6C30 1813'.split())
+        fpr = fingerprint_from_keydata(KEYDATA)
     else:
-        KEYDATA = 'Example data'
+        KEYDATA = b'Example data'
         fpr = ''.join('F289 F7BA 977D F414 3AE9  FDFB F70A 0290 6C30 1813'.split())
 
     if len(sys.argv) >= 3:

@@ -26,7 +26,19 @@ import sys
 import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
-from monkeysign.gpg import Keyring
+
+if  __name__ == "__main__" and __package__ is None:
+    logging.getLogger().error("You seem to be trying to execute " +
+                              "this script directly which is discouraged. " +
+                              "Try python -m instead.")
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    os.sys.path.insert(0, parent_dir)
+    import keysign
+    #mod = __import__('keysign')
+    #sys.modules["keysign"] = mod
+    __package__ = str('keysign')
+
+from .gpgmh import get_usable_keys
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -46,12 +58,10 @@ from .QRCode import QRImage
 def main():
     import sys
     key = sys.argv[1]
-    keyring = Keyring()
-    keys = keyring.get_keys(key)
     # Heh, we take the first key here. Maybe we should raise a warning
     # or so, when there is more than one key.
-    key = next(iter(keys.items()))[1]
-    fpr = key.fpr
+    key = list(get_usable_keys(pattern=key))[0]
+    fpr = key.fingerprint
     data = 'OPENPGP4FPR:' + fpr
     
     w = Gtk.Window()

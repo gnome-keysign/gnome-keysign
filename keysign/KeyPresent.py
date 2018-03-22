@@ -17,7 +17,6 @@
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
 import signal
 import sys
 import argparse
@@ -25,9 +24,6 @@ import logging
 import os
 
 from gi.repository import Gtk, GLib
-from gi.repository import GObject
-
-from monkeysign.gpg import Keyring
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -35,16 +31,83 @@ if  __name__ == "__main__" and __package__ is None:
                               "Try python -m instead.")
     parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     os.sys.path.insert(0, parent_dir)
+    os.sys.path.insert(0, os.path.join(parent_dir, 'monkeysign'))
     import keysign
     #mod = __import__('keysign')
     #sys.modules["keysign"] = mod
     __package__ = str('keysign')
 
 from .__init__ import __version__
-# FIXME: We should probably move KeyPresentPage to this file here
-from .SignPages import KeyPresentPage
+from .gpgmh import get_usable_keys
+from .QRCode import QRImage
+from .util import format_fingerprint
+
+
 
 log = logging.getLogger(__name__)
+
+
+
+class KeyPresentWidget(Gtk.Widget):
+    """A widget for presenting a gpgmh.Key
+
+    It shows details of the given key and customizable data in a
+    qrcode encoded in a QRImage.
+
+    The widget takes a full key object, rather than a fingerprint,
+    because it makes assumptions about the key object anyway. So
+    it can as well take it directly and enable higher level controllers
+    to deal with the situation that a given fingerprint, which really is
+    a search string for gpg, yields multiple results.
+    """
+
+    def __new__(cls, *args, **kwargs):
+        thisdir = os.path.dirname(os.path.abspath(__file__))
+        builder = kwargs.pop("builder", None)
+        if not builder:
+            builder = Gtk.Builder()
+            builder.add_objects_from_file(
+                os.path.join(thisdir, 'send.ui'),
+                ['box3']
+                )
+        log.debug("Our builder is: %r", builder)
+        # The widget will very likely have a parent.
+        # Gtk doesn't like so much adding a Widget to a container
+        # when the widget already has been added somewhere.
+        # So we get the parent widget and remove the child.
+        w = builder.get_object('box3')
+        parent = w.get_parent()
+        if parent:
+            parent.remove(w)
+        w._builder = builder
+        w.__class__ = cls
+        return w
+
+    def __init__(self, key, qrcodedata=None, builder=None):
+        """A new KeyPresentWidget shows the string you provide as qrcodedata
+        in a qrcode. If it evaluates to False, the key's fingerprint will
+        be shown. That is, "OPENPGP4FPR: + fingerprint.
+        """
+        self.key_id_label = self._builder.get_object("keyidLabel")
+        self.uids_label = self._builder.get_object("uidsLabel")
+        self.fingerprint_label = self._builder.get_object("keyFingerprintLabel")
+        self.qrcode_frame = self._builder.get_object("qrcode_frame")
+
+        self.key_id_label.set_markup(
+            format_fingerprint(key.fingerprint).replace('\n', '  '))
+        self.uids_label.set_markup("\n".join(
+                                        [GLib.markup_escape_text(uid.uid)
+                                        for uid
+                                        in key.uidslist]))
+        self.fingerprint_label.set_markup(format_fingerprint(key.fingerprint))
+        if not qrcodedata:
+            qrcodedata = "OPENPGP4FPR:" + key.fingerprint
+        self.qrcode_frame.add(QRImage(qrcodedata))
+        self.qrcode_frame.show_all()
+
+
+
+
 
 
 
@@ -93,7 +156,8 @@ class KeyPresent(Gtk.Application):
         log.debug("running: %s", args)
         fpr = args
 
-        self.key_present_page = KeyPresentPage(fpr=fpr)
+        key = next(iter(get_usable_keys(pattern=fpr)))
+        self.key_present_page = KeyPresentWidget(key)
 
         super(KeyPresent, self).run()
 
@@ -139,14 +203,7 @@ def main(args=sys.argv):
         arguments = parse_command_line(args)
         
         #if arguments.gpg:
-        #    keyid = arguments.file
-        #    keyring = Keyring()
-        #    # this is a dict {fpr: key-instance}
-        #    found_keys = keyring.get_keys(keyid)
-        #    # We take the first item we found and export the actual keydata
-        #    fpr = found_keys.items()[0][0]
-        #    keyring.export_data(fpr=fpr, secret=False)
-        #    keydata = keyring.context.stdout
+        #    keydata = export_keydata(next(get_usable_keys(keyid)))
         #else:
         #    keydata = open(arguments.file, 'r').read()
         fpr = arguments.fpr

@@ -18,35 +18,6 @@
 
 from ._version import __version__
 
-def main():
-    # These imports were moved here because the keysign module
-    # can be imported without wanting to run it, e.g. setup.py
-    # imports the __version__
-    import logging, sys, signal
-    
-    import gi
-    gi.require_version('Gtk', '3.0')
-    from gi.repository import GLib, Gtk
-    
-    from .MainWindow import MainWindow
-
-    logging.basicConfig(stream=sys.stderr,
-        level=logging.DEBUG,
-        format='%(name)s (%(levelname)s): %(message)s')
-
-    app = MainWindow()
-
-    try:
-        GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT, lambda *args : app.quit(), None)
-    except AttributeError:
-        pass
-
-    exit_status = app.run(None)
-
-    return exit_status
-
-
-
-if __name__ == '__main__':
-    sys.exit(main())
-
+def main(*args, **kwargs):
+    from . import app
+    return app.main(*args, **kwargs)

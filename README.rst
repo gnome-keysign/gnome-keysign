@@ -5,8 +5,8 @@ A tool for signing OpenPGP keys.
 
 Its purpose is to ease signing other peoples' keys.
 It is similar to caff, PIUS, or monkeysign.  In fact, it is influenced a lot by these tools
-and either reimplements ideas or reuses code.
-Consider either of the aboved mentioned tools when you need a much more mature codebase.
+and either re-implements ideas or reuses code.
+Consider either of the above mentioned tools when you need a much more mature codebase.
 
 In contrast to caff or monkeysign, this tool enables you to sign a key without contacting
 a key server.
@@ -29,42 +29,104 @@ and gives the user a well known interface.
 Installation
 =============
 
-The list of dependencies has not yet fully been determined.
-However, this list of Ubuntu packages seems to make it work:
+Before you can install GNOME Keysign, you need to have a few
+dependencies installed.
 
-    python  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad
+The list of dependencies includes:
 
+    * avahi with python bindings
+    * dbus with python bindings
+    * GStreamer with the good and bad plugins
+    * GTK and Cairo
+    * gobject introspection for those libraries
+    * PyBluez (optional)
+
+
+openSUSE installation
+---------------------
+
+openSUSE has `packaged the application <https://build.opensuse.org/package/show/GNOME:Apps/gnome-keysign>`_
+so it should be easy for you to install it.
+
+
+
+Debian and Ubuntu dependencies
+------------------------------
+
+Some versions of Debian/Ubuntu have `packaged the application <https://packages.debian.org/gnome-keysign>`_
+so it should be easy for you to install it.
+
+If your version is older than that,
+this list of packages seems to make it work:
+
+    python  python-lxml  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad gstreamer1.0-plugins-good python-gi-cairo
+
+In Ubuntu, the package
+gstreamer1.0-plugins-bad provides the zbar and the gtksink element, and
+gstreamer1.0-plugins-good provides the autovideosrc element.
 
 These packages should be optional:
 
-    python-requests monkeysign python-qrcode
+    python-requests monkeysign python-qrcode python-bluez
 
 
-Once you have the dependencies installed, a
+Fedora dependencies
+--------------------
 
-    pip install --user .
+The following has worked at least once for getting the application running,
+assuming that pip and git are already installed:
 
-should do everything in order to install the program to your
-user's home directory.
+.. code::
 
-If you don't have a local copy of the repository, you may try
+    sudo dnf install -y python-lxml python-gobject python-avahi dbus-python gstreamer1-plugins-bad-free-gtk gstreamer1-plugins-good  gnupg
 
-    pip install --user 'git+https://github.com/muelli/geysigning.git#egg=gnome-keysign'
+As optional:
+
+.. code::
+
+    sudo dnf install -y pybluez
+
+
+Installation with pip
+-----------------------
+
+You may try the following in order to install the program to
+your user's home directory.
+
+.. code::
+
+    pip install --user 'git+https://github.com/GNOME-Keysign/gnome-keysign.git#egg=gnome-keysign'
     
+You should find a script in ~/.local/bin/gnome-keysign as well as a
+.desktop launcher in ~/.local/share/applications/.
 
 
+From git
+---------
 
+If you intend to hack on the software (*yay*!),
+you may want to clone the repository and install from there.
+
+.. code::
+
+    git clone --recursive https://github.com/gnome-keysign/gnome-keysign.git
+    cd gnome-keysign
+    virtualenv --system-site-packages --python=python2 /tmp/keysign
+    /tmp/keysign/bin/pip install .
+
+Note that this installs the application in the virtual environment,
+so you run the program from there, e.g. /tmp/keysign/bin/gnome-keysign.
 
 
 Starting
-=======
+=========
 
 If you have installed the application with pip, a .desktop file
 should have been deployed such that you should be able to run the
 program from your desktop shell. Search for "Keysign".
 If you want to run the program from the command line, you can
 add ~/.local/bin to your PATH.  The installation should have put an
-exectuable named keysign in that directory.
+executable named keysign in that directory.
 
 If you haven't installed via pip or not to your user's home directory
 (i.e. with --user), you can start the program from your environment's
@@ -83,16 +145,16 @@ you to have your key signed by others running the application in client
 mode.
 
 Once you've fired up the application, you can see a list of your private keys.
-Select one and click "Next".
+Select one and the application will advance to the next stage.
 
-You will see the details of the key you've selected.  You can revise 
-your selected and click "Back".  If you are happy with the key you have 
-selected, click "Next".  This will cause the key's availability to be 
-published on the local network.  Also, a HTTP server will be spawned in 
-order to enable others to download your key.  You also notice a bar 
-code.  For now, it encodes the fingerprint of the key you have selected.
+You will see the details of the key you've selected.
+If you are happy with the key you have selected, click "Next".  
+This will cause the key's availability to be published on the local network.
+Also, a HTTP server will be spawned in order to enable others to download
+your key.  In order for others to find you, the app displays both
+a string identifying your key and a bar code.
 
-Either share the fingerprint or the bar code with someone who wants to 
+Either share the string or the bar code with someone who wants to
 sign your key.
 
 
@@ -101,16 +163,16 @@ Client side
 
 Here, the client side is described. This is to sign someone's key.
 
-If you select the "Get Key" Tab, you can either enter a key's 
-fingerprint manually or scan a bar code.  If you meet someone who has 
-the server side of the application running, you can scan the bar code
-present at the other party.
+You are presented with feed of your camera and an entry field to
+type in a string.  If you meet someone who has the server side of
+the application running, you can scan the bar code present at the
+other party.
 
 After you either typed a fingerprint or scanned a bar code, the program
 will look for the relevant key on your local network.  Note that you've
 transmitted the fingerprint securely, i.e. via a visual channel in form 
 of a bar code or the displayed fingerprint.  This data allows to 
-find the correct key.  In fact, they client tries to find the correct 
+find the correct key.  In fact, the client tries to find the correct 
 key by comparing the fingerprint of the keys available on the local 
 network.
 

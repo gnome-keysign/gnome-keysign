@@ -18,9 +18,9 @@
 
 import logging, sys
 
-from .__init__ import main
-
-
+def main(*args, **kwargs):
+    from . import app
+    return app.main(*args, **kwargs)
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr,

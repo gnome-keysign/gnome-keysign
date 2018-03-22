@@ -22,7 +22,16 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gdk, Gtk, GObject
 import qrcode
+
+## It seems python3-cairo does not implement Surface.create_for_data
+## https://bugs.freedesktop.org/show_bug.cgi?id=99855
+## Also, the gi version of cairo seems to be mostly useless,
+## so either pycairo or cairocffi needs to exist.
+## Rumour has it, though, that cairocffi cannot work well together
+## with the CairoContext exposed in the do_draw method that we are trying to
+## overwrite.  So we're back to square one and need to take pycairo.
 import cairo
+
 
 log = logging.getLogger(__name__)
 
@@ -69,6 +78,9 @@ class QRImage(Gtk.DrawingArea):
         self.log.info('Event %s', dir(event))
         if event.button == 1:
             w = FullscreenQRImageWindow(data=self.data)
+            top_level_window = self.get_toplevel()
+            if top_level_window.is_toplevel():
+                w.set_transient_for(top_level_window)
 
 
     def do_size_allocate(self, event):
@@ -131,7 +143,8 @@ class QRImage(Gtk.DrawingArea):
 
         matrix = code.get_matrix()
         size = len(matrix)
-        stride = (size + 3) / 4 * 4
+        stride = (size + 3) // 4 * 4
+        log.debug("stride: %r  size: %r", stride, size)
         data = bytearray(stride * size)
 
         background = self.background
@@ -174,11 +187,32 @@ class QRImage(Gtk.DrawingArea):
         self.set_size_request(size, size)
 
         self.queue_draw()
+        
+        self.set_tooltip_text(data)
 
     def get_data(self):
         return self._data
 
     data = GObject.property(getter=get_data, setter=set_data)
+
+
+def fullscreen_at_monitor(window, n):
+    """Fullscreens a given window on the n-th monitor
+
+    This is because Gtk's fullscreen_on_monitor seems to
+    be buggy.
+    http://stackoverflow.com/a/39386341/2015768
+    """
+    screen = Gdk.Screen.get_default()
+
+    monitor_n_geo = screen.get_monitor_geometry(n)
+    x = monitor_n_geo.x
+    y = monitor_n_geo.y
+
+    window.move(x,y)
+
+    window.fullscreen()
+
 
 class FullscreenQRImageWindow(Gtk.Window):
     '''Displays a QRImage in a fullscreen window
@@ -197,6 +231,7 @@ class FullscreenQRImageWindow(Gtk.Window):
         self.fullscreen()
         
         self.qrimage = QRImage(data=data, handle_events=False)
+        self.qrimage.set_has_tooltip(False)
         self.add(self.qrimage)
         
         self.connect('button-release-event', self.on_button_released)
@@ -228,6 +263,30 @@ class FullscreenQRImageWindow(Gtk.Window):
             self.unfullscreen()
             self.hide()
             self.close()
+        elif keyname == 'left' or keyname == 'right':
+            # We're trying to switch monitors
+            screen = self.get_screen()
+            # Determines the monitor the window is currently most visible in
+            n = screen.get_monitor_at_window(screen.get_active_window())
+            n_monitors = screen.get_n_monitors()
+
+            if keyname == 'left':
+                delta = -1
+            elif keyname == 'right':
+                delta = 1
+            else:
+                raise ValueError()
+
+            new_n = (n+delta) % n_monitors
+            log.info("Moving from %d to %d/%d", n, new_n, n_monitors)
+            if n != new_n:
+                # This call would make it animate a little,
+                # but it looks weird for me, so we don't unfullscreen.
+                # self.unfullscreen()
+                fullscreen_at_monitor(self, new_n)
+                # The following call is broken, unfortunately.
+                # https://bugzilla.gnome.org/show_bug.cgi?id=752677
+                # self.fullscreen_on_monitor(self.get_screen(), new_n)
 
 
 def main(data):

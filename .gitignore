@@ -1,7 +1,16 @@
+*.mo
+*.pot
+.eggs/
 *.swp
 *.pyc
 *.bak
 /build
 /dist
 /gnome_keysign.egg-info
-**.flatpak-builder
+**.flatpak-builder/
+.flatpak-builder/
+/.coverage
+/.noseids
+.tox/
+cover/
+/coverage/

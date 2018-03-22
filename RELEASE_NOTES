@@ -1,18 +1,23 @@
 GNOME Keysign is a tool to make signing OpenPGP keys as easy as possible.
-This is the v0.6 release which fixes a few bugs and increases py3k
-compatibilty.
+This is the v0.9.6 release which makes minor changes to i18n infrastructure.
+
+You can get the app from:
+            
+            https://github.com/GNOME-Keysign/gnome-keysign/
 
 Changes
 ==========
 
- * Fixed manually typing the fingerprint
- * Made gsignal definitions use str() for names
- * Got rid of warning from gi when importing
+ * New translation: Brazilian Portuguese
+ * Translate appdata and desktop files
+ * Make i18n workflow python3 compatible
+ * New dependencies for building the translatoins: lxml
+ * Skip Bluetooth and monkeysign tests if modules are not available
+ * Removed vendorised copy of monkeysign
 
 
 Resources
 =========
 
-Download: https://github.com/muelli/geysigning/releases/download/0.5/gnome-keysign-0.6.tar.gz
-sha256sum:
-Web site: https://wiki.gnome.org/GnomeKeysign
+Download: https://github.com/GNOME-Keysign/gnome-keysign/archive/0.9.5.tar.gz
+Web site: https://wiki.gnome.org/Apps/GnomeKeysign
