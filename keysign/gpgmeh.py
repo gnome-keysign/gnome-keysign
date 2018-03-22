@@ -104,7 +104,7 @@ def sign_key(uid=0, sign_cmd=u"sign", expire=False, check=3,
              error_cb=None):
     log.info("Signing key uid %r", uid)
     status, prompt = yield None
-    assert status == gpg.constants.STATUS_GET_LINE
+    assert status == gpg.constants.STATUS_GET_LINE, "Expected status to be GET_LINE, but is %r" % status
     assert prompt == u"keyedit.prompt"
 
     status, prompt = yield u"uid %d" % uid
