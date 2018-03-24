@@ -51,8 +51,8 @@ class Discover:
                 if key_data:
                     # If we found the key
                     returnValue((key_data, success, message))
-            except Exception as e:
-                log.exception("An Exception Occurred: %s " % e)
+            except TypeError as e:
+                log.exception("Pybluez may be missing.")
         key_data = None
         success = False
         message = ""
