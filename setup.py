@@ -232,6 +232,9 @@ setup(
     tests_require=[
         "pgpy",
         "nose",
+        "tox",
+        "pep8",
+        "pylint",
     ],
     license='GPLv3+',
     long_description=open('README.rst').read(),
