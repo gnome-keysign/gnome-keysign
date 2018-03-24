@@ -101,6 +101,15 @@ You should find a script in ~/.local/bin/gnome-keysign as well as a
 .desktop launcher in ~/.local/share/applications/.
 
 
+As a flatpak
+-------------
+
+GNOME Keysign is available as a Flatpak.
+You will need to have the xdg-desktop-portals installed in order to send email.
+You also need a pinentry to does not require access to the X window. A pinentry-gnome3 as of 1.0.0 works.
+Please see the documentation in the flatpak folder for more details regarding building and installation as a flatpak.
+
+
 From git
 ---------
 
