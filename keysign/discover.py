@@ -28,13 +28,27 @@ class Discover:
             self.discovery = AvahiKeysignDiscoveryWithMac()
         self.bt = None
         self.stopped = False
+    
+    def success_callback(self, response):
+        #If the we find key with the given userdata, load the key
+        log.debug("key_data sucessfuly loaded")
+
+    def failure_callback(self, error):
+        #if we get an execption due to failure log the message
+        log.debug("malformed or altered key key received, loading keydata failed ")
 
     @inlineCallbacks
     def start(self):
         # First we try Avahi, if it fails we fallback to Bluetooth because
         # the receiver may be able to use only one of them
         log.info("Trying to use this code with Avahi: %s", self.userdata)
-        key_data = yield threads.deferToThread(self.discovery.find_key, self.userdata)
+        
+        #chain callback to handle failure gracefully and prevent from crash
+        data = threads.deferToThread(self.discovery.find_key, self.userdata)
+        data.addCallback(self.success_callback)
+        data.addErrback(self.failure_callback)
+        key_data = yield data
+
         if key_data and not self.stopped:
             success = True
             message = ""
