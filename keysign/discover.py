@@ -40,7 +40,10 @@ class Discover:
             log.debug("Received key successfully")
         except Exception as e:
             log.debug('Unable to get key_data, received malformed or altered key')
-            returnValue((None, False, ""))
+            key_data = None
+            success = False
+            message = ""
+            returnValue((key_data, success, message))
 
         if key_data and not self.stopped:
             success = True
