@@ -1,5 +1,5 @@
 import logging
-
+from sys import exc_info
 from twisted.internet import threads
 from twisted.internet.defer import inlineCallbacks, returnValue
 
@@ -39,10 +39,12 @@ class Discover:
             key_data = yield threads.deferToThread(self.discovery.find_key, self.userdata)
             log.debug("Received key successfully")
         except ValueError:
+            exc_type, exc_value = exc_info()[:2]
+            log.debug('Handling %s exception with message "%s"', exc_type.__name__, exc_value)
             log.debug('Unable to get key_data, received malformed or altered key')
             key_data = None
             success = False
-            message = ""
+            message = "Error downloading key, maybe it has been altered in transit"
             returnValue((key_data, success, message))
 
         if key_data and not self.stopped:
