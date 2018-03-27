@@ -5,7 +5,7 @@
 # Python packages
 requests
 qrcode
-
+twisted 
 
 # Additional Development packages
 pytest
