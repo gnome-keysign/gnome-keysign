@@ -38,9 +38,8 @@ class Discover:
         try:
             key_data = yield threads.deferToThread(self.discovery.find_key, self.userdata)
             log.debug("Received key successfully")
-        except ValueError:
-            exc_type, exc_value = exc_info()[:2]
-            log.debug('Handling %s exception with message "%s"', exc_type.__name__, exc_value)
+        except ValueError as e:
+            log.debug("Exception occured", exc_info=e)
             log.debug('Unable to get key_data, received malformed or altered key')
             key_data = None
             success = False
