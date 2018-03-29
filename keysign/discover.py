@@ -39,8 +39,7 @@ class Discover:
             key_data = yield threads.deferToThread(self.discovery.find_key, self.userdata)
             log.debug("Received key successfully")
         except ValueError as e:
-            log.debug("foo", exc_info=e)
-            log.debug('Unable to get key_data, received malformed or altered key')
+            log.debug('Unable to get key_data, received malformed or altered key', exc_info=e)
             key_data = None
             success = False
             message = "Error downloading key, maybe it has been altered in transit"
