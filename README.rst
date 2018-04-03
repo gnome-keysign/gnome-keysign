@@ -11,19 +11,29 @@ Consider either of the above mentioned tools when you need a much more mature co
 In contrast to caff or monkeysign, this tool enables you to sign a key without contacting
 a key server.
 It downloads an authenticated copy of the key from the other party.
-For now, the key is authenticated by its fingerprint which is securely transferred via a QR code.
+For now, the key is authenticated by a Message Authentication Code which is securely transferred via a QR code.
 Alternatively, the user may type the fingerprint manually, assuming that it has been transferred
 securely via the audible channel.
-
-
 After having obtained an authentic copy of the key, its UIDs are signed.
-The signatures are then encrypted and sent via email.
-In contrast to monkeysign, xdg-email is used to pop up a pre-filled email composer windows
-of the mail client the user has configured to use.
+The signatures are then separately encrypted and sent via email to each UID.
+xdg-email is used to pop up a pre-filled email composer window of the mail client the user has already configured to use.
 This greatly reduces complexity as no SMTP configuration needs to be obtained
 and gives the user a well known interface.
 
 
+The list of features includes:
+
+    * Modern GTK3 GUI
+    * Avahi-based discovery of peers in the local network
+    * alternatively: Key transfer via Bluetooth
+    * Cryptographically authenticated key exchange
+    * No (unauthenticated) connection to the Internet
+    * display of scanned QR code to prevent a maliciously injected frame
+    * alternatively manual fingerprint verification of the key
+    * signatures for each UID separately signed, encrypted, and sent
+    * no SMTP setup needed due to use of desktop portals or xdg-email
+    * runs in a Flatpak sandbox to isolate the app from the rest of the system
+    
 
 
 Installation
