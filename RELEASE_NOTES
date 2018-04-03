@@ -1,5 +1,5 @@
 GNOME Keysign is a tool to make signing OpenPGP keys as easy as possible.
-This is the v0.9.6 release which makes minor changes to i18n infrastructure.
+This is the v0.9.7 release which makes minor changes to stabilise 
 
 You can get the app from:
             
@@ -8,16 +8,17 @@ You can get the app from:
 Changes
 ==========
 
- * New translation: Brazilian Portuguese
- * Translate appdata and desktop files
- * Make i18n workflow python3 compatible
- * New dependencies for building the translatoins: lxml
- * Skip Bluetooth and monkeysign tests if modules are not available
- * Removed vendorised copy of monkeysign
+ * Fixed icon, desktop, and appdata file names to match appid
+ * support for running as a flatpak app, i.e. making use of email portal
+ * Handle gpgme's "status_code_lost" if the agent on the host is old
+ * Handle gpgme's "INV_SGNR" for expired keys
+ * Fixed the detection of keys and the relevant homedir
+ * Now fully removed traces of monkeysign
+ * Fixed an encoding issue with Bluetooth under Python2
 
 
 Resources
 =========
 
-Download: https://github.com/GNOME-Keysign/gnome-keysign/archive/0.9.5.tar.gz
+Download: https://github.com/GNOME-Keysign/gnome-keysign/archive/0.9.7.tar.gz
 Web site: https://wiki.gnome.org/Apps/GnomeKeysign
