@@ -1,5 +1,6 @@
 GNOME Keysign is a tool to make signing OpenPGP keys as easy as possible.
-This is the v0.9.7 release which makes minor changes to stabilise 
+This is the v0.9.7 release which makes minor changes to stabilise the app
+in various circumstances, including running as a flatpaked app.
 
 You can get the app from:
             
@@ -15,6 +16,7 @@ Changes
  * Fixed the detection of keys and the relevant homedir
  * Now fully removed traces of monkeysign
  * Fixed an encoding issue with Bluetooth under Python2
+ * Bluetooth should now really be optional
 
 
 Resources
