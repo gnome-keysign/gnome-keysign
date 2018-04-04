@@ -39,6 +39,7 @@ The list of dependencies includes:
     * GStreamer with the good and bad plugins
     * GTK and Cairo
     * gobject introspection for those libraries
+    * Twisted( `pip install Twisted` )
     * PyBluez (optional)
 
 
