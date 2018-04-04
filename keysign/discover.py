@@ -1,5 +1,4 @@
 import logging
-from sys import exc_info
 from twisted.internet import threads
 from twisted.internet.defer import inlineCallbacks, returnValue
 
