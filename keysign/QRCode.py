@@ -20,6 +20,7 @@ import logging
 
 import gi
 gi.require_version('Gtk', '3.0')
+gi.require_version('Gdk', '3.0')
 from gi.repository import Gdk, Gtk, GObject
 import qrcode
 
@@ -317,5 +318,8 @@ def main(data):
 if __name__ == '__main__':
     import sys
     logging.basicConfig(level=logging.DEBUG)
-    data = sys.argv[1]
+    try:
+        data = sys.argv[1]
+    except:
+        raise ValueError("Not Enough Arguments passed as data for the QR code encoding")
     main(data)
