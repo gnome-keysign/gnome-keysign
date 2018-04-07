@@ -17,6 +17,7 @@ Changes
  * Now fully removed traces of monkeysign
  * Fixed an encoding issue with Bluetooth under Python2
  * Bluetooth should now really be optional
+ * work around a crash in gpgme on 32bit
 
 
 Resources
