@@ -40,19 +40,19 @@ class QRImage(Gtk.DrawingArea):
     """An Image encoding data as a QR Code.
     The image tries to scale as big as possible.
     """
-    
+
     def __init__(self, data='Default String', handle_events=True,
                        background=0xff, *args, **kwargs):
         """The QRImage widget inherits from Gtk.Image,
         but it probably cannot be used as one, as there
         is an event handler for resizing events which will
         overwrite to currently loaded image.
-        
+
         You made set data now, or later simply via the property.
-        
+
         handle_events can be set to False if the fullscreen
         window should not be created on click.
-        
+
         The background can be set to 0x00 (or 0xff) creating a
         black (or white) background onto which the code is rendered.
         """
@@ -74,7 +74,6 @@ class QRImage(Gtk.DrawingArea):
             self.add_events(
                 Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.BUTTON_PRESS_MASK)
 
-
     def on_button_released(self, widget, event):
         self.log.info('Event %s', dir(event))
         if event.button == 1:
@@ -82,7 +81,6 @@ class QRImage(Gtk.DrawingArea):
             top_level_window = self.get_toplevel()
             if top_level_window.is_toplevel():
                 w.set_transient_for(top_level_window)
-
 
     def do_size_allocate(self, event):
         """This is the event handler for the resizing event, i.e.
@@ -188,14 +186,13 @@ class QRImage(Gtk.DrawingArea):
         self.set_size_request(size, size)
 
         self.queue_draw()
-        
+
         self.set_tooltip_text(data)
 
     def get_data(self):
         return self._data
 
     data = GObject.property(getter=get_data, setter=set_data)
-
 
 def fullscreen_at_monitor(window, n):
     """Fullscreens a given window on the n-th monitor
@@ -214,10 +211,9 @@ def fullscreen_at_monitor(window, n):
 
     window.fullscreen()
 
-
 class FullscreenQRImageWindow(Gtk.Window):
     '''Displays a QRImage in a fullscreen window
-    
+
     The window is supposed to close itself when a button is
     clicked.'''
 
@@ -230,11 +226,11 @@ class FullscreenQRImageWindow(Gtk.Window):
             Gtk.Window.__init__(*args, **kwargs)
 
         self.fullscreen()
-        
+
         self.qrimage = QRImage(data=data, handle_events=False)
         self.qrimage.set_has_tooltip(False)
         self.add(self.qrimage)
-        
+
         self.connect('button-release-event', self.on_button_released)
         self.connect('key-release-event', self.on_key_released)
         self.add_events(
@@ -243,7 +239,6 @@ class FullscreenQRImageWindow(Gtk.Window):
             )
 
         self.show_all()
-
 
     def on_button_released(self, widget, event):
         '''Connected to the button-release-event and closes this
@@ -289,7 +284,6 @@ class FullscreenQRImageWindow(Gtk.Window):
                 # https://bugzilla.gnome.org/show_bug.cgi?id=752677
                 # self.fullscreen_on_monitor(self.get_screen(), new_n)
 
-
 def main(data):
     w = Gtk.Window()
     w.connect("delete-event", Gtk.main_quit)
@@ -301,14 +295,14 @@ def main(data):
 
     def on_released(widget, event):
         global fullscreen
- 
+
         if event.button == 1:
             fullscreen = not fullscreen
             if fullscreen:
                 w.fullscreen()
             else:
                 w.unfullscreen()
-        
+
     #qr.connect('button-release-event', on_released)
     #qr.add_events(Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.BUTTON_PRESS_MASK)
     w.add(qr)
