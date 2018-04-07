@@ -34,7 +34,17 @@ class Discover:
         # First we try Avahi, if it fails we fallback to Bluetooth because
         # the receiver may be able to use only one of them
         log.info("Trying to use this code with Avahi: %s", self.userdata)
-        key_data = yield threads.deferToThread(self.discovery.find_key, self.userdata)
+        
+        try:
+            key_data = yield threads.deferToThread(self.discovery.find_key, self.userdata)
+            log.debug("Received key successfully")
+        except ValueError as e:
+            key_data = None
+            success = False
+            message = "Error downloading key, maybe it has been altered in transit"
+            log.warning(message, exc_info=e)
+            returnValue((key_data, success, message))
+
         if key_data and not self.stopped:
             success = True
             message = ""
