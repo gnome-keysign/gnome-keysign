@@ -22,6 +22,7 @@ import os  # The SigningKeyring uses os.symlink for the agent
 from subprocess import check_output
 import sys
 from tempfile import mkdtemp
+import platform
 
 import gpg
 from gpg.constants import PROTOCOL_OpenPGP
@@ -32,6 +33,17 @@ from .gpgkey import Key, UID
 texttype = unicode if sys.version_info.major < 3 else str
 
 log = logging.getLogger(__name__)
+
+
+major, minor, patch = map(int, gpg.version.versionlist)
+# Due to https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=884900
+# we'd crash if we're accessing signatures on a key.
+# With this test we can try to avoid that as much as possible.
+on32bit = platform.architecture()[0] == "32bit"
+crashing_gpgme = on32bit  and  major <= 1  and  minor <= 10  and  patch <= 0
+log.info("Detected gpgme (%d.%d.%d). %s", major, minor, patch, "And it might crash" if crashing_gpgme else "")
+
+
 
 #####
 ## INTERNAL API
@@ -441,7 +453,10 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
                 continue
             else:
                 uid_data = UIDExport(signed_keydata, i)
-                log.debug("Data for uid %d: %r, sigs: %r %r", i, uid, uid.signatures, uid_data)
+                # FIXME: Check whether this bug is resolved and the remove this conditional
+                # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=884900
+                if not crashing_gpgme:
+                    log.debug("Data for uid %d: %r, sigs: %r %r", i, uid, uid.signatures, uid_data)
 
                 ciphertext, _, _ = ctx.encrypt(plaintext=uid_data,
                                                recipients=[key],
