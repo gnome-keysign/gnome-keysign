@@ -114,7 +114,7 @@ def get_catalogs(localedir):
     catalogs = {}
 
     for pofile in pofiles:
-        catalog = read_po(open(pofile, 'r'))
+        catalog = read_po(codecs.open(pofile, 'r', encoding="utf-8"))
         catalogs[catalog.locale] = catalog
         logging.info("Found %d strings for %s", len(catalog), catalog.locale)
         # logging.debug("Strings for %r", catalog, catalog.values())
