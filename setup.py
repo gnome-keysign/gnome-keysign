@@ -94,7 +94,7 @@ def translate_appdata_file(infile, outfile, localedir):
                     attrib["{http://www.w3.org/XML/1998/namespace}lang"] = str(locale)
                     tr.text = translated.string
                     parent.insert(pos, tr)
-    tree.write(outfile, encoding='utf-8', pretty_print=True)
+    tree.write(outfile, encoding='utf-8', xml_declaration=True, pretty_print=True)
 
 
 def get_catalogs(localedir):
