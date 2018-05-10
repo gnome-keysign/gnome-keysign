@@ -192,7 +192,7 @@ setup(
     data_files=[
         ( 'share/applications',
             ['data/org.gnome.Keysign.desktop']),
-        ( 'share/appdata',
+        ( 'share/metainfo',
             ['data/org.gnome.Keysign.appdata.xml']),
         ( 'share/icons/hicolor/scalable/apps',
             ['data/org.gnome.Keysign.svg']),
