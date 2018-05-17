@@ -1,5 +1,5 @@
 GNOME Keysign is a tool to make signing OpenPGP keys as easy as possible.
-This is the v0.9.7.1 release which fixes only the appdata.
+This is the v0.9.7.2 release which fixes only the appdata.
 
 You can get the app from:
             
@@ -8,11 +8,11 @@ You can get the app from:
 Changes
 ==========
 
- * Generate appdata with XML declaration
-
+ * Change desktop ID
+ * Save appdata in share/metainfo
 
 Resources
 =========
 
-Download: https://github.com/GNOME-Keysign/gnome-keysign/archive/0.9.7.1.tar.gz
+Download: https://github.com/GNOME-Keysign/gnome-keysign/archive/0.9.7.2.tar.gz
 Web site: https://wiki.gnome.org/Apps/GnomeKeysign
