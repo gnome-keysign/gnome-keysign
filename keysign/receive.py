@@ -108,6 +108,8 @@ class ReceiveApp:
 
         self.discover = None
 
+        self.bt_available = is_bt_available()
+
 
     def on_keydata_downloaded(self, keydata, pixbuf=None):
         key = openpgpkey_from_data(keydata)
@@ -165,11 +167,18 @@ class ReceiveApp:
         """We show an infobar if we can only receive with Avahi and
         there are zero nearby servers"""
         ib = userdata
-        if number == 0 and not is_bt_available():
+        bt_usable = False
+        try:
+            if self.bt_available.result:
+                bt_usable = True
+        except AttributeError:
+            log.debug("We still don't know if Bluetooth is available, until proven contrary "
+                      "we simply assume it is not")
+
+        if number == 0 and not bt_usable:
             ib.show()
         elif ib.is_visible():
             ib.hide()
-
 
 
 class App(Gtk.Application):
