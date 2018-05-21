@@ -354,3 +354,9 @@ class TestMultipleUID(TestSignAndEncrypt):
 class TestUtf8(TestSignAndEncrypt):
     SENDER_KEY = "seckey-utf8.asc"
     RECEIVER_KEY = "seckey-utf8-2.asc"
+
+
+@unittest.skipUnless(HAVE_MKS, "requires monkeysign")
+class TestSubKeys(TestSignAndEncrypt):
+    SENDER_KEY = "seckey-2.asc"
+    RECEIVER_KEY = "seckey-subkeys.asc"

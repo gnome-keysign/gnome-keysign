@@ -553,9 +553,11 @@ class TestLatin1(TestSignAndEncrypt):
     SENDER_KEY = "seckey-latin1.asc"
     RECEIVER_KEY = "seckey-2.asc"
 
+
 class TestColon(TestSignAndEncrypt):
     SENDER_KEY = "seckey-colon.asc"
     RECEIVER_KEY = "seckey-2.asc"
+
 
 class TestMultipleUID(TestSignAndEncrypt):
     SENDER_KEY = "seckey-multiple-uid-colon.asc"
@@ -565,3 +567,8 @@ class TestMultipleUID(TestSignAndEncrypt):
 class TestUtf8(TestSignAndEncrypt):
     SENDER_KEY = "seckey-utf8.asc"
     RECEIVER_KEY = "seckey-utf8-2.asc"
+
+
+class TestSubKeys(TestSignAndEncrypt):
+    SENDER_KEY = "seckey-2.asc"
+    RECEIVER_KEY = "seckey-subkeys.asc"
