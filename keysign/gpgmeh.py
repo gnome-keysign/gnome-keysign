@@ -374,7 +374,13 @@ def fingerprint_from_keydata(keydata):
 def get_usable_keys_from_context(ctx, pattern="", secret=False):
     keys = [Key.from_gpgme(key)
             for key in ctx.keylist(pattern=pattern, secret=secret)
-            if is_usable(key)]
+            if is_usable(key)
+                and     # We filter "offline" keys.
+                        # If secret=False then it passes.
+                        # If secret=True then we require the primary subkey
+                        # to be "secret". It is false if the key is offline.
+                (not secret or key.subkeys[0].secret)
+            ]
     return keys
 
 def get_usable_keys(pattern="", homedir=None):
