@@ -569,6 +569,9 @@ class TestUtf8(TestSignAndEncrypt):
     RECEIVER_KEY = "seckey-utf8-2.asc"
 
 
-class TestSubKeys(TestSignAndEncrypt):
-    SENDER_KEY = "seckey-2.asc"
-    RECEIVER_KEY = "seckey-subkeys.asc"
+# There is little we can do here.
+# That OpenPGP key is incomplete, i.e. it lacks the "d" needed to
+# do anything meaningful with the key.
+#class TestSubKeys(TestSignAndEncrypt):
+#    SENDER_KEY = "seckey-2.asc"
+#    RECEIVER_KEY = "seckey-subkeys.asc"
