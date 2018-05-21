@@ -20,6 +20,7 @@ import logging
 import os, sys
 from subprocess import CalledProcessError, check_call
 import tempfile
+import unittest
 
 from nose.tools import *
 
@@ -35,6 +36,7 @@ from keysign.gpgmeh import get_usable_keys
 from keysign.gpgmeh import get_usable_secret_keys
 from keysign.gpgmeh import get_public_key_data
 from keysign.gpgmeh import sign_keydata_and_encrypt
+from keysign.gpgmeh import crashing_gpgme
 
 from keysign.gpgkey import to_valid_utf8_string
 
@@ -423,6 +425,7 @@ class TestSignAndEncrypt:
         # shutil.rmtree(self.receiver_homedir)
         pass
 
+    @unittest.skipUnless(not crashing_gpgme, "Detected a crashing gpgme")
     def test_sign_and_encrypt(self):
         # This might be a secret key, too, so we import and export to
         # get hold of the public portion.
@@ -478,6 +481,7 @@ class TestSignAndEncrypt:
                                     key).values() for s in l]
         assert_greater(len(sigs_after), len(sigs_before))
 
+    @unittest.skipUnless(not crashing_gpgme, "Detected a crashing gpgme")
     def test_sign_and_encrypt_double_secret(self):
         "We want to produce as many signatures as possible"
         recv = DirectoryContext(homedir=self.key_receiver_homedir)

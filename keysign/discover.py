@@ -42,7 +42,17 @@ class Discover:
         # First we try Avahi, if it fails we fallback to Bluetooth and lastly
         # Wormhole, because the receiver may be able to use only one of them
         log.info("Trying to use this code with Avahi: %s", self.userdata)
-        key_data = yield threads.deferToThread(self.discovery.find_key, self.userdata)
+        
+        try:
+            key_data = yield threads.deferToThread(self.discovery.find_key, self.userdata)
+            log.debug("Received key successfully")
+        except ValueError as e:
+            key_data = None
+            success = False
+            message = "Error downloading key, maybe it has been altered in transit"
+            log.warning(message, exc_info=e)
+            returnValue((key_data, success, message))
+
         if key_data and not self.stopped:
             success = True
             message = ""
@@ -50,12 +60,17 @@ class Discover:
         if self.bt_code and BluetoothReceive and not self.stopped:
             # We try Bluetooth, if we have it
             log.info("Trying to connect to %s with Bluetooth", self.bt_code)
-            self.bt = BluetoothReceive(self.bt_port)
-            msg_tuple = yield self.bt.find_key(self.bt_code, self.mac)
-            key_data, success, message = msg_tuple
-            if key_data:
-                # If we found the key, otherwise we continue with wormhole
-                returnValue((key_data, success, message))
+            # We try to see if Bluetooth was imported,
+            # else we log an event of missing Pybluez.
+            try:
+                self.bt = BluetoothReceive(self.bt_port)
+                msg_tuple = yield self.bt.find_key(self.bt_code, self.mac)
+                key_data, success, message = msg_tuple
+                if key_data:
+                    # If we found the key, otherwise we continue with wormhole
+                    returnValue((key_data, success, message))
+            except TypeError as e:
+                log.exception("Pybluez may be missing.")
         elif self.worm_code and not self.stopped:
             # We try the wormhole code, if we have it
             log.info("Trying to use this code with Wormhole: %s", self.worm_code)

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop">
-  <id>org.gnome.Keysign</id>
+  <id>org.gnome.Keysign.desktop</id>
   <metadata_license>CC0</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <name>Keysign</name>
@@ -43,6 +43,11 @@
  <project_group>GNOME</project_group>
 
   <releases>
+​    <release version="0.9.7.2" date="2018-05-17">
+​      <description>
+​        <p>Made Appdata go into right places</p>
+​      </description>
+​    </release>
 ​    <release version="0.9.5" date="2017-10-03">
 ​      <description>
 ​        <p>Add Bluetooth support</p>

@@ -7,12 +7,12 @@
 /build
 /dist
 /gnome_keysign.egg-info
+**.flatpak-builder/
 .flatpak-builder/
 /.coverage
 /.noseids
 .tox/
 cover/
-**.flatpak-builder/
 /coverage/
 .idea/
 *.ui~

@@ -11,19 +11,29 @@ Consider either of the above mentioned tools when you need a much more mature co
 In contrast to caff or monkeysign, this tool enables you to sign a key without contacting
 a key server.
 It downloads an authenticated copy of the key from the other party.
-For now, the key is authenticated by its fingerprint which is securely transferred via a QR code.
+For now, the key is authenticated by a Message Authentication Code which is securely transferred via a QR code.
 Alternatively, the user may type the fingerprint manually, assuming that it has been transferred
 securely via the audible channel.
-
-
 After having obtained an authentic copy of the key, its UIDs are signed.
-The signatures are then encrypted and sent via email.
-In contrast to monkeysign, xdg-email is used to pop up a pre-filled email composer windows
-of the mail client the user has configured to use.
+The signatures are then separately encrypted and sent via email to each UID.
+xdg-email is used to pop up a pre-filled email composer window of the mail client the user has already configured to use.
 This greatly reduces complexity as no SMTP configuration needs to be obtained
 and gives the user a well known interface.
 
 
+The list of features includes:
+
+    * Modern GTK3 GUI
+    * Avahi-based discovery of peers in the local network
+    * alternatively: Key transfer via Bluetooth
+    * Cryptographically authenticated key exchange
+    * No (unauthenticated) connection to the Internet
+    * display of scanned QR code to prevent a maliciously injected frame
+    * alternatively manual fingerprint verification of the key
+    * signatures for each UID separately signed, encrypted, and sent
+    * no SMTP setup needed due to use of desktop portals or xdg-email
+    * runs in a Flatpak sandbox to isolate the app from the rest of the system
+    
 
 
 Installation
@@ -70,7 +80,7 @@ so it should be easy for you to install it.
 If your version is older than that,
 this list of packages seems to make it work:
 
-    python  python-lxml  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad gstreamer1.0-plugins-good python-gi-cairo python-future
+    python  python-lxml  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad gstreamer1.0-plugins-good python-gi-cairo python-gpg  python-twisted python-future
 
 Magic Wormhole can be installed with pip:
 
@@ -95,7 +105,7 @@ assuming that pip and git are already installed:
 
 .. code::
 
-    sudo dnf install -y python-lxml python-gobject python-avahi dbus-python gstreamer1-plugins-bad-free-gtk gstreamer1-plugins-good  gnupg
+    sudo dnf install -y python-lxml python-gobject python-avahi dbus-python gstreamer1-plugins-bad-free-gtk gstreamer1-plugins-good  gnupg python-gnupg  python-twisted
     pip install magic-wormhole
 
 As optional:
@@ -117,6 +127,18 @@ your user's home directory.
     
 You should find a script in ~/.local/bin/gnome-keysign as well as a
 .desktop launcher in ~/.local/share/applications/.
+
+
+As a flatpak
+-------------
+
+GNOME Keysign is available as a Flatpak.
+You will need to have the xdg-desktop-portals installed in order to send email.
+You also need a pinentry to does not require access to the X window. A pinentry-gnome3 as of 1.0.0 works.
+Please see the documentation in the flatpak folder for more details regarding building and installation as a flatpak.
+
+A note to Arch users: This Pipewire bug <https://github.com/PipeWire/pipewire/issues/55>`_ is preventing gstreamer from running correctly.
+
 
 
 From git

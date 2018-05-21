@@ -17,16 +17,16 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 
-import dbus
 import hashlib
 import hmac
 import json
 import logging
+import os
+import shutil
 import requests
 from subprocess import call
 from string import Template
 from tempfile import NamedTemporaryFile
-
 try:
     from urllib.parse import urlparse, parse_qs
     from urllib.parse import ParseResult
@@ -35,8 +35,9 @@ except ImportError:
     from urlparse import ParseResult
 
 import requests
+import dbus
 from wormhole._wordlist import PGPWordList
-from gi.repository import Gtk, GLib
+from gi.repository import Gtk, Gdk, GLib
 
 from .gpgmh import fingerprint_from_keydata
 from .gpgmh import sign_keydata_and_encrypt
@@ -59,12 +60,72 @@ def mac_verify(key, data, mac):
     return result
 
 
+def _email_portal(to, subject=None, body=None, files=None):
+    # The following checks are to ensure Python 2 compatibility
+    if not hasattr(os, 'O_PATH'):
+        os.O_PATH = 2097152
+    if not hasattr(os, 'O_CLOEXEC'):
+        os.O_CLOEXEC = 524288
+    name = "org.freedesktop.portal.Desktop"
+    path = "/org/freedesktop/portal/desktop"
+    bus = dbus.SessionBus()
+    try:
+        proxy = bus.get_object(name, path)
+    except dbus.exceptions.DBusException:
+        log.debug("Desktop portal is not available")
+        return None
+    iface = "org.freedesktop.portal.Email"
+    email = dbus.Interface(proxy, iface)
+    # Apparently we are unable to get the parent window XID from the receive class.
+    # Until this is sorted out, we leave the parent window empty.
+    parent_window = ""
+    attrs = []
+    # Even if we don't close the file descriptor it should not be a problem because
+    # eventually at runtime it will be automatically closed.
+    # Designing this class we took the recipes one as reference
+    # https://gitlab.gnome.org/GNOME/recipes/blob/4afc9df6/src/gr-mail.c#L293
+    if files:
+        for file in files:
+            fd = os.open(file, os.O_PATH | os.O_CLOEXEC)
+            attrs.append(dbus.types.UnixFd(fd))
+    opts = {"subject": subject, "address": to, "body": body, "attachment_fds": attrs}
+    try:
+        ret = email.ComposeEmail(parent_window, opts)
+        return ret
+    except TypeError:
+        log.debug("Email portal is not available")
+        return None
 
-def email_file(to, from_=None, subject=None,
-               body=None,
-               ccs=None, bccs=None,
-               files=None, utf8=True):
-    "Calls xdg-email with the appriopriate options"
+
+def _email_mailto(to, subject=None, body=None, files=None):
+    url = "mailto:"
+    url += "\"{0}\"".format(to)
+    # Apparently we don't need to use urllib.parse.quote_plus
+    if subject:
+        url += "?subject={0}".format(subject)
+    if body:
+        if "?" in url:
+            url += "&body={0}".format(quote(body))
+        else:
+            url += "?body={0}".format(quote(body))
+    for file in files:
+        if "?" in url:
+            url += "&attach={0}".format(file)
+        else:
+            url += "?attach={0}".format(file)
+    try:
+        Gtk.show_uri(None, url, Gdk.CURRENT_TIME)
+        return True
+    except GLib.GError as e:
+        log.debug("mailto URI is probably not available: %s", e.message)
+        return None
+
+
+def _email_file(to, from_=None, subject=None,
+                body=None,
+                ccs=None, bccs=None,
+                files=None, utf8=True):
+    """Calls xdg-email with the appropriate options"""
     cmd = ['xdg-email']
     if utf8:
         cmd += ['--utf8']
@@ -79,12 +140,59 @@ def email_file(to, from_=None, subject=None,
     for file_ in files or []:
         cmd += ['--attach', file_]
 
+    if not to:
+        log.error("email_file: We are seeing an empty 'to': %r", to)
+
     cmd += [to]
 
     log.info("Running %s", cmd)
     retval = call(cmd)
     return retval
 
+
+def _using_flatpak():
+    """Check if we are inside flatpak"""
+    return os.path.exists("/.flatpak-info")
+
+
+def _fix_path_flatpak(files):
+    """In Flatpak the only special path visible also from outside is /var/tmp/
+    To be able to use the files from the host we change the path to the absolute one.
+    This fix in the future may not be necessary because the portals should be able
+    to automatically handle it."""
+    part_1 = os.path.expanduser("~/.var/app/")
+    app_id = "org.gnome.Keysign"
+    part_2 = "cache/tmp/"
+    flatpak_path = os.path.join(part_1, app_id, part_2)
+    fixed_files = []
+    if files:
+        for file in files:
+            base = os.path.basename(file)
+            new_path = os.path.join(flatpak_path, base)
+            shutil.move(file, new_path)
+            fixed_files.append(new_path)
+    return fixed_files
+
+
+def send_email(to, subject=None, body=None, files=None):
+    """Tries to send the email using firstly the portal, then the xdg-email
+    and as a last attempt the mailto uri"""
+    if _using_flatpak():
+        files = _fix_path_flatpak(files)
+
+    if _email_portal(to, subject, body, files):
+        return
+
+    try:
+        _email_file(to=to, subject=subject, body=body, files=files)
+        return
+    except FileNotFoundError:
+        log.debug("xdg-email is not available")
+
+    if _email_mailto(to, subject, body, files):
+        return
+
+    log.error("An error occurred trying to compose the email")
 
 
 SUBJECT = 'Your signed key $fingerprint'
@@ -110,7 +218,7 @@ def sign_keydata_and_send(keydata, error_cb=None):
     onto sign_keydata_and_encrypt.
     
     For the resulting signatures, emails are created and
-    sent via email_file.
+    sent via send_email.
     
     Return value:  NamedTemporaryFiles used for saving the signatures.
     If you let them go out of scope they should get deleted.
@@ -125,33 +233,37 @@ def sign_keydata_and_send(keydata, error_cb=None):
     # acceptable if all key operations are done before we go ahead
     # and spawn an email client.
     log.info("About to create signatures for key with fpr %r", fingerprint)
-    for uid, encrypted_key in list(sign_keydata_and_encrypt(keydata, error_cb)):
-            log.info("Using UID: %r", uid)
-            # We expect uid.uid to be a consumable string
-            uid_str = uid.uid
-            ctx = {
-                'uid' : uid_str,
-                'fingerprint': fingerprint,
-                'keyid': keyid,
-            }
-            tmpfile = NamedTemporaryFile(prefix='gnome-keysign-',
-                                         suffix='.asc',
-                                         delete=True)
-            filename = tmpfile.name
-            log.info('Writing keydata to %s', filename)
-            tmpfile.write(encrypted_key)
-            # Interesting, sometimes it would not write the
-            # whole thing out, so we better flush here
-            tmpfile.flush()
-            # If we close the actual file descriptor to free
-            # resources. Calling tmpfile.close would get the file deleted.
-            tmpfile.file.close()
+    try:
+        keydata = keydata.encode()
+    except AttributeError:
+        log.debug("keydata is probably already a bytes type")
 
-            subject = Template(SUBJECT).safe_substitute(ctx)
-            body = Template(BODY).safe_substitute(ctx)
-            email_file (to=uid.email, subject=subject,
-                        body=body, files=[filename])
-            yield tmpfile
+    for uid, encrypted_key in list(sign_keydata_and_encrypt(keydata, error_cb)):
+        log.info("Using UID: %r", uid)
+        # We expect uid.uid to be a consumable string
+        uid_str = uid.uid
+        ctx = {
+            'uid' : uid_str,
+            'fingerprint': fingerprint,
+            'keyid': keyid,
+        }
+        tmpfile = NamedTemporaryFile(prefix='gnome-keysign-',
+                                     suffix='.asc',
+                                     delete=True)
+        filename = tmpfile.name
+        log.info('Writing keydata to %s', filename)
+        tmpfile.write(encrypted_key)
+        # Interesting, sometimes it would not write the
+        # whole thing out, so we better flush here
+        tmpfile.flush()
+        # If we close the actual file descriptor to free
+        # resources. Calling tmpfile.close would get the file deleted.
+        tmpfile.file.close()
+
+        subject = Template(SUBJECT).safe_substitute(ctx)
+        body = Template(BODY).safe_substitute(ctx)
+        send_email(uid.email, subject, body, [filename])
+        yield tmpfile
 
 
 def format_fingerprint(fpr):
@@ -229,26 +341,6 @@ def download_key_http(address, port):
     data = requests.get(url.geturl(), timeout=5).content
     log.debug("finished downloading %d bytes", len(data))
     return data
-
-
-def glib_markup_escape_rencoded_text(s, errors='replace'):
-    """Calls GLib.markup_escape and the re-encoded text.
-    The re-encoding is for getting rid of surrogates in unicode strings.
-    Those surrogates appear when the UID contains non UTF-8 bytes, e.g.
-    latin1. gpgme will return a unicode string with those surrogates.
-    Because surrogates cannot be encoded as utf-8, we replace the
-    errornous bytes (with '?').  You can control that behaviour via the
-    errors parameter.
-    You better pass a string here that we can `encode` in first place.
-    """
-    log.debug('markup rencode escape %s %r (%r)', type(s), s, errors)
-    encoded = s.encode('utf-8', errors)
-    decoded = encoded.decode('utf-8')
-    log.debug('Decoded: %r', decoded)
-    replaced = decoded.replace('\ufffd', '?')
-    escaped = GLib.markup_escape_text(replaced)
-    log.debug('escaped: %r', escaped)
-    return escaped
 
 
 def encode_message(message):

@@ -4,6 +4,6 @@ Comment=A keysigning helper to enable you to comfortably exchange OpenPGP keys w
 Keywords=python;gpg;gnupg;key;openpgp;
 Type=Application
 Exec=python -m keysign
-Icon=gnome-keysign
+Icon=org.gnome.Keysign
 Categories=GTK;GNOME;Utility;
 StartupNotify=true

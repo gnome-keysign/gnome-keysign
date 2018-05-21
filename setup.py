@@ -94,7 +94,7 @@ def translate_appdata_file(infile, outfile, localedir):
                     attrib["{http://www.w3.org/XML/1998/namespace}lang"] = str(locale)
                     tr.text = translated.string
                     parent.insert(pos, tr)
-    tree.write(outfile, encoding='utf-8', pretty_print=True)
+    tree.write(outfile, encoding='utf-8', xml_declaration=True, pretty_print=True)
 
 
 def get_catalogs(localedir):
@@ -127,8 +127,8 @@ class BuildWithCompile(build):
     sub_commands = [('compile_catalog', None)] + build.sub_commands
 
     def run(self):
-        translate_desktop_file('data/gnome-keysign.raw.desktop', 'data/gnome-keysign.desktop', 'keysign/locale')
-        translate_appdata_file('data/gnome-keysign.raw.appdata.xml', 'data/gnome-keysign.appdata.xml', 'keysign/locale')
+        translate_desktop_file('data/org.gnome.Keysign.raw.desktop', 'data/org.gnome.Keysign.desktop', 'keysign/locale')
+        translate_appdata_file('data/org.gnome.Keysign.raw.appdata.xml', 'data/org.gnome.Keysign.appdata.xml', 'keysign/locale')
         build.run(self)
 
 
@@ -191,11 +191,11 @@ setup(
     include_package_data = True,
     data_files=[
         ( 'share/applications',
-            ['data/gnome-keysign.desktop']),
-        ( 'share/appdata',
-            ['data/gnome-keysign.appdata.xml']),
+            ['data/org.gnome.Keysign.desktop']),
+        ( 'share/metainfo',
+            ['data/org.gnome.Keysign.appdata.xml']),
         ( 'share/icons/hicolor/scalable/apps',
-            ['data/gnome-keysign.svg']),
+            ['data/org.gnome.Keysign.svg']),
         #( 'share/locale/',
         # # We cannot use the glob below, because it only copies the file
         # # into the directory mentioned above, i.e. keysign.po, rather
@@ -234,6 +234,9 @@ setup(
     tests_require=[
         "pgpy",
         "nose",
+        "tox",
+        "pep8",
+        "pylint",
     ],
     license='GPLv3+',
     long_description=open('README.rst').read(),
@@ -264,7 +267,7 @@ setup(
         # I think we are only 2.7 compatible
         'Programming Language :: Python :: 2.7',
         # We're still lacking support for 3
-        #'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3',
 
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
