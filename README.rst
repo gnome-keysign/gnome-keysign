@@ -68,7 +68,7 @@ For example you can install it with:
 
 .. code::
 
-    pacaur -y gnome-keysign
+    yay -S gnome-keysign
 
 
 Debian and Ubuntu dependencies
