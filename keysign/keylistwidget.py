@@ -23,7 +23,7 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .gpgmh import get_usable_keys
 from .i18n import _
-from .util import glib_markup_escape_rencoded_text, fix_infobar
+from .util import fix_infobar
 
 log = logging.getLogger(__name__)
 
