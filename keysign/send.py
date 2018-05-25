@@ -107,7 +107,10 @@ class SendApp:
             try:
                 info = yield self.offer.allocate_code(worm=True)
             except ServerConnectionError:
+                # We are without a working Internet connection so we stop the previously
+                # activated Avahi server and we display an infobar
                 self._deactivate_timer()
+                self.offer.stop_avahi()
                 self.offer = None
                 self.klw.code_spinner.stop()
                 self.no_connection()
