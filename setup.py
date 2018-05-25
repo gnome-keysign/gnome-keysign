@@ -217,7 +217,7 @@ setup(
         'requests>=2.6',
         
         'qrcode',
-        'twisted',
+        'twisted[tls]',
         'future',
         'magic-wormhole>=0.10.2',
         #'monkeysign', # Apparently not in the cheeseshop
