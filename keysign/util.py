@@ -25,6 +25,8 @@ import shutil
 from subprocess import call
 from string import Template
 from tempfile import NamedTemporaryFile
+from twisted.internet import threads
+
 try:
     from urllib.parse import urlparse, parse_qs
     from urllib.parse import ParseResult
@@ -360,11 +362,17 @@ def get_local_bt_address(hci_number=0):
 
 
 def is_bt_available(hci_number=0):
+    """We check for bluez with a deferred thread because this is a blocking operation"""
+    d = threads.deferToThread(_get_bluez, hci_number)
+    return d
+
+
+def _get_bluez(hci_number=0):
     """If the bluez object is available it means that there is a working Bluetooth"""
     bus = dbus.SystemBus()
     try:
-        dbus.Interface(bus.get_object("org.bluez", "/org/bluez/hci%i" % hci_number),
-                             "org.freedesktop.DBus.Properties")
+        bus.get_object("org.bluez", "/org/bluez/hci%i" % hci_number)
+        log.debug("Bluetooth seems to be available in the system")
         return True
     except dbus.exceptions.DBusException as e:
         log.debug("Bluetooth is not available: %s", e)
