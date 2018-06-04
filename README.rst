@@ -124,7 +124,7 @@ You will need to have the xdg-desktop-portals installed in order to send email.
 You also need a pinentry to does not require access to the X window. A pinentry-gnome3 as of 1.0.0 works.
 Please see the documentation in the flatpak folder for more details regarding building and installation as a flatpak.
 
-A note to Arch users: This Pipewire bug <https://github.com/PipeWire/pipewire/issues/55>`_ is preventing gstreamer from running correctly.
+A note to Arch users: `This Pipewire bug <https://github.com/PipeWire/pipewire/issues/55>`_ is preventing gstreamer from running correctly.
 
 
 
