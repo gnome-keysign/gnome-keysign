@@ -83,6 +83,11 @@ These packages should be optional:
 Fedora dependencies
 --------------------
 
+Eventually an up to date version is in Fedora's `COPR <https://copr.fedorainfracloud.org/coprs/muelli/gnome-keysign/>`_.
+
+If that does not work or is not recent enough, then you may try an 
+OpenSuSE package as mentioned above or install the dependencies 
+yourself.
 The following has worked at least once for getting the application running,
 assuming that pip and git are already installed:
 
