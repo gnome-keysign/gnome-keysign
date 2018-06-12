@@ -89,9 +89,8 @@ class BluetoothOffer:
             return None
         if self.server_socket is None:
             self.server_socket = BluetoothSocket(RFCOMM)
-            # We can also bind only the mac found with get_local_bt_address(), anyway
-            # even with multiple bt in a single system BDADDR_ANY is not a problem
-            self.server_socket.bind((socket.BDADDR_ANY, PORT_ANY))
+            # We create a bind with the Bluetooth address we have in the system
+            self.server_socket.bind((code, PORT_ANY))
             # Number of unaccepted connections that the system will allow before refusing new connections
             backlog = 1
             self.server_socket.listen(backlog)
