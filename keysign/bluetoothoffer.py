@@ -30,7 +30,7 @@ if __name__ == "__main__" and __package__ is None:
 
 from .gpgmh import get_public_key_data, get_usable_keys
 from .i18n import _
-from .util import get_local_bt_address, mac_generate
+from .util import get_local_bt_address, mac_generate, get_bt_power
 
 log = logging.getLogger(__name__)
 
@@ -43,7 +43,6 @@ class BluetoothOffer:
         self.server_socket = None
         self.message_def = None
         self.stopped = False
-        self.code = None
 
     @inlineCallbacks
     def start(self):
@@ -76,29 +75,31 @@ class BluetoothOffer:
         returnValue((success, message))
 
     def allocate_code(self):
-        try:
-            code = get_local_bt_address().upper()
-        except dbus.exceptions.DBusException as e:
-            if e.get_dbus_name() == "org.freedesktop.systemd1.NoSuchUnit":
-                log.info("No Bluetooth devices found, probably the bluetooth service is not running")
-            elif e.get_dbus_name() == "org.freedesktop.DBus.Error.UnknownObject":
-                log.info("No Bluetooth devices available")
+        bt_data = None
+        # Do not allocate the BT code if there isn't a powered on BT adapter
+        if get_bt_power():
+            try:
+                code = get_local_bt_address().upper()
+            except dbus.exceptions.DBusException as e:
+                if e.get_dbus_name() == "org.freedesktop.systemd1.NoSuchUnit":
+                    log.info("No Bluetooth devices found, probably the bluetooth service is not running")
+                elif e.get_dbus_name() == "org.freedesktop.DBus.Error.UnknownObject":
+                    log.info("No Bluetooth devices available")
+                else:
+                    log.error("An unexpected error occurred %s", e.get_dbus_name())
             else:
-                log.error("An unexpected error occurred %s", e.get_dbus_name())
-            self.code = None
-            return None
-        if self.server_socket is None:
-            self.server_socket = BluetoothSocket(RFCOMM)
-            # We can also bind only the mac found with get_local_bt_address(), anyway
-            # even with multiple bt in a single system BDADDR_ANY is not a problem
-            self.server_socket.bind((socket.BDADDR_ANY, PORT_ANY))
-            # Number of unaccepted connections that the system will allow before refusing new connections
-            backlog = 1
-            self.server_socket.listen(backlog)
-            log.info("sockname: %r", self.server_socket.getsockname())
-        port = self.server_socket.getsockname()[1]
-        log.info("BT Code: %s %s", code, port)
-        bt_data = "BT={0};PT={1}".format(code, port)
+                if self.server_socket is None:
+                    self.server_socket = BluetoothSocket(RFCOMM)
+                    # We can also bind only the mac found with get_local_bt_address(), anyway
+                    # even with multiple bt in a single system BDADDR_ANY is not a problem
+                    self.server_socket.bind((socket.BDADDR_ANY, PORT_ANY))
+                    # Number of unaccepted connections that the system will allow before refusing new connections
+                    backlog = 1
+                    self.server_socket.listen(backlog)
+                    log.info("sockname: %r", self.server_socket.getsockname())
+                port = self.server_socket.getsockname()[1]
+                log.info("BT Code: %s %s", code, port)
+                bt_data = "BT={0};PT={1}".format(code, port)
         return bt_data
 
     def stop(self):

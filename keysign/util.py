@@ -40,6 +40,7 @@ import requests
 import dbus
 from gi.repository import Gtk, Gdk, GLib
 
+from .errors import NoBluezDbus, UnpoweredAdapter, NoAdapter
 from .gpgmh import fingerprint_from_keydata
 from .gpgmh import sign_keydata_and_encrypt
 
@@ -355,6 +356,8 @@ def fix_infobar(infobar):
 
 
 def get_local_bt_address(hci_number=0):
+    # TODO: when we merge magic-wormhole we need to use a timeout here
+    # because this can be a blocking operation
     bus = dbus.SystemBus()
     adapter = dbus.Interface(bus.get_object("org.bluez", "/org/bluez/hci%i" % hci_number),
                              "org.freedesktop.DBus.Properties")
@@ -362,18 +365,18 @@ def get_local_bt_address(hci_number=0):
 
 
 def is_bt_available(hci_number=0):
-    """We check for bluez with a deferred thread because this is a blocking operation"""
-    d = threads.deferToThread(_get_bluez, hci_number)
-    return d
-
-
-def _get_bluez(hci_number=0):
-    """If the bluez object is available it means that there is a working Bluetooth"""
+    """Check if there is a powered on Bluetooth device.
+       This is a blocking method"""
     bus = dbus.SystemBus()
     try:
-        bus.get_object("org.bluez", "/org/bluez/hci%i" % hci_number)
-        log.debug("Bluetooth seems to be available in the system")
-        return True
+        adapter = dbus.Interface(bus.get_object("org.bluez", "/org/bluez/hci%i" % hci_number),
+                                 "org.freedesktop.DBus.Properties")
+        power = adapter.Get("org.bluez.Adapter1", "Powered")
+        if not power:
+            raise UnpoweredAdapter
+        return power
     except dbus.exceptions.DBusException as e:
-        log.debug("Bluetooth is not available: %s", e)
-        return False
+        if "NoSuchUnit" in e.get_dbus_name():
+            raise NoBluezDbus(e)
+        else:
+            raise NoAdapter(e)

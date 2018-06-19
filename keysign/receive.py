@@ -30,7 +30,7 @@ from gi.repository import Gst
 if __name__ == "__main__":
     from twisted.internet import gtk3reactor
     gtk3reactor.install()
-from twisted.internet import reactor
+from twisted.internet import reactor, threads
 from twisted.internet.defer import inlineCallbacks
 
 if  __name__ == "__main__" and __package__ is None:
@@ -47,14 +47,16 @@ if  __name__ == "__main__" and __package__ is None:
 
 
 from .avahidiscovery import AvahiKeysignDiscoveryWithMac
-from .keyfprscan import KeyFprScanWidget
-from .keyconfirm import PreSignWidget
+from .discover import Discover
+from .errors import NoBluezDbus, UnpoweredAdapter, NoAdapter
 from .gpgmh import openpgpkey_from_data
 from .i18n import _
+from .keyfprscan import KeyFprScanWidget
+from .keyconfirm import PreSignWidget
 from .util import sign_keydata_and_send, fix_infobar, is_bt_available
-from .discover import Discover
 
 log = logging.getLogger(__name__)
+
 
 def remove_whitespace(s):
     cleaned = re.sub('[\s+]', '', s)
@@ -107,9 +109,25 @@ class ReceiveApp:
         self.discovery.connect('list-changed', self.on_list_changed, ib)
 
         self.discover = None
+        self.bt_usable = False
 
-        self.bt_available = is_bt_available()
+        # We call this in async because it can take several seconds to complete and we don't want
+        # to stall the UI boot. Also we don't care about having this information immediately.
+        threads.deferToThread(self.check_bt_availability)
 
+    def check_bt_availability(self):
+        try:
+            avail = is_bt_available()
+            if avail:
+                self.bt_usable = True
+            else:
+                self.bt_usable = False
+        except NoBluezDbus as e:
+            log.debug("Bluetooth service seems to be unavailable: %s", e)
+        except NoAdapter as e:
+            log.debug("Bluetooth adapter is not available: %s", e)
+        except UnpoweredAdapter as e:
+            log.debug("Bluetooth adapter is turned off: %s", e)
 
     def on_keydata_downloaded(self, keydata, pixbuf=None):
         key = openpgpkey_from_data(keydata)
@@ -167,15 +185,7 @@ class ReceiveApp:
         """We show an infobar if we can only receive with Avahi and
         there are zero nearby servers"""
         ib = userdata
-        bt_usable = False
-        try:
-            if self.bt_available.result:
-                bt_usable = True
-        except AttributeError:
-            log.debug("We still don't know if Bluetooth is available, until proven contrary "
-                      "we simply assume it is not")
-
-        if number == 0 and not bt_usable:
+        if number == 0 and not self.bt_usable:
             ib.show()
         elif ib.is_visible():
             ib.hide()
