@@ -76,7 +76,8 @@ class BluetoothOffer:
         returnValue((success, message))
 
     def allocate_code(self):
-        """Allocate a BT code only if there is a powered on BT adapter"""
+        """Acquires and returns a string suitable for finding the key via Bluetooth.
+        Returns None if no powered on adapter could be found."""
         # TODO: when we have magic-wormhole we should perform this operation in async
         # and show the loading spinning wheel
         bt_data = None
