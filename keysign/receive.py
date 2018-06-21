@@ -53,7 +53,7 @@ from .gpgmh import openpgpkey_from_data
 from .i18n import _
 from .keyfprscan import KeyFprScanWidget
 from .keyconfirm import PreSignWidget
-from .util import sign_keydata_and_send, fix_infobar, is_bt_available
+from .util import sign_keydata_and_send, fix_infobar, get_local_bt_address
 
 log = logging.getLogger(__name__)
 
@@ -117,11 +117,12 @@ class ReceiveApp:
 
     def check_bt_availability(self):
         try:
-            avail = is_bt_available()
-            if avail:
+            if get_local_bt_address():
                 self.bt_usable = True
+                log.debug("A working Bluetooth seems to be available")
             else:
                 self.bt_usable = False
+                log.debug("There is no usable Bluetooth")
         except NoBluezDbus as e:
             log.debug("Bluetooth service seems to be unavailable: %s", e)
         except NoAdapter as e:
