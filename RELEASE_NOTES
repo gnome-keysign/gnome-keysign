@@ -9,6 +9,7 @@ Changes
 ==========
 
  * Check for Bluetooth in a separate thread
+ * Detect powered off bluetooth adapter
  * Do not show "offline" keys
  * Make setup.py python 3 compatible
 
