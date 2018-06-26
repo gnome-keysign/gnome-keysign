@@ -31,12 +31,14 @@ from .avahioffer import AvahiHTTPOffer
 from . import gpgmh
 # We import i18n to have the locale set up for Glade
 from .i18n import _
+log = logging.getLogger(__name__)
+
 try:
     from .bluetoothoffer import BluetoothOffer
 except ImportError:
+    log.exception("cannot import BluetoothOffer")
     BluetoothOffer = None
 
-log = logging.getLogger(__name__)
 
 
 class SendApp:
@@ -102,6 +104,8 @@ class SendApp:
             bt_data = self.bt_offer.allocate_code()
             if bt_data:
                 discovery_list.append(bt_data)
+        else:
+            log.debug("No BluetoothOffer: %r", BluetoothOffer)
         discovery_data = ";".join(discovery_list)
         if bt_data:
             self.bt_offer.start().addCallback(self._restart_bluetooth)
