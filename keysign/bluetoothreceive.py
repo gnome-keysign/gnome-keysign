@@ -63,6 +63,7 @@ class BluetoothReceive:
                     try:
                         while True:
                             part_message = self.client_socket.recv(self.size)
+                            log.debug("Read %d bytes: %r", len(part_message), part_message)
                             message += part_message
                     except BluetoothError as be:
                         if be.args[0] == "(104, 'Connection reset by peer')":
@@ -113,7 +114,7 @@ class BluetoothReceive:
                 if be.args[0] == "(9, 'Bad file descriptor')":
                     log.info("The old Bluetooth connection was already closed")
                 else:
-                    log.warning("An unknown bt error occurred: %s" % be.args[0])
+                    log.exception("An unknown bt error occurred")
 
 
 def main(args):
