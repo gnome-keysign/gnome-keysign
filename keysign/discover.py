@@ -78,8 +78,8 @@ class Discover:
                 key_data = None
                 log.warning("Neither key_data nor btcode. Weird")
 
-        log.debug("Returning key: %r, succes: %r, message: %r",
-            key_data, success, messages)
+        log.debug("Returning key: %r, success: %r, message: %r",
+                  key_data, success, message)
         returnValue((key_data, success, message))
 
 
