@@ -240,9 +240,9 @@ setup(
     long_description=open('README.rst').read(),
     
     entry_points = {
-        #'console_scripts': [
-        #    'keysign = keysign.main'
-        #],
+        'console_scripts': [
+            'gnome-keysign-sign-key = keysign.SignKey:main'
+        ],
         'gui_scripts': [
             'gnome-keysign = keysign:main',
             'gks-qrcode = keysign.GPGQRCode:main',
