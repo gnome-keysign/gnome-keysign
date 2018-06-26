@@ -12,6 +12,7 @@ Changes
  * Detect powered off bluetooth adapter
  * Do not show "offline" keys
  * Make setup.py python 3 compatible
+ * Install gnome-keysign-sign-key CLI tool
 
 Resources
 =========
