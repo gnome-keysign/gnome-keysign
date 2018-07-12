@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.22.1 -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkMessageDialog" id="dialog_avahi">
+    <property name="can_focus">False</property>
+    <property name="type_hint">dialog</property>
+    <property name="text" translatable="yes">Unable to Start Avahi</property>
+    <property name="secondary_text" translatable="yes">Keysign is unable to automatically start Avahi. You can try to execute `systemctl start avahi-daemon` for solving this problem.</property>
+    <child internal-child="vbox">
+      <object class="GtkBox">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox">
+            <property name="can_focus">False</property>
+            <property name="hexpand">True</property>
+            <property name="homogeneous">True</property>
+            <property name="layout_style">expand</property>
+            <child>
+              <object class="GtkButton" id="avahi_ok">
+                <property name="label" translatable="yes">OK</property>
+                <property name="name">avahi_ok</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

@@ -48,6 +48,7 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .avahioffer import AvahiHTTPOffer
 from .avahidiscovery import AvahiKeysignDiscoveryWithMac
+from .errors import NoAvahiDbus
 from .keyconfirm import PreSignWidget
 from .keyfprscan import KeyFprScanWidget
 from .keylistwidget import KeyListWidget
@@ -149,31 +150,46 @@ class KeysignApp(Gtk.Application):
 
 
         # Load Receive part
-        self.receive = PswMappingReceiveApp(self.on_presign_mapped)
-        rs = self.receive.stack
+        try:
+            self.receive = PswMappingReceiveApp(self.on_presign_mapped)
+        except NoAvahiDbus as de:
+            log.info("Probably Avahi needs to be manually started: %s", de)
+            ui_file_path = os.path.join(
+                os.path.dirname(os.path.abspath(__file__)),
+                "dialog_avahi.ui")
+            appwindow = 'dialog_avahi'
+            builder = Gtk.Builder()
+            builder.add_objects_from_file(ui_file_path, [appwindow])
+            window.set_wmclass("GNOME Keysign", "GNOME Keysign")
+            window.set_title("GNOME Keysign")
+            ok_button = builder.get_object("avahi_ok")
+            ok_button.connect('clicked', self.on_delete_window)
+            window = builder.get_object(appwindow)
+        else:
+            rs = self.receive.stack
 
-        rs.connect('notify::visible-child',
-            self.on_receive_stack_switch)
+            rs.connect('notify::visible-child',
+                self.on_receive_stack_switch)
 
 
-        scanner = self.receive.scanner
-        scanner.connect("map", self.on_scanner_mapped)
-        self.receive_stack = rs
+            scanner = self.receive.scanner
+            scanner.connect("map", self.on_scanner_mapped)
+            self.receive_stack = rs
 
 
-        # Hm. Leaving comments for translators does not seem to work
-        self.send_receive_stack.add_titled(self.send_stack,
-            "send_stack", _("Send"))
-        self.send_receive_stack.add_titled(rs,
-            "receive_stack", _("Receive"))
+            # Hm. Leaving comments for translators does not seem to work
+            self.send_receive_stack.add_titled(self.send_stack,
+                "send_stack", _("Send"))
+            self.send_receive_stack.add_titled(rs,
+                "receive_stack", _("Receive"))
 
-        # These properties must be set after the stacks has been added to the window
-        # because they require a window element that "receive.ui" file doesn't provide.
-        accel_group = Gtk.AccelGroup()
-        window.add_accel_group(accel_group)
-        self.receive.accept_button.add_accelerator("clicked", accel_group, ord('o'), Gdk.ModifierType.MOD1_MASK,
-                                                   Gtk.AccelFlags.VISIBLE)
-        self.receive.accept_button.set_can_default(True)
+            # These properties must be set after the stacks has been added to the window
+            # because they require a window element that "receive.ui" file doesn't provide.
+            accel_group = Gtk.AccelGroup()
+            window.add_accel_group(accel_group)
+            self.receive.accept_button.add_accelerator("clicked", accel_group, ord('o'), Gdk.ModifierType.MOD1_MASK,
+                                                       Gtk.AccelFlags.VISIBLE)
+            self.receive.accept_button.set_can_default(True)
 
         window.show_all()
         self.add_window(window)
