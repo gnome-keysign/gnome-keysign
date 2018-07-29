@@ -553,9 +553,11 @@ class TestLatin1(TestSignAndEncrypt):
     SENDER_KEY = "seckey-latin1.asc"
     RECEIVER_KEY = "seckey-2.asc"
 
+
 class TestColon(TestSignAndEncrypt):
     SENDER_KEY = "seckey-colon.asc"
     RECEIVER_KEY = "seckey-2.asc"
+
 
 class TestMultipleUID(TestSignAndEncrypt):
     SENDER_KEY = "seckey-multiple-uid-colon.asc"
@@ -565,3 +567,11 @@ class TestMultipleUID(TestSignAndEncrypt):
 class TestUtf8(TestSignAndEncrypt):
     SENDER_KEY = "seckey-utf8.asc"
     RECEIVER_KEY = "seckey-utf8-2.asc"
+
+
+# There is little we can do here.
+# That OpenPGP key is incomplete, i.e. it lacks the "d" needed to
+# do anything meaningful with the key.
+#class TestSubKeys(TestSignAndEncrypt):
+#    SENDER_KEY = "seckey-2.asc"
+#    RECEIVER_KEY = "seckey-subkeys.asc"

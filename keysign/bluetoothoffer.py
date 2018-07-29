@@ -28,6 +28,7 @@ if __name__ == "__main__" and __package__ is None:
     import keysign
     __package__ = str('keysign')
 
+from .errors import NoBluezDbus, NoAdapter, UnpoweredAdapter
 from .gpgmh import get_public_key_data, get_usable_keys
 from .i18n import _
 from .util import get_local_bt_address, mac_generate
@@ -43,7 +44,6 @@ class BluetoothOffer:
         self.server_socket = None
         self.message_def = None
         self.stopped = False
-        self.code = None
 
     @inlineCallbacks
     def start(self):
@@ -76,29 +76,31 @@ class BluetoothOffer:
         returnValue((success, message))
 
     def allocate_code(self):
+        """Acquires and returns a string suitable for finding the key via Bluetooth.
+        Returns None if no powered on adapter could be found."""
+        # TODO: when we have magic-wormhole we should perform this operation in async
+        # and show the loading spinning wheel
+        bt_data = None
         try:
             code = get_local_bt_address().upper()
-        except dbus.exceptions.DBusException as e:
-            if e.get_dbus_name() == "org.freedesktop.systemd1.NoSuchUnit":
-                log.info("No Bluetooth devices found, probably the bluetooth service is not running")
-            elif e.get_dbus_name() == "org.freedesktop.DBus.Error.UnknownObject":
-                log.info("No Bluetooth devices available")
-            else:
-                log.error("An unexpected error occurred %s", e.get_dbus_name())
-            self.code = None
-            return None
-        if self.server_socket is None:
-            self.server_socket = BluetoothSocket(RFCOMM)
-            # We can also bind only the mac found with get_local_bt_address(), anyway
-            # even with multiple bt in a single system BDADDR_ANY is not a problem
-            self.server_socket.bind((socket.BDADDR_ANY, PORT_ANY))
-            # Number of unaccepted connections that the system will allow before refusing new connections
-            backlog = 1
-            self.server_socket.listen(backlog)
-            log.info("sockname: %r", self.server_socket.getsockname())
-        port = self.server_socket.getsockname()[1]
-        log.info("BT Code: %s %s", code, port)
-        bt_data = "BT={0};PT={1}".format(code, port)
+        except NoBluezDbus as e:
+            log.debug("Bluetooth service seems to be unavailable: %s", e)
+        except NoAdapter as e:
+            log.debug("Bluetooth adapter is not available: %s", e)
+        except UnpoweredAdapter as e:
+            log.debug("Bluetooth adapter is turned off: %s", e)
+        else:
+            if self.server_socket is None:
+                self.server_socket = BluetoothSocket(RFCOMM)
+                # We create a bind with the Bluetooth address we have in the system
+                self.server_socket.bind((code, PORT_ANY))
+                # Number of unaccepted connections that the system will allow before refusing new connections
+                backlog = 1
+                self.server_socket.listen(backlog)
+                log.info("sockname: %r", self.server_socket.getsockname())
+            port = self.server_socket.getsockname()[1]
+            log.info("BT Code: %s %s", code, port)
+            bt_data = "BT={0};PT={1}".format(code, port)
         return bt_data
 
     def stop(self):

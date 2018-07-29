@@ -31,7 +31,7 @@ from gi.repository import Gst
 if __name__ == "__main__":
     from twisted.internet import gtk3reactor
     gtk3reactor.install()
-from twisted.internet import reactor
+from twisted.internet import reactor, threads
 from twisted.internet.defer import inlineCallbacks
 from wormhole.errors import WrongPasswordError, LonelyError
 
@@ -49,12 +49,13 @@ if  __name__ == "__main__" and __package__ is None:
 
 
 from .avahidiscovery import AvahiKeysignDiscoveryWithMac
-from .keyfprscan import KeyFprScanWidget
-from .keyconfirm import PreSignWidget
+from .discover import Discover
+from .errors import NoBluezDbus, UnpoweredAdapter, NoAdapter
 from .gpgmh import openpgpkey_from_data
 from .i18n import _
-from .util import sign_keydata_and_send, fix_infobar, is_bt_available
-from .discover import Discover
+from .keyfprscan import KeyFprScanWidget
+from .keyconfirm import PreSignWidget
+from .util import sign_keydata_and_send, fix_infobar, get_local_bt_address
 
 log = logging.getLogger(__name__)
 
@@ -119,6 +120,12 @@ class ReceiveApp:
         # Clear the "downloading" label
         builder.get_object("label10").set_label("")
 
+        self.bt_usable = False
+
+        # We call this in async because it can take several seconds to complete and we don't want
+        # to stall the UI boot. Also we don't care about having this information immediately.
+        threads.deferToThread(self.check_bt_availability)
+
     def on_redo_button_clicked(self, button):
         log.info("redo pressed")
         self.stack.remove(self.rb)
@@ -127,6 +134,21 @@ class ReceiveApp:
     def on_cancel_button_clicked(self, button):
         log.info("cancel pressed")
         self.stack.remove(self.rb)
+
+    def check_bt_availability(self):
+        try:
+            if get_local_bt_address():
+                self.bt_usable = True
+                log.debug("A working Bluetooth seems to be available")
+            else:
+                self.bt_usable = False
+                log.debug("There is no usable Bluetooth")
+        except NoBluezDbus as e:
+            log.debug("Bluetooth service seems to be unavailable: %s", e)
+        except NoAdapter as e:
+            log.debug("Bluetooth adapter is not available: %s", e)
+        except UnpoweredAdapter as e:
+            log.debug("Bluetooth adapter is turned off: %s", e)
 
     def on_keydata_downloaded(self, keydata, pixbuf=None):
         key = openpgpkey_from_data(keydata)
@@ -193,7 +215,7 @@ class ReceiveApp:
         """We show an infobar if we can only receive with Avahi and
         there are zero nearby servers"""
         ib = userdata
-        if number == 0 and not is_bt_available():
+        if number == 0 and not self.bt_usable:
             ib.show()
         elif ib.is_visible():
             ib.hide()

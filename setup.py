@@ -114,7 +114,7 @@ def get_catalogs(localedir):
     catalogs = {}
 
     for pofile in pofiles:
-        catalog = read_po(open(pofile, 'r'))
+        catalog = read_po(codecs.open(pofile, 'r', encoding="utf-8"))
         catalogs[catalog.locale] = catalog
         logging.info("Found %d strings for %s", len(catalog), catalog.locale)
         # logging.debug("Strings for %r", catalog, catalog.values())
@@ -242,9 +242,9 @@ setup(
     long_description=open('README.rst').read(),
     
     entry_points = {
-        #'console_scripts': [
-        #    'keysign = keysign.main'
-        #],
+        'console_scripts': [
+            'gnome-keysign-sign-key = keysign.SignKey:main'
+        ],
         'gui_scripts': [
             'gnome-keysign = keysign:main',
             'gks-qrcode = keysign.GPGQRCode:main',

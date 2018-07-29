@@ -80,7 +80,7 @@ so it should be easy for you to install it.
 If your version is older than that,
 this list of packages seems to make it work:
 
-    python  python-lxml  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad gstreamer1.0-plugins-good python-gi-cairo python-gpg  python-twisted python-future
+    python  python-lxml  avahi-daemon  python-avahi python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad gstreamer1.0-plugins-good gstreamer1.0-gtk3  python-gi-cairo python-gpg  python-twisted python-future
 
 Magic Wormhole can be installed with pip:
 
@@ -89,7 +89,10 @@ Magic Wormhole can be installed with pip:
     pip install magic-wormhole
 
 In Ubuntu, the package
-gstreamer1.0-plugins-bad provides the zbar and the gtksink element, and
+gstreamer1.0-plugins-bad provides the zbar element and in versions older
+than 18.04 the gtksink element.
+In newer versions of Ubuntu, the gtksink elment is provided by the
+gstreamer1.0-gtk3 packages.
 gstreamer1.0-plugins-good provides the autovideosrc element.
 
 These packages should be optional:
@@ -100,6 +103,11 @@ These packages should be optional:
 Fedora dependencies
 --------------------
 
+Eventually an up to date version is in Fedora's `COPR <https://copr.fedorainfracloud.org/coprs/muelli/gnome-keysign/>`_.
+
+If that does not work or is not recent enough, then you may try an 
+OpenSuSE package as mentioned above or install the dependencies 
+yourself.
 The following has worked at least once for getting the application running,
 assuming that pip and git are already installed:
 
@@ -137,7 +145,7 @@ You will need to have the xdg-desktop-portals installed in order to send email.
 You also need a pinentry to does not require access to the X window. A pinentry-gnome3 as of 1.0.0 works.
 Please see the documentation in the flatpak folder for more details regarding building and installation as a flatpak.
 
-A note to Arch users: This Pipewire bug <https://github.com/PipeWire/pipewire/issues/55>`_ is preventing gstreamer from running correctly.
+A note to Arch users: `This Pipewire bug <https://github.com/PipeWire/pipewire/issues/55>`_ is preventing gstreamer from running correctly.
 
 
 

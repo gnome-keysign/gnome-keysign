@@ -45,44 +45,58 @@ class Discover:
         
         try:
             key_data = yield threads.deferToThread(self.discovery.find_key, self.userdata)
-            log.debug("Received key successfully")
         except ValueError as e:
             key_data = None
             success = False
             message = "Error downloading key, maybe it has been altered in transit"
             log.warning(message, exc_info=e)
-            returnValue((key_data, success, message))
-
-        if key_data and not self.stopped:
-            success = True
-            message = ""
-            returnValue((key_data, success, message))
-        if self.bt_code and BluetoothReceive and not self.stopped:
-            # We try Bluetooth, if we have it
-            log.info("Trying to connect to %s with Bluetooth", self.bt_code)
-            # We try to see if Bluetooth was imported,
-            # else we log an event of missing Pybluez.
-            try:
-                self.bt = BluetoothReceive(self.bt_port)
-                msg_tuple = yield self.bt.find_key(self.bt_code, self.mac)
-                key_data, success, message = msg_tuple
-                if key_data:
-                    # If we found the key, otherwise we continue with wormhole
-                    returnValue((key_data, success, message))
-            except TypeError as e:
-                log.exception("Pybluez may be missing.")
-        elif self.worm_code and not self.stopped:
-            # We try the wormhole code, if we have it
-            log.info("Trying to use this code with Wormhole: %s", self.worm_code)
-            self.worm = WormholeReceive(self.worm_code)
-            msg_tuple = yield self.worm.start()
-            key_data, success, message = msg_tuple
-            returnValue((key_data, success, message))
         else:
+            # Actually.. key_data can very well be None as an indication of failure. We might change that API to throw.
+            log.debug("We may have found a key: %r", key_data)
+
+        if self.stopped:
             key_data = None
             success = False
-            message = LonelyError
-            returnValue((key_data, success, message))
+            message = ""
+        else:
+            if key_data:
+                success = True
+                message = ""
+            elif self.bt_code:
+                # We try Bluetooth, if we have it
+                log.info("Trying to connect to %s with Bluetooth", self.bt_code)
+                # We try to see if Bluetooth was imported,
+                # else we log an event of missing Pybluez.
+                try:
+                    self.bt = BluetoothReceive(self.bt_port)
+                    msg_tuple = yield self.bt.find_key(self.bt_code, self.mac)
+                except TypeError as e:
+                    key_data = None
+                    success = False
+                    message = ""
+                    log.exception("Pybluez may be missing.")
+                else:
+                    key_data, success, message = msg_tuple
+                    if key_data:
+                        # If we found the key
+                        log.debug("Found the key via bluetooth: %r", key_data[:32])
+            # We check again for the stopped variable because we don't know how long BT worked
+            elif self.worm_code and not self.stopped:
+                # We try the wormhole code, if we have it
+                log.info("Trying to use this code with Wormhole: %s", self.worm_code)
+                self.worm = WormholeReceive(self.worm_code)
+                msg_tuple = yield self.worm.start()
+                key_data, success, message = msg_tuple
+            else:
+                message = ""
+                success = False
+                key_data = None
+                log.warning("Neither key_data nor btcode. Weird")
+
+        log.debug("Returning key: %r, success: %r, message: %r",
+                  key_data, success, message)
+        returnValue((key_data, success, message))
+
 
     def stop(self):
         self.stopped = True

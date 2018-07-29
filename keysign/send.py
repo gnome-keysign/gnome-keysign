@@ -33,8 +33,13 @@ from .offer import Offer
 from . import gpgmh
 # We import i18n to have the locale set up for Glade
 from .i18n import _
-
 log = logging.getLogger(__name__)
+
+try:
+    from .bluetoothoffer import BluetoothOffer
+except ImportError:
+    log.exception("cannot import BluetoothOffer")
+    BluetoothOffer = None
 
 
 class SendApp:

@@ -25,14 +25,18 @@ if sys.version_info.major < 3:
     input = raw_input
 
 
-def main(args):
+def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="Sign an OpenPGP key from a file.  The program will open each file, exrtact exactly one OpenPGP key, sign each UID separately, encrypt and send each signed UID using xdg-email.")
+    parser.add_argument("file", nargs='+', type=argparse.FileType('rb'),
+        help="File containing OpenPGP keys")
+    args = parser.parse_args()
+
     log = logging.getLogger(__name__)
     log.debug('Running main with args: %s', args)
-    if not args:
-        raise ValueError("You need to give filesnames as args: %s" % args)
-    for fname in args:
-        data = open(fname, 'rb').read()
-        log.info("Calling %r to sign %s", sign_keydata_and_send, fname)
+    for fhandle in args.file:
+        data = fhandle.read()
+        log.info("Calling %r to sign %s", sign_keydata_and_send, fhandle.name)
         tmpfiles = list(sign_keydata_and_send(keydata=data))
     log.info("Finished signing. " +
              "We're only waiting for the signature " +
@@ -44,4 +48,4 @@ def main(args):
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG,
             format='%(name)s (%(levelname)s): %(message)s')
-    sys.exit(main(sys.argv[1:]))
+    sys.exit(main())
