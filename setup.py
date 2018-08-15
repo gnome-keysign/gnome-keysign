@@ -233,7 +233,7 @@ setup(
         "pgpy",
         "nose",
         "tox",
-        "pep8",
+        "pycodestyle",
         "pylint",
     ],
     license='GPLv3+',
