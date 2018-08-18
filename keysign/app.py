@@ -200,6 +200,8 @@ class KeysignApp(Gtk.Application):
         elif current == self.send.rb:
             log.debug("Result page now visible")
             self.on_resultbox_mapped(self.send.rb)
+        else:
+            log.error("An unexpected page is now visible: %r", current)
 
     def on_receive_stack_switch(self, stack, *args):
         log.debug("Switched Receive Stack! %r", args)
