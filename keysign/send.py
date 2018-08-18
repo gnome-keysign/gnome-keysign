@@ -285,6 +285,8 @@ class App(Gtk.Application):
         elif current == self.send_app.rb:
             log.debug("Result page now visible")
             self.on_resultbox_mapped(self.send_app.rb)
+        else:
+            log.error("An unexpected page is now visible: %r", current)
 
     def on_resultbox_mapped(self, rb):
         log.debug("Resultbox becomes visible!")
