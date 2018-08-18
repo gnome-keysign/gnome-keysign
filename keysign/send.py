@@ -162,12 +162,12 @@ class SendApp:
         self.klw.ib.show()
         log.info("No Internet connection")
 
-    def create_keypresent(self, code, discovery_data):
+    def create_keypresent(self, discovery_code, discovery_data):
         self._deactivate_timer()
         log.info("Use this for discovering the other key: %r", discovery_data)
         ####
         # Create widget for key
-        self.kpw = KeyPresentWidget(self.key, code, discovery_data)
+        self.kpw = KeyPresentWidget(self.key, discovery_code, discovery_data)
 
         ####
         # Show widget for key
