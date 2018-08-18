@@ -153,12 +153,13 @@ class SendApp:
             self.show_result(success, message)
 
     def slow_connection(self):
-        self.klw.label_ib.set_label("Very slow Internet connection!")
+        self.klw.label_ib.set_label(_("Still trying to get a connection to the Internet. "
+                                      "It appears to be slow or unavailable."))
         self.klw.ib.show()
         log.info("Slow Internet connection")
 
     def no_connection(self):
-        self.klw.label_ib.set_label("No Internet connection!")
+        self.klw.label_ib.set_label(_("There isn't an Internet connection!"))
         self.klw.ib.show()
         log.info("No Internet connection")
 
@@ -186,16 +187,16 @@ class SendApp:
         self.kpw = None
 
         if success:
-            self.result_label.set_label("Key successfully sent.\n"
-                                        "You should receive soon an email with the signature.")
+            self.result_label.set_label(_("Key successfully sent.\n"
+                                          "You should receive soon an email with the signature."))
             self.stack.set_visible_child(self.rb)
         else:
             if type(message) == WrongPasswordError:
-                self.result_label.set_label("The security of the connection seems low.\n"
-                                            "Either your partner has entered a wrong code or "
-                                            "someone tried to intercept your connection")
+                self.result_label.set_label(_("Could not establish a secure connection.\n"
+                                              "Either your partner has entered a wrong code or "
+                                              "someone tried to intercept your connection"))
             else:
-                self.result_label.set_label("An unexpected error occurred:\n%s" % message)
+                self.result_label.set_label(_("An unexpected error occurred:\n%s" % message))
             self.stack.set_visible_child(self.rb)
 
     def deactivate(self):
