@@ -167,7 +167,7 @@ class KeyPresent(Gtk.Application):
         fpr = args
 
         key = next(iter(get_usable_keys(pattern=fpr)))
-        self.key_present_page = KeyPresentWidget(key)
+        self.key_present_page = KeyPresentWidget(key, format_fingerprint(key.fingerprint))
 
         super(KeyPresent, self).run()
 
