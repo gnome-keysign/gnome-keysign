@@ -1,5 +1,5 @@
 GNOME Keysign is a tool to make signing OpenPGP keys as easy as possible.
-This is the v0.9.8 release which has some usability fixes.
+This is the v0.9.9 release which introduces key transport via the Internet.
 
 You can get the app from:
             
@@ -8,14 +8,10 @@ You can get the app from:
 Changes
 ==========
 
- * Check for Bluetooth in a separate thread
- * Detect powered off bluetooth adapter
- * Do not show "offline" keys
- * Make setup.py python 3 compatible
- * Install gnome-keysign-sign-key CLI tool
+ * Added support for magic wormhole as transport
 
 Resources
 =========
 
-Download: https://github.com/GNOME-Keysign/gnome-keysign/archive/0.9.8.tar.gz
+Download: https://github.com/GNOME-Keysign/gnome-keysign/archive/0.9.9.tar.gz
 Web site: https://wiki.gnome.org/Apps/GnomeKeysign
