@@ -23,6 +23,7 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .gpgmh import get_usable_keys
 from .i18n import _
+from .util import fix_infobar
 
 log = logging.getLogger(__name__)
 
@@ -134,6 +135,10 @@ class KeyListWidget(Gtk.HBox):
         self.add(widget)
 
         self.listbox = builder.get_object("keys_listbox")
+        self.code_spinner = builder.get_object("code_spinner")
+        self.ib = builder.get_object('infobar_internet')
+        fix_infobar(self.ib)
+        self.label_ib = builder.get_object('label_internet')
 
         if len(list(keys)) <= 0:
             infobar = builder.get_object("infobar")

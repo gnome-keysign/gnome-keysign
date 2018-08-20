@@ -33,6 +33,7 @@ gtk3reactor.install()
 
 from twisted.internet import reactor
 
+
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
                               "this script directly which is discouraged. " +
@@ -96,7 +97,7 @@ class KeysignApp(Gtk.Application):
     def __init__(self, *args, **kwargs):
         super(KeysignApp, self).__init__(*args, **kwargs)
         self.connect('activate', self.on_activate)
-        
+
         self.send_stack = None
         self.receive_stack = None
         self.send_receive_stack = None
@@ -117,6 +118,8 @@ class KeysignApp(Gtk.Application):
         self.headerbar = window.get_titlebar()
         self.header_button = builder.get_object("back_refresh_button")
         self.header_button.connect('clicked', self.on_header_button_clicked)
+        self.internet_toggle = builder.get_object("internet_toggle")
+        self.internet_toggle.connect("toggled", self.on_toggle_clicked)
 
         sw = builder.get_object('stackswitcher1')
         # FIXME: I want to be able to press Alt+S and Alt+R respectively
@@ -140,10 +143,6 @@ class KeysignApp(Gtk.Application):
             p.remove(ss)
         ss.connect('notify::visible-child', self.on_send_stack_switch)
         ss.connect('map', self.on_send_stack_mapped)
-        klw = self.send.klw
-        klw.connect("key-activated", self.on_key_activated)
-        klw.connect("map", self.on_keylist_mapped)
-        klw.props.margin_left = klw.props.margin_right = 15
         self.send_stack = ss
         ## End of loading send part
 
@@ -185,56 +184,49 @@ class KeysignApp(Gtk.Application):
     def on_delete_window(*args):
         reactor.callFromThread(reactor.stop)
 
-    def on_key_activated(self, widget, key):
-        log.info("Activated key %r", key)
-        # Ouf, we rely on the the SendApp to have reacted to
-        # the signal first, so that it sets up the keypresentwidget
-        # and so that we can access it here.  If it did, however,
-        # We might not be able to catch the mapped signal quickly
-        # enough. So we ask the widget wether it is already mapped.
-        kpw = self.send.kpw
-        kpw.connect('map', self.on_keypresent_mapped)
-        log.debug("KPW to wait for map: %r (%r)", kpw, kpw.get_mapped())
-        if kpw.get_mapped():
-            # The widget is already visible. Let's quickly call our handler
-            self.on_keypresent_mapped(kpw)
-
-        ####
-        # Saving subtitle
-        self.headerbar_subtitle = self.headerbar.get_subtitle()
-        self.headerbar.set_subtitle(_("Sending {}").format(key.fpr))
-        ####
-        # Making button clickable
-        self.header_button.set_sensitive(True)
-
-
-
-
-
     def on_sr_stack_switch(self, stack, *args):
         log.debug("Switched Stack! %r", args)
         #self.update_header_button()
 
     def on_send_stack_switch(self, stack, *args):
         log.debug("Switched Send Stack! %r", args)
-        #self.update_header_button()
+        current = self.send.stack.get_visible_child()
+        if current == self.send.klw:
+            log.debug("Key list page now visible")
+            self.on_keylist_mapped(self.send.klw)
+        elif current == self.send.kpw:
+            log.debug("Key present page now visible")
+            self.on_keypresent_mapped(self.send.kpw)
+        elif current == self.send.rb:
+            log.debug("Result page now visible")
+            self.on_resultbox_mapped(self.send.rb)
+        else:
+            log.error("An unexpected page is now visible: %r", current)
 
     def on_receive_stack_switch(self, stack, *args):
         log.debug("Switched Receive Stack! %r", args)
         #self.update_header_button()
 
-
     def on_send_header_button_clicked(self, button, *args):
-        # Here we assume that there is only one place where
+        # Here we assume that there are only two places where
         # we could have possibly pressed this button, i.e.
-        # from the keypresentwidget.
+        # from the keypresentwidget or the result page
         log.debug("Send Headerbutton %r clicked! %r", button, args)
+        current = self.send.stack.get_visible_child()
         klw = self.send.klw
-        self.send_stack.set_visible_child(klw)
-        
-        self.send.deactivate()
-
-
+        kpw = self.send.kpw
+        rb = self.send.rb
+        # If we are in the keypresentwidget
+        if current == kpw:
+            self.send_stack.set_visible_child(klw)
+            self.send.deactivate()
+        # If we are in the result page
+        elif current == rb:
+            self.send_stack.remove(current)
+            self.send.set_saved_child_visible()
+            self.send.on_key_activated(None, self.send.key)
+        else:
+            log.error("Header button pressed in an unexpected page: %s", current)
 
     def on_receive_header_button_clicked(self, button, *args):
         # Here we assume that there is only one place where
@@ -259,8 +251,17 @@ class KeysignApp(Gtk.Application):
             raise RuntimeError("We expected either send or receive stack "
                 "but got %r" % visible_child)
 
+    def on_toggle_clicked(self, toggle):
+        log.info("Internet toggled to: %s", toggle.get_active())
+        self.send.set_internet_option(toggle.get_active())
 
-
+    def on_resultbox_mapped(self, rb):
+        log.debug("Resultbox becomes visible!")
+        self.header_button.set_sensitive(True)
+        self.header_button.set_image(
+            Gtk.Image.new_from_icon_name("go-previous",
+                                         Gtk.IconSize.BUTTON))
+        self.internet_toggle.hide()
 
     def on_keylist_mapped(self, keylistwidget):
         log.debug("Keylist becomes visible!")
@@ -269,10 +270,12 @@ class KeysignApp(Gtk.Application):
             Gtk.IconSize.BUTTON))
         # We don't support refreshing for now.
         self.header_button.set_sensitive(False)
-
+        self.internet_toggle.show()
 
     def on_send_stack_mapped(self, stack):
         log.debug("send stack becomes visible!")
+        # Adjust the top bar buttons
+        self.on_send_stack_switch(stack)
 
     def on_keypresent_mapped(self, kpw):
         log.debug("keypresent becomes visible!")
@@ -280,6 +283,7 @@ class KeysignApp(Gtk.Application):
         self.header_button.set_image(
             Gtk.Image.new_from_icon_name("go-previous",
             Gtk.IconSize.BUTTON))
+        self.internet_toggle.hide()
 
     def on_scanner_mapped(self, scanner):
         log.debug("scanner becomes visible!")
@@ -287,6 +291,7 @@ class KeysignApp(Gtk.Application):
         self.header_button.set_image(
             Gtk.Image.new_from_icon_name("go-previous",
             Gtk.IconSize.BUTTON))
+        self.internet_toggle.hide()
 
     def on_presign_mapped(self, psw):
         log.debug("presign becomes visible!")
@@ -294,11 +299,10 @@ class KeysignApp(Gtk.Application):
         self.header_button.set_image(
             Gtk.Image.new_from_icon_name("go-previous",
             Gtk.IconSize.BUTTON))
+        self.internet_toggle.hide()
 
 
-
-
-def main(args = []):
+def main(args=[]):
     logging.basicConfig(
         level=logging.DEBUG,
         format='%(name)s (%(levelname)s): %(message)s')

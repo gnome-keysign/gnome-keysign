@@ -8,10 +8,12 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GLib
+from wormhole.errors import ServerConnectionError, LonelyError, WrongPasswordError
 if __name__ == "__main__":
     from twisted.internet import gtk3reactor
     gtk3reactor.install()
 from twisted.internet import reactor
+from twisted.internet.defer import inlineCallbacks
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -27,7 +29,7 @@ if  __name__ == "__main__" and __package__ is None:
 
 from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
-from .avahioffer import AvahiHTTPOffer
+from .offer import Offer
 from . import gpgmh
 # We import i18n to have the locale set up for Glade
 from .i18n import _
@@ -40,7 +42,6 @@ except ImportError:
     BluetoothOffer = None
 
 
-
 class SendApp:
     """Common functionality needed when building the sending part
     
@@ -51,9 +52,7 @@ class SendApp:
     call deactivate().
     """
     def __init__(self, builder=None):
-        self.stopped = True
-        self.a_offer = None
-        self.bt_offer = None
+        self.offer = None
         self.stack = None
         self.stack_saved_visible_child = None
         self.klw = None
@@ -84,71 +83,155 @@ class SendApp:
         # code runs, it detaches itself from its parent, i.e. the stack.
         # We need need to instantiate the widget with key, however.
         fakekey = gpgmh.Key("","","")
-        kpw = KeyPresentWidget(fakekey, builder=builder)
+        kpw = KeyPresentWidget(fakekey, "", builder=builder)
 
+        self.rb = builder.get_object('resultbox')
+        self.stack.remove(self.rb)
         self.key = None
+        self.result_label = builder.get_object("result_label")
+        self.notify = None
+        self.internet_option = False
 
+    @inlineCallbacks
     def on_key_activated(self, widget, key):
-        self.stopped = False
+        # Deactivate any old connection attempt
+        self._deactivate_timer()
+        self.deactivate()
+        self.klw.ib.hide()
         self.key = key
         log.info("Activated key %r", key)
         ####
         # Start network services
-        discovery_list = []
-        self.a_offer = AvahiHTTPOffer(self.key)
-        a_data = self.a_offer.start()
-        discovery_list.append(a_data)
-        bt_data = None
-        if BluetoothOffer:
-            self.bt_offer = BluetoothOffer(self.key)
-            bt_data = self.bt_offer.allocate_code()
-            if bt_data:
-                discovery_list.append(bt_data)
+        self.klw.code_spinner.start()
+        if self.internet_option:
+            #self.kpw.internet_spinner.start()
+            # After 10 seconds without a wormhole code we display an info bar
+            timer = 10
+            self.notify = reactor.callLater(timer, self.slow_connection)
+            self.offer = Offer(self.key)
+            try:
+                info = yield self.offer.allocate_code(worm=True)
+            except ServerConnectionError:
+                # We are without a working Internet connection so we stop the previously
+                # activated Avahi server and we display an infobar
+                self._deactivate_timer()
+                self.offer.stop_avahi()
+                self.offer = None
+                self.klw.code_spinner.stop()
+                self.no_connection()
+                return
+
+            code, discovery_data = info
+            self.create_keypresent(code, discovery_data)
+            defers = self.offer.start()
+            for de in defers:
+                # TODO handle errors here?
+                de.addCallback(self._received)
         else:
-            log.debug("No BluetoothOffer: %r", BluetoothOffer)
-        discovery_data = ";".join(discovery_list)
-        if bt_data:
-            self.bt_offer.start().addCallback(self._restart_bluetooth)
+            self.offer = Offer(self.key)
+            info = yield self.offer.allocate_code(worm=False)
+            code, discovery_data = info
+            self.create_keypresent(code, discovery_data)
+            defers = self.offer.start()
+            for de in defers:
+                de.addCallback(self._received)
+
+    def _received(self, start_data):
+        success, message = start_data
+        if message and type(message) == LonelyError:
+            # This only means that we closed wormhole before a transfer
+            pass
+        elif message and message == "Back":
+            # Simply the return of the back button, no errors here
+            pass
+        elif message and type(message) == ServerConnectionError:
+            self._deactivate_timer()
+            self.deactivate()
+            self.klw.code_spinner.stop()
+            self.no_connection()
         else:
-            log.info("Bluetooth as been skipped")
+            self.show_result(success, message)
+
+    def slow_connection(self):
+        self.klw.label_ib.set_label(_("Still trying to get a connection to the Internet. "
+                                      "It appears to be slow or unavailable."))
+        self.klw.ib.show()
+        log.info("Slow Internet connection")
+
+    def no_connection(self):
+        self.klw.label_ib.set_label(_("There isn't an Internet connection!"))
+        self.klw.ib.show()
+        log.info("No Internet connection")
+
+    def create_keypresent(self, discovery_code, discovery_data):
+        self._deactivate_timer()
         log.info("Use this for discovering the other key: %r", discovery_data)
         ####
-        # Create and show widget for key
-        kpw = KeyPresentWidget(key, qrcodedata=discovery_data)
-        self.stack.add(kpw)
+        # Create widget for key
+        self.kpw = KeyPresentWidget(self.key, discovery_code, discovery_data)
+
+        ####
+        # Show widget for key
+        self.stack.add(self.kpw)
         self.stack_saved_visible_child = self.stack.get_visible_child()
-        self.stack.set_visible_child(kpw)
-        log.debug('Setting kpw: %r', kpw)
-        self.kpw = kpw
+        self.stack.set_visible_child(self.kpw)
+        log.debug('Setting kpw: %r', self.kpw)
+        self.klw.ib.hide()
+        self.klw.code_spinner.stop()
+
+    def show_result(self, success, message):
+        self._deactivate_offer()
+
+        self.stack.add(self.rb)
+        self.stack.remove(self.kpw)
+        self.kpw = None
+
+        if success:
+            self.result_label.set_label(_("Key successfully sent.\n"
+                                          "You should receive soon an email with the signature."))
+            self.stack.set_visible_child(self.rb)
+        else:
+            if type(message) == WrongPasswordError:
+                self.result_label.set_label(_("Could not establish a secure connection.\n"
+                                              "Either your partner has entered a wrong code or "
+                                              "someone tried to intercept your connection"))
+            else:
+                self.result_label.set_label(_("An unexpected error occurred:\n%s" % message))
+            self.stack.set_visible_child(self.rb)
 
     def deactivate(self):
-        self.stopped = True
         self._deactivate_offer()
 
         ####
-        # Re-set stack to inital position
-        self.stack.set_visible_child(self.stack_saved_visible_child)
-        self.stack.remove(self.kpw)
-        self.kpw = None
-        self.stack_saved_visible_child = None
+        # Re-set stack to initial position
+        self.set_saved_child_visible()
+        if self.kpw:
+            self.stack.remove(self.kpw)
+            self.kpw = None
+
+    def set_saved_child_visible(self):
+        if self.stack_saved_visible_child:
+            self.stack.set_visible_child(self.stack_saved_visible_child)
+            self.stack_saved_visible_child = None
+
+    def set_internet_option(self, value):
+        self._deactivate_timer()
+        self.deactivate()
+        self.klw.ib.hide()
+        self.klw.code_spinner.stop()
+        self.internet_option = value
+
+    def _deactivate_timer(self):
+        if self.notify and not self.notify.called:
+            self.notify.cancel()
+            self.notify = None
 
     def _deactivate_offer(self):
         # Stop network services
-        if self.a_offer:
-            self.a_offer.stop()
-            # We need to deallocate the avahi object or the used port will never be released
-            self.a_offer = None
-        if self.bt_offer:
-            self.bt_offer.stop()
-            self.bt_offer = None
+        if self.offer:
+            self.offer.stop()
+            self.offer = None
         log.debug("Stopped network services")
-
-    def _restart_bluetooth(self, _):
-        # If a BT transfer ends, we need to start again the service
-        # in order to accept new connections
-        if not self.stopped:
-            log.info("Bluetooth as been restarted")
-            self.bt_offer.start().addCallback(self._restart_bluetooth)
 
 
 class App(Gtk.Application):
@@ -168,11 +251,16 @@ class App(Gtk.Application):
         window.connect("delete-event", self.on_delete_window)
         self.headerbar = self.builder.get_object("headerbar")
         hb = self.builder.get_object("headerbutton")
-        hb.connect("clicked", self.on_headerbutton_clicked)
-        self.headerbutton = hb
+        hb.connect("clicked", self.on_header_button_clicked)
+        self.header_button = hb
+        self.internet_toggle = self.builder.get_object("internet_toggle")
+        self.internet_toggle.connect("toggled", self.on_toggle_clicked)
 
         self.send_app = SendApp(builder=self.builder)
-        self.send_app.klw.connect("key-activated", self.on_key_activated)
+        ss = self.send_app.stack
+        ss.connect('notify::visible-child', self.on_send_stack_switch)
+        ss.connect('map', self.on_send_stack_mapped)
+        self.send_stack = ss
 
         window.show_all()
         self.add_window(window)
@@ -181,37 +269,76 @@ class App(Gtk.Application):
     def on_delete_window(*args):
         reactor.callFromThread(reactor.stop)
 
-    
+    def on_toggle_clicked(self, toggle):
+        log.info("Internet toggled to: %s", toggle.get_active())
+        self.send_app.set_internet_option(toggle.get_active())
 
-    def on_key_activated(self, widget, key):
-        ####
-        # Saving subtitle
-        self.headerbar_subtitle = self.headerbar.get_subtitle()
-        self.headerbar.set_subtitle(_("Sending {}").format(key.fpr))
-        ####
-        # Making button clickable
-        self.headerbutton.set_sensitive(True)
+    def on_send_stack_switch(self, stack, *args):
+        log.debug("Switched Send Stack! %r", args)
+        current = self.send_app.stack.get_visible_child()
+        if current == self.send_app.klw:
+            log.debug("Key list page now visible")
+            self.on_keylist_mapped(self.send_app.klw)
+        elif current == self.send_app.kpw:
+            log.debug("Key present page now visible")
+            self.on_keypresent_mapped(self.send_app.kpw)
+        elif current == self.send_app.rb:
+            log.debug("Result page now visible")
+            self.on_resultbox_mapped(self.send_app.rb)
+        else:
+            log.error("An unexpected page is now visible: %r", current)
 
+    def on_resultbox_mapped(self, rb):
+        log.debug("Resultbox becomes visible!")
+        self.header_button.set_sensitive(True)
+        self.header_button.set_image(
+            Gtk.Image.new_from_icon_name("go-previous",
+                                         Gtk.IconSize.BUTTON))
+        self.internet_toggle.hide()
 
-    def on_headerbutton_clicked(self, button):
-        log.info("Headerbutton pressed: %r", button)
-        self.send_app.deactivate()
+    def on_keylist_mapped(self, keylistwidget):
+        log.debug("Keylist becomes visible!")
+        self.header_button.set_image(
+            Gtk.Image.new_from_icon_name("view-refresh",
+            Gtk.IconSize.BUTTON))
+        # We don't support refreshing for now.
+        self.header_button.set_sensitive(False)
+        self.internet_toggle.show()
 
-        # If we ever defer operations here, it seems that
-        # the order of steps is somewhat important for the
-        # responsiveness of the UI.  It seems that shutting down
-        # the HTTPd takes ages to finish and blocks animations.
-        # So we want to do that first, because we can argue
-        # better that going back takes some time rather than having
-        # a half-baked switching animation.
-        # For now, it doesn't matter, because we don't defer.
+    def on_send_stack_mapped(self, stack):
+        log.debug("send stack becomes visible!")
+        # Adjust the top bar buttons
+        self.on_send_stack_switch(stack)
 
-        ####
-        # Making button non-clickable
-        self.headerbutton.set_sensitive(False)
-        ####
-        # Restoring subtitle
-        self.headerbar.set_subtitle(self.headerbar_subtitle)
+    def on_keypresent_mapped(self, kpw):
+        log.debug("keypresent becomes visible!")
+        self.header_button.set_sensitive(True)
+        self.header_button.set_image(
+            Gtk.Image.new_from_icon_name("go-previous",
+            Gtk.IconSize.BUTTON))
+        self.internet_toggle.hide()
+
+    def on_send_header_button_clicked(self, button, *args):
+        # Here we assume that there is only two places where
+        # we could have possibly pressed this button, i.e.
+        # from the keypresentwidget or the result page
+        log.debug("Send Headerbutton %r clicked! %r", button, args)
+        current = self.send_app.stack.get_visible_child()
+        klw = self.send_app.klw
+        kpw = self.send_app.kpw
+        # If we are in the keypresentwidget
+        if current == kpw:
+            self.send_stack.set_visible_child(klw)
+            self.send_app.deactivate()
+        # Else we are in the result page
+        else:
+            self.send_stack.remove(current)
+            self.send_app.set_saved_child_visible()
+            self.send_app.on_key_activated(None, self.send_app.key)
+
+    def on_header_button_clicked(self, button, *args):
+        log.debug("Headerbutton %r clicked! %r", button, args)
+        return self.on_send_header_button_clicked(button, *args)
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)

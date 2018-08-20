@@ -19,9 +19,11 @@ from __future__ import unicode_literals
 
 import hashlib
 import hmac
+import json
 import logging
 import os
 import shutil
+import requests
 from subprocess import call
 from string import Template
 from tempfile import NamedTemporaryFile
@@ -30,14 +32,13 @@ from xml.etree import ElementTree
 try:
     from urllib.parse import urlparse, parse_qs
     from urllib.parse import ParseResult
-    from urllib.request import quote
 except ImportError:
     from urlparse import urlparse, parse_qs
     from urlparse import ParseResult
-    from urllib2 import quote
 
 import requests
 import dbus
+from wormhole._wordlist import PGPWordList
 from _dbus_bindings import BUS_DAEMON_NAME, BUS_DAEMON_PATH, BUS_DAEMON_IFACE
 import gi
 gi.require_version('Gtk', '3.0')
@@ -346,6 +347,26 @@ def download_key_http(address, port):
     data = requests.get(url.geturl(), timeout=5).content
     log.debug("finished downloading %d bytes", len(data))
     return data
+
+
+def encode_message(message):
+    """Serialize a string to json object and encode it in utf-8"""
+    return json.dumps(message).encode("utf-8")
+
+
+def decode_message(message):
+    """deserialize a json returning a string"""
+    return json.loads(message.decode("utf-8"))
+
+
+def is_code_complete(code, length=2):
+    if code[:1].isdigit():
+        wl = PGPWordList()
+        gc = wl.get_completions
+        words = code.split("-", 1)[-1]
+        return words in gc(words, length)
+    else:
+        return False
 
 
 def fix_infobar(infobar):

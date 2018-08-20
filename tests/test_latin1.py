@@ -53,7 +53,7 @@ def test_kpw():
     "We had problems with non-UTF-8 UIDs and KPW. We try to load one"
     key = load_latin1_key()
     log.info("Loaded %r", key)
-    kpw = KeyPresentWidget(key=key)
+    kpw = KeyPresentWidget(key=key, code="")
     _gui_test(kpw)
 
 def test_psw():

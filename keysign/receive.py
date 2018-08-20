@@ -21,6 +21,7 @@ import re
 import os
 import signal
 import sys
+from textwrap import dedent
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -32,6 +33,7 @@ if __name__ == "__main__":
     gtk3reactor.install()
 from twisted.internet import reactor, threads
 from twisted.internet.defer import inlineCallbacks
+from wormhole.errors import WrongPasswordError, LonelyError
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -109,11 +111,29 @@ class ReceiveApp:
         self.discovery.connect('list-changed', self.on_list_changed, ib)
 
         self.discover = None
+        self.rb = builder.get_object('box50')
+        self.result_label = builder.get_object("error_download_label")
+        self.cancel_button = builder.get_object("cancel_download_button")
+        self.redo_button = builder.get_object("redo_download_button")
+        self.redo_button.connect("clicked", self.on_redo_button_clicked)
+        self.cancel_button.connect("clicked", self.on_cancel_button_clicked)
+        # Clear the "downloading" label
+        builder.get_object("label10").set_label("")
+
         self.bt_usable = False
 
         # We call this in async because it can take several seconds to complete and we don't want
         # to stall the UI boot. Also we don't care about having this information immediately.
         threads.deferToThread(self.check_bt_availability)
+
+    def on_redo_button_clicked(self, button):
+        log.info("redo pressed")
+        self.stack.remove(self.rb)
+        self.discover.start()
+
+    def on_cancel_button_clicked(self, button):
+        log.info("cancel pressed")
+        self.stack.remove(self.rb)
 
     def check_bt_availability(self):
         try:
@@ -148,6 +168,10 @@ class ReceiveApp:
                 self.on_keydata_downloaded(key_data)
             except ValueError as ve:
                 log.error(ve.args[0])
+        else:
+            self.stack.add(self.rb)
+            self.result_label.set_label(dedent(message.__doc__))
+            self.stack.set_visible_child(self.rb)
 
     def on_code_changed(self, scanner, entry):
         self.log.debug("Entry changed %r: %r", scanner, entry)
@@ -165,7 +189,12 @@ class ReceiveApp:
         self.discover = Discover(code, self.discovery)
         msg_tuple = yield self.discover.start()
         key_data, success, message = msg_tuple
-        if success:
+        if message == WrongPasswordError or message == LonelyError:
+            # If a wrong password has been provided or we closed the connection
+            # before a transfer. We do not display that to the user
+            log.info("Waiting for another code")
+            pass
+        else:
             self.on_message_received(key_data, success, message)
 
     def on_sign_key_confirmed(self, keyPreSignWidget, key, keydata):

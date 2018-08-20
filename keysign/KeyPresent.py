@@ -43,7 +43,6 @@ from .QRCode import QRImage
 from .util import format_fingerprint
 
 
-
 log = logging.getLogger(__name__)
 
 
@@ -83,11 +82,20 @@ class KeyPresentWidget(Gtk.Widget):
         w.__class__ = cls
         return w
 
-    def __init__(self, key, qrcodedata=None, builder=None):
-        """A new KeyPresentWidget shows the string you provide as qrcodedata
+    def __init__(self, key, discovery_code, qrcodedata=None, builder=None):
+        """
+        A new KeyPresentWidget shows the string you provide as qrcodedata
         in a qrcode. If it evaluates to False, the key's fingerprint will
         be shown. That is, "OPENPGP4FPR: + fingerprint.
+
+        :param key: a QR code will be generated using this key's fingerprint if qrcodedata is None
+        :param discovery_code: the code that is displayed to the user in the send tab.
+        When a user wants to receive a key he can type this code manually instead of scanning the QR code.
+        :param qrcodedata: this string will be used in the QR code.
+        If None, the key's fingerprint will be used.
+        :param builder: not used
         """
+
         self.key_id_label = self._builder.get_object("keyidLabel")
         self.uids_label = self._builder.get_object("uidsLabel")
         self.fingerprint_label = self._builder.get_object("keyFingerprintLabel")
@@ -100,15 +108,17 @@ class KeyPresentWidget(Gtk.Widget):
                                         for uid
                                         in key.uidslist]))
         self.fingerprint_label.set_markup(format_fingerprint(key.fingerprint))
+        self.key_fingerprint = key.fingerprint
+
+        self.fingerprint_label.set_markup(discovery_code)
+
         if not qrcodedata:
-            qrcodedata = "OPENPGP4FPR:" + key.fingerprint
+            qrcodedata = "OPENPGP4FPR:" + self.key_fingerprint
+        qr = self.qrcode_frame.get_child()
+        if qr:
+            self.qrcode_frame.remove(self.qrcode_frame.get_child())
         self.qrcode_frame.add(QRImage(qrcodedata))
         self.qrcode_frame.show_all()
-
-
-
-
-
 
 
 class KeyPresent(Gtk.Application):
@@ -157,7 +167,7 @@ class KeyPresent(Gtk.Application):
         fpr = args
 
         key = next(iter(get_usable_keys(pattern=fpr)))
-        self.key_present_page = KeyPresentWidget(key)
+        self.key_present_page = KeyPresentWidget(key, format_fingerprint(key.fingerprint))
 
         super(KeyPresent, self).run()
 

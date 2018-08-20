@@ -14,5 +14,7 @@
 .tox/
 cover/
 /coverage/
+.idea/
+*.ui~
 /flatpak/fpbuilder
 /venv/
