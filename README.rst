@@ -63,7 +63,7 @@ so it should be easy for you to install it.
 Arch Linux installation
 -----------------------
 
-On Arch Linux you can find GNOME-Keysign in the AUR.
+On Arch Linux you can find GNOME-Keysign in the `AUR <https://aur.archlinux.org/packages/gnome-keysign/>`_.
 For example you can install it with:
 
 .. code::
