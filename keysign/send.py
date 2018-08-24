@@ -231,7 +231,7 @@ class SendApp:
         if self.offer:
             self.offer.stop()
             self.offer = None
-        log.debug("Stopped network services")
+            log.debug("Stopped network services")
 
 
 class App(Gtk.Application):
