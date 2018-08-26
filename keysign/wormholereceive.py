@@ -31,13 +31,15 @@ if __name__ == "__main__":
     gtk3reactor.install()
 from twisted.internet import reactor
 
-from .util import decode_message, encode_message, parse_barcode
+from .gpgmh import fingerprint_from_keydata
+from .i18n import _
+from .util import decode_message, encode_message, parse_barcode, mac_verify
 
 log = logging.getLogger(__name__)
 
 
 class WormholeReceive:
-    def __init__(self, code, app_id=None):
+    def __init__(self, code, mac=None, app_id=None):
         self.w = None
         # Check if the given code is a barcode or directly the wormhole code
         parsed = parse_barcode(code).get("WORM", [None])[0]
@@ -50,6 +52,7 @@ class WormholeReceive:
         else:
             # the following id is needed for interoperability with wormhole cli
             self.app_id = "lothar.com/wormhole/text-or-file-xfer"
+        self.mac = mac
 
     @inlineCallbacks
     def start(self):
@@ -69,27 +72,43 @@ class WormholeReceive:
                 key_data = offer.get("message", None)
             if key_data:
                 log.info("Message received: %s", key_data)
-                success = True
-                message = ""
-                # send a reply with a message ack, this also ensures wormhole cli interoperability
-                reply = {"answer": {"message_ack": "ok"}}
-                reply_encoded = encode_message(reply)
-                self.w.send_message(reply_encoded)
-                returnValue((key_data.encode("utf-8"), success, message))
+                if self._is_verified(key_data.encode("utf-8")):
+                    log.debug("MAC is valid")
+                    success = True
+                    message = ""
+                    # send a reply with a message ack, this also ensures wormhole cli interoperability
+                    reply = {"answer": {"message_ack": "ok"}}
+                    reply_encoded = encode_message(reply)
+                    self.w.send_message(reply_encoded)
+                    returnValue((key_data.encode("utf-8"), success, message))
+                else:
+                    log.warning("The received key has a different MAC")
+                    self._reply_error(_("Wrong message authentication code"))
+                    self._handle_failure(WrongPasswordError())
             else:
                 log.info("Unrecognized message: %s", m)
-                success = False
-                error_message = "Unrecognized message"
-                reply = {"error": error_message}
-                reply_encoded = encode_message(reply)
-                self.w.send_message(reply_encoded)
-                returnValue((key_data, success, TransferError))
+                self._reply_error("Unrecognized message")
+                self._handle_failure(TransferError())
         except WrongPasswordError as wpe:
             log.info("A wrong password has been used")
             self._handle_failure(wpe)
         except LonelyError as le:
             log.info("Closed the connection before we found anyone")
             self._handle_failure(le)
+
+    def _is_verified(self, key_data):
+        if self.mac is None:
+            # Currently the MAC is not mandatory
+            verified = True
+        else:
+            mac_key = fingerprint_from_keydata(key_data)
+            verified = mac_verify(mac_key.encode('ascii'), key_data, self.mac)
+        return verified
+
+    def _reply_error(self, error_message):
+        reply = {"error": error_message}
+        reply_encoded = encode_message(reply)
+        self.w.send_message(reply_encoded)
 
     @inlineCallbacks
     def stop(self):
