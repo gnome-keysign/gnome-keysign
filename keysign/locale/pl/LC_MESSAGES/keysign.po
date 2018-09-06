@@ -1,0 +1,421 @@
+# Polish translation for gnome-keysign.
+# Copyright © 2018 the gnome-keysign authors.
+# This file is distributed under the same license as the gnome-keysign package.
+# Piotr Drąg <piotrdrag@gmail.com>, 2018.
+# Aviary.pl <community-poland@mozilla.org>, 2018.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-keysign\n"
+"Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
+"POT-Creation-Date: 2018-09-04 04:53+0000\n"
+"PO-Revision-Date: 2018-09-06 22:30+0200\n"
+"Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
+"Language-Team: Polish <community-poland@mozilla.org>\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+
+#: data/org.gnome.Keysign.raw.appdata.xml:10
+msgid ""
+"\n"
+"      GNOME-Keysign allows signing OpenPGP keys comfortably and securely\n"
+"      via the local network or Bluetooth.\n"
+"    "
+msgstr ""
+"\n"
+"      GNOME Keysign umożliwia wygodne i bezpieczne podpisywanie kluczy\n"
+"      OpenPGP przez sieć lokalną lub Bluetooth.\n"
+"    "
+
+#: data/org.gnome.Keysign.raw.appdata.xml:14
+msgid ""
+"\n"
+"      It can scan another key's barcode and transfer the key securely,\n"
+"      allowing for casual two-party key signing sessions.\n"
+"      It follows best practises by sending the encrypted signatures\n"
+"      to the UIDs of a key using the Email client the user configured\n"
+"      to use.\n"
+"    "
+msgstr ""
+"\n"
+"      Można zeskanować kod kreskowy innego klucza i bezpiecznie go\n"
+"      przesłać, co umożliwia przeprowadzanie nieformalnych sesji\n"
+"      podpisywania kluczy przez dwie osoby.\n"
+"      Program używa sprawdzonych zasad, wysyłając zaszyfrowane podpisy\n"
+"      do UID klucza za pomocą klienta poczty skonfigurowanego przez\n"
+"      użytkownika.\n"
+"    "
+
+#. Name
+#: data/org.gnome.Keysign.raw.desktop:2
+msgid "Keysign"
+msgstr "Keysign"
+
+#. Comment
+#: data/org.gnome.Keysign.raw.desktop:3
+msgid ""
+"A keysigning helper to enable you to comfortably exchange OpenPGP keys with "
+"a friend"
+msgstr ""
+"Pomocnik podpisywania kluczy umożliwiający wygodną wymianę kluczy OpenPGP ze "
+"znajomymi"
+
+#. Keywords
+#: data/org.gnome.Keysign.raw.desktop:4
+msgid "python;gpg;gnupg;key;openpgp;"
+msgstr "gpg;gnupg;klucz;openpgp;podpisz;podpisywanie;"
+
+#. Icon
+#: data/org.gnome.Keysign.raw.desktop:7
+msgid "org.gnome.Keysign"
+msgstr "org.gnome.Keysign"
+
+#: keysign/app.py:165
+msgid "Send"
+msgstr "Wyślij"
+
+#: keysign/app.py:167 keysign/receive.py:238
+msgid "Receive"
+msgstr "Odbierz"
+
+#: keysign/app.ui:62 keysign/send.ui:616
+msgid "Internet"
+msgstr "Internet"
+
+#: keysign/avahioffer.py:81 keysign/bluetoothoffer.py:144
+msgid "Offering key: {}"
+msgstr "Proponowany klucz: {}"
+
+#: keysign/avahioffer.py:82 keysign/bluetoothoffer.py:145
+msgid "Discovery info: {}"
+msgstr "Informacje o wykrywaniu: {}"
+
+#: keysign/avahioffer.py:83
+msgid "Press Enter to stop"
+msgstr "Naciśnięcie klawisza Enter zatrzyma"
+
+#: keysign/bluetoothoffer.py:127
+msgid ""
+"\n"
+"Key successfully sent"
+msgstr ""
+"\n"
+"Pomyślnie wysłano klucz"
+
+#: keysign/bluetoothoffer.py:129
+msgid ""
+"\n"
+"An error occurred: {}"
+msgstr ""
+"\n"
+"Wystąpił błąd: {}"
+
+#: keysign/bluetoothoffer.py:131
+msgid "Press Enter to exit"
+msgstr "Naciśnięcie klawisza Enter zakończy"
+
+#: keysign/bluetoothoffer.py:146
+msgid "HMAC: {}"
+msgstr "HMAC: {}"
+
+#: keysign/bluetoothoffer.py:147
+msgid "Port: {}"
+msgstr "Port: {}"
+
+#: keysign/bluetoothoffer.py:152
+msgid "Bluetooth not available"
+msgstr "Bluetooth jest niedostępne"
+
+#: keysign/bluetoothreceive.py:134
+msgid "Trying to download the key, please wait"
+msgstr "Próba pobrania klucza, proszę czekać"
+
+#: keysign/gpgmks.py:178
+#, python-format
+msgid "installing symlinks for sockets from %s to %s"
+msgstr "instalowanie dowiązań symbolicznych dla gniazd od %s do %s"
+
+#: keysign/gtkexcepthook.py:173
+msgid "Bug Detected"
+msgstr "Wykryto błąd"
+
+#: keysign/gtkexcepthook.py:175
+msgid "<big><b>A programming error has been detected.</b></big>"
+msgstr "<big><b>Wykryto błąd programu.</b></big>"
+
+#: keysign/gtkexcepthook.py:178
+msgid ""
+"You may be able to ignore this error and carry on working, but you may get "
+"unexpected results.\n"
+"\n"
+"Please tell the developers about this using the issue tracker if no-one else "
+"has reported it yet."
+msgstr ""
+"Być może można zignorować ten błąd i kontynuować działanie, ale może to "
+"spowodować nieoczekiwane wyniki.\n"
+"\n"
+"Proszę poinformować o tym programistów za pomocą systemu śledzenia błędów "
+"(w języku angielskim), jeśli nikt jeszcze tego nie zrobił."
+
+#: keysign/gtkexcepthook.py:187
+msgid "Search Tracker..."
+msgstr "Przeszukaj system śledzenia błędów…"
+
+#: keysign/gtkexcepthook.py:189
+msgid "Report..."
+msgstr "Zgłoś…"
+
+#: keysign/gtkexcepthook.py:191
+msgid "Ignore Error"
+msgstr "Zignoruj błąd"
+
+#: keysign/gtkexcepthook.py:192
+msgid "Quit GNOME Keysign"
+msgstr "Zakończ program"
+
+#: keysign/gtkexcepthook.py:202
+msgid "Details..."
+msgstr "Szczegóły…"
+
+#: keysign/gtkexcepthook.py:229 keysign/gtkexcepthook.py:232
+msgid "Exception while analyzing the exception."
+msgstr "Wyjątek podczas analizowania wyjątku."
+
+#: keysign/gtkexcepthook.py:281
+msgid ""
+"            #### Description\n"
+"\n"
+"            Give this report a short descriptive title.\n"
+"            Use something like\n"
+"            \"{feature-that-broke}: {what-went-wrong}\"\n"
+"            for the title, if you can.\n"
+"            Then please replace this text\n"
+"            with a longer description of the bug.\n"
+"            Screenshots or videos are great, too!\n"
+"\n"
+"            #### Steps to reproduce\n"
+"\n"
+"            Please tell us what you were doing\n"
+"            when the error message popped up.\n"
+"            If you can provide step-by-step instructions\n"
+"            on how to reproduce the bug,\n"
+"            that's even better.\n"
+"\n"
+"            #### Traceback\n"
+"        "
+msgstr ""
+"            #### Opis\n"
+"\n"
+"            Nadaj temu zgłoszeniu krótki opisowy tytuł.\n"
+"            Napisz coś w stylu\n"
+"            „{funkcja, która nie działa}: {co się zepsuło}”\n"
+"            jako tytuł, jeśli możesz.\n"
+"            Następnie zastąp ten tekst\n"
+"            dłuższym opisem błędu.\n"
+"            Zrzuty ekranu i nagrania też są przydatne!\n"
+"\n"
+"            #### Jak powtórzyć\n"
+"\n"
+"            Powiedz nam, co próbowano zrobić,\n"
+"            kiedy pojawił się błąd.\n"
+"            Jeśli możesz podać instrukcje krok po kroku\n"
+"            jak powtórzyć błąd,\n"
+"            to nawet lepiej.\n"
+"\n"
+"            #### Wyjątek\n"
+"        "
+
+#: keysign/i18n.py:39
+msgid "Translated for gettext (C)"
+msgstr "Przetłumaczone dla biblioteki gettext (pl)"
+
+#: keysign/i18n.py:47
+msgid "Translated for Python (C)"
+msgstr "Przetłumaczone dla języka Python (pl)"
+
+#: keysign/keylistwidget.py:83
+msgid "Expires: "
+msgstr "Wygasa: "
+
+#: keysign/receive.py:158
+msgid "Sign Key"
+msgstr "Podpisz klucz"
+
+#: keysign/receive.ui:53
+msgid ""
+"No GNOME Keysign servers around :-(\n"
+"Find a friend to use GNOME Keysign with.\n"
+"You may also suffer from connectivity problems.\n"
+"For more information click <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"NoServers/1\">here</a>."
+msgstr ""
+"Nie ma żadnych serwerów GNOME Keysign. :(\n"
+"Należy znaleźć znajomego, aby móc użyć GNOME Keysign.\n"
+"Mogą też występować problemy z łącznością.\n"
+"<a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/NoServers/1\">Ta strona</"
+"a> zawiera więcej informacji."
+
+#: keysign/receive.ui:105
+msgid ""
+"<small>To sign someone's key, scan their QR or enter security code</small>"
+msgstr ""
+"<small>Aby podpisać czyjś klucz, należy zeskanować jego kod QR lub wpisać "
+"kod zabezpieczeń</small>"
+
+#: keysign/receive.ui:124
+msgid "<b>Camera</b>"
+msgstr "<b>Aparat</b>"
+
+#: keysign/receive.ui:139
+msgid "Integrated Web Cam"
+msgstr "Zintegrowana kamerka internetowa"
+
+#: keysign/receive.ui:176 keysign/send.ui:435
+msgid "<b>Security Code</b>"
+msgstr "<b>Kod zabezpieczeń</b>"
+
+#: keysign/receive.ui:209
+msgid "Scan Barcode"
+msgstr "Zeskanuj kod kreskowy"
+
+#: keysign/receive.ui:226
+msgid "Downloading key-data. Please wait ..."
+msgstr "Pobieranie danych klucza. Proszę czekać…"
+
+#: keysign/receive.ui:251
+msgid "Key download was interrupted!"
+msgstr "Pobieranie klucza zostało przerwane."
+
+#: keysign/receive.ui:313 keysign/send.ui:527
+msgid "page1"
+msgstr "1. strona"
+
+#: keysign/receive.ui:337
+msgid ""
+"To sign the key, confirm that you want to sign the following key.\n"
+"This will generate an email that must be sent in order to complete the "
+"signing process."
+msgstr ""
+"Aby podpisać klucz, należy potwierdzić, że ma zostać podpisany poniższy "
+"klucz.\n"
+"Utworzy to wiadomość e-mail, którą należy wysłać, aby ukończyć proces "
+"podpisywania."
+
+#: keysign/receive.ui:365
+msgid "Key"
+msgstr "Klucz"
+
+#: keysign/receive.ui:398 keysign/send.ui:360
+msgid "UIDs"
+msgstr "UID"
+
+#: keysign/receive.ui:485
+msgid "C_onfirm"
+msgstr "P_otwierdź"
+
+#: keysign/receive.ui:521 keysign/send.ui:564
+msgid "page2"
+msgstr "2. strona"
+
+#: keysign/receive.ui:539
+msgid "Signing the following UIDs:"
+msgstr "Podpisywanie tych UID:"
+
+#: keysign/receive.ui:615
+msgid "page3"
+msgstr "3. strona"
+
+#: keysign/send.py:156
+msgid ""
+"Still trying to get a connection to the Internet. It appears to be slow or "
+"unavailable."
+msgstr ""
+"Nadal trwa próba uzyskania połączenia z Internetem. Jest ono wolne lub "
+"niedostępne."
+
+#: keysign/send.py:162
+msgid "There isn't an Internet connection!"
+msgstr "Nie ma połączenia z Internetem."
+
+#: keysign/send.py:190 keysign/send.ui:545
+msgid ""
+"Key successfully sent.\n"
+"You should receive soon an email with the signature."
+msgstr ""
+"Pomyślnie wysłano klucz.\n"
+"Wkrótce powinna przyjść wiadomość e-mail z podpisem."
+
+#: keysign/send.py:195
+msgid ""
+"Could not establish a secure connection.\n"
+"Either your partner has entered a wrong code or someone tried to intercept "
+"your connection"
+msgstr ""
+"Nie można nawiązać bezpiecznego połączenia.\n"
+"Partner wpisał błędny kod lub ktoś próbuje przechwycić połączenie"
+
+#: keysign/send.py:199
+#, python-format
+msgid ""
+"An unexpected error occurred:\n"
+"%s"
+msgstr ""
+"Wystąpił nieoczekiwany błąd:\n"
+"%s"
+
+#: keysign/send.ui:7
+msgid "Select and send key"
+msgstr "Wybierz i wyślij klucz"
+
+#: keysign/send.ui:58
+msgid ""
+"You don't have any keys!\n"
+"Please use, e.g. Seahorse to create one."
+msgstr ""
+"Nie ma żadnych kluczy.\n"
+"Proszę użyć np. programu Seahorse i utworzyć jakiś."
+
+#: keysign/send.ui:135
+msgid "Very slow or no Internet connection!"
+msgstr "Bardzo wolne lub niedziałające połączenie z Internetem."
+
+#: keysign/send.ui:190
+msgid "<b>Select a key for signing</b>"
+msgstr "<b>Wybór klucza do podpisania</b>"
+
+#: keysign/send.ui:206
+msgid "<small>Times signed</small>"
+msgstr "<small>Ile razy podpisano</small>"
+
+#: keysign/send.ui:272
+msgid "Keylist"
+msgstr "Lista kluczy"
+
+#: keysign/send.ui:292
+msgid ""
+"<small>To have the key signed, the other person must enter the security "
+"code, or scan the QR code</small>"
+msgstr ""
+"<small>Aby klucz został podpisany, druga osoba musi wpisać kod zabezpieczeń "
+"lub zeskanować kod QR</small>"
+
+#: keysign/send.ui:319
+msgid "<b>Key Details</b>"
+msgstr "<b>Informacje o kluczu</b>"
+
+#: keysign/send.ui:344
+msgid "Fingerprint"
+msgstr "Odcisk"
+
+#: keysign/send.ui:498
+msgid "<b>QR Code</b>"
+msgstr "<b>Kod QR</b>"
+
+#: keysign/send.ui:575
+msgid "Select and Send key"
+msgstr "Wybierz i wyślij klucz"
