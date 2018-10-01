@@ -81,7 +81,7 @@ class Discover:
             if not key_data and self.worm_code and not self.stopped:
                 # We try the wormhole code, if we have it
                 log.info("Trying to use this code with Wormhole: %s", self.worm_code)
-                self.worm = WormholeReceive(self.worm_code)
+                self.worm = WormholeReceive(self.worm_code, self.mac)
                 msg_tuple = yield self.worm.start()
                 key_data, success, message = msg_tuple
 
