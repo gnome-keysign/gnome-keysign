@@ -28,6 +28,7 @@ from subprocess import call
 from string import Template
 from tempfile import NamedTemporaryFile
 from xml.etree import ElementTree
+from gettext import gettext as _
 
 try:
     from urllib.parse import urlparse, parse_qs
@@ -201,7 +202,7 @@ def send_email(to, subject=None, body=None, files=None):
     log.error("An error occurred trying to compose the email")
 
 
-SUBJECT = 'Your signed key $fingerprint'
+SUBJECT = _('Your signed key $fingerprint')
 BODY = '''Hi $uid,
 
 
