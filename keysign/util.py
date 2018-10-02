@@ -28,7 +28,6 @@ from subprocess import call
 from string import Template
 from tempfile import NamedTemporaryFile
 from xml.etree import ElementTree
-from gettext import gettext as _
 
 try:
     from urllib.parse import urlparse, parse_qs
@@ -42,6 +41,8 @@ import dbus
 from wormhole._wordlist import PGPWordList
 from _dbus_bindings import BUS_DAEMON_NAME, BUS_DAEMON_PATH, BUS_DAEMON_IFACE
 import gi
+from i18n import _
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
 
