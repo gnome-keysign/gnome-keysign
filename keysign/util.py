@@ -204,7 +204,7 @@ def send_email(to, subject=None, body=None, files=None):
 
 
 SUBJECT = _('Your signed key $fingerprint')
-BODY = '''Hi $uid,
+BODY = _('''Hi $uid,
 
 
 I have just signed your key
@@ -216,7 +216,7 @@ Thanks for letting me sign your key!
 
 --
 GNOME Keysign
-'''
+''')
 
 
 def sign_keydata_and_send(keydata, error_cb=None):
