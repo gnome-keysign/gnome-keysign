@@ -41,7 +41,6 @@ import dbus
 from wormhole._wordlist import PGPWordList
 from _dbus_bindings import BUS_DAEMON_NAME, BUS_DAEMON_PATH, BUS_DAEMON_IFACE
 import gi
-from i18n import _
 
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
@@ -49,6 +48,7 @@ from gi.repository import Gtk, Gdk, GLib
 from .errors import NoBluezDbus, UnpoweredAdapter, NoAdapter
 from .gpgmh import fingerprint_from_keydata
 from .gpgmh import sign_keydata_and_encrypt
+from .i18n import _
 
 log = logging.getLogger(__name__)
 
