@@ -41,6 +41,8 @@ import dbus
 from wormhole._wordlist import PGPWordList
 from _dbus_bindings import BUS_DAEMON_NAME, BUS_DAEMON_PATH, BUS_DAEMON_IFACE
 import gi
+from i18n import _
+
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
 
@@ -201,8 +203,8 @@ def send_email(to, subject=None, body=None, files=None):
     log.error("An error occurred trying to compose the email")
 
 
-SUBJECT = 'Your signed key $fingerprint'
-BODY = '''Hi $uid,
+SUBJECT = _('Your signed key $fingerprint')
+BODY = _('''Hi $uid,
 
 
 I have just signed your key
@@ -214,7 +216,7 @@ Thanks for letting me sign your key!
 
 --
 GNOME Keysign
-'''
+''')
 
 
 def sign_keydata_and_send(keydata, error_cb=None):
