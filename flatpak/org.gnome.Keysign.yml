@@ -1,0 +1,356 @@
+id: org.gnome.Keysign
+runtime: org.gnome.Platform
+runtime-version: 'master'
+sdk: org.gnome.Sdk
+command: gnome-keysign
+copy-icon: true
+tags:
+  - devel
+  - development
+  - nightly
+desktop-file-name-prefix: "(Development) "
+finish-args:
+  - --share=ipc
+  - --socket=x11
+  - --socket=wayland
+  - --share=network
+  - --system-talk-name=org.freedesktop.Avahi
+  - --system-talk-name=org.bluez
+  - --allow=bluetooth
+  - --device=all
+  - --filesystem=~/.gnupg:ro
+  - --filesystem=xdg-run/gnupg:ro
+# We're waiting for webcam support: https://github.com/flatpak/xdg-desktop-portal/issues/38;
+# we use --device=all meanwhile. We do network, because we're opening a port.
+build-options:
+  cflags: -O2 -g
+  cxxflags: -O2 -g
+  env:
+    V: '1'
+cleanup:
+  - /include
+  - /lib/pkgconfig
+  - /share/pkgconfig
+  - /share/aclocal
+  - /man
+  - /share/man
+  - /share/gtk-doc
+  - /share/vala
+  - "*.la"
+  - "*.a"
+modules:
+  - name: pycairo
+    buildsystem: simple
+    ensure-writable:
+      - easy-install.pth
+      - setuptools.pth
+    build-commands:
+      - python3 setup.py build
+      - python3 setup.py install --prefix=${FLATPAK_DEST}
+    sources:
+      - type: archive
+        url: https://github.com/pygobject/pycairo/releases/download/v1.17.1/pycairo-1.17.1.tar.gz
+        sha256: 0f0a35ec923d87bc495f6753b1e540fd046d95db56a35250c44089fbce03b698
+
+  - name: python3-pytz
+    buildsystem: simple
+    ensure-writable:
+      - easy-install.pth
+      - setuptools.pth
+    build-commands:
+      - pip3 install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} pytz
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/ca/a9/62f96decb1e309d6300ebe7eee9acfd7bccaeedd693794437005b9067b44/pytz-2018.5.tar.gz
+        sha256: ffb9ef1de172603304d9d2819af6f5ece76f2e85ec10692a524dd876e72bf277
+
+
+
+  - name: python3-pygobject
+    buildsystem: simple
+    build-options:
+      env:
+        PYTHON: python3
+    ensure-writable:
+      - easy-install.pth
+      - setuptools.pth
+    build-commands:
+      - pip3 install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} pygobject
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/00/17/198a9d0eb0e89b5c7d2a9b4437eb40d62702ab771030cd79fc7141cb0d30/PyGObject-3.30.1.tar.gz
+        sha256: 5e642a76cfddd3e488a32bcdf7cef189e29226522be8726bc0e050dd53fa2d1c
+
+
+  - name: swig
+    config-opts:
+      - "--without-boost"
+      - "--without-pcre"
+    sources:
+      - type: archive
+        url: http://prdownloads.sourceforge.net/swig/swig-3.0.12.tar.gz
+        sha256: 7cf9f447ae7ed1c51722efc45e7f14418d15d7a1e143ac9f09a668999f4fc94d
+
+  - name: python3-dbus-python
+    buildsystem: simple
+    ensure-writable:
+      - easy-install.pth
+      - setuptools.pth
+    build-commands:
+      - pip3 install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} dbus-python
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/3f/e7/4edb582d1ffd5ac3c84188deea32e960b5c8c0fe1da56ce70224f85ce542/dbus-python-1.2.8.tar.gz
+        sha256: abf12bbb765e300bf8e2a1b2f32f85949eab06998dbda127952c31cb63957b6f
+
+  - name: avahi
+    # hrm, I don't want to install this, but we need the python module
+    rm-configure: true
+    config-opts:
+      - "--disable-static"
+      - "--disable-mono"
+      - "--disable-monodoc"
+      - "--disable-qt3"
+      - "--disable-qt4"
+      - "--disable-gtk"
+      - "--disable-gtk3"
+      - "--with-distro=none"
+      - "--with-systemdsystemunitdir=no"
+      - "--disable-libdaemon"
+      - "--disable-pygtk"
+      - "--disable-gdbm"
+      - "--disable-manpages"
+    build-options:
+      env:
+        PYTHON: /usr/bin/python3
+    ensure-writable:
+      - easy-install.pth
+      - setuptools.pth
+    sources:
+      - type: archive
+        url: http://avahi.org/download/avahi-0.7.tar.gz
+        sha256: 57a99b5dfe7fdae794e3d1ee7a62973a368e91e414bd0dfa5d84434de5b14804
+
+  - name: gstreamer
+    sources:
+      - type: archive
+        url: https://gstreamer.freedesktop.org/src/gstreamer/gstreamer-1.14.4.tar.xz
+        sha256: f94f6696c5f05a3b3a9183e39c5f5c0b779f75a04c0efa497e7920afa985ffc7
+
+  - name: gst-plugins-base
+    sources:
+      - type: archive
+        url: https://gstreamer.freedesktop.org/src/gst-plugins-base/gst-plugins-base-1.14.4.tar.xz
+        sha256: ca6139490e48863e7706d870ff4e8ac9f417b56f3b9e4b3ce490c13b09a77461
+
+  - name: gst-plugins-good
+    sources:
+      - type: archive
+        url: https://gstreamer.freedesktop.org/src/gst-plugins-good/gst-plugins-good-1.14.4.tar.xz
+        sha256: 5f8b553260cb0aac56890053d8511db1528d53cae10f0287cfce2cb2acc70979
+
+  - name: gst-plugins-bad
+    build-options:
+      config-opts:
+        - "--enable-zbar"
+    sources:
+      - type: archive
+        url: https://gstreamer.freedesktop.org/src/gst-plugins-bad/gst-plugins-bad-1.14.4.tar.xz
+        sha256: 910b4e0e2e897e8b6d06767af1779d70057c309f67292f485ff988d087aa0de5
+    modules:
+      - name: zbar
+        build-options:
+          config-opts:
+            - "--disable-video"
+            - "--without-xv"
+            - "--without-python2"
+            - "--without-gtk"
+            - "--without-qt"
+        sources:
+          - type: git
+            url: git://git.linuxtv.org/zbar.git
+            commit: edcf08b49e0a5fe71c18fa9d4b8ed83ed8fc9082
+          - type: shell
+            commands:
+                # Patch for Imagemagick 7 https://git.archlinux.org/svntogit/community.git/tree/trunk/imagemagick7.patch?h=packages/zbar&id=f80dc934f730ee4204dc51f3ef47cd2ec7406898
+                - sed -i 's|wand/MagickWand.h|MagickWand/MagickWand.h|g' configure.ac
+                - sed -i 's|wand/MagickWand.h|MagickWand/MagickWand.h|g' zbarimg/zbarimg.c
+                # Avoid documentation
+                - sed -i '48d' Makefile.am
+          - type: script
+            dest-filename: autogen.sh
+            commands:
+                - autoreconf -vfi -W none
+        modules:
+          - name: ImageMagick
+            sources:
+              - type: archive
+                url: https://github.com/ImageMagick/ImageMagick/archive/7.0.8-12.tar.gz
+                sha256: cd3a25183d433f3ad4f8ed6301c5ae5dfb0959c1f09b059acee447bb3881bf99
+
+  - name: gst-python
+    config-opts:
+      - "--with-pygi-overrides-dir=/app/lib/python3.4/site-packages/gi/overrides/"
+    ensure-writable:
+      - easy-install.pth
+      - setuptools.pth
+    sources:
+      - type: archive
+        url: https://gstreamer.freedesktop.org/src/gst-python/gst-python-1.14.4.tar.xz
+        sha256: d0fdb24f93b6d889f309d2f526b8ea9577e0084ff0a62b4623ef1aed52e85a1b
+
+  - name: python3-babel
+    buildsystem: simple
+    build-commands:
+      - pip3 install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} babel
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/be/cc/9c981b249a455fa0c76338966325fc70b7265521bad641bf2932f77712f4/Babel-2.6.0.tar.gz
+        sha256: 8cba50f48c529ca3fa18cf81fa9403be176d374ac4d60738b839122dfaaa3d23
+
+  - name: python3-six
+    buildsystem: simple
+    ensure-writable:
+      - easy-install.pth
+      - setuptools.pth
+    build-commands:
+      - pip3 install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} six
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/16/d8/bc6316cf98419719bd59c91742194c111b6f2e85abac88e496adefaf7afe/six-1.11.0.tar.gz
+        sha256: 70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9
+
+  - name: python3-qrcode
+    buildsystem: simple
+    ensure-writable:
+      - easy-install.pth
+      - setuptools.pth
+    build-commands:
+      - pip3 install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} qrcode
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/8d/b6/beed3d50e1047a2aa6437d3a653e5f31feb7f4de8bc054299dc205682e41/qrcode-6.0.tar.gz
+        sha256: 037b0db4c93f44586e37f84c3da3f763874fcac85b2974a69a98e399ac78e1bf
+
+  - name: python3-requests
+    buildsystem: simple
+    ensure-writable:
+      - easy-install.pth
+      - setuptools.pth
+    build-commands:
+      - pip3 install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} requests
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/e1/0f/f8d5e939184547b3bdc6128551b831a62832713aa98c2ccdf8c47ecc7f17/certifi-2018.8.24.tar.gz
+        sha256: 376690d6f16d32f9d1fe8932551d80b23e9d393a8578c5633a2ed39a64861638
+      - type: file
+        url: https://files.pythonhosted.org/packages/3c/d2/dc5471622bd200db1cd9319e02e71bc655e9ea27b8e0ce65fc69de0dac15/urllib3-1.23.tar.gz
+        sha256: a68ac5e15e76e7e5dd2b8f94007233e01effe3e50e8daddf69acfd81cb686baf
+      - type: file
+        url: https://files.pythonhosted.org/packages/65/c4/80f97e9c9628f3cac9b98bfca0402ede54e0563b56482e3e6e45c43c4935/idna-2.7.tar.gz
+        sha256: 684a38a6f903c1d71d6d5fac066b58d7768af4de2b832e426ec79c30daa94a16
+      - type: file
+        url: https://files.pythonhosted.org/packages/fc/bb/a5768c230f9ddb03acc9ef3f0d4a3cf93462473795d18e9535498c8f929d/chardet-3.0.4.tar.gz
+        sha256: 84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae
+      - type: file
+        url: https://files.pythonhosted.org/packages/54/1f/782a5734931ddf2e1494e4cd615a51ff98e1879cbe9eecbdfeaf09aa75e9/requests-2.19.1.tar.gz
+        sha256: ec22d826a36ed72a7358ff3fe56cbd4ba69dd7a6718ffd450ff0e9df7a47ce6a
+
+  - name: gpgme
+    sources:
+      - type: archive
+        url: https://www.gnupg.org/ftp/gcrypt/gpgme/gpgme-1.12.0.tar.bz2
+        sha256: b4dc951c3743a60e2e120a77892e9e864fb936b2e58e7c77e8581f4d050e8cd8
+    modules:
+      - name: libassaun
+        sources:
+          - type: archive
+            url: https://www.gnupg.org/ftp/gcrypt/libassuan/libassuan-2.5.1.tar.bz2
+            sha256: 47f96c37b4f2aac289f0bc1bacfa8bd8b4b209a488d3d15e2229cb6cc9b26449
+        modules:
+          - name: libgpg-error
+            sources:
+              - type: archive
+                # this is a mirror because ftp is not yet supported https://github.com/flatpak/flatpak-builder/issues/23
+                url: https://mirrors.dotsrc.org/gnupg/libgpg-error/libgpg-error-1.32.tar.bz2
+                sha256: c345c5e73cc2332f8d50db84a2280abfb1d8f6d4f1858b9daa30404db44540ca
+
+  - gpg.yml
+
+  - twisted[tls].yml
+
+  - magic-wormhole.yml
+
+  - shared-modules/udev/udev-175.json
+
+
+  - name: libical
+    cleanup:
+    - "/lib/cmake"
+    buildsystem: cmake
+    config-opts:
+    - "-DCMAKE_INSTALL_LIBDIR:PATH=/app/lib"
+    - "-DBUILD_SHARED_LIBS:BOOL=ON"
+    sources:
+    - type: archive
+      url: https://github.com/libical/libical/archive/v3.0.4.tar.gz
+      sha256: 20f39343701ccd3ad896a9f9e982fdf85c1d3a35572e9d962216b69a64aef2ae
+
+  - name: bluez
+    config-opts:
+    - "--disable-datafiles"
+    - "--disable-systemd"
+    - "--enable-midi"
+    - "--enable-experimental"
+    - "--enable-library"
+    - "--prefix=/app"
+    - "--sysconfdir=/app/etc"
+    sources:
+    - type: archive
+      url: https://mirrors.edge.kernel.org/pub/linux/bluetooth/bluez-5.50.tar.xz
+      sha256: 5ffcaae18bbb6155f1591be8c24898dc12f062075a40b538b745bfd477481911
+
+  - name: python3-pybluez
+    buildsystem: simple
+    build-commands:
+      - pip3 install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} pybluez
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/c1/98/3149481d508bee174335be6725880f00d297afebe75c15e917af8f6fe169/PyBluez-0.22.zip
+        sha256: 4ce006716a54d9d18e8186a3f1c8b12a8e6befecffe8fd5828a291fb694ce49d
+
+  - name: python3-lxml
+    buildsystem: simple
+    build-options:
+      env:
+        XSLT_CONFIG: pkg-config libxslt
+    ensure-writable:
+      - easy-install.pth
+      - setuptools.pth
+    build-commands:
+      - pip3 install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} lxml
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/4b/20/ddf5eb3bd5c57582d2b4652b4bbcf8da301bdfe5d805cb94e805f4d7464d/lxml-4.2.5.tar.gz
+        sha256: 36720698c29e7a9626a0dc802ef8885f8f0239bfd1689628ecd459a061f2807f
+
+  - name: python3-future
+    buildsystem: simple
+    build-commands:
+      - pip3 install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} future
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/00/2b/8d082ddfed935f3608cc61140df6dcbf0edea1bc3ab52fb6c29ae3e81e85/future-0.16.0.tar.gz
+        sha256: e39ced1ab767b5936646cedba8bcce582398233d6a627067d4c6a454c90cfedb
+
+  - name: gnome-keysign
+    no-autogen: true
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=${FLATPAK_DEST} .
+    post-install:
+      - sed -i 's|python -m|python3 -m|g' /app/share/applications/org.gnome.Keysign.desktop
+    sources:
+      - type: archive
+        url: https://gitlab.gnome.org/GNOME/gnome-keysign/-/archive/0.9.9/gnome-keysign-0.9.9.tar.gz
+        sha256: e4b32675664a32bef9386f2f6bc187c0506f54a1c6ceff5b07377f73a85e3e39

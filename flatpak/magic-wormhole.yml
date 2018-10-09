@@ -1,0 +1,113 @@
+name: python3-magic-wormhole
+buildsystem: simple
+build-commands:
+  - pip3 install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} magic-wormhole
+sources:
+  - type: file
+    url: https://files.pythonhosted.org/packages/fc/f1/8db7daa71f414ddabfa056c4ef792e1461ff655c2ae2928a2b675bfed6b4/asn1crypto-0.24.0.tar.gz
+    sha256: 9d5c20441baf0cb60a4ac34cc447c6c189024b6b4c6cd7877034f4965c464e49
+
+  - type: file
+    url: https://files.pythonhosted.org/packages/37/33/74ebdc52be534e683dc91faf263931bc00ae05c6073909fde53999088541/pyasn1-modules-0.2.2.tar.gz
+    sha256: a0cf3e1842e7c60fde97cb22d275eb6f9524f5c5250489e292529de841417547
+
+  - type: file
+    url: https://files.pythonhosted.org/packages/10/46/059775dc8e50f722d205452bced4b3cc965d27e8c3389156acd3b1123ae3/pyasn1-0.4.4.tar.gz
+    sha256: f58f2a3d12fd754aa123e9fa74fb7345333000a035f3921dbdaa08597aa53137
+
+  - type: file
+    url: https://files.pythonhosted.org/packages/22/21/233e38f74188db94e8451ef6385754a98f3cad9b59bedf3a8e8b14988be4/cryptography-2.3.1.tar.gz
+    sha256: 8d10113ca826a4c29d5b85b2c4e045ffa8bad74fb525ee0eceb1d38d4c70dfd6
+
+  - type: file
+    url: https://files.pythonhosted.org/packages/8c/2d/aad7f16146f4197a11f8e91fb81df177adcc2073d36a17b1491fd09df6ed/pycparser-2.18.tar.gz
+    sha256: 99a8ca03e29851d96616ad0404b4aad7d9ee16f25c9f9708a11faf2810f7b226
+
+  - type: file
+    url: https://files.pythonhosted.org/packages/c1/99/81de004578e9afe017bb1d4c8968088a33621c05449fe330bdd7016d5377/txaio-18.8.1.tar.gz
+    sha256: 67e360ac73b12c52058219bb5f8b3ed4105d2636707a36a7cdafb56fe06db7fe
+
+  - type: file
+    url: https://files.pythonhosted.org/packages/de/2a/cab6e30be82c8fcd2339ef618036720eda954cf05daef514e386661c9221/service_identity-17.0.0.tar.gz
+    sha256: 4001fbb3da19e0df22c47a06d29681a398473af4aa9d745eca525b3b2c2302ab
+
+  - type: file
+    url: https://files.pythonhosted.org/packages/9b/7c/ee600b2a9304d260d96044ab5c5e57aa489755b92bbeb4c0803f9504f480/pyOpenSSL-18.0.0.tar.gz
+    sha256: 6488f1423b00f73b7ad5167885312bb0ce410d3312eb212393795b53c8caa580
+
+  - type: file
+    url: https://files.pythonhosted.org/packages/8c/e0/e512e4ac6d091fc990bbe13f9e0378f34cf6eecd1c6c268c9e598dcf5bb9/humanize-0.5.1.tar.gz
+    sha256: a43f57115831ac7c70de098e6ac46ac13be00d69abbf60bdcac251344785bb19
+
+  - type: file
+    url: https://files.pythonhosted.org/packages/95/d9/c3336b6b5711c3ab9d1d3a80f1a3e2afeb9d8c02a7166462f6cc96570897/click-6.7.tar.gz
+    sha256: f15516df478d5a56180fbf80e68f206010e6d160fc39fa508b65e035fd75130b
+
+  - type: file
+    url: https://files.pythonhosted.org/packages/48/9e/db8e0c2def12e8d3209ac1e23bfb630c6bbb9c9aa0a2ff000eda23ec1d8c/tqdm-4.25.0.tar.gz
+    sha256: a3364bd83ce4777320b862e3c8a93d7da91e20a95f06ef79bed7dd71c654cafa
+
+  - type: file
+    url: https://files.pythonhosted.org/packages/c3/be/327e072850db181ce56afd51e26ec7aa5659b18466c709fa5ea2548c935f/hkdf-0.0.3.tar.gz
+    sha256: 622a31c634bc185581530a4b44ffb731ed208acf4614f9c795bdd70e77991dca
+
+  - type: file
+    url: https://files.pythonhosted.org/packages/97/8d/77b8cedcfbf93676148518036c6b1ce7f8e14bf07e95d7fd4ddcb8cc052f/ipaddress-1.0.22.tar.gz
+    sha256: b146c751ea45cad6188dd6cf2d9b757f6f4f8d6ffb96a023e6f2e26eea02a72c
+
+  - type: file
+    url: https://files.pythonhosted.org/packages/d2/de/afcee4274270d78f10dbca8982427fd0708b0a3297fd46d2f2dee59e73e9/autobahn-18.8.2.tar.gz
+    sha256: 448df2e241011ea2948799918930042d81e63d26b01912c472f5a9a37f42f319
+
+  - type: file
+    url: https://files.pythonhosted.org/packages/08/19/cf56e60efd122fa6d2228118a9b345455b13ffe16a14be81d025b03b261f/PyNaCl-1.2.1.tar.gz
+    sha256: e0d38fa0a75f65f556fb912f2c6790d1fa29b7dd27a1d9cc5591b281321eaaa9
+
+  - type: file
+    url: https://files.pythonhosted.org/packages/60/0b/bb5eca8e18c38a10b1c207bbe6103df091e5cf7b3e5fdc0efbcad7b85b60/spake2-0.8.tar.gz
+    sha256: c17a614b29ee4126206e22181f70a406c618d3c6c62ca6d6779bce95e9c926f4
+
+  - type: file
+    url: https://files.pythonhosted.org/packages/b5/d3/5409c111835af19af00643a8fbd0c0a6f30f025400ca5bb72f59fd1e42fb/magic-wormhole-0.10.5.tar.gz
+    sha256: 9558ea1f3551e535deec3462cd5c8391cb32ebb12ecd8b40b36861dbee4917ee
+
+modules:
+  - name: cffi
+    buildsystem: simple
+    ensure-writable:
+      - easy-install.pth
+      - setuptools.pth
+    build-commands:
+      - pip3 install --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} cffi
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/e7/a7/4cd50e57cc6f436f1cc3a7e8fa700ff9b8b4d471620629074913e3735fb2/cffi-1.11.5.tar.gz
+        sha256: e90f17980e6ab0f3c2f3730e56d1fe9bcba1891eeea58966e89d352492cc74f4
+      - type: file
+        url: https://files.pythonhosted.org/packages/8c/2d/aad7f16146f4197a11f8e91fb81df177adcc2073d36a17b1491fd09df6ed/pycparser-2.18.tar.gz
+        sha256: 99a8ca03e29851d96616ad0404b4aad7d9ee16f25c9f9708a11faf2810f7b226
+
+  - name: setuptools
+    buildsystem: simple
+    ensure-writable:
+      - easy-install.pth
+      - setuptools.pth
+    build-commands:
+      - python3 setup.py build
+      - python3 setup.py install --prefix=${FLATPAK_DEST}
+    sources:
+      - type: archive
+        url: https://files.pythonhosted.org/packages/ef/1d/201c13e353956a1c840f5d0fbf0461bd45bbd678ea4843ebf25924e8984c/setuptools-40.2.0.zip
+        sha256: 47881d54ede4da9c15273bac65f9340f8929d4f0213193fa7894be384f2dcfa6
+
+  - name: txtorcon
+    buildsystem: simple
+    ensure-writable:
+      - easy-install.pth
+      - setuptools.pth
+    build-commands:
+      - pip3 install --no-deps --no-index --find-links="file://${PWD}" --prefix=${FLATPAK_DEST} txtorcon
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/0d/cf/d60e12055c2930aa5a347043423e59e29241d03fd1f2316d1dea08db383a/txtorcon-18.0.2.tar.gz
+        sha256: ce50fdd00abb8b490b72809a2c664684f67f3c9467f392642d36f58309395a87
