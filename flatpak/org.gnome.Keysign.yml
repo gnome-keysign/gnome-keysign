@@ -351,6 +351,6 @@ modules:
     post-install:
       - sed -i 's|python -m|python3 -m|g' /app/share/applications/org.gnome.Keysign.desktop
     sources:
-      - type: archive
-        url: https://gitlab.gnome.org/GNOME/gnome-keysign/-/archive/0.9.9/gnome-keysign-0.9.9.tar.gz
-        sha256: e4b32675664a32bef9386f2f6bc187c0506f54a1c6ceff5b07377f73a85e3e39
+      - type: git
+        url: git@gitlab.gnome.org:GNOME/gnome-keysign.git
+        branch: master
