@@ -352,5 +352,5 @@ modules:
       - sed -i 's|python -m|python3 -m|g' /app/share/applications/org.gnome.Keysign.desktop
     sources:
       - type: git
-        url: git@gitlab.gnome.org:GNOME/gnome-keysign.git
+        url: https://gitlab.gnome.org/GNOME/gnome-keysign.git
         branch: master
