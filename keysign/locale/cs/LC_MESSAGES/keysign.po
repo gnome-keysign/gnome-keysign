@@ -1,24 +1,23 @@
-# German translations for gnome-keysign.
-# Copyright (C) 2017 Tobias Mueller
-# This file is distributed under the same license as the gnome-keysign
-# project.
-# Mario Blättermann <mario.blaettermann@gmail.com>, 2018.
+# Czech translation for gnome-keysign.
+# Copyright (C) 2018 gnome-keysign's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-keysign package.
+# Marek Černocký <marek@manet.cz>, 2018.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-keysign 0.9\n"
+"Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2018-09-07 10:11+0000\n"
-"PO-Revision-Date: 2018-09-18 23:07+0200\n"
-"Last-Translator: Christian Kirbach <christian.kirbach@gmail.com>\n"
-"Language-Team: Deutsch <gnome-de@gnome.org>\n"
-"Language: de\n"
+"POT-Creation-Date: 2018-10-04 17:23+0000\n"
+"PO-Revision-Date: 2018-10-05 10:37+0200\n"
+"Last-Translator: Marek Černocký <marek@manet.cz>\n"
+"Language-Team: čeština <gnome-cs-list@gnome.org>\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Generated-By: Babel 2.5.1\n"
-"X-Generator: Poedit 2.1.1\n"
+"Generated-By: Babel 2.6.0\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Generator: Gtranslator 2.91.7\n"
 
 #: data/org.gnome.Keysign.raw.appdata.xml:10
 msgid ""
@@ -28,12 +27,9 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"      GNOME-Keysign signiert OpenPGP-Schlüssel einfach und sicher über das\n"
-"      lokale Netzwerk oder Bluetooth.\n"
-"    "
+"Podepisování klíčů GNOME umožňuje pohodlné a bezpečné podepisování klíčů "
+"OpenPGP přes místní síť nebo Bluetooth. "
 
-# CHECK: Keysigning-Party...?
-# Außerdem ein offensichtlicher Fehler im Original: höchstwahrscheinlich geht es generell nur um QR-Codes, nicht um Barcodes.
 #: data/org.gnome.Keysign.raw.appdata.xml:14
 msgid ""
 "\n"
@@ -45,22 +41,15 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"      Das Programm scannt den Barcode eines anderen Schlüssels und "
-"überträgt\n"
-"      den Schlüssel sicher, was spontane Signierpartys zu zweit ermöglicht. "
-"Es hält\n"
-"      sich dabei an die übliche Vorgehensweise. So schickt es die "
-"verschlüsselten\n"
-"      Signaturen als E-Mail-Anhang an die Benutzerkennungen des Schlüssels "
-"unter\n"
-"      Benutzung des E-Mail-Clients, den der Benutzer schon eingerichtet "
-"hat.\n"
-"    "
+"Umí číst čárový kód jiného klíče a klíče bezpečně přenášet, což se hodí pro "
+"dvoustranné podepisování klíčů. Drží se osvědčené praxe posílání šifrovaných "
+"podpisů do UID klíče pomocí e-mailového klienta, kterého pro daný účel "
+"uživatel nastavil."
 
 #. Name
 #: data/org.gnome.Keysign.raw.desktop:2
 msgid "Keysign"
-msgstr "Keysign"
+msgstr "Podepisování klíčů"
 
 #. Comment
 #: data/org.gnome.Keysign.raw.desktop:3
@@ -68,13 +57,13 @@ msgid ""
 "A keysigning helper to enable you to comfortably exchange OpenPGP keys with "
 "a friend"
 msgstr ""
-"Ein Dienstprogramm zum Signieren von Schlüsseln, um komfortabel OpenPGP-"
-"Schlüssel mit einem Freund auszutauschen"
+"Pomocník s podepisováním klíčů, abyste si mohli s přáteli pohodlně vyměňovat "
+"klíče OpenPGP"
 
 #. Keywords
 #: data/org.gnome.Keysign.raw.desktop:4
 msgid "python;gpg;gnupg;key;openpgp;"
-msgstr "python;gpg;gnupg;Schlüssel;openpgp;"
+msgstr "python;gpg;gnupg;key;openpgp;"
 
 #. Icon
 #: data/org.gnome.Keysign.raw.desktop:7
@@ -83,11 +72,11 @@ msgstr "org.gnome.Keysign"
 
 #: keysign/app.py:165
 msgid "Send"
-msgstr "Senden"
+msgstr "Odeslání"
 
 #: keysign/app.py:167 keysign/receive.py:238
 msgid "Receive"
-msgstr "Empfangen"
+msgstr "Příjem"
 
 #: keysign/app.ui:62 keysign/send.ui:616
 msgid "Internet"
@@ -95,15 +84,15 @@ msgstr "Internet"
 
 #: keysign/avahioffer.py:81 keysign/bluetoothoffer.py:144
 msgid "Offering key: {}"
-msgstr "Schlüssel wird angeboten: {}"
+msgstr "Nabízený klíč: {}"
 
 #: keysign/avahioffer.py:82 keysign/bluetoothoffer.py:145
 msgid "Discovery info: {}"
-msgstr "Suchinformation: {}"
+msgstr "Informace o vyhledávání: {}"
 
 #: keysign/avahioffer.py:83
 msgid "Press Enter to stop"
-msgstr "Eingabetaste zum Stoppen drücken"
+msgstr "Zastavíte zmáčknutím Enter"
 
 #: keysign/bluetoothoffer.py:127
 msgid ""
@@ -111,7 +100,7 @@ msgid ""
 "Key successfully sent"
 msgstr ""
 "\n"
-"Schlüssel erfolgreich gesendet"
+"Klíč byl úspěšně odeslán"
 
 #: keysign/bluetoothoffer.py:129
 msgid ""
@@ -119,11 +108,11 @@ msgid ""
 "An error occurred: {}"
 msgstr ""
 "\n"
-"Es ist ein Fehler aufgetreten: {}"
+"Vyskytla se chyba: {}"
 
 #: keysign/bluetoothoffer.py:131
 msgid "Press Enter to exit"
-msgstr "Eingabetaste zum Beenden drücken"
+msgstr "Ukončíte zmáčknutím Enter"
 
 #: keysign/bluetoothoffer.py:146
 msgid "HMAC: {}"
@@ -135,25 +124,24 @@ msgstr "Port: {}"
 
 #: keysign/bluetoothoffer.py:152
 msgid "Bluetooth not available"
-msgstr "Bluetooth ist nicht verfügbar"
+msgstr "Bluetooth není k dispozici"
 
 #: keysign/bluetoothreceive.py:134
 msgid "Trying to download the key, please wait"
-msgstr "Es wird versucht, den Schlüssel herunterzuladen. Bitte warten"
+msgstr "Zkouší se stáhnout klíč, čekejte prosím"
 
 #: keysign/gpgmks.py:178
 #, python-format
 msgid "installing symlinks for sockets from %s to %s"
-msgstr ""
-"Symbolische Verknüpfungen für Sockets aus %s werden nach %s installiert"
+msgstr "instalují se symbolické odkazy pro sokety od %s do %s"
 
 #: keysign/gtkexcepthook.py:173
 msgid "Bug Detected"
-msgstr "Fehler erkannt"
+msgstr "Zjištěna chyba"
 
 #: keysign/gtkexcepthook.py:175
 msgid "<big><b>A programming error has been detected.</b></big>"
-msgstr "<big><b>Ein Programmierfehler wurde bemerkt.</b></big>"
+msgstr "<big><b>Byla zjištěna programová chyba.</b></big>"
 
 #: keysign/gtkexcepthook.py:178
 msgid ""
@@ -163,39 +151,36 @@ msgid ""
 "Please tell the developers about this using the issue tracker if no-one else "
 "has reported it yet."
 msgstr ""
-"Sie können diesen Fehler ignorieren und weiter arbeiten, was aber zu "
-"unerwarteten Ergebnissen\n"
-"führen könnte.\n"
+"Můžete tuto chybu ignorovat a pokračovat v práci, ale může to způsobit "
+"neočekávané výsledky.\n"
 "\n"
-"Bitte melden Sie dies mit Hilfe des Fehlererfassungssystems den Entwicklern, "
-"falls es bisher\n"
-"noch von niemandem gemeldet wurde."
+"Pokud problém zatím nikdo nenahlásil, řekněte o něm prosím vývojářům pomoci "
+"systému pro sledování problémů."
 
 #: keysign/gtkexcepthook.py:187
 msgid "Search Tracker..."
-msgstr "Fehlererfassungssystem durchsuchen …"
+msgstr "Vyhledat v nahlášených…"
 
 #: keysign/gtkexcepthook.py:189
 msgid "Report..."
-msgstr "Melden …"
+msgstr "Nahlásit…"
 
 #: keysign/gtkexcepthook.py:191
 msgid "Ignore Error"
-msgstr "Fehler ignorieren"
+msgstr "Ignorovat chyby"
 
 #: keysign/gtkexcepthook.py:192
 msgid "Quit GNOME Keysign"
-msgstr "GNOME Keysign beenden"
+msgstr "Ukončit Podepisování klíčů"
 
 #: keysign/gtkexcepthook.py:202
 msgid "Details..."
-msgstr "Details …"
+msgstr "Podrobnosti…"
 
 #: keysign/gtkexcepthook.py:229 keysign/gtkexcepthook.py:232
 msgid "Exception while analyzing the exception."
-msgstr "Ausnahmefehler während der Analyse der Ausnahme."
+msgstr "Výjimka při analýze výjimky."
 
-# Müssen wir so etwas übersetzen? Die Gitlab-Oberfläche ist sowieso in Englisch, und vom Bugreporter wird auch Englisch erwartet. Zar haben wird es hier in diesem Fall mit einem deutschsprachigen Entwickler zu tun, aber in anderen Sprachen ergibt so etwas überhaupt keinen Sinn.
 #: keysign/gtkexcepthook.py:281
 msgid ""
 "            #### Description\n"
@@ -219,22 +204,41 @@ msgid ""
 "            #### Traceback\n"
 "        "
 msgstr ""
+"            #### Description\n"
+"\n"
+"            Dejte hlášení výstižný anglický název.\n"
+"            Pokud můžete, použijte něco jako\n"
+"            \"{vadná-funkce}: {co-je-špatně}\"\n"
+"            Po té nahraďte tento text delším popisem\n"
+"            chyby v angličtině. Hodit se mohou i\n"
+"            Snímky nebo nahrávky obrazovky.\n"
+"\n"
+"            #### Steps to reproduce\n"
+"\n"
+"            Sdělte nám anglicky, co přesně děláte,\n"
+"            když se chyba projeví.\n"
+"            Nejlepší je, pokud můžete napsat krok za\n"
+"            krokem instrukce, které vedou k vyvolání.\n"
+"            chyby.\n"
+"\n"
+"            #### Traceback\n"
+"        "
 
 #: keysign/i18n.py:39
 msgid "Translated for gettext (C)"
-msgstr "Übersetzt für gettext (DE)"
+msgstr "Přeloženo pro gettext ©"
 
 #: keysign/i18n.py:47
 msgid "Translated for Python (C)"
-msgstr "Übersetzt für Python (DE)"
+msgstr "Přeloženo pro Python ©"
 
 #: keysign/keylistwidget.py:83
 msgid "Expires: "
-msgstr "Läuft ab: "
+msgstr "Vyprší: "
 
 #: keysign/receive.py:158
 msgid "Sign Key"
-msgstr "Schlüssel signieren"
+msgstr "Podepisovací klíč"
 
 #: keysign/receive.ui:53
 msgid ""
@@ -244,18 +248,18 @@ msgid ""
 "For more information click <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "NoServers/1\">here</a>."
 msgstr ""
-"Es konnten keine GNOME Keysign-Server erkannt werden :-(\n"
-"Sie brauchen einen Freund, um GNOME Keysign zu benutzen.\n"
-"Netzwerkprobleme können auch ursächlich sein.\n"
-"Weitere Informationen finden Sie <a href=\"https://wiki.gnome.org/Apps/"
-"Keysign/Doc/NoServers/1\">hier</a>."
+"V okolí není žádný server pro podepisování klíčů :-(\n"
+"Domluvte se s přáteli na používání aplikace Podepisování klíčů.\n"
+"Nebo je také možné, že máte jen problémy s připojením k síti.\n"
+"Více informací si zobrazíte kliknutím <a href=\"https://wiki.gnome.org/Apps/"
+"Keysign/Doc/NoServers/1\">zde</a>."
 
 #: keysign/receive.ui:105
 msgid ""
 "<small>To sign someone's key, scan their QR or enter security code</small>"
 msgstr ""
-"<small>Scannen Sie einen QR-Code oder tippen Sie den Sicherheitscode ein, um "
-"einen Schlüssel zu signieren</small>"
+"<small>Abyste mohl podepsat něčí klíč, musíte načíst QR kód neb zadat "
+"bezpečnostní kód</small>"
 
 #: keysign/receive.ui:124
 msgid "<b>Camera</b>"
@@ -263,27 +267,27 @@ msgstr "<b>Kamera</b>"
 
 #: keysign/receive.ui:139
 msgid "Integrated Web Cam"
-msgstr "Integrierte Webcam"
+msgstr "Integrovaná webová kamera"
 
 #: keysign/receive.ui:176 keysign/send.ui:435
 msgid "<b>Security Code</b>"
-msgstr "<b>Sicherheitscode</b>"
+msgstr "<b>Bezpečnostní kód</b>"
 
 #: keysign/receive.ui:209
 msgid "Scan Barcode"
-msgstr "QR-Code scannen"
+msgstr "Načtení čárového kódu"
 
 #: keysign/receive.ui:226
 msgid "Downloading key-data. Please wait ..."
-msgstr "Schlüsseldaten werden heruntergeladen. Bitte warten …"
+msgstr "Stahují se data klíče. Čekejte prosím…"
 
 #: keysign/receive.ui:251
 msgid "Key download was interrupted!"
-msgstr "Herunterladen des Schlüssels wurde unterbrochen!"
+msgstr "Stahování klíče bylo přerušeno!"
 
 #: keysign/receive.ui:313 keysign/send.ui:527
 msgid "page1"
-msgstr "Seite1"
+msgstr ""
 
 #: keysign/receive.ui:337
 msgid ""
@@ -291,53 +295,52 @@ msgid ""
 "This will generate an email that must be sent in order to complete the "
 "signing process."
 msgstr ""
-"Bestätigen Sie das Signieren des Schlüssels.\n"
-"Im Anschluss wird eine E-Mail generiert, die verschickt werden muss, um das "
-"Signieren abzuschließen."
+"Jestli chcete klíč podepsat, potvrďte, že chcete podepsat následující klíč.\n"
+"Tím se vygeneruje e-mail, který musíte odeslat, aby bylo podepsání úplné."
 
 #: keysign/receive.ui:365
 msgid "Key"
-msgstr "Schlüssel"
+msgstr "Klíč"
 
 #: keysign/receive.ui:398 keysign/send.ui:360
 msgid "UIDs"
-msgstr "Benutzerkennungen"
+msgstr "UID"
 
 #: keysign/receive.ui:485
 msgid "C_onfirm"
-msgstr "_Bestätigen"
+msgstr "P_otvrdit"
 
 #: keysign/receive.ui:521 keysign/send.ui:564
 msgid "page2"
-msgstr "Seite2"
+msgstr ""
 
 #: keysign/receive.ui:539
 msgid "Signing the following UIDs:"
-msgstr "Folgende Benutzerkennungen werden signiert:"
+msgstr "Podepisují se následující UID:"
 
 #: keysign/receive.ui:615
 msgid "page3"
-msgstr "Seite3"
+msgstr ""
 
 #: keysign/send.py:156
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
 msgstr ""
-"Es wird immer noch versucht, eine Verbindung zum Internet herzustellen. "
-"Offensichtlich ist die Verbindung langsam oder nicht verfügbar."
+"Stále se zkouší získat připojení do Internetu. Vypadá to, že je pomalé nebo "
+"nedostupné."
 
 #: keysign/send.py:162
 msgid "There isn't an Internet connection!"
-msgstr "Es gibt keine Internetverbindung!"
+msgstr "Není k dispozici internetové připojení!"
 
 #: keysign/send.py:190 keysign/send.ui:545
 msgid ""
 "Key successfully sent.\n"
 "You should receive soon an email with the signature."
 msgstr ""
-"Der Schlüssel wurde erfolgreich gesendet.\n"
-"Sie sollten zeitnah eine E-Mail mit der Signatur erhalten."
+"Klíč byl úspěšně odeslán.\n"
+"V krátké době byste měli obdržet e-mail s podpisem."
 
 #: keysign/send.py:195
 msgid ""
@@ -345,9 +348,9 @@ msgid ""
 "Either your partner has entered a wrong code or someone tried to intercept "
 "your connection"
 msgstr ""
-"Es konnte keine sichere Verbindung aufgebaut werden.\n"
-"Entweder hat Ihr Partner einen falschen Code eingegeben oder jemand versucht "
-"die Datenübertragung zu belauschen"
+"Nelze ustavit bezpečné spojení.\n"
+"Buď váš partner zadal nesprávný kód nebo se někdo pokusil zachytit vaše "
+"spojení."
 
 #: keysign/send.py:199
 #, python-format
@@ -355,58 +358,93 @@ msgid ""
 "An unexpected error occurred:\n"
 "%s"
 msgstr ""
-"Ein unerwarteter Fehler ist aufgetreten:\n"
+"Vyskytla se neočekávaná chyba:\n"
 "%s"
 
 #: keysign/send.ui:7
 msgid "Select and send key"
-msgstr "Schlüssel auswählen und senden"
+msgstr "Výběr a odeslání klíče"
 
 #: keysign/send.ui:58
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
 msgstr ""
-"Sie haben keine Schlüssel!\n"
-"Sie können beispielsweise Seahorse verwenden, um einen Schlüssel zu erzeugen."
+"Nemáte žádné klíče!\n"
+"Použijte prosím třeba „Hesla a klíče“ k vytvoření nějakého."
 
 #: keysign/send.ui:135
 msgid "Very slow or no Internet connection!"
-msgstr "Sehr langsame oder keine Internetverbindung!"
+msgstr "Připojení do Internetu je pomalé nebo nefunkční!"
 
 #: keysign/send.ui:190
 msgid "<b>Select a key for signing</b>"
-msgstr "<b>Einen Schlüssel zum Signieren auswählen</b>"
+msgstr "<b>Vyberte klíč k podepsání</b>"
 
-# CHECK
 #: keysign/send.ui:206
 msgid "<small>Times signed</small>"
-msgstr "<small>Anzahl erhaltener Signaturen</small>"
+msgstr "<small>Počet podepsání</small>"
 
 #: keysign/send.ui:272
 msgid "Keylist"
-msgstr "Schlüsselliste"
+msgstr "Seznam klíčů"
 
 #: keysign/send.ui:292
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
 msgstr ""
-"<small>Um den Schlüssel signieren zu lassen, muss eine andere Person den "
-"Sicherheitscode oder den QR-Code scannen</small>"
+"<small>Abyste měli klíč podepsaný, musí jiná osoba zadat bezpečnostní kód "
+"nebo načíst QR kód</small>"
 
 #: keysign/send.ui:319
 msgid "<b>Key Details</b>"
-msgstr "<b>Schlüsseldetails</b>"
+msgstr "<b>Údaje klíče</b>"
 
 #: keysign/send.ui:344
 msgid "Fingerprint"
-msgstr "Fingerabdruck"
+msgstr "Otisk"
 
 #: keysign/send.ui:498
 msgid "<b>QR Code</b>"
-msgstr "<b>QR-Code</b>"
+msgstr "<b>QR kód</b>"
 
 #: keysign/send.ui:575
 msgid "Select and Send key"
-msgstr "Schlüssel auswählen und senden"
+msgstr "Výběr a odeslání klíče"
+
+#: keysign/util.py:206
+msgid "Your signed key $fingerprint"
+msgstr "Váš podepsaný klíč $fingerprint"
+
+#: keysign/util.py:207
+msgid ""
+"Hi $uid,\n"
+"\n"
+"\n"
+"I have just signed your key\n"
+"\n"
+"      $fingerprint\n"
+"\n"
+"\n"
+"Thanks for letting me sign your key!\n"
+"\n"
+"--\n"
+"GNOME Keysign\n"
+msgstr ""
+"Milý uživateli/uživatelko $uid,\n"
+"\n"
+"\n"
+"Právě byl podepsán váš klíč\n"
+"\n"
+"      $fingerprint\n"
+"\n"
+"\n"
+"Děkujeme, že jste umožnil(a) svůj klíč podepsat!\n"
+"\n"
+"--\n"
+"Podepisování klíčů GNOME\n"
+
+#: keysign/wormholereceive.py:86
+msgid "Wrong message authentication code"
+msgstr "Nesprávný ověřovací kód zprávy"

@@ -3,36 +3,42 @@
 # This file is distributed under the same license as the gnome-keysign
 # project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
+# Daniel Mustieles <daniel.mustieles@gmail.com>, 2018.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign 0.9.7.2\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2018-06-02 17:55+0200\n"
-"PO-Revision-Date: 2018-06-02 17:55+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2018-09-06 20:41+0000\n"
+"PO-Revision-Date: 2018-09-07 12:01+0200\n"
+"Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
+"Language-Team: es <gnome-es-list@gnome.org>\n"
 "Language: es\n"
-"Language-Team: es <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.5.1\n"
-
+"X-Generator: Gtranslator 2.91.7\n"
 
 #: data/org.gnome.Keysign.raw.appdata.xml:10
+#| msgid ""
+#| "\n"
+#| "      GNOME-Keysign allows signing OpenPGP keys comfortably and securely\n"
+#| "      via the local network or Bluetooth.\n"
+#| "      "
 msgid ""
 "\n"
 "      GNOME-Keysign allows signing OpenPGP keys comfortably and securely\n"
 "      via the local network or Bluetooth.\n"
-"      "
+"    "
 msgstr ""
 "\n"
 "      GNOME-Keysign permite firmar llaves OpenPGP de manera cómoda y segura\n"
 "      a través de la red local o Bluetooth.\n"
 "      "
 
-#: data/org.gnome.Keysign.raw.appdata.xml:16
+#: data/org.gnome.Keysign.raw.appdata.xml:14
 msgid ""
 "\n"
 "      It can scan another key's barcode and transfer the key securely,\n"
@@ -44,7 +50,8 @@ msgid ""
 msgstr ""
 "\n"
 "      Puede escanear el código de barra de otra llave y transferirla\n"
-"      de manera segura, permitiendo sesiones casuales bipartitas de firma de llave.\n"
+"      de manera segura, permitiendo sesiones casuales bipartitas de firma de "
+"llave.\n"
 "      Sigue buenas prácticas al enviar las firmas encriptadas a los UIDs\n"
 "      de una llave usando el cliente de correo configurado por\n"
 "      el usuario.\n"
@@ -58,11 +65,11 @@ msgstr "Keysign"
 #. Comment
 #: data/org.gnome.Keysign.raw.desktop:3
 msgid ""
-"A keysigning helper to enable you to comfortably exchange OpenPGP keys with a"
-" friend"
+"A keysigning helper to enable you to comfortably exchange OpenPGP keys with "
+"a friend"
 msgstr ""
-"Un ayudante para firmar llaves que te permite cómodamente intercambiar llaves"
-" OpenPGP con un amigo"
+"Un ayudante para firmar llaves que te permite cómodamente intercambiar "
+"llaves OpenPGP con un amigo"
 
 #. Keywords
 #: data/org.gnome.Keysign.raw.desktop:4
@@ -74,31 +81,31 @@ msgstr "python;gpg;gnupg;key;openpgp;"
 msgid "org.gnome.Keysign"
 msgstr "org.gnome.Keysign"
 
-#: keysign/app.py:166
+#: keysign/app.py:165
 msgid "Send"
 msgstr "Enviar"
 
-#: keysign/app.py:168 keysign/receive.py:198
+#: keysign/app.py:167 keysign/receive.py:238
 msgid "Receive"
 msgstr "Recibir"
 
-#: keysign/app.py:205 keysign/send.py:186
-msgid "Sending {}"
-msgstr "Enviando {}"
+#: keysign/app.ui:62 keysign/send.ui:616
+msgid "Internet"
+msgstr "Internet"
 
-#: keysign/avahioffer.py:82 keysign/bluetoothoffer.py:142
+#: keysign/avahioffer.py:81 keysign/bluetoothoffer.py:144
 msgid "Offering key: {}"
 msgstr "Ofreciendo llave: {}"
 
-#: keysign/avahioffer.py:83 keysign/bluetoothoffer.py:143
+#: keysign/avahioffer.py:82 keysign/bluetoothoffer.py:145
 msgid "Discovery info: {}"
 msgstr "Información de descubrimiento: {}"
 
-#: keysign/avahioffer.py:84
+#: keysign/avahioffer.py:83
 msgid "Press Enter to stop"
 msgstr "Presiona Enter para parar"
 
-#: keysign/bluetoothoffer.py:125
+#: keysign/bluetoothoffer.py:127
 msgid ""
 "\n"
 "Key successfully sent"
@@ -106,7 +113,7 @@ msgstr ""
 "\n"
 "Llave enviada con éxito"
 
-#: keysign/bluetoothoffer.py:127
+#: keysign/bluetoothoffer.py:129
 msgid ""
 "\n"
 "An error occurred: {}"
@@ -114,23 +121,23 @@ msgstr ""
 "\n"
 "Ha ocurrido un error: {}"
 
-#: keysign/bluetoothoffer.py:129
+#: keysign/bluetoothoffer.py:131
 msgid "Press Enter to exit"
 msgstr "Presiona Enter para salir"
 
-#: keysign/bluetoothoffer.py:144
+#: keysign/bluetoothoffer.py:146
 msgid "HMAC: {}"
 msgstr "HMAC: {}"
 
-#: keysign/bluetoothoffer.py:145
+#: keysign/bluetoothoffer.py:147
 msgid "Port: {}"
 msgstr "Port: {}"
 
-#: keysign/bluetoothoffer.py:150
+#: keysign/bluetoothoffer.py:152
 msgid "Bluetooth not available"
 msgstr "Bluetooth no disponible"
 
-#: keysign/bluetoothreceive.py:133
+#: keysign/bluetoothreceive.py:134
 msgid "Trying to download the key, please wait"
 msgstr "Intentando descargar la llave, espera por favor"
 
@@ -155,11 +162,11 @@ msgid ""
 "Please tell the developers about this using the issue tracker if no-one else "
 "has reported it yet."
 msgstr ""
-"Es posible que puedas ignorar este error y continuar trabajando, pero puede que haya "
-"resultados inesperados.\n"
+"Es posible que puedas ignorar este error y continuar trabajando, pero puede "
+"que haya resultados inesperados.\n"
 "\n"
-"Por favor, dile a los desarrolladores de esto usando el gestor de problemas"
-"si nadie más lo ha reportado aún."
+"Por favor, dile a los desarrolladores de esto usando el gestor de "
+"problemassi nadie más lo ha reportado aún."
 
 #: keysign/gtkexcepthook.py:187
 msgid "Search Tracker..."
@@ -231,17 +238,17 @@ msgstr ""
 
 #: keysign/i18n.py:39
 msgid "Translated for gettext (C)"
-msgstr "Traducido para gettext (C)"
+msgstr "Traducido para gettext (es)"
 
 #: keysign/i18n.py:47
 msgid "Translated for Python (C)"
-msgstr "Traducido para Python (C)"
+msgstr "Traducido para Python (es)"
 
-#: keysign/keylistwidget.py:82
+#: keysign/keylistwidget.py:83
 msgid "Expires: "
 msgstr "Expira: "
 
-#: keysign/receive.py:119
+#: keysign/receive.py:158
 msgid "Sign Key"
 msgstr "Firmar Llave"
 
@@ -250,20 +257,21 @@ msgid ""
 "No GNOME Keysign servers around :-(\n"
 "Find a friend to use GNOME Keysign with.\n"
 "You may also suffer from connectivity problems.\n"
-"For more information click <a "
-"href=\"https://wiki.gnome.org/Apps/Keysign/Doc/NoServers/1\">here</a>."
+"For more information click <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"NoServers/1\">here</a>."
 msgstr ""
 "No hay servidores GNOME Keysign cerca :-(\n"
 "Encuentra un amigo con el que usar GNOME Keysign.\n"
 "Puede que también estés teniendo problemas de conectividad.\n"
-"Para más información haz click <a "
-"href=\"https://wiki.gnome.org/Apps/Keysign/Doc/NoServers/1\">aquí</a>."
-
-
+"Para más información haz click <a href=\"https://wiki.gnome.org/Apps/Keysign/"
+"Doc/NoServers/1\">aquí</a>."
 
 #: keysign/receive.ui:105
-msgid "<small>To sign someone's key, scan their QR or enter security code</small>"
-msgstr "<small>Para firmar la llave de alguien, escanea su QR o introduce el código de seguridad</small>"
+msgid ""
+"<small>To sign someone's key, scan their QR or enter security code</small>"
+msgstr ""
+"<small>Para firmar la llave de alguien, escanea su QR o introduce el código "
+"de seguridad</small>"
 
 #: keysign/receive.ui:124
 msgid "<b>Camera</b>"
@@ -273,59 +281,94 @@ msgstr "<b>Cámara</b>"
 msgid "Integrated Web Cam"
 msgstr "WebCam Integrada"
 
-#: keysign/receive.ui:176 keysign/send.ui:341
+#: keysign/receive.ui:176 keysign/send.ui:435
 msgid "<b>Security Code</b>"
 msgstr "<b>Código de Seguridad</b>"
 
-#: keysign/receive.ui:208
+#: keysign/receive.ui:209
 msgid "Scan Barcode"
 msgstr "Escanear Código de Barras"
 
-#: keysign/receive.ui:225
+#: keysign/receive.ui:226
 msgid "Downloading key-data. Please wait ..."
 msgstr "Descargando datos de llave. Por favor espera..."
 
-#: keysign/receive.ui:250
+#: keysign/receive.ui:251
 msgid "Key download was interrupted!"
 msgstr "La descarga de la llave fue interrumpida!"
 
-#: keysign/receive.ui:310 keysign/send.ui:426
+#: keysign/receive.ui:313 keysign/send.ui:527
 msgid "page1"
 msgstr "page1"
 
-#: keysign/receive.ui:334
+#: keysign/receive.ui:337
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
 "signing process."
 msgstr ""
 "Para firmar la llave, confirma que quieres firma la siguiente llave.\n"
-"Esto generará un email que debe enviarse para completar el proceso "
-"de firmado."
+"Esto generará un email que debe enviarse para completar el proceso de "
+"firmado."
 
-#: keysign/receive.ui:362
+#: keysign/receive.ui:365
 msgid "Key"
 msgstr "Llave"
 
-#: keysign/receive.ui:395 keysign/send.ui:270
+#: keysign/receive.ui:398 keysign/send.ui:360
 msgid "UIDs"
 msgstr "UIDs"
 
-#: keysign/receive.ui:482
+#: keysign/receive.ui:485
 msgid "C_onfirm"
 msgstr "C_onfirm"
 
-#: keysign/receive.ui:518
+#: keysign/receive.ui:521 keysign/send.ui:564
 msgid "page2"
 msgstr "page2"
 
-#: keysign/receive.ui:536
+#: keysign/receive.ui:539
 msgid "Signing the following UIDs:"
 msgstr "Firmando los siguientes UIDs:"
 
-#: keysign/receive.ui:612
+#: keysign/receive.ui:615
 msgid "page3"
 msgstr "page3"
+
+#: keysign/send.py:156
+msgid ""
+"Still trying to get a connection to the Internet. It appears to be slow or "
+"unavailable."
+msgstr ""
+
+#: keysign/send.py:162
+msgid "There isn't an Internet connection!"
+msgstr "No hay conexión a Internet."
+
+#: keysign/send.py:190 keysign/send.ui:545
+msgid ""
+"Key successfully sent.\n"
+"You should receive soon an email with the signature."
+msgstr ""
+
+#: keysign/send.py:195
+msgid ""
+"Could not establish a secure connection.\n"
+"Either your partner has entered a wrong code or someone tried to intercept "
+"your connection"
+msgstr ""
+
+#: keysign/send.py:199
+#, python-format
+#| msgid ""
+#| "\n"
+#| "An error occurred: {}"
+msgid ""
+"An unexpected error occurred:\n"
+"%s"
+msgstr ""
+"Ha ocurrido un error inesperado:\n"
+"%s"
 
 #: keysign/send.ui:7
 msgid "Select and send key"
@@ -339,39 +382,45 @@ msgstr ""
 "No tienes ninguna llave!\n"
 "Por favor, usa algo como Seahorse para crear una."
 
-#: keysign/send.ui:114
+#: keysign/send.ui:135
+msgid "Very slow or no Internet connection!"
+msgstr ""
+
+#: keysign/send.ui:190
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>Selecciona una llave para firmar</b>"
 
-#: keysign/send.ui:130
+#: keysign/send.ui:206
 msgid "<small>Times signed</small>"
 msgstr "<small>Veces firmada</small>"
 
-#: keysign/send.ui:185
+#: keysign/send.ui:272
 msgid "Keylist"
 msgstr "Lista de llaves"
 
-#: keysign/send.ui:202
+#: keysign/send.ui:292
 msgid ""
-"<small>To have the key signed, the other person must enter the security code,"
-" or scan the QR code</small>"
+"<small>To have the key signed, the other person must enter the security "
+"code, or scan the QR code</small>"
 msgstr ""
-"<small>Para firmar la llave, la otra persona debe introducir el código de seguridad,"
-" o escanear el código QR</small>"
+"<small>Para firmar la llave, la otra persona debe introducir el código de "
+"seguridad, o escanear el código QR</small>"
 
-#: keysign/send.ui:229
+#: keysign/send.ui:319
 msgid "<b>Key Details</b>"
 msgstr "<b>Detalles de Llave</b>"
 
-#: keysign/send.ui:254
+#: keysign/send.ui:344
 msgid "Fingerprint"
 msgstr "Huella"
 
-#: keysign/send.ui:397
+#: keysign/send.ui:498
 msgid "<b>QR Code</b>"
 msgstr "<b>Código QR</b>"
 
-#: keysign/send.ui:437
+#: keysign/send.ui:575
 msgid "Select and Send key"
 msgstr "Seleccionar y Enviar llave"
 
+#~ msgid "Sending {}"
+#~ msgstr "Enviando {}"
