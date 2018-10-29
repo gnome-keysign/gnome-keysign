@@ -247,7 +247,6 @@ setup(
         ],
         'gui_scripts': [
             'gnome-keysign = keysign:main',
-            'gks-qrcode = keysign.GPGQRCode:main',
         ],
     },
     
