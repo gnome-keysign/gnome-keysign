@@ -31,15 +31,7 @@ log = logging.getLogger(__name__)
 # because it may turn out to be not working as well as expected.
 # We also use the standard monkeysign module for now, because
 # we know it better.  Expect that to change, though.
-try:
-    GPGME = int(os.environ.get("KEYSIGN_GPGME", 1))
-    if GPGME:
-        from . import gpgmeh as gpg
-    else:
-        from . import gpgmks as gpg
-except ImportError:
-    log.exception("Error import gpgmeh, falling back tp gpgmks")
-    from . import gpgmks as gpg
+from . import gpgmeh as gpg
 
 
 # We expect these functions:

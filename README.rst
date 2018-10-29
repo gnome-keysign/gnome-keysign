@@ -97,7 +97,7 @@ gstreamer1.0-plugins-good provides the autovideosrc element.
 
 These packages should be optional:
 
-    python-requests monkeysign python-qrcode python-bluez
+    python-requests python-qrcode python-bluez
 
 
 Fedora dependencies
