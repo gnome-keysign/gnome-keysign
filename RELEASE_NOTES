@@ -10,6 +10,7 @@ Changes
 
  * Run with python3 from the desktop file
  * Removed monkeysign support
+ * Stop installing gks-qrcode
 
 Resources
 =========
