@@ -9,6 +9,7 @@ Changes
 ==========
 
  * Run with python3 from the desktop file
+ * Removed monkeysign support
 
 Resources
 =========
