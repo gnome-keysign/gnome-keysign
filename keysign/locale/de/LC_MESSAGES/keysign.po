@@ -28,7 +28,7 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"      GNOME-Keysign signiert OpenPGP-Schlüssel einfach und sicher über das\n"
+"      GNOME-Keysign beglaubigt OpenPGP-Schlüssel einfach und sicher über das\n"
 "      lokale Netzwerk oder Bluetooth.\n"
 "    "
 
@@ -68,7 +68,7 @@ msgid ""
 "A keysigning helper to enable you to comfortably exchange OpenPGP keys with "
 "a friend"
 msgstr ""
-"Ein Dienstprogramm zum Signieren von Schlüsseln, um komfortabel OpenPGP-"
+"Ein Dienstprogramm zum Beglaubigen von Schlüsseln, um komfortabel OpenPGP-"
 "Schlüssel mit einem Freund auszutauschen"
 
 #. Keywords
@@ -234,7 +234,7 @@ msgstr "Läuft ab: "
 
 #: keysign/receive.py:158
 msgid "Sign Key"
-msgstr "Schlüssel signieren"
+msgstr "Schlüssel beglaubigen"
 
 #: keysign/receive.ui:53
 msgid ""
@@ -255,7 +255,7 @@ msgid ""
 "<small>To sign someone's key, scan their QR or enter security code</small>"
 msgstr ""
 "<small>Scannen Sie einen QR-Code oder tippen Sie den Sicherheitscode ein, um "
-"einen Schlüssel zu signieren</small>"
+"einen Schlüssel zu beglaubigen</small>"
 
 #: keysign/receive.ui:124
 msgid "<b>Camera</b>"
@@ -291,9 +291,9 @@ msgid ""
 "This will generate an email that must be sent in order to complete the "
 "signing process."
 msgstr ""
-"Bestätigen Sie das Signieren des Schlüssels.\n"
+"Bestätigen Sie das Beglaubigen des Schlüssels.\n"
 "Im Anschluss wird eine E-Mail generiert, die verschickt werden muss, um das "
-"Signieren abzuschließen."
+"Beglaubigen abzuschließen."
 
 #: keysign/receive.ui:365
 msgid "Key"
@@ -313,7 +313,7 @@ msgstr "Seite2"
 
 #: keysign/receive.ui:539
 msgid "Signing the following UIDs:"
-msgstr "Folgende Benutzerkennungen werden signiert:"
+msgstr "Folgende Benutzerkennungen werden beglaubigt:"
 
 #: keysign/receive.ui:615
 msgid "page3"
@@ -376,7 +376,7 @@ msgstr "Sehr langsame oder keine Internetverbindung!"
 
 #: keysign/send.ui:190
 msgid "<b>Select a key for signing</b>"
-msgstr "<b>Einen Schlüssel zum Signieren auswählen</b>"
+msgstr "<b>Einen Schlüssel zum Beglaubigen auswählen</b>"
 
 # CHECK
 #: keysign/send.ui:206
@@ -392,7 +392,7 @@ msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
 msgstr ""
-"<small>Um den Schlüssel signieren zu lassen, muss eine andere Person den "
+"<small>Um den Schlüssel beglaubigen zu lassen, muss eine andere Person den "
 "Sicherheitscode oder den QR-Code scannen</small>"
 
 #: keysign/send.ui:319
