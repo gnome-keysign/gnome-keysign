@@ -310,7 +310,7 @@ For more information click &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
       </object>
       <packing>
         <property name="name">page1</property>
-        <property name="title" translatable="yes">page1</property>
+        <property name="title">page1</property>
         <property name="position">1</property>
       </packing>
     </child>
@@ -518,7 +518,7 @@ Alpha Bar &lt;example@example.com&gt;</property>
       </object>
       <packing>
         <property name="name">page2</property>
-        <property name="title" translatable="yes">page2</property>
+        <property name="title">page2</property>
         <property name="position">2</property>
       </packing>
     </child>
@@ -612,7 +612,7 @@ Alpha Bar &lt;example@example.com&gt;</property>
       </object>
       <packing>
         <property name="name">page3</property>
-        <property name="title" translatable="yes">page3</property>
+        <property name="title">page3</property>
         <property name="position">3</property>
       </packing>
     </child>
