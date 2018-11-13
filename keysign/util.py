@@ -203,8 +203,22 @@ def send_email(to, subject=None, body=None, files=None):
     log.error("An error occurred trying to compose the email")
 
 
-SUBJECT = _('Your signed key $fingerprint')
-BODY = _('''Hi $uid,
+SUBJECT = 'Your signed key $fingerprint'
+BODY = '''Hi $uid,
+
+
+I have just signed your key
+
+      $fingerprint
+
+
+Thanks for letting me sign your key!
+
+--
+GNOME Keysign
+'''
+DIVIDER = '\n--------\nTranslated version below\n--------\n'
+BODY_TRANSLATED = _('''Hi $uid,
 
 
 I have just signed your key
@@ -268,8 +282,13 @@ def sign_keydata_and_send(keydata, error_cb=None):
         # resources. Calling tmpfile.close would get the file deleted.
         tmpfile.file.close()
 
+        body = BODY
+        # If the primary language is not English we append the translation
+        if BODY != BODY_TRANSLATED:
+            body += DIVIDER + BODY_TRANSLATED
+
         subject = Template(SUBJECT).safe_substitute(ctx)
-        body = Template(BODY).safe_substitute(ctx)
+        body = Template(body).safe_substitute(ctx)
         send_email(uid.email, subject, body, [filename])
         yield tmpfile
 
