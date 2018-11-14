@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import logging
+import mailbox
 import os
 import signal
 
@@ -32,6 +33,7 @@ if  __name__ == "__main__" and __package__ is None:
 from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
 from .offer import Offer
+from .util import get_attachments
 from . import gpgmeh
 # We import i18n to have the locale set up for Glade
 from .i18n import _
@@ -103,13 +105,25 @@ class SendApp:
         self.label.drag_dest_set(Gtk.DestDefaults.ALL, [], DRAG_ACTION)
         self.label.drag_dest_set_target_list(None)
         self.label.drag_dest_add_text_targets()
+        self.label.drag_dest_add_uri_targets()
 
     def on_drag_data_received(self, widget, drag_context, x, y, data, info, time):
         filename = data.get_text()
+        # If we don't have a filename it means that the user maybe dropped
+        # an attachment or an entire email.
+        if not filename:
+            filename = data.get_data().decode("utf-8")
         filename = filename[7:].strip('\r\n\x00')  # remove file://, \r\n and NULL
         log.info("Received file: %s" % filename)
+        signatures = get_attachments(filename)
+        if not signatures:
+            with open(filename, "rb") as si:
+                signatures.append(si.read())
+            si.close()
+
         try:
-            gpgmh.import_signature(filename)
+            for signature in signatures:
+                gpgmeh.import_signature(signature)
         except errors.GPGMEError as e:
             log.error(e)
 

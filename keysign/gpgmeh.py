@@ -473,11 +473,10 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
                 yield (UID.from_gpgme(uid), ciphertext)
 
 
-def import_signature(filename, homedir=None):
+def import_signature(signature, homedir=None):
     # ctx = gpg.Context()
     ctx = DirectoryContext(homedir)
-    with open(filename, "rb") as fh:
-        decrypted = ctx.decrypt(fh)
+    decrypted = ctx.decrypt(signature)
     ctx.op_import(decrypted[0])
     result = ctx.op_import_result()
     if len(result.imports) < 0:

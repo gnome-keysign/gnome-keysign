@@ -21,6 +21,7 @@ import hashlib
 import hmac
 import json
 import logging
+import mailbox
 import os
 import shutil
 from subprocess import call
@@ -455,3 +456,14 @@ def _get_available_bt():
             bt = '/'.join((object_path, child.attrib['name']))
             available_bt.append(bt)
     return available_bt
+
+
+def get_attachments(filename):
+    mbox = mailbox.mbox(filename)
+    attachments = []
+    for message in mbox:
+        # Check if there are attachments
+        if message.is_multipart():
+            for attach in message.get_payload()[1:]:
+                attachments.append(attach.get_payload(decode=True))
+    return attachments
