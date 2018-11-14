@@ -9,6 +9,7 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GLib
 from gi.repository import Gdk
+from gpg import errors
 from wormhole.errors import ServerConnectionError, LonelyError, WrongPasswordError
 if __name__ == "__main__":
     from twisted.internet import gtk3reactor
@@ -107,6 +108,10 @@ class SendApp:
         filename = data.get_text()
         filename = filename[7:].strip('\r\n\x00')  # remove file://, \r\n and NULL
         log.info("Received file: %s" % filename)
+        try:
+            gpgmh.import_signature(filename)
+        except errors.GPGMEError as e:
+            log.error(e)
 
     @inlineCallbacks
     def on_key_activated(self, widget, key):
