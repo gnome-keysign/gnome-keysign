@@ -8,6 +8,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GLib
+from gi.repository import Gdk
 from wormhole.errors import ServerConnectionError, LonelyError, WrongPasswordError
 if __name__ == "__main__":
     from twisted.internet import gtk3reactor
@@ -40,6 +41,9 @@ try:
 except ImportError:
     log.exception("cannot import BluetoothOffer")
     BluetoothOffer = None
+
+
+DRAG_ACTION = Gdk.DragAction.COPY
 
 
 class SendApp:
@@ -91,6 +95,18 @@ class SendApp:
         self.result_label = builder.get_object("result_label")
         self.notify = None
         self.internet_option = False
+
+        # Add drag and drop to the keys list widget
+        builder.connect_signals(self)
+        self.label = builder.get_object("keys_listbox")
+        self.label.drag_dest_set(Gtk.DestDefaults.ALL, [], DRAG_ACTION)
+        self.label.drag_dest_set_target_list(None)
+        self.label.drag_dest_add_text_targets()
+
+    def on_drag_data_received(self, widget, drag_context, x, y, data, info, time):
+        filename = data.get_text()
+        filename = filename[7:].strip('\r\n\x00')  # remove file://, \r\n and NULL
+        log.info("Received file: %s" % filename)
 
     @inlineCallbacks
     def on_key_activated(self, widget, key):
