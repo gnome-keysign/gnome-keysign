@@ -27,9 +27,13 @@ from gi.repository import GObject
 
 import logging
 
+from ..errors import NoAvahiDbus
+
 __all__ = ["AvahiBrowser"]
 
 DBusGMainLoop( set_as_default=True )
+
+log = logging.getLogger(__name__)
 
 # This should probably be upstreamed.
 # Unfortunately, upstream seems rather inactive.
@@ -83,8 +87,12 @@ class AvahiBrowser(GObject.GObject):
         self.loop = loop or DBusGMainLoop()
         self.bus = dbus.SystemBus(mainloop=self.loop)
 
-        self.server = dbus.Interface( self.bus.get_object(avahi.DBUS_NAME, '/'),
-                'org.freedesktop.Avahi.Server')
+        try:
+            self.server = dbus.Interface(self.bus.get_object(avahi.DBUS_NAME, '/'),
+                                         'org.freedesktop.Avahi.Server')
+        except dbus.exceptions.DBusException as de:
+            log.exception("Avahi cannot be started: %s", de)
+            raise NoAvahiDbus(de)
 
         self.sbrowser = dbus.Interface(self.bus.get_object(avahi.DBUS_NAME,
             self.server.ServiceBrowserNew(avahi.IF_UNSPEC,

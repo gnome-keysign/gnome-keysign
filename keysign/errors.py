@@ -14,3 +14,9 @@ class UnpoweredAdapter(BluetoothException):
     """The Bluetooth adapter is turned off"""
 
 
+class AvahiException(Exception):
+    """Parent class for all Avahi-related errors"""
+
+
+class NoAvahiDbus(AvahiException):
+    """The required avahi dbus is not available"""
