@@ -15,7 +15,7 @@ BuildRequires: python-lxml
 BuildRequires: python2-babel
 BuildRequires: /usr/bin/desktop-file-validate
 Requires:      python-gobject  gtk3
-Requires:      python-avahi  dbus-python
+Requires:      dbus-python
 Requires:      gstreamer1-plugins-bad-free-extras gstreamer1-plugins-good
 Requires:      python-qrcode
 Requires:      python-requests avahi-ui-tools
