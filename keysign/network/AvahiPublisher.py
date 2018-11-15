@@ -18,13 +18,23 @@
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 import logging
+import os
 
-import avahi
 import dbus
 from dbus.mainloop.glib import DBusGMainLoop
 from gi.repository import GObject
 
-DBusGMainLoop( set_as_default=True )
+if __name__ == "__main__" and __package__ is None:
+    logging.getLogger().error("You seem to be trying to execute " +
+                              "this script directly which is discouraged. " +
+                              "Try python -m instead.")
+    parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    os.sys.path.insert(0, parent_dir)
+    os.sys.path.insert(0, os.path.join(parent_dir, 'monkeysign'))
+    __package__ = str('keysign')
+
+from .AvahiConstants import AvahiConstants as avahi
+DBusGMainLoop(set_as_default=True)
 
 
 class AvahiPublisher:
