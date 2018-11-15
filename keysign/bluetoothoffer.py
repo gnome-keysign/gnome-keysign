@@ -75,14 +75,14 @@ class BluetoothOffer:
 
         returnValue((success, message))
 
+    @inlineCallbacks
     def allocate_code(self):
         """Acquires and returns a string suitable for finding the key via Bluetooth.
         Returns None if no powered on adapter could be found."""
-        # TODO: when we have magic-wormhole we should perform this operation in async
-        # and show the loading spinning wheel
         bt_data = None
         try:
-            code = get_local_bt_address().upper()
+            code = yield threads.deferToThread(get_local_bt_address)
+            code = code.upper()
         except NoBluezDbus as e:
             log.debug("Bluetooth service seems to be unavailable: %s", e)
         except NoAdapter as e:
@@ -101,7 +101,7 @@ class BluetoothOffer:
             port = self.server_socket.getsockname()[1]
             log.info("BT Code: %s %s", code, port)
             bt_data = "BT={0};PT={1}".format(code, port)
-        return bt_data
+        returnValue(bt_data)
 
     def stop(self):
         log.debug("Stopping bt receive")
@@ -114,10 +114,27 @@ class BluetoothOffer:
 
 def main(args):
     if not args:
-        raise ValueError("You must provide an argument to identify the key")
+        raise ValueError(_("You must provide an argument to identify the key"))
+
+    def code_generated(data):
+        if data:
+            # getting the code from "BT=code;...."
+            code = data.split("=", 1)[1]
+            code = code.split(";", 1)[0]
+            port = data.rsplit("=", 1)[1]
+            offer.start().addCallback(_received)
+            print(_("Offering key: {}").format(key))
+            print(_("Discovery info: {}").format(code))
+            print(_("HMAC: {}").format(hmac))
+            print(_("Port: {}").format(port))
+            # Wait for the user without blocking everything
+        else:
+            print(_("Bluetooth not available"))
+
+        reactor.callInThread(cancel)
 
     def cancel():
-        input("Press Enter to cancel")
+        input(_("Press Enter to cancel"))
         offer.stop()
         reactor.callFromThread(reactor.stop)
 
@@ -134,22 +151,10 @@ def main(args):
     file_key_data = get_public_key_data(key.fingerprint)
     hmac = mac_generate(key.fingerprint.encode('ascii'), file_key_data)
     offer = BluetoothOffer(key)
-    data = offer.allocate_code()
-    if data:
-        # getting the code from "BT=code;...."
-        code = data.split("=", 1)[1]
-        code = code.split(";", 1)[0]
-        port = data.rsplit("=", 1)[1]
-        offer.start().addCallback(_received)
-        print(_("Offering key: {}").format(key))
-        print(_("Discovery info: {}").format(code))
-        print(_("HMAC: {}").format(hmac))
-        print(_("Port: {}").format(port))
-        # Wait for the user without blocking everything
-        reactor.callInThread(cancel)
-        reactor.run()
-    else:
-        print(_("Bluetooth not available"))
+
+    offer.allocate_code().addCallback(code_generated)
+    reactor.run()
+
 
 if __name__ == "__main__":
     import sys

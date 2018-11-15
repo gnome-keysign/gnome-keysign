@@ -35,7 +35,7 @@ class Offer:
                 discovery_data.append(w_data)
         if BluetoothOffer:
             self.bt_offer = BluetoothOffer(self.key)
-            self.b_data = self.bt_offer.allocate_code()
+            self.b_data = yield self.bt_offer.allocate_code()
             if self.b_data:
                 discovery_data.append(self.b_data)
         discovery_data = ";".join(discovery_data)
