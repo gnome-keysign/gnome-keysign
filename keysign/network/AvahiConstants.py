@@ -45,29 +45,6 @@ class AvahiConstants:
     DBUS_INTERFACE_SERVICE_BROWSER = DBUS_NAME + ".ServiceBrowser"
 
     @staticmethod
-    def txt_array_to_dict(txt_array):
-        # This has been taken from Gajim
-        # https://dev.gajim.org/gajim/gajim/blob/2d6e7d2e/gajim/common/zeroconf/zeroconf_avahi.py#L131
-        # it is licensed under the GPLv3.
-        # https://github.com/lathiat/avahi/pull/133
-        txt_dict = {}
-        for els in txt_array:
-            key, val = '', None
-            for c in els:
-                c = chr(c)
-                if val is None:
-                    if c == '=':
-                        val = ''
-                    else:
-                        key += c
-                else:
-                    val += c
-            if val is None:  # missing '='
-                val = ''
-            txt_dict[key] = val
-        return txt_dict
-
-    @staticmethod
     def string_to_byte_array(s):
         if isinstance(s, unicode):
             s = s.encode('utf-8')

@@ -40,6 +40,33 @@ __all__ = ["AvahiBrowser"]
 
 DBusGMainLoop( set_as_default=True )
 
+# This should probably be upstreamed.
+# Unfortunately, upstream seems rather inactive.
+if getattr(avahi, 'txt_array_to_dict', None) is None:
+    # This has been taken from Gajim
+    # https://dev.gajim.org/gajim/gajim/blob/2d6e7d2e/gajim/common/zeroconf/zeroconf_avahi.py#L131
+    # it is licensed under the GPLv3.
+    # https://github.com/lathiat/avahi/pull/133
+    def txt_array_to_dict(txt_array):
+        txt_dict = {}
+        for els in txt_array:
+            key, val = '', None
+            for c in els:
+                c = chr(c)
+                if val is None:
+                    if c == '=':
+                        val = ''
+                    else:
+                        key += c
+                else:
+                    val += c
+            if val is None:  # missing '='
+                val = ''
+            txt_dict[key] = val
+        return txt_dict
+
+    setattr(avahi, 'txt_array_to_dict', txt_array_to_dict)
+
 
 class AvahiBrowser(GObject.GObject):
     __gsignals__ = {
