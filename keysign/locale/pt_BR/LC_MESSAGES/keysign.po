@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2018-10-04 17:23+0000\n"
-"PO-Revision-Date: 2018-10-05 07:32-0200\n"
+"POT-Creation-Date: 2018-11-15 22:39+0000\n"
+"PO-Revision-Date: 2018-11-22 06:57-0200\n"
 "Last-Translator: Rafael Fontenelle <rafaelff@gnome.org>\n"
 "Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
 "Language: pt_BR\n"
@@ -75,11 +75,11 @@ msgstr "python;gpg;gnupg;chave;openpgp;"
 msgid "org.gnome.Keysign"
 msgstr "org.gnome.Keysign"
 
-#: keysign/app.py:165
+#: keysign/app.py:181
 msgid "Send"
 msgstr "Enviar"
 
-#: keysign/app.py:167 keysign/receive.py:238
+#: keysign/app.py:183 keysign/receive.py:238
 msgid "Receive"
 msgstr "Receber"
 
@@ -87,11 +87,11 @@ msgstr "Receber"
 msgid "Internet"
 msgstr "Internet"
 
-#: keysign/avahioffer.py:81 keysign/bluetoothoffer.py:144
+#: keysign/avahioffer.py:81 keysign/bluetoothoffer.py:126
 msgid "Offering key: {}"
 msgstr "Oferecendo chave: {}"
 
-#: keysign/avahioffer.py:82 keysign/bluetoothoffer.py:145
+#: keysign/avahioffer.py:82 keysign/bluetoothoffer.py:127
 msgid "Discovery info: {}"
 msgstr "Info da descoberta: {}"
 
@@ -99,7 +99,28 @@ msgstr "Info da descoberta: {}"
 msgid "Press Enter to stop"
 msgstr "Pressione Enter para interromper"
 
-#: keysign/bluetoothoffer.py:127
+#: keysign/bluetoothoffer.py:117
+msgid "You must provide an argument to identify the key"
+msgstr "Você deve fornecer um argumento para identificar a chave"
+
+#: keysign/bluetoothoffer.py:128
+msgid "HMAC: {}"
+msgstr "HMAC: {}"
+
+#: keysign/bluetoothoffer.py:129
+msgid "Port: {}"
+msgstr "Porta: {}"
+
+#: keysign/bluetoothoffer.py:132
+msgid "Bluetooth not available"
+msgstr "Bluetooth não disponível"
+
+#: keysign/bluetoothoffer.py:137
+#| msgid "Press Enter to exit"
+msgid "Press Enter to cancel"
+msgstr "Pressione Enter para cancelar"
+
+#: keysign/bluetoothoffer.py:144
 msgid ""
 "\n"
 "Key successfully sent"
@@ -107,7 +128,7 @@ msgstr ""
 "\n"
 "Chave enviada com sucesso"
 
-#: keysign/bluetoothoffer.py:129
+#: keysign/bluetoothoffer.py:146
 msgid ""
 "\n"
 "An error occurred: {}"
@@ -115,30 +136,29 @@ msgstr ""
 "\n"
 "Ocorreu um erro: {}"
 
-#: keysign/bluetoothoffer.py:131
+#: keysign/bluetoothoffer.py:148
 msgid "Press Enter to exit"
 msgstr "Pressione Enter para sair"
-
-#: keysign/bluetoothoffer.py:146
-msgid "HMAC: {}"
-msgstr "HMAC: {}"
-
-#: keysign/bluetoothoffer.py:147
-msgid "Port: {}"
-msgstr "Porta: {}"
-
-#: keysign/bluetoothoffer.py:152
-msgid "Bluetooth not available"
-msgstr "Bluetooth não disponível"
 
 #: keysign/bluetoothreceive.py:134
 msgid "Trying to download the key, please wait"
 msgstr "Tentando baixar a chave, por favor aguarde"
 
-#: keysign/gpgmks.py:178
-#, python-format
-msgid "installing symlinks for sockets from %s to %s"
-msgstr "instalando links simbólicos para soquetes de %s para %s"
+#: keysign/dialog_avahi.ui:8
+msgid "Unable to Start Avahi"
+msgstr "Não foi possível iniciar o Avahi"
+
+#: keysign/dialog_avahi.ui:9
+msgid ""
+"Keysign is unable to automatically start Avahi. You can try to execute "
+"`systemctl start avahi-daemon` for solving this problem."
+msgstr ""
+"O Keysign não conseguiu iniciar automaticamente o Avahi. Você pode tentar "
+"executar `systemctl start avahi-daemon` para resolver este problema."
+
+#: keysign/dialog_avahi.ui:23
+msgid "OK"
+msgstr "OK"
 
 #: keysign/gtkexcepthook.py:173
 msgid "Bug Detected"
@@ -186,6 +206,9 @@ msgstr "Detalhes…"
 msgid "Exception while analyzing the exception."
 msgstr "Exceção enquanto analisava a exceção."
 
+#. TRANSLATORS: Crash report template for github, preceding a traceback.
+#. TRANSLATORS: Please ask users kindly to supply at least an English
+#. TRANSLATORS: title if they are able.
 #: keysign/gtkexcepthook.py:281
 msgid ""
 "            #### Description\n"
@@ -230,10 +253,14 @@ msgstr ""
 "            #### Traceback\n"
 "        "
 
+#. TRANSLATORS: Please include your locale, e.g. "de". We're trying to debug native
+#. gettext
 #: keysign/i18n.py:39
 msgid "Translated for gettext (C)"
 msgstr "Traduzido para gettext (pt_BR)"
 
+#. TRANSLATORS: Please include your locale, e.g. "de". We're trying to debug pure
+#. python gettext
 #: keysign/i18n.py:47
 msgid "Translated for Python (C)"
 msgstr "Traduzido para Python (pt_BR)"
@@ -291,10 +318,6 @@ msgstr "Baixando dados da chave. Por favor, aguarde …"
 msgid "Key download was interrupted!"
 msgstr "Obtenção da chave foi interrompida!"
 
-#: keysign/receive.ui:313 keysign/send.ui:527
-msgid "page1"
-msgstr "página1"
-
 #: keysign/receive.ui:337
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
@@ -317,17 +340,9 @@ msgstr "UIDs"
 msgid "C_onfirm"
 msgstr "C_onfirmar"
 
-#: keysign/receive.ui:521 keysign/send.ui:564
-msgid "page2"
-msgstr "página2"
-
 #: keysign/receive.ui:539
 msgid "Signing the following UIDs:"
 msgstr "Assinando os seguintes UIDs:"
-
-#: keysign/receive.ui:615
-msgid "page3"
-msgstr "página3"
 
 #: keysign/send.py:156
 msgid ""
@@ -421,11 +436,7 @@ msgstr "<b>Código QR</b>"
 msgid "Select and Send key"
 msgstr "Selecionar e enviar chave"
 
-#: keysign/util.py:206
-msgid "Your signed key $fingerprint"
-msgstr "Sua chave assinada $fingerprint"
-
-#: keysign/util.py:207
+#: keysign/util.py:222
 msgid ""
 "Hi $uid,\n"
 "\n"
@@ -456,3 +467,18 @@ msgstr ""
 #: keysign/wormholereceive.py:86
 msgid "Wrong message authentication code"
 msgstr "Código de autenticação de mensagem errado"
+
+#~ msgid "installing symlinks for sockets from %s to %s"
+#~ msgstr "instalando links simbólicos para soquetes de %s para %s"
+
+#~ msgid "page1"
+#~ msgstr "página1"
+
+#~ msgid "page2"
+#~ msgstr "página2"
+
+#~ msgid "page3"
+#~ msgstr "página3"
+
+#~ msgid "Your signed key $fingerprint"
+#~ msgstr "Sua chave assinada $fingerprint"
