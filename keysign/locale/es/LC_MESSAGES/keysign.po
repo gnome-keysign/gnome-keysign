@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign 0.9.7.2\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2018-09-06 20:41+0000\n"
-"PO-Revision-Date: 2018-09-07 12:01+0200\n"
+"POT-Creation-Date: 2018-11-15 22:39+0000\n"
+"PO-Revision-Date: 2018-11-30 09:57+0100\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: es <gnome-es-list@gnome.org>\n"
 "Language: es\n"
@@ -22,11 +22,6 @@ msgstr ""
 "X-Generator: Gtranslator 2.91.7\n"
 
 #: data/org.gnome.Keysign.raw.appdata.xml:10
-#| msgid ""
-#| "\n"
-#| "      GNOME-Keysign allows signing OpenPGP keys comfortably and securely\n"
-#| "      via the local network or Bluetooth.\n"
-#| "      "
 msgid ""
 "\n"
 "      GNOME-Keysign allows signing OpenPGP keys comfortably and securely\n"
@@ -52,7 +47,7 @@ msgstr ""
 "      Puede escanear el código de barra de otra llave y transferirla\n"
 "      de manera segura, permitiendo sesiones casuales bipartitas de firma de "
 "llave.\n"
-"      Sigue buenas prácticas al enviar las firmas encriptadas a los UIDs\n"
+"      Siga buenas prácticas al enviar las firmas cifradas a los UID\n"
 "      de una llave usando el cliente de correo configurado por\n"
 "      el usuario.\n"
 "    "
@@ -68,7 +63,7 @@ msgid ""
 "A keysigning helper to enable you to comfortably exchange OpenPGP keys with "
 "a friend"
 msgstr ""
-"Un ayudante para firmar llaves que te permite cómodamente intercambiar "
+"Un ayudante para firmar llaves que le permite cómodamente intercambiar "
 "llaves OpenPGP con un amigo"
 
 #. Keywords
@@ -81,11 +76,11 @@ msgstr "python;gpg;gnupg;key;openpgp;"
 msgid "org.gnome.Keysign"
 msgstr "org.gnome.Keysign"
 
-#: keysign/app.py:165
+#: keysign/app.py:181
 msgid "Send"
 msgstr "Enviar"
 
-#: keysign/app.py:167 keysign/receive.py:238
+#: keysign/app.py:183 keysign/receive.py:238
 msgid "Receive"
 msgstr "Recibir"
 
@@ -93,27 +88,48 @@ msgstr "Recibir"
 msgid "Internet"
 msgstr "Internet"
 
-#: keysign/avahioffer.py:81 keysign/bluetoothoffer.py:144
+#: keysign/avahioffer.py:81 keysign/bluetoothoffer.py:126
 msgid "Offering key: {}"
-msgstr "Ofreciendo llave: {}"
+msgstr "Ofreciendo clave: {}"
 
-#: keysign/avahioffer.py:82 keysign/bluetoothoffer.py:145
+#: keysign/avahioffer.py:82 keysign/bluetoothoffer.py:127
 msgid "Discovery info: {}"
 msgstr "Información de descubrimiento: {}"
 
 #: keysign/avahioffer.py:83
 msgid "Press Enter to stop"
-msgstr "Presiona Enter para parar"
+msgstr "Pulse Intro para parar"
 
-#: keysign/bluetoothoffer.py:127
+#: keysign/bluetoothoffer.py:117
+msgid "You must provide an argument to identify the key"
+msgstr "Debe proporcionar un argumento para identificar la clave"
+
+#: keysign/bluetoothoffer.py:128
+msgid "HMAC: {}"
+msgstr "HMAC: {}"
+
+#: keysign/bluetoothoffer.py:129
+msgid "Port: {}"
+msgstr "Port: {}"
+
+#: keysign/bluetoothoffer.py:132
+msgid "Bluetooth not available"
+msgstr "Bluetooth no disponible"
+
+#: keysign/bluetoothoffer.py:137
+#| msgid "Press Enter to exit"
+msgid "Press Enter to cancel"
+msgstr "Pulse Intro para cancelar"
+
+#: keysign/bluetoothoffer.py:144
 msgid ""
 "\n"
 "Key successfully sent"
 msgstr ""
 "\n"
-"Llave enviada con éxito"
+"Clave enviada con éxito"
 
-#: keysign/bluetoothoffer.py:129
+#: keysign/bluetoothoffer.py:146
 msgid ""
 "\n"
 "An error occurred: {}"
@@ -121,34 +137,33 @@ msgstr ""
 "\n"
 "Ha ocurrido un error: {}"
 
-#: keysign/bluetoothoffer.py:131
+#: keysign/bluetoothoffer.py:148
 msgid "Press Enter to exit"
-msgstr "Presiona Enter para salir"
-
-#: keysign/bluetoothoffer.py:146
-msgid "HMAC: {}"
-msgstr "HMAC: {}"
-
-#: keysign/bluetoothoffer.py:147
-msgid "Port: {}"
-msgstr "Port: {}"
-
-#: keysign/bluetoothoffer.py:152
-msgid "Bluetooth not available"
-msgstr "Bluetooth no disponible"
+msgstr "Pulse Intro para salir"
 
 #: keysign/bluetoothreceive.py:134
 msgid "Trying to download the key, please wait"
-msgstr "Intentando descargar la llave, espera por favor"
+msgstr "Intentando descargar la clave, espere por favor"
 
-#: keysign/gpgmks.py:178
-#, python-format
-msgid "installing symlinks for sockets from %s to %s"
-msgstr "Instalando enlaces simbólicos para sockets de %s a %s"
+#: keysign/dialog_avahi.ui:8
+msgid "Unable to Start Avahi"
+msgstr "No se pudo iniciar Avahi"
+
+#: keysign/dialog_avahi.ui:9
+msgid ""
+"Keysign is unable to automatically start Avahi. You can try to execute "
+"`systemctl start avahi-daemon` for solving this problem."
+msgstr ""
+"Keysing no puede iniciar Avahi automáticamente. Puede intentar ejecutar "
+"«systemctl start avahi-daemon» para solucionar este problema."
+
+#: keysign/dialog_avahi.ui:23
+msgid "OK"
+msgstr "Aceptar"
 
 #: keysign/gtkexcepthook.py:173
 msgid "Bug Detected"
-msgstr "Bug Detectado"
+msgstr "Error detectado"
 
 #: keysign/gtkexcepthook.py:175
 msgid "<big><b>A programming error has been detected.</b></big>"
@@ -162,23 +177,23 @@ msgid ""
 "Please tell the developers about this using the issue tracker if no-one else "
 "has reported it yet."
 msgstr ""
-"Es posible que puedas ignorar este error y continuar trabajando, pero puede "
+"Es posible que pueda ignorar este error y continuar trabajando, pero puede "
 "que haya resultados inesperados.\n"
 "\n"
-"Por favor, dile a los desarrolladores de esto usando el gestor de "
-"problemassi nadie más lo ha reportado aún."
+"Informe de esto a los desarrolladores usando el gestor de informes de error "
+"si nadie más lo ha reportado aún."
 
 #: keysign/gtkexcepthook.py:187
 msgid "Search Tracker..."
-msgstr "Buscar Tracker"
+msgstr "Buscar Tracker..."
 
 #: keysign/gtkexcepthook.py:189
 msgid "Report..."
-msgstr "Reportar"
+msgstr "Informar..."
 
 #: keysign/gtkexcepthook.py:191
 msgid "Ignore Error"
-msgstr "Ignorar Error"
+msgstr "Ignorar error"
 
 #: keysign/gtkexcepthook.py:192
 msgid "Quit GNOME Keysign"
@@ -186,12 +201,15 @@ msgstr "Salir de GNOME Keysign"
 
 #: keysign/gtkexcepthook.py:202
 msgid "Details..."
-msgstr "Detalles"
+msgstr "Detalles..."
 
 #: keysign/gtkexcepthook.py:229 keysign/gtkexcepthook.py:232
 msgid "Exception while analyzing the exception."
 msgstr "Excepción analizando la excepción."
 
+#. TRANSLATORS: Crash report template for github, preceding a traceback.
+#. TRANSLATORS: Please ask users kindly to supply at least an English
+#. TRANSLATORS: title if they are able.
 #: keysign/gtkexcepthook.py:281
 msgid ""
 "            #### Description\n"
@@ -217,29 +235,33 @@ msgid ""
 msgstr ""
 "            #### Descripción\n"
 "\n"
-"            Dale a este reporte un título corto y descriptivo.\n"
-"            Usa algo como\n"
-"            \"{característica-rota}: {lo-que-salió-mal}\"\n"
+"            Asigne a este reporte un título corto y descriptivo.\n"
+"            Use algo como\n"
+"            \"{característica-rota}: {fallo}\"\n"
 "            para el título, si es posible.\n"
-"            Luego, por favor, reemplaza este texto\n"
-"            con una descripción más larga del bug.\n"
-"            Las capturas de pantalla o videos nos viene genial!\n"
+"            Luego reemplace este texto\n"
+"            con una descripción más larga del error.\n"
+"            Las capturas de pantalla o vídeos vienen genial.\n"
 "\n"
 "            #### Pasos para reproducir\n"
 "\n"
-"            Por favor, dinos qué estabas haciendo\n"
+"            Díganos qué estaba haciendo\n"
 "            cuando el mensaje de error apareció.\n"
-"            Si puedes ofrecer instrucciones paso-a-paso\n"
-"            para poder reproducir el bug,\n"
-"            pues mejor aún.\n"
+"            Si puede ofrecer instrucciones paso a paso\n"
+"            para poder reproducir el error,\n"
+"            mejor aún.\n"
 "\n"
 "            #### Traceback\n"
 "        "
 
+#. TRANSLATORS: Please include your locale, e.g. "de". We're trying to debug native
+#. gettext
 #: keysign/i18n.py:39
 msgid "Translated for gettext (C)"
 msgstr "Traducido para gettext (es)"
 
+#. TRANSLATORS: Please include your locale, e.g. "de". We're trying to debug pure
+#. python gettext
 #: keysign/i18n.py:47
 msgid "Translated for Python (C)"
 msgstr "Traducido para Python (es)"
@@ -250,7 +272,7 @@ msgstr "Expira: "
 
 #: keysign/receive.py:158
 msgid "Sign Key"
-msgstr "Firmar Llave"
+msgstr "Firmar clave"
 
 #: keysign/receive.ui:53
 msgid ""
@@ -261,16 +283,16 @@ msgid ""
 "NoServers/1\">here</a>."
 msgstr ""
 "No hay servidores GNOME Keysign cerca :-(\n"
-"Encuentra un amigo con el que usar GNOME Keysign.\n"
-"Puede que también estés teniendo problemas de conectividad.\n"
-"Para más información haz click <a href=\"https://wiki.gnome.org/Apps/Keysign/"
-"Doc/NoServers/1\">aquí</a>."
+"Encuentre un amigo con el que usar GNOME Keysign.\n"
+"Puede que también esté teniendo problemas de conectividad.\n"
+"Para obtener más información pulse <a href=\"https://wiki.gnome.org/Apps/"
+"Keysign/Doc/NoServers/1\">aquí</a>."
 
 #: keysign/receive.ui:105
 msgid ""
 "<small>To sign someone's key, scan their QR or enter security code</small>"
 msgstr ""
-"<small>Para firmar la llave de alguien, escanea su QR o introduce el código "
+"<small>Para firmar la llave de alguien, escanee su QR o introduzca el código "
 "de seguridad</small>"
 
 #: keysign/receive.ui:124
@@ -279,27 +301,23 @@ msgstr "<b>Cámara</b>"
 
 #: keysign/receive.ui:139
 msgid "Integrated Web Cam"
-msgstr "WebCam Integrada"
+msgstr "Cámara web Integrada"
 
 #: keysign/receive.ui:176 keysign/send.ui:435
 msgid "<b>Security Code</b>"
-msgstr "<b>Código de Seguridad</b>"
+msgstr "<b>Código de seguridad</b>"
 
 #: keysign/receive.ui:209
 msgid "Scan Barcode"
-msgstr "Escanear Código de Barras"
+msgstr "Escanear código de barras"
 
 #: keysign/receive.ui:226
 msgid "Downloading key-data. Please wait ..."
-msgstr "Descargando datos de llave. Por favor espera..."
+msgstr "Descargando datos de clave, espere..."
 
 #: keysign/receive.ui:251
 msgid "Key download was interrupted!"
-msgstr "La descarga de la llave fue interrumpida!"
-
-#: keysign/receive.ui:313 keysign/send.ui:527
-msgid "page1"
-msgstr "page1"
+msgstr "Se ha interrumpido la descarga de la clave."
 
 #: keysign/receive.ui:337
 msgid ""
@@ -307,8 +325,8 @@ msgid ""
 "This will generate an email that must be sent in order to complete the "
 "signing process."
 msgstr ""
-"Para firmar la llave, confirma que quieres firma la siguiente llave.\n"
-"Esto generará un email que debe enviarse para completar el proceso de "
+"Para firmar la clave, confirme que quiere firma la siguiente clave.\n"
+"Esto generará un correo que debe enviarse para completar el proceso de "
 "firmado."
 
 #: keysign/receive.ui:365
@@ -317,29 +335,23 @@ msgstr "Llave"
 
 #: keysign/receive.ui:398 keysign/send.ui:360
 msgid "UIDs"
-msgstr "UIDs"
+msgstr "UID"
 
 #: keysign/receive.ui:485
 msgid "C_onfirm"
-msgstr "C_onfirm"
-
-#: keysign/receive.ui:521 keysign/send.ui:564
-msgid "page2"
-msgstr "page2"
+msgstr "C_onfirmar"
 
 #: keysign/receive.ui:539
 msgid "Signing the following UIDs:"
-msgstr "Firmando los siguientes UIDs:"
-
-#: keysign/receive.ui:615
-msgid "page3"
-msgstr "page3"
+msgstr "Firmando los siguientes UID:"
 
 #: keysign/send.py:156
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
 msgstr ""
+"Intentado obtener conexión a Internet. Parece que va muy lento o que no está "
+"disponible."
 
 #: keysign/send.py:162
 msgid "There isn't an Internet connection!"
@@ -350,6 +362,8 @@ msgid ""
 "Key successfully sent.\n"
 "You should receive soon an email with the signature."
 msgstr ""
+"Clave enviada correctamente.\n"
+"Debería recibir un correo con la firma en breve."
 
 #: keysign/send.py:195
 msgid ""
@@ -357,12 +371,12 @@ msgid ""
 "Either your partner has entered a wrong code or someone tried to intercept "
 "your connection"
 msgstr ""
+"No se ha podido establecer una conexión segura.\n"
+"O bien la otra parte ha introducido mal el código o alguien ha intentado "
+"interceptar la conexión."
 
 #: keysign/send.py:199
 #, python-format
-#| msgid ""
-#| "\n"
-#| "An error occurred: {}"
 msgid ""
 "An unexpected error occurred:\n"
 "%s"
@@ -372,23 +386,23 @@ msgstr ""
 
 #: keysign/send.ui:7
 msgid "Select and send key"
-msgstr "Seleccionar y enviar llave"
+msgstr "Seleccionar y enviar clave"
 
 #: keysign/send.ui:58
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
 msgstr ""
-"No tienes ninguna llave!\n"
-"Por favor, usa algo como Seahorse para crear una."
+"No tiene ninguna clave.\n"
+"Use algo como Seahorse para crear una."
 
 #: keysign/send.ui:135
 msgid "Very slow or no Internet connection!"
-msgstr ""
+msgstr "Conexión a Internet muy lenta o no hay conexión."
 
 #: keysign/send.ui:190
 msgid "<b>Select a key for signing</b>"
-msgstr "<b>Selecciona una llave para firmar</b>"
+msgstr "<b>Seleccione una clave para firmar</b>"
 
 #: keysign/send.ui:206
 msgid "<small>Times signed</small>"
@@ -396,23 +410,23 @@ msgstr "<small>Veces firmada</small>"
 
 #: keysign/send.ui:272
 msgid "Keylist"
-msgstr "Lista de llaves"
+msgstr "Lista de claves"
 
 #: keysign/send.ui:292
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
 msgstr ""
-"<small>Para firmar la llave, la otra persona debe introducir el código de "
+"<small>Para firmar la clave, la otra persona debe introducir el código de "
 "seguridad, o escanear el código QR</small>"
 
 #: keysign/send.ui:319
 msgid "<b>Key Details</b>"
-msgstr "<b>Detalles de Llave</b>"
+msgstr "<b>Detalles de la clave</b>"
 
 #: keysign/send.ui:344
 msgid "Fingerprint"
-msgstr "Huella"
+msgstr "Huella dactilar"
 
 #: keysign/send.ui:498
 msgid "<b>QR Code</b>"
@@ -420,7 +434,52 @@ msgstr "<b>Código QR</b>"
 
 #: keysign/send.ui:575
 msgid "Select and Send key"
-msgstr "Seleccionar y Enviar llave"
+msgstr "Seleccionar y enviar clave"
+
+#: keysign/util.py:222
+msgid ""
+"Hi $uid,\n"
+"\n"
+"\n"
+"I have just signed your key\n"
+"\n"
+"      $fingerprint\n"
+"\n"
+"\n"
+"Thanks for letting me sign your key!\n"
+"\n"
+"--\n"
+"GNOME Keysign\n"
+msgstr ""
+"Hola $uid,\n"
+"\n"
+"\n"
+"Acabo de firmar su clave\n"
+"\n"
+"\n"
+"      $fingerprint\n"
+"\n"
+"\n"
+"¡Gracias!\n"
+"\n"
+"--\n"
+"GNOME Keysign\n"
+
+#: keysign/wormholereceive.py:86
+msgid "Wrong message authentication code"
+msgstr "Mensaje de código de autenticación incorrecto"
+
+#~ msgid "installing symlinks for sockets from %s to %s"
+#~ msgstr "Instalando enlaces simbólicos para sockets de %s a %s"
+
+#~ msgid "page1"
+#~ msgstr "page1"
+
+#~ msgid "page2"
+#~ msgstr "page2"
+
+#~ msgid "page3"
+#~ msgstr "page3"
 
 #~ msgid "Sending {}"
 #~ msgstr "Enviando {}"
