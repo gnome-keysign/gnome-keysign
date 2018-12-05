@@ -35,7 +35,7 @@ class ListBoxRowWithKey(Gtk.ListBoxRow):
         self.key = key
 
         s = self.format(key)
-        label = Gtk.Label(s, use_markup=True, xalign=0)
+        label = Gtk.Label(label=s, use_markup=True, xalign=0)
         self.add(label)
 
     @staticmethod
