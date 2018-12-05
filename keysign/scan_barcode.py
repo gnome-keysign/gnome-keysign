@@ -89,7 +89,7 @@ class BarcodeReaderGTK(Gtk.Box):
                         self.emit("barcode", barcode, message, pixbuf)
                     else:
                         # If we do not see the zbar < 1.6, we raise
-                        raise
+                        raise Exception("Zbar version is not what we expected")
 
 
     def run(self):
