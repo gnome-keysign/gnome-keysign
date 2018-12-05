@@ -80,7 +80,7 @@ def test_wrmhl_offline_code():
     key = openpgpkey_from_data(data)
     file_key_data = get_public_key_data(key.fingerprint)
     # We assume that this channel, at execution time, is free
-    code = "5556-penguin-paw-print"
+    code = u"5556-penguin-paw-print"
     # Start offering the key
     offer = WormholeOffer(key)
     offer.allocate_code(code)
