@@ -340,7 +340,7 @@ class TestGetUsableKeys:
         keys = get_usable_keys(fpr, homedir=self.homedir)
         assert_equal(1, len(keys))
         key = keys[0]
-        assert_equal(fpr, self.originalkey.fingerprint)
+        assert_equal(self.originalkey, key)
 
 
 class TestGetUsableSecretKeys:
@@ -372,7 +372,7 @@ class TestGetUsableSecretKeys:
         keys = get_usable_secret_keys(fpr, homedir=self.homedir)
         assert_equal(1, len(keys))
         key = keys[0]
-        assert_equal(fpr, self.originalkey.fingerprint)
+        assert_equal(self.originalkey, key)
 
 
 def get_signatures_for_uids_on_key(ctx, key):
