@@ -88,7 +88,9 @@ class Discover:
         if self.stopped:
             key_data = None
             success = False
-            message = ""
+            # We use the LonelyError in a similar way as Wormhole does.
+            # That is to indicate that the connection as been stopped before a transfer.
+            message = LonelyError
 
         log.debug("Returning key: %r, success: %r, message: %r",
                   key_data, success, message)
