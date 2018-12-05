@@ -40,7 +40,7 @@ log = logging.getLogger(__name__)
 class BarcodeReaderGTK(Gtk.Box):
 
     __gsignals__ = {
-        str('barcode'): (GObject.SIGNAL_RUN_LAST, None,
+        str('barcode'): (GObject.SignalFlags.RUN_LAST, None,
                         (str, # The barcode string
                          Gst.Message.__gtype__, # The GStreamer message itself
                          GdkPixbuf.Pixbuf.__gtype__, # The pixbuf which caused

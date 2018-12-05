@@ -105,11 +105,11 @@ class KeyListWidget(Gtk.HBox):
     and potentially display a user facing warning. Or not.
     """
     __gsignals__ = {
-        str('key-activated'): (GObject.SIGNAL_RUN_LAST, None,
+        str('key-activated'): (GObject.SignalFlags.RUN_LAST, None,
                                # (ListBoxRowWithKey.__gtype__,)
                                (object,)),
                                # The activated key
-        str('key-selected'): (GObject.SIGNAL_RUN_LAST, None,
+        str('key-selected'): (GObject.SignalFlags.RUN_LAST, None,
                                # (ListBoxRowWithKey.__gtype__,)
                                (object,)),
                                # The selected key

@@ -57,7 +57,7 @@ class AvahiKeysignDiscovery(GObject.GObject):
     __gsignals__ = {
         # Gets emitted whenever a new server has been found or has been removed.
         # Is also emitted shortly after an object has been created.
-        str("list-changed"): (GObject.SIGNAL_RUN_LAST, None, (int,)),
+        str("list-changed"): (GObject.SignalFlags.RUN_LAST, None, (int,)),
     }
 
     def __init__(self, *args, **kwargs):
