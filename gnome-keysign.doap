@@ -16,7 +16,7 @@ follows best practices when producing and sending the signatures.
   / -->
   <download-page rdf:resource="https://gitlab.gnome.org/GNOME/gnome-keysign/tags" />
   <bug-database rdf:resource="https://gitlab.gnome.org/GNOME/gnome-keysign/issues" />
-  <category rdf:resource="http://api.gnome.org/doap-extensions#deprecated" />
+  <!-- <category rdf:resource="http://api.gnome.org/doap-extensions#deprecated" /> -->
   <programming-language>Python</programming-language>
 
   <maintainer>
