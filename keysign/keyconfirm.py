@@ -85,7 +85,7 @@ class PreSignWidget(Gtk.VBox):
     """
 
     __gsignals__ = {
-        str('sign-key-confirmed'): (GObject.SIGNAL_RUN_LAST, None,
+        str('sign-key-confirmed'): (GObject.SignalFlags.RUN_LAST, None,
                                     (GObject.TYPE_PYOBJECT,)),
     }
 

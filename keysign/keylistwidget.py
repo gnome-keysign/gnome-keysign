@@ -35,7 +35,7 @@ class ListBoxRowWithKey(Gtk.ListBoxRow):
         self.key = key
 
         s = self.format(key)
-        label = Gtk.Label(s, use_markup=True, xalign=0)
+        label = Gtk.Label(label=s, use_markup=True, xalign=0)
         self.add(label)
 
     @staticmethod
@@ -105,11 +105,11 @@ class KeyListWidget(Gtk.HBox):
     and potentially display a user facing warning. Or not.
     """
     __gsignals__ = {
-        str('key-activated'): (GObject.SIGNAL_RUN_LAST, None,
+        str('key-activated'): (GObject.SignalFlags.RUN_LAST, None,
                                # (ListBoxRowWithKey.__gtype__,)
                                (object,)),
                                # The activated key
-        str('key-selected'): (GObject.SIGNAL_RUN_LAST, None,
+        str('key-selected'): (GObject.SignalFlags.RUN_LAST, None,
                                # (ListBoxRowWithKey.__gtype__,)
                                (object,)),
                                # The selected key

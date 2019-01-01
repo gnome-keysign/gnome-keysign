@@ -56,12 +56,12 @@ class KeyFprScanWidget(Gtk.VBox):
 
     __gsignals__ = {
         # This is the Gtk widget signal's name
-        str('changed'): (GObject.SIGNAL_RUN_LAST, None,
+        str('changed'): (GObject.SignalFlags.RUN_LAST, None,
                         (GObject.TYPE_PYOBJECT,)),
         # It's probably not the best name for that signal.
         # While "barcode_scanned" might be better, it is probably
         # unneccesarily specific.
-        str('barcode'): (GObject.SIGNAL_RUN_LAST, None,
+        str('barcode'): (GObject.SignalFlags.RUN_LAST, None,
                         (str, # The barcode string
                          Gst.Message.__gtype__, # The GStreamer message itself
                          GdkPixbuf.Pixbuf.__gtype__,),) # The pixbuf which caused
