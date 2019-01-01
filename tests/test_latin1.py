@@ -24,9 +24,11 @@ def get_fixture_dir(fixture=""):
     dname = os.path.join(thisdir, "fixtures", fixture)
     return dname
 
+
 def get_fixture_file(fixture):
     fname = os.path.join(get_fixture_dir(), fixture)
     return fname
+
 
 def read_fixture_file(fixture):
     fname = get_fixture_file(fixture)
@@ -39,9 +41,11 @@ def load_key(key):
     k = gpgmh.openpgpkey_from_data(f)
     return k
 
+
 def load_latin1_key():
     key = "seckey-latin1.asc"
     return load_key(key)
+
 
 def _gui_test(widget):
     widget.show_all()
@@ -50,20 +54,22 @@ def _gui_test(widget):
 
 
 def test_kpw():
-    "We had problems with non-UTF-8 UIDs and KPW. We try to load one"
+    """We had problems with non-UTF-8 UIDs and KPW. We try to load one"""
     key = load_latin1_key()
     log.info("Loaded %r", key)
-    kpw = KeyPresentWidget(key=key, code="")
+    kpw = KeyPresentWidget(key=key, discovery_code="")
     _gui_test(kpw)
 
+
 def test_psw():
-    "We had problems with non UTF-8 UIDs and PSW. We try to load one"
+    """We had problems with non UTF-8 UIDs and PSW. We try to load one"""
     key = load_latin1_key()
     psw = PreSignWidget(key=key)
     _gui_test(psw)
 
+
 def test_klw():
-    "We had problems with non UTF-8 UIDs and KLW. We try to load one"
+    """We had problems with non UTF-8 UIDs and KLW. We try to load one"""
     key = load_latin1_key()
     klw = KeyListWidget(keys=[key])
     _gui_test(klw)
