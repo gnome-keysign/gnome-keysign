@@ -17,6 +17,7 @@
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import unicode_literals
 
+import base64
 import logging
 import os  # The SigningKeyring uses os.symlink for the agent
 from subprocess import check_output
@@ -24,8 +25,10 @@ import sys
 from tempfile import mkdtemp
 import platform
 
+import dbus
 import gpg
 from gpg.constants import PROTOCOL_OpenPGP
+from gpg.errors import GPGMEError
 
 
 from .gpgkey import Key, UID
@@ -473,11 +476,31 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
                 yield (UID.from_gpgme(uid), ciphertext)
 
 
-def import_signature(signature, homedir=None):
+def import_signature(encrypted_sig, homedir=None):
     # ctx = gpg.Context()
     ctx = DirectoryContext(homedir)
-    decrypted = ctx.decrypt(signature)
-    ctx.op_import(decrypted[0])
-    result = ctx.op_import_result()
-    if len(result.imports) < 0:
-        raise gpg.errors.GPGMEError
+    signature = ctx.decrypt(encrypted_sig)
+
+    # Try Seahorse DBus
+    name = "org.gnome.seahorse"
+    path = "/org/gnome/seahorse/keys"
+    bus = dbus.SessionBus()
+    result = []
+
+    try:
+        proxy = bus.get_object(name, path)
+        iface = "org.gnome.seahorse.KeyService"
+        gpg_iface = dbus.Interface(proxy, iface)
+        payload = base64.b64encode(signature[0]).decode('latin-1')
+        payload = '\n'.join(payload[i:(i + 64)] for i in range(0, len(payload), 64))
+        payload = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n\n" + payload + "\n-----END PGP PUBLIC KEY BLOCK-----"
+        result = gpg_iface.ImportKeys("openpgp", payload)
+    except dbus.exceptions.DBusException:
+        log.debug("Seahorse DBus is not available")
+
+    # If Seahorse failed we try op_import
+    if len(result) < 1:
+        ctx.op_import(signature[0])
+        result = ctx.op_import_result()
+        if len(result.imports) < 1:
+            raise GPGMEError
