@@ -25,6 +25,12 @@ follows best practices when producing and sending the signatures.
       <gnome:userid>tobiasmue</gnome:userid>
     </foaf:Person>
   </maintainer>
+  <maintainer>
+    <foaf:Person>
+      <foaf:name>Ludovico de Nittis</foaf:name>
+      <gnome:userid>denittis</gnome:userid>
+    </foaf:Person>
+  </maintainer>
 </Project>
 
 
