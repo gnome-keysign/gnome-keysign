@@ -41,7 +41,7 @@ log.debug (_("Translated for gettext (C)"))
 try:
     _ = lang.ugettext
 except AttributeError:
-    log.exception("Cannot get ugettext from lang: %r", lang)
+    log.info("Cannot get ugettext from lang: %r", lang, exc_info=True)
 
 # TRANSLATORS: Please include your locale, e.g. "de". We're trying to debug pure python gettext
 log.debug (_("Translated for Python (C)"))
