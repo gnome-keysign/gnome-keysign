@@ -54,8 +54,8 @@ from .keyconfirm import PreSignWidget
 from .keyfprscan import KeyFprScanWidget
 from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
-from .gpgmh import openpgpkey_from_data
-from . import gpgmh
+from .gpgmeh import openpgpkey_from_data
+from . import gpgmeh
 from .i18n import _
 from .receive import ReceiveApp
 from .send import SendApp

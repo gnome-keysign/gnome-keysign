@@ -29,7 +29,7 @@ if __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 from .errors import NoBluezDbus, NoAdapter, UnpoweredAdapter
-from .gpgmh import get_public_key_data, get_usable_keys
+from .gpgmeh import get_public_key_data, get_usable_keys
 from .i18n import _
 from .util import get_local_bt_address, mac_generate
 

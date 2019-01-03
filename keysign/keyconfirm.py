@@ -45,7 +45,7 @@ if  __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 
-from .gpgmh import get_usable_keys
+from .gpgmeh import get_usable_keys
 from .scan_barcode import ScalingImage
 from .util import format_fingerprint
 

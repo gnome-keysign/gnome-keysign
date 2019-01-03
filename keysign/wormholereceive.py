@@ -31,7 +31,7 @@ if __name__ == "__main__":
     gtk3reactor.install()
 from twisted.internet import reactor
 
-from .gpgmh import fingerprint_from_keydata
+from .gpgmeh import fingerprint_from_keydata
 from .i18n import _
 from .util import decode_message, encode_message, parse_barcode, mac_verify
 

@@ -51,7 +51,7 @@ if  __name__ == "__main__" and __package__ is None:
 from .avahidiscovery import AvahiKeysignDiscoveryWithMac
 from .discover import Discover
 from .errors import NoBluezDbus, UnpoweredAdapter, NoAdapter
-from .gpgmh import openpgpkey_from_data
+from .gpgmeh import openpgpkey_from_data
 from .i18n import _
 from .keyfprscan import KeyFprScanWidget
 from .keyconfirm import PreSignWidget

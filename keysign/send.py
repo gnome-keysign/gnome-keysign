@@ -30,7 +30,7 @@ if  __name__ == "__main__" and __package__ is None:
 from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
 from .offer import Offer
-from . import gpgmh
+from . import gpgmeh
 # We import i18n to have the locale set up for Glade
 from .i18n import _
 log = logging.getLogger(__name__)
@@ -64,7 +64,7 @@ class SendApp:
         if not builder:
             builder = Gtk.Builder()
             builder.add_objects_from_file(ui_file_path, ["send_stack"])
-        keys = gpgmh.get_usable_secret_keys()
+        keys = gpgmeh.get_usable_secret_keys()
         klw = KeyListWidget(keys, builder=builder)
         klw.connect("key-activated", self.on_key_activated)
         self.klw = klw
@@ -82,7 +82,7 @@ class SendApp:
         # currently attached to a GtkStack. When our custom widget
         # code runs, it detaches itself from its parent, i.e. the stack.
         # We need need to instantiate the widget with key, however.
-        fakekey = gpgmh.Key("","","")
+        fakekey = gpgmeh.Key("","","")
         kpw = KeyPresentWidget(fakekey, "", builder=builder)
 
         self.rb = builder.get_object('resultbox')

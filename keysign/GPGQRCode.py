@@ -38,7 +38,7 @@ if  __name__ == "__main__" and __package__ is None:
     #sys.modules["keysign"] = mod
     __package__ = str('keysign')
 
-from .gpgmh import get_usable_keys
+from .gpgmeh import get_usable_keys
 
 if  __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +

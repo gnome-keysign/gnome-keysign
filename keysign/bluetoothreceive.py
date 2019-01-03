@@ -25,7 +25,7 @@ if __name__ == "__main__" and __package__ is None:
     #sys.modules["keysign"] = mod
     __package__ = str('keysign')
 
-from .gpgmh import fingerprint_from_keydata
+from .gpgmeh import fingerprint_from_keydata
 from .i18n import _
 from .util import mac_verify
 

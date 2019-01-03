@@ -21,7 +21,7 @@ if  __name__ == "__main__" and __package__ is None:
     #sys.modules["keysign"] = mod
     __package__ = str('keysign')
 
-from .gpgmh import get_usable_keys
+from .gpgmeh import get_usable_keys
 from .i18n import _
 from .util import fix_infobar
 
@@ -57,7 +57,7 @@ class ListBoxRowWithKey(Gtk.ListBoxRow):
 
     @classmethod
     def format_uid(cls, uid):
-        "Returns a pango string for a gpgmh.UID"
+        "Returns a pango string for a gpgmeh.UID"
         fmt = "{name}\t<i>{email}</i>\t<small>{expiry}</small>"
 
         items = ('name', 'email', 'expiry')
@@ -76,7 +76,7 @@ class ListBoxRowWithKey(Gtk.ListBoxRow):
 
     @classmethod
     def format(cls, key):
-        "Returns a pango string for a gpgmh.Key"
+        "Returns a pango string for a gpgmeh.Key"
         fmt  = "{created} "
         fmt  = "<b>{fingerprint}</b>\n"
         fmt += "\n".join((cls.format_uid(uid) for uid in key.uidslist))

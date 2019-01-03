@@ -47,7 +47,7 @@ if  __name__ == "__main__" and __package__ is None:
 from .__init__ import __version__
 from .network.AvahiPublisher import AvahiPublisher
 
-from .gpgmh import fingerprint_from_keydata
+from .gpgmeh import fingerprint_from_keydata
 
 log = logging.getLogger(__name__)
 

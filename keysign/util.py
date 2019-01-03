@@ -47,8 +47,8 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
 
 from .errors import NoBluezDbus, UnpoweredAdapter, NoAdapter
-from .gpgmh import fingerprint_from_keydata
-from .gpgmh import sign_keydata_and_encrypt
+from .gpgmeh import fingerprint_from_keydata
+from .gpgmeh import sign_keydata_and_encrypt
 from .i18n import _
 
 log = logging.getLogger(__name__)

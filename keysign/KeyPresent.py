@@ -38,7 +38,7 @@ if  __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 from .__init__ import __version__
-from .gpgmh import get_usable_keys
+from .gpgmeh import get_usable_keys
 from .QRCode import QRImage
 from .util import format_fingerprint
 
@@ -48,7 +48,7 @@ log = logging.getLogger(__name__)
 
 
 class KeyPresentWidget(Gtk.Widget):
-    """A widget for presenting a gpgmh.Key
+    """A widget for presenting a gpgmeh.Key
 
     It shows details of the given key and customizable data in a
     qrcode encoded in a QRImage.

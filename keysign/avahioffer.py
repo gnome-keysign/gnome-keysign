@@ -36,7 +36,7 @@ if __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 from .__init__ import __version__
-from .gpgmh import get_usable_keys, get_public_key_data
+from .gpgmeh import get_usable_keys, get_public_key_data
 from .i18n import _
 from .util import mac_generate, format_fingerprint
 from . import Keyserver
