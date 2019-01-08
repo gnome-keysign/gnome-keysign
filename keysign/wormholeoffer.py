@@ -135,7 +135,7 @@ class WormholeOffer:
     def stop(self):
         if self.w:
             try:
-                self.w.close()
+                self.w.close().addErrback(log.debug)
             except (TransferError, ServerConnectionError, WrongPasswordError) as error:
                 # These errors should be already handled previously
                 # so here we can safely ignore them
