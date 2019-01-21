@@ -58,8 +58,9 @@ def test_bt():
     """This test requires two working Bluetooth devices"""
     # This should be a new, empty directory
     homedir = tempfile.mkdtemp()
+    os.environ["GNUPGHOME"] = homedir
     key = import_key_from_file("seckey-no-pw-1.asc", homedir)
-    file_key_data = get_public_key_data(key.fingerprint, homedir=homedir)
+    file_key_data = get_public_key_data(key.fingerprint)
     log.info("Running with key %r", key)
     hmac = mac_generate(key.fingerprint.encode('ascii'), file_key_data)
     # Start offering the key
@@ -85,6 +86,7 @@ def test_bt_wrong_hmac():
     """This test requires two working Bluetooth devices"""
     # This should be a new, empty directory
     homedir = tempfile.mkdtemp()
+    os.environ["GNUPGHOME"] = homedir
     key = import_key_from_file("seckey-no-pw-1.asc", homedir)
     log.info("Running with key %r", key)
     hmac = "wrong_hmac_eg_tampered_key"
@@ -149,9 +151,10 @@ def test_bt_corrupted_key():
 
     # This should be a new, empty directory
     homedir = tempfile.mkdtemp()
+    os.environ["GNUPGHOME"] = homedir
     key = import_key_from_file("seckey-no-pw-1.asc", homedir)
     log.info("Running with key %r", key)
-    file_key_data = get_public_key_data(key.fingerprint, homedir=homedir)
+    file_key_data = get_public_key_data(key.fingerprint)
     hmac = mac_generate(key.fingerprint.encode('ascii'), file_key_data)
     # Start offering the key
     offer = BluetoothOffer(key)

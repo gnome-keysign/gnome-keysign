@@ -61,13 +61,14 @@ def import_key_from_file(fixture, homedir):
     return openpgpkey_from_data(original)
 
 
-@deferred(timeout=200)
+@deferred(timeout=10)
 @inlineCallbacks
 def test_wrmhl():
     # This should be a new, empty directory
     homedir = tempfile.mkdtemp()
+    os.environ["GNUPGHOME"] = homedir
     key = import_key_from_file("seckey-no-pw-1.asc", homedir)
-    file_key_data = get_public_key_data(key.fingerprint, homedir=homedir)
+    file_key_data = get_public_key_data(key.fingerprint)
     log.info("Running with key %r", key)
     # Start offering the key
     offer = WormholeOffer(key)
@@ -87,8 +88,9 @@ def test_wrmhl():
 def test_wrmhl_offline_code():
     # This should be a new, empty directory
     homedir = tempfile.mkdtemp()
+    os.environ["GNUPGHOME"] = homedir
     key = import_key_from_file("seckey-no-pw-1.asc", homedir)
-    file_key_data = get_public_key_data(key.fingerprint, homedir=homedir)
+    file_key_data = get_public_key_data(key.fingerprint)
     # We assume that this channel, at execution time, is free
     code = u"5556-penguin-paw-print"
     # Start offering the key
@@ -109,6 +111,7 @@ def test_wrmhl_offline_code():
 def test_wrmhl_wrong_code():
     # This should be a new, empty directory
     homedir = tempfile.mkdtemp()
+    os.environ["GNUPGHOME"] = homedir
     key = import_key_from_file("seckey-no-pw-1.asc", homedir)
     log.info("Running with key %r", key)
     # Start offering the key
@@ -129,6 +132,7 @@ def test_wrmhl_wrong_code():
 def test_wrmhl_wrong_hmac():
     # This should be a new, empty directory
     homedir = tempfile.mkdtemp()
+    os.environ["GNUPGHOME"] = homedir
     key = import_key_from_file("seckey-no-pw-1.asc", homedir)
     log.info("Running with key %r", key)
     hmac = "wrong_hmac_eg_tampered_key"
@@ -150,8 +154,9 @@ def test_wrmhl_wrong_hmac():
 def test_wrmhl_with_hmac():
     # This should be a new, empty directory
     homedir = tempfile.mkdtemp()
+    os.environ["GNUPGHOME"] = homedir
     key = import_key_from_file("seckey-no-pw-1.asc", homedir)
-    file_key_data = get_public_key_data(key.fingerprint, homedir=homedir)
+    file_key_data = get_public_key_data(key.fingerprint)
     log.info("Running with key %r", key)
     hmac = mac_generate(key.fingerprint.encode('ascii'), file_key_data)
     # Start offering the key
@@ -178,6 +183,7 @@ def test_offer_cancel():
 
     # This should be a new, empty directory
     homedir = tempfile.mkdtemp()
+    os.environ["GNUPGHOME"] = homedir
     key = import_key_from_file("seckey-no-pw-1.asc", homedir)
     log.info("Running with key %r", key)
     # Start offering the key
