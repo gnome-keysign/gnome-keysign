@@ -170,7 +170,7 @@ setup(
     description = 'OpenPGP key signing helper',
     author = 'Tobias Mueller',
     author_email = 'tobiasmue@gnome.org',
-    url = 'http://wiki.gnome.org/GnomeKeysign',
+    url = 'https://wiki.gnome.org/Apps/Keysign',
     packages = [
         'keysign',
         'keysign.compat',
@@ -220,7 +220,6 @@ setup(
         'twisted[tls]>=17.5.0',
         'future',
         'magic-wormhole>=0.10.2',
-        #'monkeysign', # Apparently not in the cheeseshop
         # avahi # Also no entry in the cheeseshop
         # dbus # dbus-python is in the cheeseshop but not pip-able
         ],
@@ -232,7 +231,6 @@ setup(
         "lxml",
     ],
     tests_require=[
-        "pgpy",
         "nose",
         "tox",
         "pycodestyle",
