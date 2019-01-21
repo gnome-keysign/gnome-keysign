@@ -18,6 +18,8 @@
 
 import os
 import logging
+from subprocess import check_call
+import tempfile
 import gi
 gi.require_version('Gtk', '3.0')
 
@@ -26,8 +28,8 @@ from nose.tools import *
 from wormhole.errors import WrongPasswordError, LonelyError
 from twisted.internet.defer import inlineCallbacks
 
-from keysign.gpgmh import openpgpkey_from_data
-from keysign.gpgmh import get_public_key_data
+from keysign.gpgmeh import openpgpkey_from_data
+from keysign.gpgmeh import get_public_key_data
 from keysign.offer import Offer
 from keysign.util import mac_generate
 from keysign.wormholeoffer import WormholeOffer
@@ -49,18 +51,23 @@ def get_fixture_file(fixture):
     return fname
 
 
-def read_fixture_file(fixture):
+def import_key_from_file(fixture, homedir):
     fname = get_fixture_file(fixture)
-    data = open(fname, 'rb').read()
-    return data
+    original = open(fname, 'rb').read()
+    gpgcmd = ["gpg", "--homedir={}".format(homedir)]
+    # Now we import a single key
+    check_call(gpgcmd + ["--import", fname])
+
+    return openpgpkey_from_data(original)
 
 
-@deferred(timeout=10)
+@deferred(timeout=200)
 @inlineCallbacks
 def test_wrmhl():
-    data = read_fixture_file("seckey-no-pw-1.asc")
-    key = openpgpkey_from_data(data)
-    file_key_data = get_public_key_data(key.fingerprint)
+    # This should be a new, empty directory
+    homedir = tempfile.mkdtemp()
+    key = import_key_from_file("seckey-no-pw-1.asc", homedir)
+    file_key_data = get_public_key_data(key.fingerprint, homedir=homedir)
     log.info("Running with key %r", key)
     # Start offering the key
     offer = WormholeOffer(key)
@@ -78,9 +85,10 @@ def test_wrmhl():
 @deferred(timeout=10)
 @inlineCallbacks
 def test_wrmhl_offline_code():
-    data = read_fixture_file("seckey-no-pw-1.asc")
-    key = openpgpkey_from_data(data)
-    file_key_data = get_public_key_data(key.fingerprint)
+    # This should be a new, empty directory
+    homedir = tempfile.mkdtemp()
+    key = import_key_from_file("seckey-no-pw-1.asc", homedir)
+    file_key_data = get_public_key_data(key.fingerprint, homedir=homedir)
     # We assume that this channel, at execution time, is free
     code = u"5556-penguin-paw-print"
     # Start offering the key
@@ -99,8 +107,9 @@ def test_wrmhl_offline_code():
 @deferred(timeout=10)
 @inlineCallbacks
 def test_wrmhl_wrong_code():
-    data = read_fixture_file("seckey-no-pw-1.asc")
-    key = openpgpkey_from_data(data)
+    # This should be a new, empty directory
+    homedir = tempfile.mkdtemp()
+    key = import_key_from_file("seckey-no-pw-1.asc", homedir)
     log.info("Running with key %r", key)
     # Start offering the key
     offer = WormholeOffer(key)
@@ -118,8 +127,9 @@ def test_wrmhl_wrong_code():
 @deferred(timeout=10)
 @inlineCallbacks
 def test_wrmhl_wrong_hmac():
-    data = read_fixture_file("seckey-no-pw-1.asc")
-    key = openpgpkey_from_data(data)
+    # This should be a new, empty directory
+    homedir = tempfile.mkdtemp()
+    key = import_key_from_file("seckey-no-pw-1.asc", homedir)
     log.info("Running with key %r", key)
     hmac = "wrong_hmac_eg_tampered_key"
     # Start offering the key
@@ -138,9 +148,10 @@ def test_wrmhl_wrong_hmac():
 @deferred(timeout=10)
 @inlineCallbacks
 def test_wrmhl_with_hmac():
-    data = read_fixture_file("seckey-no-pw-1.asc")
-    key = openpgpkey_from_data(data)
-    file_key_data = get_public_key_data(key.fingerprint)
+    # This should be a new, empty directory
+    homedir = tempfile.mkdtemp()
+    key = import_key_from_file("seckey-no-pw-1.asc", homedir)
+    file_key_data = get_public_key_data(key.fingerprint, homedir=homedir)
     log.info("Running with key %r", key)
     hmac = mac_generate(key.fingerprint.encode('ascii'), file_key_data)
     # Start offering the key
@@ -165,8 +176,9 @@ def test_offer_cancel():
         assert_is_not_none(message)
         assert_equal(type(message), LonelyError)
 
-    data = read_fixture_file("seckey-no-pw-1.asc")
-    key = openpgpkey_from_data(data)
+    # This should be a new, empty directory
+    homedir = tempfile.mkdtemp()
+    key = import_key_from_file("seckey-no-pw-1.asc", homedir)
     log.info("Running with key %r", key)
     # Start offering the key
     offer = Offer(key)
