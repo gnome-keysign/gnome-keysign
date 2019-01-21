@@ -36,7 +36,7 @@
     <kudo>ModernToolkit</kudo>
   </kudos>
 
- <url type="homepage">https://wiki.gnome.org/GnomeKeysign</url>
+ <url type="homepage">https://wiki.gnome.org/Apps/Keysign</url>
  <url type="bugtracker">https://github.com/gnome-keysign/gnome-keysign/issues</url>
 ​ <!-- "Metainfo files may only contain 'stock' icons, icons of kind 'remote' are not allowed"...
   icon type="remote">https://gitlab.gnome.org/GNOME/gnome-keysign/raw/master/data/gnome-keysign.svg</icon -->
