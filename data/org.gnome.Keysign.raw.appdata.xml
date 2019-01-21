@@ -43,6 +43,14 @@
  <project_group>GNOME</project_group>
 
   <releases>
+​​    <release version="1.0.1" date="2019-01-21">
+​      <description>
+​        <p>
+         * fixed up appdata
+         * Cater for newer wormhole close() semantics
+        </p>
+​      </description>
+​    </release>
 ​​    <release version="1.0.0" date="2019-01-08">
 ​      <description>
 ​        <p>
