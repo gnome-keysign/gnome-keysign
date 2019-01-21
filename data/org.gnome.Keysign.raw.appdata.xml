@@ -43,6 +43,19 @@
  <project_group>GNOME</project_group>
 
   <releases>
+​​    <release version="1.0.0" date="2019-01-08">
+​      <description>
+​        <p>
+         * Run with python3 from the desktop file
+         * Removed monkeysign support
+         * Stop installing gks-qrcode
+         * Increased Python2 support in the tests
+         * Fixed stopping wormhole discovery
+         * Ship a new icon for the app
+         * Removed gpgmh wrapper module
+        </p>
+​      </description>
+​    </release>
 ​​    <release version="0.9.9" date="2018-08-30">
 ​      <description>
 ​        <p>Transfer keys via the Internet through Magic Wormhole</p>
