@@ -8,7 +8,7 @@ gi.require_version('Gtk', "3.0")
 from gi.repository import Gtk, GLib
 
 
-from keysign import gpgmh
+from keysign import gpgmeh
 from keysign.KeyPresent import KeyPresentWidget
 from keysign.keyconfirm import PreSignWidget
 from keysign.keylistwidget import KeyListWidget
@@ -38,7 +38,7 @@ def read_fixture_file(fixture):
 
 def load_key(key):
     f = read_fixture_file(key)
-    k = gpgmh.openpgpkey_from_data(f)
+    k = gpgmeh.openpgpkey_from_data(f)
     return k
 
 
