@@ -107,9 +107,9 @@ def get_catalogs(localedir):
 
     # glob in Python 3.5 takes ** syntax
     # pofiles = glob.glob(os.path.join(localedir, '**.po', recursive=True))
-    pofiles = [os.path.join(dirpath, f)
+    pofiles = sorted([os.path.join(dirpath, f)
                for dirpath, dirnames, files in os.walk(localedir)
-               for f in files if f.endswith('.po')]
+               for f in files if f.endswith('.po')])
     logging.debug('Loading %r', pofiles)
     catalogs = {}
 
