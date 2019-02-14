@@ -53,7 +53,7 @@
                     <property name="label" translatable="yes">No GNOME Keysign servers around :-(
 Find a friend to use GNOME Keysign with.
 You may also suffer from connectivity problems.
-For more information click &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/NoServers/1"&gt;here&lt;/a&gt;.</property>
+For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/NoServers/1"&gt;No GNOME Keysign servers around&lt;/a&gt;.</property>
                     <property name="use_markup">True</property>
                   </object>
                   <packing>
