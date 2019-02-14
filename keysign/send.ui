@@ -187,7 +187,7 @@ Please use, e.g. Seahorse to create one.</property>
                       <object class="GtkLabel" id="label1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">&lt;b&gt;Select a key for signing&lt;/b&gt;</property>
+                        <property name="label" translatable="yes" comments="This refers to the key being certified by someone rather than the key used for certifying someone">&lt;b&gt;Select a key for signing&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
                         <property name="xalign">0</property>
                       </object>
