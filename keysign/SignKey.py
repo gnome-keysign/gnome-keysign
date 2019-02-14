@@ -38,7 +38,7 @@ def main():
         data = fhandle.read()
         log.info("Calling %r to sign %s", sign_keydata_and_send, fhandle.name)
         tmpfiles = list(sign_keydata_and_send(keydata=data))
-    log.info("Finished signing. " +
+    print("Finished signing. " +
              "We're only waiting for the signature " +
              "files to be picked up. " +
              "Press any key to quit the application.")
