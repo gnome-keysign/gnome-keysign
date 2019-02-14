@@ -591,6 +591,7 @@ You should receive soon an email with the signature.</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
+            <property name="tooltip_text" translatable="yes">Uses the Internet to transport the key rather than the local network and Bluetooth (if available)</property>
             <property name="always_show_image">True</property>
             <child>
               <object class="GtkBox">
