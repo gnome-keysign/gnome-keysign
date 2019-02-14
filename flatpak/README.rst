@@ -1,3 +1,11 @@
+Note
+----------
+
+These instructions do only apply if you want to build the flatpak yourself.
+For installing the app, Flathub is most likely the best place to go:
+https://flathub.org/apps/details/org.gnome.Keysign
+
+
 Building
 --------------
 
