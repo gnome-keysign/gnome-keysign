@@ -1,15 +1,15 @@
 # Polish translation for gnome-keysign.
-# Copyright © 2018 the gnome-keysign authors.
+# Copyright © 2018-2019 the gnome-keysign authors.
 # This file is distributed under the same license as the gnome-keysign package.
-# Piotr Drąg <piotrdrag@gmail.com>, 2018.
-# Aviary.pl <community-poland@mozilla.org>, 2018.
+# Piotr Drąg <piotrdrag@gmail.com>, 2018-2019.
+# Aviary.pl <community-poland@mozilla.org>, 2018-2019.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2018-11-15 22:39+0000\n"
-"PO-Revision-Date: 2018-11-18 12:58+0100\n"
+"POT-Creation-Date: 2019-02-14 15:55+0000\n"
+"PO-Revision-Date: 2019-02-14 19:45+0100\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -23,7 +23,7 @@ msgstr ""
 #: data/org.gnome.Keysign.raw.appdata.xml:10
 msgid ""
 "\n"
-"      GNOME-Keysign allows signing OpenPGP keys comfortably and securely\n"
+"      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
 "      via the local network or Bluetooth.\n"
 "    "
 msgstr ""
@@ -83,7 +83,7 @@ msgstr "Wyślij"
 msgid "Receive"
 msgstr "Odbierz"
 
-#: keysign/app.ui:62 keysign/send.ui:616
+#: keysign/app.ui:62 keysign/send.ui:617
 msgid "Internet"
 msgstr "Internet"
 
@@ -252,18 +252,6 @@ msgstr ""
 "            #### Wyjątek\n"
 "        "
 
-#. TRANSLATORS: Please include your locale, e.g. "de". We're trying to debug native
-#. gettext
-#: keysign/i18n.py:39
-msgid "Translated for gettext (C)"
-msgstr "Przetłumaczone dla biblioteki gettext (pl)"
-
-#. TRANSLATORS: Please include your locale, e.g. "de". We're trying to debug pure
-#. python gettext
-#: keysign/i18n.py:47
-msgid "Translated for Python (C)"
-msgstr "Przetłumaczone dla języka Python (pl)"
-
 #: keysign/keylistwidget.py:83
 msgid "Expires: "
 msgstr "Wygasa: "
@@ -310,7 +298,7 @@ msgid "Scan Barcode"
 msgstr "Zeskanuj kod kreskowy"
 
 #: keysign/receive.ui:226
-msgid "Downloading key-data. Please wait ..."
+msgid "Downloading key-data. Please wait..."
 msgstr "Pobieranie danych klucza. Proszę czekać…"
 
 #: keysign/receive.ui:251
@@ -398,6 +386,8 @@ msgstr ""
 msgid "Very slow or no Internet connection!"
 msgstr "Bardzo wolne lub niedziałające połączenie z Internetem."
 
+#. This refers to the key being certified by someone rather than the key used for
+#. certifying someone
 #: keysign/send.ui:190
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>Wybór klucza do podpisania</b>"
@@ -433,6 +423,14 @@ msgstr "<b>Kod QR</b>"
 #: keysign/send.ui:575
 msgid "Select and Send key"
 msgstr "Wybierz i wyślij klucz"
+
+#: keysign/send.ui:594
+msgid ""
+"Uses the Internet to transport the key rather than the local network and "
+"Bluetooth (if available)"
+msgstr ""
+"Używa Internetu do przesłania klucza zamiast lokalnej sieci i Bluetooth "
+"(jeśli jest dostępny)"
 
 #: keysign/util.py:222
 msgid ""
