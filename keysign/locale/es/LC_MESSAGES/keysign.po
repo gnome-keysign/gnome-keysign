@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the gnome-keysign
 # project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
-# Daniel Mustieles <daniel.mustieles@gmail.com>, 2018.
+# Daniel Mustieles <daniel.mustieles@gmail.com>, 2018-2019.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign 0.9.7.2\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2018-11-15 22:39+0000\n"
-"PO-Revision-Date: 2018-11-30 09:57+0100\n"
+"POT-Creation-Date: 2019-02-14 15:55+0000\n"
+"PO-Revision-Date: 2019-02-19 15:42+0100\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: es <gnome-es-list@gnome.org>\n"
 "Language: es\n"
@@ -19,19 +19,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.5.1\n"
-"X-Generator: Gtranslator 2.91.7\n"
+"X-Generator: Gtranslator 3.31.90\n"
 
 #: data/org.gnome.Keysign.raw.appdata.xml:10
+#| msgid ""
+#| "\n"
+#| "      GNOME-Keysign allows signing OpenPGP keys comfortably and securely\n"
+#| "      via the local network or Bluetooth.\n"
+#| "    "
 msgid ""
 "\n"
-"      GNOME-Keysign allows signing OpenPGP keys comfortably and securely\n"
+"      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
 "      via the local network or Bluetooth.\n"
 "    "
 msgstr ""
 "\n"
 "      GNOME-Keysign permite firmar llaves OpenPGP de manera cómoda y segura\n"
 "      a través de la red local o Bluetooth.\n"
-"      "
+"    "
 
 #: data/org.gnome.Keysign.raw.appdata.xml:14
 msgid ""
@@ -84,7 +89,7 @@ msgstr "Enviar"
 msgid "Receive"
 msgstr "Recibir"
 
-#: keysign/app.ui:62 keysign/send.ui:616
+#: keysign/app.ui:62 keysign/send.ui:617
 msgid "Internet"
 msgstr "Internet"
 
@@ -117,7 +122,6 @@ msgid "Bluetooth not available"
 msgstr "Bluetooth no disponible"
 
 #: keysign/bluetoothoffer.py:137
-#| msgid "Press Enter to exit"
 msgid "Press Enter to cancel"
 msgstr "Pulse Intro para cancelar"
 
@@ -254,18 +258,6 @@ msgstr ""
 "            #### Traceback\n"
 "        "
 
-#. TRANSLATORS: Please include your locale, e.g. "de". We're trying to debug native
-#. gettext
-#: keysign/i18n.py:39
-msgid "Translated for gettext (C)"
-msgstr "Traducido para gettext (es)"
-
-#. TRANSLATORS: Please include your locale, e.g. "de". We're trying to debug pure
-#. python gettext
-#: keysign/i18n.py:47
-msgid "Translated for Python (C)"
-msgstr "Traducido para Python (es)"
-
 #: keysign/keylistwidget.py:83
 msgid "Expires: "
 msgstr "Expira: "
@@ -312,7 +304,8 @@ msgid "Scan Barcode"
 msgstr "Escanear código de barras"
 
 #: keysign/receive.ui:226
-msgid "Downloading key-data. Please wait ..."
+#| msgid "Downloading key-data. Please wait ..."
+msgid "Downloading key-data. Please wait..."
 msgstr "Descargando datos de clave, espere..."
 
 #: keysign/receive.ui:251
@@ -400,6 +393,8 @@ msgstr ""
 msgid "Very slow or no Internet connection!"
 msgstr "Conexión a Internet muy lenta o no hay conexión."
 
+#. This refers to the key being certified by someone rather than the key used for
+#. certifying someone
 #: keysign/send.ui:190
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>Seleccione una clave para firmar</b>"
@@ -436,6 +431,14 @@ msgstr "<b>Código QR</b>"
 msgid "Select and Send key"
 msgstr "Seleccionar y enviar clave"
 
+#: keysign/send.ui:594
+msgid ""
+"Uses the Internet to transport the key rather than the local network and "
+"Bluetooth (if available)"
+msgstr ""
+"Usa Internet para transportar la clave en lugar de la red local y el "
+"Bluetooth (si está disponible)"
+
 #: keysign/util.py:222
 msgid ""
 "Hi $uid,\n"
@@ -468,6 +471,12 @@ msgstr ""
 #: keysign/wormholereceive.py:86
 msgid "Wrong message authentication code"
 msgstr "Mensaje de código de autenticación incorrecto"
+
+#~ msgid "Translated for gettext (C)"
+#~ msgstr "Traducido para gettext (es)"
+
+#~ msgid "Translated for Python (C)"
+#~ msgstr "Traducido para Python (es)"
 
 #~ msgid "installing symlinks for sockets from %s to %s"
 #~ msgstr "Instalando enlaces simbólicos para sockets de %s a %s"
