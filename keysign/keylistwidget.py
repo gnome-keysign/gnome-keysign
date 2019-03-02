@@ -139,6 +139,7 @@ class KeyListWidget(Gtk.HBox):
         self.ib = builder.get_object('infobar_internet')
         fix_infobar(self.ib)
         self.label_ib = builder.get_object('label_internet')
+        self.image_ib = builder.get_object('image_ib')
 
         if len(list(keys)) <= 0:
             infobar = builder.get_object("infobar")

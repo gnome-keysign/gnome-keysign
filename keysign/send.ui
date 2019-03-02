@@ -141,7 +141,7 @@ Please use, e.g. Seahorse to create one.</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkImage">
+                      <object class="GtkImage" id="image_ib">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="stock">gtk-dialog-warning</property>

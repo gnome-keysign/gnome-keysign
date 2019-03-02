@@ -108,6 +108,11 @@ class SendApp:
         self.label.drag_dest_add_uri_targets()
 
     def on_drag_data_received(self, widget, drag_context, x, y, data, info, time):
+        if self.notify is not None:
+            log.debug("We are trying to send a key, no imports at this stage")
+            return
+
+        self.klw.ib.hide()
         filename = data.get_text()
         # If we don't have a filename it means that the user maybe dropped
         # an attachment or an entire email.
@@ -124,8 +129,10 @@ class SendApp:
         try:
             for signature in signatures:
                 gpgmeh.import_signature(signature)
+            self.signature_imported()
         except errors.GPGMEError as e:
             log.error(e)
+            self.signature_import_error()
 
     @inlineCallbacks
     def on_key_activated(self, widget, key):
@@ -188,15 +195,30 @@ class SendApp:
             self.show_result(success, message)
 
     def slow_connection(self):
+        self.klw.image_ib.set_from_icon_name(Gtk.STOCK_DIALOG_WARNING, Gtk.IconSize.BUTTON)
         self.klw.label_ib.set_label(_("Still trying to get a connection to the Internet. "
                                       "It appears to be slow or unavailable."))
         self.klw.ib.show()
         log.info("Slow Internet connection")
 
     def no_connection(self):
+        self.klw.image_ib.set_from_icon_name(Gtk.STOCK_DIALOG_WARNING, Gtk.IconSize.BUTTON)
         self.klw.label_ib.set_label(_("There isn't an Internet connection!"))
         self.klw.ib.show()
         log.info("No Internet connection")
+
+    def signature_imported(self):
+        self.klw.image_ib.set_from_icon_name(Gtk.STOCK_OK, Gtk.IconSize.BUTTON)
+        self.klw.label_ib.set_label(_("The signature has been successfully imported!"))
+        self.klw.ib.show()
+        log.info("Signature imported")
+
+    def signature_import_error(self):
+        self.klw.image_ib.set_from_icon_name(Gtk.STOCK_DIALOG_ERROR, Gtk.IconSize.BUTTON)
+        self.klw.label_ib.set_label(_("An error occurred while trying to import the signature.\n"
+                                      "Please double check the correctness of the chosen signature."))
+        self.klw.ib.show()
+        log.info("Signature import error")
 
     def create_keypresent(self, discovery_code, discovery_data):
         self._deactivate_timer()
