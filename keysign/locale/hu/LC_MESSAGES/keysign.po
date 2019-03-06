@@ -1,0 +1,467 @@
+# Hungarian translation for gnome-keysign.
+# Copyright (C) 2019 Free Software Foundation, Inc.
+# This file is distributed under the same license as the gnome-keysign package.
+#
+# Norbert Makula <kapcsolat at ancovens dot hu>, 2019.
+# Balázs Meskó <mesko.balazs at fsf dot hu>, 2019.
+# Balázs Úr <ur.balazs at fsf dot hu>, 2019.
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-keysign master\n"
+"Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
+"POT-Creation-Date: 2019-02-19 14:44+0000\n"
+"PO-Revision-Date: 2019-03-06 21:25+0100\n"
+"Last-Translator: Balázs Úr <ur.balazs at fsf dot hu>\n"
+"Language-Team: Hungarian <gnome-hu-list at gnome dot org>\n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 2.0\n"
+
+#: data/org.gnome.Keysign.raw.appdata.xml:10
+msgid ""
+"\n"
+"      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
+"      via the local network or Bluetooth.\n"
+"    "
+msgstr ""
+"\n"
+"      A GNOME Kulcsaláíró lehetővé teszi, hogy OpenPGP kulcsokat írjon\n"
+"      alá kényelmesen és biztonságosan a helyi hálózaton vagy\n"
+"      Bluetoothon keresztül.\n"
+"    "
+
+#: data/org.gnome.Keysign.raw.appdata.xml:14
+msgid ""
+"\n"
+"      It can scan another key's barcode and transfer the key securely,\n"
+"      allowing for casual two-party key signing sessions.\n"
+"      It follows best practises by sending the encrypted signatures\n"
+"      to the UIDs of a key using the Email client the user configured\n"
+"      to use.\n"
+"    "
+msgstr ""
+"\n"
+"      Képes leolvasni egy másik kulcs vonalkódját, és biztonságosan\n"
+"      átküldeni a kulcsot, így egyszerű kétszereplős kulcsaláírást\n"
+"      biztosít. Követi a legjobb gyakorlatokat azáltal, hogy a\n"
+"      felhasználó által beállított levelezőprogramot használja a\n"
+"      kulcs UID-jaihoz tartozó titkosított aláírások elküldéséhez.\n"
+"    "
+
+#. Name
+#: data/org.gnome.Keysign.raw.desktop:2
+msgid "Keysign"
+msgstr "Kulcsaláíró"
+
+#. Comment
+#: data/org.gnome.Keysign.raw.desktop:3
+msgid ""
+"A keysigning helper to enable you to comfortably exchange OpenPGP keys with "
+"a friend"
+msgstr ""
+"Egy kulcsaláíró segédprogram, hogy kényelmesen cserélhessen OpenPGP "
+"kulcsokat a barátaival"
+
+#. Keywords
+#: data/org.gnome.Keysign.raw.desktop:4
+msgid "python;gpg;gnupg;key;openpgp;"
+msgstr "python;gpg;gnupg;kulcs;openpgp;"
+
+#. Icon
+#: data/org.gnome.Keysign.raw.desktop:7
+msgid "org.gnome.Keysign"
+msgstr "org.gnome.Keysign"
+
+#: keysign/app.py:181
+msgid "Send"
+msgstr "Küldés"
+
+#: keysign/app.py:183 keysign/receive.py:238
+msgid "Receive"
+msgstr "Fogadás"
+
+#: keysign/app.ui:62 keysign/send.ui:617
+msgid "Internet"
+msgstr "Internet"
+
+#: keysign/avahioffer.py:81 keysign/bluetoothoffer.py:126
+msgid "Offering key: {}"
+msgstr "Ajánló kulcs: {}"
+
+#: keysign/avahioffer.py:82 keysign/bluetoothoffer.py:127
+msgid "Discovery info: {}"
+msgstr "Felfedezési információ: {}"
+
+#: keysign/avahioffer.py:83
+msgid "Press Enter to stop"
+msgstr "Nyomja meg az Entert a leállításhoz"
+
+#: keysign/bluetoothoffer.py:117
+msgid "You must provide an argument to identify the key"
+msgstr "Meg kell adnia egy argumentumot a kulcs azonosításához"
+
+#: keysign/bluetoothoffer.py:128
+msgid "HMAC: {}"
+msgstr "HMAC: {}"
+
+#: keysign/bluetoothoffer.py:129
+msgid "Port: {}"
+msgstr "Port: {}"
+
+#: keysign/bluetoothoffer.py:132
+msgid "Bluetooth not available"
+msgstr "Bluetooth nem érhető el"
+
+#: keysign/bluetoothoffer.py:137
+msgid "Press Enter to cancel"
+msgstr "Nyomja meg az Entert a megszakításhoz"
+
+#: keysign/bluetoothoffer.py:144
+msgid ""
+"\n"
+"Key successfully sent"
+msgstr ""
+"\n"
+"Kulcs sikeresen elküldve"
+
+#: keysign/bluetoothoffer.py:146
+msgid ""
+"\n"
+"An error occurred: {}"
+msgstr ""
+"\n"
+"Hiba történt: {}"
+
+#: keysign/bluetoothoffer.py:148
+msgid "Press Enter to exit"
+msgstr "Nyomja meg az Entert a kilépéshez"
+
+#: keysign/bluetoothreceive.py:134
+msgid "Trying to download the key, please wait"
+msgstr "A kulcs letöltésének kísérlete, kérem várjon"
+
+#: keysign/dialog_avahi.ui:8
+msgid "Unable to Start Avahi"
+msgstr "Nem indítható el az Avahi"
+
+#: keysign/dialog_avahi.ui:9
+msgid ""
+"Keysign is unable to automatically start Avahi. You can try to execute "
+"`systemctl start avahi-daemon` for solving this problem."
+msgstr ""
+"A Kulcsaláíró nem tudja automatikusan elindítani az Avahit. A probléma "
+"megoldásához megpróbálhatja végrehajtani a „systemctl start avahi-daemon” "
+"parancsot."
+
+#: keysign/dialog_avahi.ui:23
+msgid "OK"
+msgstr "OK"
+
+#: keysign/gtkexcepthook.py:173
+msgid "Bug Detected"
+msgstr "Hibát észleltünk"
+
+#: keysign/gtkexcepthook.py:175
+msgid "<big><b>A programming error has been detected.</b></big>"
+msgstr "<big><b>Egy programozási hibát észleltünk.</b></big>"
+
+#: keysign/gtkexcepthook.py:178
+msgid ""
+"You may be able to ignore this error and carry on working, but you may get "
+"unexpected results.\n"
+"\n"
+"Please tell the developers about this using the issue tracker if no-one else "
+"has reported it yet."
+msgstr ""
+"Figyelmen kívül hagyhatja ezt a hibát, és folytathatja a munkát, de váratlan "
+"eredményeket tapasztalhat.\n"
+"\n"
+"Értesítse a fejlesztőket erről a problémáról a hibakövetőn keresztül, ha még "
+"senki más nem jelentette."
+
+#: keysign/gtkexcepthook.py:187
+msgid "Search Tracker..."
+msgstr "Keresés a hibakövetőben…"
+
+#: keysign/gtkexcepthook.py:189
+msgid "Report..."
+msgstr "Jelentés…"
+
+#: keysign/gtkexcepthook.py:191
+msgid "Ignore Error"
+msgstr "Hiba figyelmen kívül hagyása"
+
+#: keysign/gtkexcepthook.py:192
+msgid "Quit GNOME Keysign"
+msgstr "Kilépés a GNOME Kulcsaláíróból"
+
+#: keysign/gtkexcepthook.py:202
+msgid "Details..."
+msgstr "Részletek…"
+
+#: keysign/gtkexcepthook.py:229 keysign/gtkexcepthook.py:232
+msgid "Exception while analyzing the exception."
+msgstr "Kivétel történt a kivétel elemzésekor."
+
+#. TRANSLATORS: Crash report template for github, preceding a traceback.
+#. TRANSLATORS: Please ask users kindly to supply at least an English
+#. TRANSLATORS: title if they are able.
+#: keysign/gtkexcepthook.py:281
+msgid ""
+"            #### Description\n"
+"\n"
+"            Give this report a short descriptive title.\n"
+"            Use something like\n"
+"            \"{feature-that-broke}: {what-went-wrong}\"\n"
+"            for the title, if you can.\n"
+"            Then please replace this text\n"
+"            with a longer description of the bug.\n"
+"            Screenshots or videos are great, too!\n"
+"\n"
+"            #### Steps to reproduce\n"
+"\n"
+"            Please tell us what you were doing\n"
+"            when the error message popped up.\n"
+"            If you can provide step-by-step instructions\n"
+"            on how to reproduce the bug,\n"
+"            that's even better.\n"
+"\n"
+"            #### Traceback\n"
+"        "
+msgstr ""
+"            #### Leírás\n"
+"\n"
+"            Adjon egy rövid, beszédes (angol) címet a jelentésnek.\n"
+"            Használjon valami ilyesmit a címhez:\n"
+"            \"{funkció-amely-nem-működik}: {mi-romlott-el}\"\n"
+"            ha lehetséges.\n"
+"            Aztán cserélje ki ezt a szöveget a\n"
+"            hiba hosszabb (angol) leírására.\n"
+"            A képernyőképek és a videók is nagyszerűek!\n"
+"\n"
+"            #### Reprodukálási lépések\n"
+"\n"
+"            Mondja el, hogy mit csinált, amikor megjelent\n"
+"            a hibaüzenet Ha tud lépésről lépésre szóló\n"
+"            utasításokat adni a hiba reprodukálásáról,\n"
+"            az még jobb.\n"
+"\n"
+"            #### Nyomkövetés\n"
+"        "
+
+#: keysign/keylistwidget.py:83
+msgid "Expires: "
+msgstr "Lejárat: "
+
+#: keysign/receive.py:158
+msgid "Sign Key"
+msgstr "Kulcs aláírása"
+
+#: keysign/receive.ui:53
+msgid ""
+"No GNOME Keysign servers around :-(\n"
+"Find a friend to use GNOME Keysign with.\n"
+"You may also suffer from connectivity problems.\n"
+"For more information click <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"NoServers/1\">here</a>."
+msgstr ""
+"A GNOME Kulcsaláíró kiszolgálók nem érhetőek el :-(\n"
+"Keressen egy barátot, akivel a GNOME Kulcsaláírót fogja használni.\n"
+"Kapcsolódási problémái is lehetnek.\n"
+"További információkért kattintson <a href=\"https://wiki.gnome.org/Apps/"
+"Keysign/Doc/NoServers/1\">ide</a>."
+
+#: keysign/receive.ui:105
+msgid ""
+"<small>To sign someone's key, scan their QR or enter security code</small>"
+msgstr ""
+"<small>Más kulcsának aláírásához olvassa le a QR-kódját vagy adja meg a "
+"biztonsági kódot</small>"
+
+#: keysign/receive.ui:124
+msgid "<b>Camera</b>"
+msgstr "<b>Kamera</b>"
+
+#: keysign/receive.ui:139
+msgid "Integrated Web Cam"
+msgstr "Integrált webkamera"
+
+#: keysign/receive.ui:176 keysign/send.ui:435
+msgid "<b>Security Code</b>"
+msgstr "<b>Biztonsági kód</b>"
+
+#: keysign/receive.ui:209
+msgid "Scan Barcode"
+msgstr "Vonalkód leolvasása"
+
+#: keysign/receive.ui:226
+msgid "Downloading key-data. Please wait..."
+msgstr "Kulcsadatok letöltése. Kérem várjon…"
+
+#: keysign/receive.ui:251
+msgid "Key download was interrupted!"
+msgstr "A kulcs letöltése megszakadt!"
+
+#: keysign/receive.ui:337
+msgid ""
+"To sign the key, confirm that you want to sign the following key.\n"
+"This will generate an email that must be sent in order to complete the "
+"signing process."
+msgstr ""
+"A kulcs aláírásához erősítse meg, hogy a következő kulcsot akarja aláírni.\n"
+"Ez egy e-mailt fog előállítani, amelyet el kell küldeni az aláírási folyamat "
+"befejezéséhez."
+
+#: keysign/receive.ui:365
+msgid "Key"
+msgstr "Kulcs"
+
+#: keysign/receive.ui:398 keysign/send.ui:360
+msgid "UIDs"
+msgstr "UID-k"
+
+#: keysign/receive.ui:485
+msgid "C_onfirm"
+msgstr "_Megerősítés"
+
+#: keysign/receive.ui:539
+msgid "Signing the following UIDs:"
+msgstr "A következő UID-k aláírása:"
+
+#: keysign/send.py:156
+msgid ""
+"Still trying to get a connection to the Internet. It appears to be slow or "
+"unavailable."
+msgstr ""
+"Még mindig nem sikerült internetkapcsolatot szerezni. Lassúnak tűnik vagy "
+"nem érhető el."
+
+#: keysign/send.py:162
+msgid "There isn't an Internet connection!"
+msgstr "Nincs internetkapcsolat!"
+
+#: keysign/send.py:190 keysign/send.ui:545
+msgid ""
+"Key successfully sent.\n"
+"You should receive soon an email with the signature."
+msgstr ""
+"Kulcs sikeresen elküldve.\n"
+"Hamarosan meg kell kapnia az e-mailt az aláírással."
+
+#: keysign/send.py:195
+msgid ""
+"Could not establish a secure connection.\n"
+"Either your partner has entered a wrong code or someone tried to intercept "
+"your connection"
+msgstr ""
+"Nem sikerült biztonságos kapcsolatot kiépíteni.\n"
+"Vagy hibás kódot adott meg a partnere, vagy valaki megpróbálta elfogni a "
+"kapcsolatát"
+
+#: keysign/send.py:199
+#, python-format
+msgid ""
+"An unexpected error occurred:\n"
+"%s"
+msgstr ""
+"Váratlan hiba történt:\n"
+"%s"
+
+#: keysign/send.ui:7
+msgid "Select and send key"
+msgstr "Kulcs kiválasztása és küldése"
+
+#: keysign/send.ui:58
+msgid ""
+"You don't have any keys!\n"
+"Please use, e.g. Seahorse to create one."
+msgstr ""
+"Nincs egyetlen kulcsa sem.\n"
+"Használja például a Seahorse programot a létrehozáshoz."
+
+#: keysign/send.ui:135
+msgid "Very slow or no Internet connection!"
+msgstr "Nagyon lassú vagy nincs internetkapcsolat."
+
+#. This refers to the key being certified by someone rather than the key used for
+#. certifying someone
+#: keysign/send.ui:190
+msgid "<b>Select a key for signing</b>"
+msgstr "<b>Válassza ki az aláírandó kulcsot</b>"
+
+#: keysign/send.ui:206
+msgid "<small>Times signed</small>"
+msgstr "<small>Aláírások száma</small>"
+
+#: keysign/send.ui:272
+msgid "Keylist"
+msgstr "Kulcslista"
+
+#: keysign/send.ui:292
+msgid ""
+"<small>To have the key signed, the other person must enter the security "
+"code, or scan the QR code</small>"
+msgstr ""
+"<small>A kulcs aláírásához a másik személynek meg kell adnia a biztonsági "
+"kódját, vagy le kell olvasnia a QR-kódját</small>"
+
+#: keysign/send.ui:319
+msgid "<b>Key Details</b>"
+msgstr "<b>Kulcs részletei</b>"
+
+#: keysign/send.ui:344
+msgid "Fingerprint"
+msgstr "Ujjlenyomat"
+
+#: keysign/send.ui:498
+msgid "<b>QR Code</b>"
+msgstr "<b>QR-kód</b>"
+
+#: keysign/send.ui:575
+msgid "Select and Send key"
+msgstr "Kulcs kiválasztása és küldése"
+
+#: keysign/send.ui:594
+msgid ""
+"Uses the Internet to transport the key rather than the local network and "
+"Bluetooth (if available)"
+msgstr ""
+"Az internetet használja a kulcs elküldésére a helyi hálózat vagy a Bluetooth "
+"helyett (ha elérhető)"
+
+#: keysign/util.py:222
+msgid ""
+"Hi $uid,\n"
+"\n"
+"\n"
+"I have just signed your key\n"
+"\n"
+"      $fingerprint\n"
+"\n"
+"\n"
+"Thanks for letting me sign your key!\n"
+"\n"
+"--\n"
+"GNOME Keysign\n"
+msgstr ""
+"Kedves $uid,\n"
+"\n"
+"\n"
+"Aláírtam a kulcsodat:\n"
+"\n"
+"      $fingerprint\n"
+"\n"
+"\n"
+"Köszönöm, hogy aláírhattam a kulcsod.\n"
+"\n"
+"--\n"
+"GNOME Kulcsaláíró\n"
+
+#: keysign/wormholereceive.py:86
+msgid "Wrong message authentication code"
+msgstr "Hibás üzenethitelesítő-kód"
+
