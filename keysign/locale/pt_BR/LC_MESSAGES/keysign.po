@@ -1,34 +1,34 @@
 # Portuguese (Brazil) translations for gnome-keysign.
-# Copyright (C) 2018 Tobias Mueller
-# This file is distributed under the same license as the gnome-keysign
-# project.
-# Rafael Fontenelle <rafaelff@gnome.org>, 2017, 2018.
+# Copyright (C) 2019 Tobias Mueller
+# This file is distributed under the same license as the gnome-keysign project.
+# Rafael Fontenelle <rafaelff@gnome.org>, 2017-2019.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2018-11-15 22:39+0000\n"
-"PO-Revision-Date: 2018-11-22 06:57-0200\n"
+"POT-Creation-Date: 2019-02-14 15:55+0000\n"
+"PO-Revision-Date: 2019-03-09 23:06-0300\n"
 "Last-Translator: Rafael Fontenelle <rafaelff@gnome.org>\n"
-"Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
+"Language-Team: Portuguese - Brazil <gnome-pt_br-list@gnome.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Virtaal 1.0.0-beta1\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"X-Generator: Gtranslator 3.31.90\n"
 "Generated-By: Babel 2.5.1\n"
 "X-Project-Style: gnome\n"
 
 #: data/org.gnome.Keysign.raw.appdata.xml:10
 msgid ""
 "\n"
-"      GNOME-Keysign allows signing OpenPGP keys comfortably and securely\n"
+"      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
 "      via the local network or Bluetooth.\n"
 "    "
 msgstr ""
 "\n"
-"      GNOME-Keysign permite assinar chaves OpenPGP de forma\n"
+"      GNOME Keysign permite assinar chaves OpenPGP de forma\n"
 "      confortável e segura por meio da rede local ou do Bluetooth.\n"
 "    "
 
@@ -83,7 +83,7 @@ msgstr "Enviar"
 msgid "Receive"
 msgstr "Receber"
 
-#: keysign/app.ui:62 keysign/send.ui:616
+#: keysign/app.ui:62 keysign/send.ui:617
 msgid "Internet"
 msgstr "Internet"
 
@@ -116,7 +116,6 @@ msgid "Bluetooth not available"
 msgstr "Bluetooth não disponível"
 
 #: keysign/bluetoothoffer.py:137
-#| msgid "Press Enter to exit"
 msgid "Press Enter to cancel"
 msgstr "Pressione Enter para cancelar"
 
@@ -253,18 +252,6 @@ msgstr ""
 "            #### Traceback\n"
 "        "
 
-#. TRANSLATORS: Please include your locale, e.g. "de". We're trying to debug native
-#. gettext
-#: keysign/i18n.py:39
-msgid "Translated for gettext (C)"
-msgstr "Traduzido para gettext (pt_BR)"
-
-#. TRANSLATORS: Please include your locale, e.g. "de". We're trying to debug pure
-#. python gettext
-#: keysign/i18n.py:47
-msgid "Translated for Python (C)"
-msgstr "Traduzido para Python (pt_BR)"
-
 #: keysign/keylistwidget.py:83
 msgid "Expires: "
 msgstr "Expira: "
@@ -311,8 +298,9 @@ msgid "Scan Barcode"
 msgstr "Ler código de barra"
 
 #: keysign/receive.ui:226
-msgid "Downloading key-data. Please wait ..."
-msgstr "Baixando dados da chave. Por favor, aguarde …"
+#| msgid "Downloading key-data. Please wait ..."
+msgid "Downloading key-data. Please wait..."
+msgstr "Baixando dados da chave. Por favor, aguarde…"
 
 #: keysign/receive.ui:251
 msgid "Key download was interrupted!"
@@ -400,6 +388,8 @@ msgstr ""
 msgid "Very slow or no Internet connection!"
 msgstr "Conexão muito lenta ou sem conexão com a Internet!"
 
+#. This refers to the key being certified by someone rather than the key used for
+#. certifying someone
 #: keysign/send.ui:190
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>Selecione uma chave para assinar</b>"
@@ -436,6 +426,14 @@ msgstr "<b>Código QR</b>"
 msgid "Select and Send key"
 msgstr "Selecionar e enviar chave"
 
+#: keysign/send.ui:594
+msgid ""
+"Uses the Internet to transport the key rather than the local network and "
+"Bluetooth (if available)"
+msgstr ""
+"Usa a Internet para transportar a chave em vez da rede local e Bluetooth (se "
+"disponível)"
+
 #: keysign/util.py:222
 msgid ""
 "Hi $uid,\n"
@@ -467,6 +465,12 @@ msgstr ""
 #: keysign/wormholereceive.py:86
 msgid "Wrong message authentication code"
 msgstr "Código de autenticação de mensagem errado"
+
+#~ msgid "Translated for gettext (C)"
+#~ msgstr "Traduzido para gettext (pt_BR)"
+
+#~ msgid "Translated for Python (C)"
+#~ msgstr "Traduzido para Python (pt_BR)"
 
 #~ msgid "installing symlinks for sockets from %s to %s"
 #~ msgstr "instalando links simbólicos para soquetes de %s para %s"
