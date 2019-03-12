@@ -136,10 +136,14 @@ class KeyListWidget(Gtk.HBox):
 
         self.listbox = builder.get_object("keys_listbox")
         self.code_spinner = builder.get_object("code_spinner")
-        self.ib = builder.get_object('infobar_internet')
-        fix_infobar(self.ib)
-        self.label_ib = builder.get_object('label_internet')
-        self.image_ib = builder.get_object('image_ib')
+        self.ib_internet = builder.get_object('infobar_internet')
+        fix_infobar(self.ib_internet)
+        self.label_ib_internet = builder.get_object('label_internet')
+
+        self.ib_import = builder.get_object('infobar_import')
+        fix_infobar(self.ib_import)
+        self.label_ib_import = builder.get_object('label_import')
+        self.image_ib_import = builder.get_object('image_import')
 
         if len(list(keys)) <= 0:
             infobar = builder.get_object("infobar")

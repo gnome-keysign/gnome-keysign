@@ -112,7 +112,6 @@ class SendApp:
             log.debug("We are trying to send a key, no imports at this stage")
             return
 
-        self.klw.ib.hide()
         filename = data.get_text()
         # If we don't have a filename it means that the user maybe dropped
         # an attachment or an entire email.
@@ -139,7 +138,7 @@ class SendApp:
         # Deactivate any old connection attempt
         self._deactivate_timer()
         self.deactivate()
-        self.klw.ib.hide()
+        self.klw.ib_internet.hide()
         self.key = key
         log.info("Activated key %r", key)
         ####
@@ -194,30 +193,32 @@ class SendApp:
         else:
             self.show_result(success, message)
 
+    def on_ib_closed(self, widget, data):
+        if Gtk.ResponseType.CLOSE == data:
+            widget.hide()
+
     def slow_connection(self):
-        self.klw.image_ib.set_from_icon_name(Gtk.STOCK_DIALOG_WARNING, Gtk.IconSize.BUTTON)
-        self.klw.label_ib.set_label(_("Still trying to get a connection to the Internet. "
-                                      "It appears to be slow or unavailable."))
-        self.klw.ib.show()
+        self.klw.label_ib_internet.set_label(_("Still trying to get a connection to the Internet. "
+                                             "It appears to be slow or unavailable."))
+        self.klw.ib_internet.show()
         log.info("Slow Internet connection")
 
     def no_connection(self):
-        self.klw.image_ib.set_from_icon_name(Gtk.STOCK_DIALOG_WARNING, Gtk.IconSize.BUTTON)
-        self.klw.label_ib.set_label(_("There isn't an Internet connection!"))
-        self.klw.ib.show()
+        self.klw.label_ib_internet.set_label(_("There isn't an Internet connection!"))
+        self.klw.ib_internet.show()
         log.info("No Internet connection")
 
     def signature_imported(self):
-        self.klw.image_ib.set_from_icon_name(Gtk.STOCK_OK, Gtk.IconSize.BUTTON)
-        self.klw.label_ib.set_label(_("The signature has been successfully imported!"))
-        self.klw.ib.show()
+        self.klw.image_ib_import.set_from_icon_name(Gtk.STOCK_OK, Gtk.IconSize.BUTTON)
+        self.klw.label_ib_import.set_label(_("The signature has been successfully imported!"))
+        self.klw.ib_import.show()
         log.info("Signature imported")
 
     def signature_import_error(self):
-        self.klw.image_ib.set_from_icon_name(Gtk.STOCK_DIALOG_ERROR, Gtk.IconSize.BUTTON)
-        self.klw.label_ib.set_label(_("An error occurred while trying to import the signature.\n"
-                                      "Please double check the correctness of the chosen signature."))
-        self.klw.ib.show()
+        self.klw.image_ib_import.set_from_icon_name(Gtk.STOCK_DIALOG_ERROR, Gtk.IconSize.BUTTON)
+        self.klw.label_ib_import.set_label(_("An error occurred while trying to import the signature.\n"
+                                           "Please double check the correctness of the chosen signature."))
+        self.klw.ib_import.show()
         log.info("Signature import error")
 
     def create_keypresent(self, discovery_code, discovery_data):
@@ -233,7 +234,7 @@ class SendApp:
         self.stack_saved_visible_child = self.stack.get_visible_child()
         self.stack.set_visible_child(self.kpw)
         log.debug('Setting kpw: %r', self.kpw)
-        self.klw.ib.hide()
+        self.klw.ib_internet.hide()
         self.klw.code_spinner.stop()
 
     def show_result(self, success, message):
@@ -274,7 +275,7 @@ class SendApp:
     def set_internet_option(self, value):
         self._deactivate_timer()
         self.deactivate()
-        self.klw.ib.hide()
+        self.klw.ib_internet.hide()
         self.klw.code_spinner.stop()
         self.internet_option = value
 
