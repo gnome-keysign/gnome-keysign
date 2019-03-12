@@ -489,14 +489,15 @@ def import_signature(encrypted_sig, homedir=None):
 
     try:
         proxy = bus.get_object(name, path)
+    except dbus.exceptions.DBusException:
+        log.debug("Seahorse DBus is not available")
+    else:
         iface = "org.gnome.seahorse.KeyService"
         gpg_iface = dbus.Interface(proxy, iface)
         payload = base64.b64encode(signature[0]).decode('latin-1')
         payload = '\n'.join(payload[i:(i + 64)] for i in range(0, len(payload), 64))
         payload = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n\n" + payload + "\n-----END PGP PUBLIC KEY BLOCK-----"
         result = gpg_iface.ImportKeys("openpgp", payload)
-    except dbus.exceptions.DBusException:
-        log.debug("Seahorse DBus is not available")
 
     # If Seahorse failed we try op_import
     if len(result) < 1:
