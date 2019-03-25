@@ -5,6 +5,11 @@ import mailbox
 import os
 import signal
 
+try:
+    from urllib.parse import unquote
+except ImportError:
+    from urllib import unquote
+
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
@@ -117,6 +122,8 @@ class SendApp:
         # an attachment or an entire email.
         if not filename:
             filename = data.get_data().decode("utf-8")
+
+        filename = unquote(filename)
         filename = filename[7:].strip('\r\n\x00')  # remove file://, \r\n and NULL
         log.info("Received file: %s" % filename)
         signatures = get_attachments(filename)
