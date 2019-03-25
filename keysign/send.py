@@ -130,14 +130,13 @@ class SendApp:
         if not signatures:
             with open(filename, "rb") as si:
                 signatures.append(si.read())
-            si.close()
 
         try:
             for signature in signatures:
                 gpgmeh.import_signature(signature)
             self.signature_imported()
         except errors.GPGMEError as e:
-            log.error(e)
+            log.exception(e)
             self.signature_import_error()
 
     @inlineCallbacks
