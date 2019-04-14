@@ -136,7 +136,7 @@ class SendApp:
                 gpgmeh.import_signature(signature)
             self.signature_imported()
         except errors.GPGMEError as e:
-            log.exception(e)
+            log.exception("Could not import signatures")
             self.signature_import_error()
 
     @inlineCallbacks
