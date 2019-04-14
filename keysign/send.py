@@ -125,7 +125,7 @@ class SendApp:
 
         filename = unquote(filename)
         filename = filename[7:].strip('\r\n\x00')  # remove file://, \r\n and NULL
-        log.info("Received file: %s" % filename)
+        log.info("Received file: %s", filename)
         signatures = get_attachments(filename)
         if not signatures:
             with open(filename, "rb") as si:
