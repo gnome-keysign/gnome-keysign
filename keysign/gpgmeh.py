@@ -420,6 +420,43 @@ def minimise_key(keydata):
         minimised_key = sink.read()
         return minimised_key
 
+def local_sign_keydata(keydata, expires_in=60*60*24*1, error_cb=None, homedir=None):
+    """Produces non-exportable and expiring signatures.
+    This can be useful if we want to enable the user to send an email to 
+    the other party right away, without waiting for the protocol to have 
+    completed. By letting the signature expire, we limit the time in 
+    which a wrongly signed key is harmful. This is a challenge for thx
+    UX, because sending emails will stop working pretty much out of 
+    the blue. But it can hardly be any worse than it is now.
+    And the app ought to inform the user about the fact that it's only 
+    ephemeral.
+    """
+    ctx = DirectoryContext(homedir)
+
+    tmpctx = TempContext()
+    available_secret_keys = [key for key in ctx.keylist(secret=True)
+        if not key.disabled or key.revoked or key.invalid or key.expired]
+    log.debug('Setting available sec keys to: %r', available_secret_keys)
+    ctx.signers = available_secret_keys
+
+    tmpctx.op_import(keydata)
+    result = tmpctx.op_import_result()
+    if result.considered != 1 and result.imported != 1:
+        raise ValueError("Expected to load exactly one key. %r", result)
+    else:
+        imports = result.imports
+        assert len(imports) == 1
+        fpr = result.imports[0].fpr
+
+        key = ctx.get_key(fpr)
+        # We need to sign in the regular context, because gpgme does not
+        # export local signatures from a keyring.
+        ctx.key_sign(key, local=True, expires_in=expires_in)
+        # Unfortunately, key_sign does not report back how many
+        # signatures were produced (or not produced...)
+        # It may raise an error, but I have yet to see that it does...
+
+
 def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
     oldctx = DirectoryContext(homedir)
     ctx = TempContextWithAgent(oldctx)
