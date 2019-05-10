@@ -430,6 +430,8 @@ def local_sign_keydata(keydata, expires_in=60*60*24*1, error_cb=None, homedir=No
     the blue. But it can hardly be any worse than it is now.
     And the app ought to inform the user about the fact that it's only 
     ephemeral.
+
+    Returns: nothing
     """
     ctx = DirectoryContext(homedir)
 
@@ -448,6 +450,7 @@ def local_sign_keydata(keydata, expires_in=60*60*24*1, error_cb=None, homedir=No
         assert len(imports) == 1
         fpr = result.imports[0].fpr
 
+        ctx.op_import(keydata)
         key = ctx.get_key(fpr)
         # We need to sign in the regular context, because gpgme does not
         # export local signatures from a keyring.
@@ -455,6 +458,7 @@ def local_sign_keydata(keydata, expires_in=60*60*24*1, error_cb=None, homedir=No
         # Unfortunately, key_sign does not report back how many
         # signatures were produced (or not produced...)
         # It may raise an error, but I have yet to see that it does...
+        log.info("Locally signed key %s with an exiry in %d secods", fpr, expires_in)
 
 
 def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
