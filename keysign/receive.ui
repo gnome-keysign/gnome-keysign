@@ -383,21 +383,7 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton" id="btn_local_import_help">
-                    <property name="label">gtk-help</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">Opens the documentation for the local temporary signature feature</property>
-                    <property name="use_stock">True</property>
-                    <property name="image_position">right</property>
-                    <property name="always_show_image">True</property>
-                  </object>
-                  <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
-                    <property name="position">3</property>
-                  </packing>
+                  <placeholder/>
                 </child>
               </object>
               <packing>
@@ -415,7 +401,8 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">Successfully produced certifications.
-You can import a temporary signature to start using the key as if it had already been properly verified.</property>
+You can import a temporary signature to start using the key as if it had already been properly verified.
+For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/ProducedSignatures/1"&gt;the documentation&lt;/a&gt;.</property>
                     <property name="use_markup">True</property>
                   </object>
                   <packing>

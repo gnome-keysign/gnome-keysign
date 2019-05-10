@@ -136,7 +136,6 @@ class PreSignWidget(Gtk.VBox):
         self.infobar_success = builder.get_object('infobar_certifications_produced')
         self.infobar_save_as_button = builder.get_object('btn_local_import_save_as')
         self.infobar_import_button = builder.get_object('btn_local_import')
-        self.infobar_help_button = builder.get_object('btn_local_import_help')
 
 
     def on_confirm_button_clicked(self, buttonObject, *args):
