@@ -51,7 +51,7 @@ if  __name__ == "__main__" and __package__ is None:
 from .avahidiscovery import AvahiKeysignDiscoveryWithMac
 from .discover import Discover
 from .errors import NoBluezDbus, UnpoweredAdapter, NoAdapter
-from .gpgmeh import openpgpkey_from_data
+from .gpgmeh import openpgpkey_from_data, local_sign_keydata
 from .i18n import _
 from .keyfprscan import KeyFprScanWidget
 from .keyconfirm import PreSignWidget
@@ -206,13 +206,44 @@ class ReceiveApp:
         # This is unzipping the list of tuples, e.g. [(1,2), (3,4)] becomes [(1,3), (2,4)]
         self.tmpfiles, plaintexts = zip(*tmpfiles_plaintext)
 
+        keyPreSignWidget.infobar_success.show()
+
+        def import_clicked(button):
+            self.log.info("Import clicked")
+            local_sign_keydata(keydata)
+        keyPreSignWidget.infobar_import_button.connect("clicked", import_clicked)
+
+        def save_as_clicked(button):
+            self.log.info("Save as clicked")
+            dialog = Gtk.FileChooserDialog(_("Select file for saving"),
+                self.get_toplevel(),
+                Gtk.FileChooserAction.SAVE,
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 Gtk.STOCK_SAVE, Gtk.ResponseType.OK)
+            )
+            response = dialog.run()
+            if response == Gtk.ResponseType.OK:
+                filename = dialog.get_filename()
+                self.log.info("Saving file to: %r", filename)
+                with open(filename, 'wb') as f:
+                    for p in plaintexts:
+                        f.write(p)
+                    for sigfile in self.tmpfiles:
+                        pass
+                        # Hrm. Those are the encrypted files, I think.
+                        # We probably want to offer the plaintext versions, though
+                        #f.write(open(sigfile, 'r').read())
+            else:
+                self.log.info("Not saving file: %r", response)
+            dialog.destroy()
+
+        keyPreSignWidget.infobar_save_as_button.connect("clicked", save_as_clicked)
 
         # After the user has signed, we switch back to the scanner,
         # because currently, there is not much to do on the
         # key confirmation page.
         log.debug ("Signed the key: %r", self.tmpfiles)
-        self.stack.set_visible_child_name("scanner")
-        # Do we also want to add an infobar message or so..?
+        # self.stack.set_visible_child_name("scanner")
 
     def on_list_changed(self, discovery, number, userdata):
         """We show an infobar if we can only receive with Avahi and
