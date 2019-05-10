@@ -507,4 +507,4 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
                                                # in order for it to work out of the box
                                                always_trust=True,
                                                sign=False)
-                yield (UID.from_gpgme(uid), ciphertext)
+                yield (UID.from_gpgme(uid), ciphertext, uid_data)

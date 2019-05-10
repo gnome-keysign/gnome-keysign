@@ -261,7 +261,7 @@ def sign_keydata_and_send(keydata, error_cb=None):
     except AttributeError:
         log.debug("keydata is probably already a bytes type")
 
-    for uid, encrypted_key in list(sign_keydata_and_encrypt(keydata, error_cb)):
+    for uid, encrypted_key, plaintext in list(sign_keydata_and_encrypt(keydata, error_cb)):
         log.info("Using UID: %r", uid)
         # We expect uid.uid to be a consumable string
         uid_str = uid.uid
