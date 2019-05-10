@@ -91,7 +91,13 @@ class PswMappingReceiveApp(ReceiveApp):
         psw.connect('map', self.func)
         if psw.get_mapped():
             self.func(psw)
-    
+
+    def get_toplevel(self):
+        """We're continuing to hack around
+        If we ever want to run a dialog, say a FileSave dialog, then we need to provide
+        the top level window of that widget.
+        """
+        return self.psw.get_toplevel()
 
 
 class KeysignApp(Gtk.Application):
