@@ -201,8 +201,11 @@ class ReceiveApp:
         self.log.debug ("Sign key confirmed! %r", key)
         # We need to prevent tmpfiles from going out of
         # scope too early so that they don't get deleted
-        self.tmpfiles = list(
-            sign_keydata_and_send(keydata))
+        tmpfiles_plaintext = list(sign_keydata_and_send(keydata))
+        self.log.debug("sign keydata result: %r", tmpfiles_plaintext)
+        # This is unzipping the list of tuples, e.g. [(1,2), (3,4)] becomes [(1,3), (2,4)]
+        self.tmpfiles, plaintexts = zip(*tmpfiles_plaintext)
+
 
         # After the user has signed, we switch back to the scanner,
         # because currently, there is not much to do on the
