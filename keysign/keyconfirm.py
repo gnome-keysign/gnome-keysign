@@ -129,6 +129,15 @@ class PreSignWidget(Gtk.VBox):
         imagebox.add(ScalingImage(pixbuf=pixbuf))
         imagebox.show_all()
 
+        # We save the reference here to expose this infobar to the caller.
+        # This is a bit ugly, because it makes this implementation detail part of the
+        # API. The infobar should probably be part of the caller's responsibility,
+        # i.e. not part of this widget.
+        self.infobar_success = builder.get_object('infobar_certifications_produced')
+        self.infobar_save_as_button = builder.get_object('btn_local_import_save_as')
+        self.infobar_import_button = builder.get_object('btn_local_import')
+        self.infobar_help_button = builder.get_object('btn_local_import_help')
+
 
     def on_confirm_button_clicked(self, buttonObject, *args):
         self.emit('sign-key-confirmed', self.key, *args)
