@@ -1,14 +1,14 @@
 # Indonesian translation for gnome-keysign.
 # Copyright (C) 2018 gnome-keysign's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-keysign package.
-# Kukuh Syafaat <kukuhsyafaat@gnome.org>.
+# Kukuh Syafaat <kukuhsyafaat@gnome.org>, 2018, 2019.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2019-02-14 15:55+0000\n"
-"PO-Revision-Date: 2019-04-12 17:11+0700\n"
+"POT-Creation-Date: 2019-04-27 17:03+0000\n"
+"PO-Revision-Date: 2019-07-11 15:01+0700\n"
 "Last-Translator: Kukuh Syafaat <kukuhsyafaat@gnome.org>\n"
 "Language-Team: Indonesian <gnome-l10n-id@googlegroups.com>\n"
 "Language: id\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
-"X-Generator: Poedit 2.2.1\n"
+"X-Generator: Poedit 2.2.3\n"
 
 #: data/org.gnome.Keysign.raw.appdata.xml:10
 msgid ""
@@ -265,13 +265,13 @@ msgid ""
 "No GNOME Keysign servers around :-(\n"
 "Find a friend to use GNOME Keysign with.\n"
 "You may also suffer from connectivity problems.\n"
-"For more information click <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
-"NoServers/1\">here</a>."
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"NoServers/1\">the documentation</a>."
 msgstr ""
-"Tidak ada server GNOME Keysign di sekitar Anda :-(\n"
+"Tidak ada peladen GNOME Keysign di sekitar Anda :-(\n"
 "Temukan teman untuk menggunakan GNOME Keysign.\n"
 "Anda mungkin juga mengalami masalah konektivitas.\n"
-"Untuk informasi lebih lanjut, klik <a href=\"https://wiki.gnome.org/Apps/"
+"Untuk informasi lebih lanjut, kunjungi <a href=\"https://wiki.gnome.org/Apps/"
 "Keysign/Doc/NoServers/1\">di sini</a>."
 
 #: keysign/receive.ui:105
