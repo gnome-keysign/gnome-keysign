@@ -243,8 +243,9 @@ def sign_keydata_and_send(keydata, error_cb=None):
     For the resulting signatures, emails are created and
     sent via send_email.
     
-    Return value:  NamedTemporaryFiles used for saving the signatures.
-    If you let them go out of scope they should get deleted.
+    Return value:  A tuple of a
+    NamedTemporaryFiles used for saving the signatures and the plaintext which got encrypted.
+    If you let the TemporaryFiles go out of scope they should get deleted.
     But don't delete too early as the MUA needs to pick them up.
     """
     log = logging.getLogger(__name__ + ':sign_keydata')
@@ -261,7 +262,7 @@ def sign_keydata_and_send(keydata, error_cb=None):
     except AttributeError:
         log.debug("keydata is probably already a bytes type")
 
-    for uid, encrypted_key in list(sign_keydata_and_encrypt(keydata, error_cb)):
+    for uid, encrypted_key, plaintext in list(sign_keydata_and_encrypt(keydata, error_cb)):
         log.info("Using UID: %r", uid)
         # We expect uid.uid to be a consumable string
         uid_str = uid.uid
@@ -291,7 +292,7 @@ def sign_keydata_and_send(keydata, error_cb=None):
         subject = Template(SUBJECT).safe_substitute(ctx)
         body = Template(body).safe_substitute(ctx)
         send_email(uid.email, subject, body, [filename])
-        yield tmpfile
+        yield tmpfile, plaintext
 
 
 def format_fingerprint(fpr):
