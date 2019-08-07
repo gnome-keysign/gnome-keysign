@@ -10,6 +10,8 @@ Changes
 
  * fixed up appdata
  * Cater for newer wormhole close() semantics
+ * Allow to drag and drop an email or its attachment into the app
+ * show options to save produced certification as a file
 
 Resources
 =========
