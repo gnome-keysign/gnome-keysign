@@ -477,8 +477,22 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
 
 
 def import_signature(encrypted_sig, homedir=None):
-    # ctx = gpg.Context()
     ctx = DirectoryContext(homedir)
+
+    # Check if we are really importing a signature
+    temp_ctx = TempContextWithAgent(ctx)
+    signature = temp_ctx.decrypt(encrypted_sig)
+    temp_ctx.op_import(signature[0])
+    result = temp_ctx.op_import_result()
+
+    if result.imported != 0:
+        log.warning("Trying to import a new key instead of a signature!")
+        raise GPGMEError
+
+    if result.new_signatures == 0 or result.revocations != 0 or result.new_sub_keys != 0:
+        log.warning("The signature that we were importing is not as we expected!")
+        raise GPGMEError
+
     signature = ctx.decrypt(encrypted_sig)
 
     # Try Seahorse DBus
