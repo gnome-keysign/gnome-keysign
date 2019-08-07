@@ -14,11 +14,11 @@ Sign another person's key easily and securely
 
 SYNOPSIS
 ========
-**gks-sign-key**
+**gnome-keysign-sign-key**
 
 DESCRIPTION
 ===========
-**gks-sign-key** is a tool for signing OpenPGP keys easily and securely
+**gnome-keysign-sign-key** is a tool for signing OpenPGP keys easily and securely
 without the need for a graphical user interface.
 It assumes that you have obtained an authentic copy of the key to be certified.
 It will perform the steps that **gnome-keysign** performs.

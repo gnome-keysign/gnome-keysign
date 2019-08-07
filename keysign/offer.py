@@ -24,8 +24,7 @@ class Offer:
     @inlineCallbacks
     def allocate_code(self, worm=True):
         self.a_offer = AvahiHTTPOffer(self.key)
-        a_info = self.a_offer.start()
-        code, a_data = a_info
+        code, a_data = self.a_offer.allocate_code()
         discovery_data = [a_data]
         if worm:
             self.w_offer = WormholeOffer(self.key)
@@ -44,9 +43,8 @@ class Offer:
         returnValue((code, discovery_data))
 
     def start(self):
-        # With the current workflow avahi needs to be started
-        # for allocate the code
-        d = []
+        avahi_defers = self.a_offer.start()
+        d = [avahi_defers] if avahi_defers else []
         if self.w_offer:
             w_d = self.w_offer.start()
             d.append(w_d)

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.20.0 -->
+<!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.16"/>
   <object class="GtkImage" id="confirm-button-image">
@@ -53,7 +53,7 @@
                     <property name="label" translatable="yes">No GNOME Keysign servers around :-(
 Find a friend to use GNOME Keysign with.
 You may also suffer from connectivity problems.
-For more information click &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/NoServers/1"&gt;here&lt;/a&gt;.</property>
+For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/NoServers/1"&gt;the documentation&lt;/a&gt;.</property>
                     <property name="use_markup">True</property>
                   </object>
                   <packing>
@@ -84,6 +84,9 @@ For more information click &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
             <property name="fill">True</property>
             <property name="position">0</property>
           </packing>
+        </child>
+        <child>
+          <placeholder/>
         </child>
         <child>
           <object class="GtkBox" id="scanner_widget">
@@ -200,7 +203,7 @@ For more information click &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
           <packing>
             <property name="expand">True</property>
             <property name="fill">True</property>
-            <property name="position">1</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </object>
@@ -325,6 +328,112 @@ For more information click &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
         <property name="margin_bottom">10</property>
         <property name="orientation">vertical</property>
         <property name="spacing">6</property>
+        <child>
+          <object class="GtkInfoBar" id="infobar_certifications_produced">
+            <property name="can_focus">False</property>
+            <child internal-child="action_area">
+              <object class="GtkButtonBox">
+                <property name="can_focus">False</property>
+                <property name="spacing">6</property>
+                <property name="layout_style">end</property>
+                <child>
+                  <object class="GtkButton" id="btn_local_import_save_as">
+                    <property name="label">gtk-save-as</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">Saves the produced certifications as separate files in a custom directory</property>
+                    <property name="use_stock">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="btn_local_import">
+                    <property name="label">gtk-jump-to</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="tooltip_text" translatable="yes">Imports a temporary version of the produced certifications into the local keyring</property>
+                    <property name="use_stock">True</property>
+                    <property name="always_show_image">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="btn_upload">
+                    <property name="label">gtk-go-up</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="no_show_all">True</property>
+                    <property name="use_stock">True</property>
+                    <property name="always_show_image">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child internal-child="content_area">
+              <object class="GtkBox">
+                <property name="can_focus">False</property>
+                <property name="spacing">16</property>
+                <child>
+                  <object class="GtkLabel" id="infobar_discover1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Successfully produced certifications.
+You can import a temporary signature to start using the key as if it had already been properly verified.
+For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/ProducedSignatures/1"&gt;the documentation&lt;/a&gt;.</property>
+                    <property name="use_markup">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <placeholder/>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
@@ -472,7 +581,7 @@ Alpha Bar &lt;example@example.com&gt;</property>
           <packing>
             <property name="expand">True</property>
             <property name="fill">True</property>
-            <property name="position">0</property>
+            <property name="position">1</property>
           </packing>
         </child>
         <child>
@@ -533,16 +642,7 @@ Alpha Bar &lt;example@example.com&gt;</property>
         <property name="orientation">vertical</property>
         <property name="spacing">6</property>
         <child>
-          <object class="GtkLabel" id="label20">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="label" translatable="yes">Signing the following UIDs:</property>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">0</property>
-          </packing>
+          <placeholder/>
         </child>
         <child>
           <object class="GtkLabel" id="uids_signed_label">
@@ -607,6 +707,18 @@ Alpha Bar &lt;example@example.com&gt;</property>
             <property name="fill">True</property>
             <property name="pack_type">end</property>
             <property name="position">4</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="label20">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">Signing the following UIDs:</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">5</property>
           </packing>
         </child>
       </object>

@@ -1,24 +1,22 @@
-# Portuguese (Brazil) translations for gnome-keysign.
-# Copyright (C) 2019 Tobias Mueller
-# This file is distributed under the same license as the gnome-keysign project.
-# Rafael Fontenelle <rafaelff@gnome.org>, 2017-2019.
+# Indonesian translation for gnome-keysign.
+# Copyright (C) 2018 gnome-keysign's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-keysign package.
+# Kukuh Syafaat <kukuhsyafaat@gnome.org>, 2018, 2019.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gnome-keysign\n"
+"Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
 "POT-Creation-Date: 2019-04-27 17:03+0000\n"
-"PO-Revision-Date: 2019-06-13 21:05-0300\n"
-"Last-Translator: Rafael Fontenelle <rafaelff@gnome.org>\n"
-"Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
-"Language: pt_BR\n"
+"PO-Revision-Date: 2019-07-11 15:01+0700\n"
+"Last-Translator: Kukuh Syafaat <kukuhsyafaat@gnome.org>\n"
+"Language-Team: Indonesian <gnome-l10n-id@googlegroups.com>\n"
+"Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
-"X-Generator: Gtranslator 3.32.0\n"
-"Generated-By: Babel 2.5.1\n"
-"X-Project-Style: gnome\n"
+"Generated-By: Babel 2.6.0\n"
+"X-Generator: Poedit 2.2.3\n"
 
 #: data/org.gnome.Keysign.raw.appdata.xml:10
 msgid ""
@@ -28,8 +26,9 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"      GNOME Keysign permite assinar chaves OpenPGP de forma\n"
-"      confortável e segura por meio da rede local ou do Bluetooth.\n"
+"      GNOME-Keysign memungkinkan penandatanganan kunci OpenPGP dengan nyaman "
+"dan aman\n"
+"      melalui jaringan lokal atau Bluetooth.\n"
 "    "
 
 #: data/org.gnome.Keysign.raw.appdata.xml:14
@@ -43,12 +42,13 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"      Ele pode escanear o código de barras de outra tecla e\n"
-"      transferir a chave com segurança, permitindo sessões\n"
-"      informais de sinalização de duas partes.\n"
-"      Ele segue as práticas recomendadas enviando as assinaturas\n"
-"      criptografadas para os UIDs de uma chave usando o cliente\n"
-"      de e-mail que o usuário configurou para usar.\n"
+"      Ini dapat memindai kode kunci lain dan mentransfer kunci secara "
+"aman, \n"
+"      memungkinkan sesi penandatanganan dua-pihak kasual.\n"
+"      Ini mengikuti praktik terbaik dengan mengirimkan tanda tangan "
+"terenkripsi\n"
+"      ke UID kunci menggunakan klien Surel yang dikonfigurasi pengguna\n"
+"      untuk digunakan.\n"
 "    "
 
 #. Name
@@ -62,13 +62,13 @@ msgid ""
 "A keysigning helper to enable you to comfortably exchange OpenPGP keys with "
 "a friend"
 msgstr ""
-"Um auxiliar de assinatura de chaves para permitir que você troque "
-"confortavelmente as chaves do OpenPGP com um amigo"
+"Penolong penandatanganan kunci untuk memungkinkan Anda untuk secara nyaman "
+"bertukar kunci OpenPGP dengan seorang teman"
 
 #. Keywords
 #: data/org.gnome.Keysign.raw.desktop:4
 msgid "python;gpg;gnupg;key;openpgp;"
-msgstr "python;gpg;gnupg;chave;openpgp;"
+msgstr "python;gpg;gnupg;kunci;openpgp;"
 
 #. Icon
 #: data/org.gnome.Keysign.raw.desktop:7
@@ -77,11 +77,11 @@ msgstr "org.gnome.Keysign"
 
 #: keysign/app.py:181
 msgid "Send"
-msgstr "Enviar"
+msgstr "Kirim"
 
 #: keysign/app.py:183 keysign/receive.py:238
 msgid "Receive"
-msgstr "Receber"
+msgstr "Terima"
 
 #: keysign/app.ui:62 keysign/send.ui:617
 msgid "Internet"
@@ -89,19 +89,19 @@ msgstr "Internet"
 
 #: keysign/avahioffer.py:81 keysign/bluetoothoffer.py:126
 msgid "Offering key: {}"
-msgstr "Oferecendo chave: {}"
+msgstr "Kunci penawaran: {}"
 
 #: keysign/avahioffer.py:82 keysign/bluetoothoffer.py:127
 msgid "Discovery info: {}"
-msgstr "Info da descoberta: {}"
+msgstr "Info penemuan: {}"
 
 #: keysign/avahioffer.py:83
 msgid "Press Enter to stop"
-msgstr "Pressione Enter para interromper"
+msgstr "Tekan Enter untuk berhenti"
 
 #: keysign/bluetoothoffer.py:117
 msgid "You must provide an argument to identify the key"
-msgstr "Você deve fornecer um argumento para identificar a chave"
+msgstr "Anda harus memberikan argumen untuk mengidentifikasi kunci"
 
 #: keysign/bluetoothoffer.py:128
 msgid "HMAC: {}"
@@ -109,15 +109,15 @@ msgstr "HMAC: {}"
 
 #: keysign/bluetoothoffer.py:129
 msgid "Port: {}"
-msgstr "Porta: {}"
+msgstr "Port: {}"
 
 #: keysign/bluetoothoffer.py:132
 msgid "Bluetooth not available"
-msgstr "Bluetooth não disponível"
+msgstr "Bluetooth tidak tersedia"
 
 #: keysign/bluetoothoffer.py:137
 msgid "Press Enter to cancel"
-msgstr "Pressione Enter para cancelar"
+msgstr "Tekan Enter untuk membatalkan"
 
 #: keysign/bluetoothoffer.py:144
 msgid ""
@@ -125,7 +125,7 @@ msgid ""
 "Key successfully sent"
 msgstr ""
 "\n"
-"Chave enviada com sucesso"
+"Kunci berhasil dikirim"
 
 #: keysign/bluetoothoffer.py:146
 msgid ""
@@ -133,27 +133,27 @@ msgid ""
 "An error occurred: {}"
 msgstr ""
 "\n"
-"Ocorreu um erro: {}"
+"Terjadi kesalahan: {}"
 
 #: keysign/bluetoothoffer.py:148
 msgid "Press Enter to exit"
-msgstr "Pressione Enter para sair"
+msgstr "Tekan Enter untuk keluar"
 
 #: keysign/bluetoothreceive.py:134
 msgid "Trying to download the key, please wait"
-msgstr "Tentando baixar a chave, por favor aguarde"
+msgstr "Mencoba mengunduh kunci, harap tunggu"
 
 #: keysign/dialog_avahi.ui:8
 msgid "Unable to Start Avahi"
-msgstr "Não foi possível iniciar o Avahi"
+msgstr "Tidak Dapat Memulai Avahi"
 
 #: keysign/dialog_avahi.ui:9
 msgid ""
 "Keysign is unable to automatically start Avahi. You can try to execute "
 "`systemctl start avahi-daemon` for solving this problem."
 msgstr ""
-"O Keysign não conseguiu iniciar automaticamente o Avahi. Você pode tentar "
-"executar `systemctl start avahi-daemon` para resolver este problema."
+"Keysign tidak dapat memulai Avahi secara otomatis. Anda dapat mencoba "
+"menjalankan `systemctl start avahi-daemon` untuk menyelesaikan masalah ini."
 
 #: keysign/dialog_avahi.ui:23
 msgid "OK"
@@ -161,11 +161,11 @@ msgstr "OK"
 
 #: keysign/gtkexcepthook.py:173
 msgid "Bug Detected"
-msgstr "Erro detectado"
+msgstr "Kutu Terdeteksi"
 
 #: keysign/gtkexcepthook.py:175
 msgid "<big><b>A programming error has been detected.</b></big>"
-msgstr "<big><b>Um erro de programação foi detectado.</b></big>"
+msgstr "<big><b>Kesalahan pemrograman telah terdeteksi.</b></big>"
 
 #: keysign/gtkexcepthook.py:178
 msgid ""
@@ -175,35 +175,35 @@ msgid ""
 "Please tell the developers about this using the issue tracker if no-one else "
 "has reported it yet."
 msgstr ""
-"Você pode ser capaz de ignorar esse erro e seguir usando, mas você pode "
-"obter resultados inesperados.\n"
+"Anda mungkin dapat mengabaikan kesalahan ini dan terus bekerja, tetapi Anda "
+"mungkin mendapatkan hasil yang tidak diharapkan.\n"
 "\n"
-"Por favor, avise aos desenvolvedores sobre isso usando o rastreador de erros "
-"caso isso ainda não tenha sido relatado por outra pessoa."
+"Beri tahu pengembang tentang hal ini menggunakan pelacak masalah jika belum "
+"ada yang melaporkannya."
 
 #: keysign/gtkexcepthook.py:187
 msgid "Search Tracker..."
-msgstr "Pesquisar no rastreador…"
+msgstr "Cari Pelacak..."
 
 #: keysign/gtkexcepthook.py:189
 msgid "Report..."
-msgstr "Relatar…"
+msgstr "Laporkan..."
 
 #: keysign/gtkexcepthook.py:191
 msgid "Ignore Error"
-msgstr "Ignorar erro"
+msgstr "Abaikan Kesalahan"
 
 #: keysign/gtkexcepthook.py:192
 msgid "Quit GNOME Keysign"
-msgstr "Sair do GNOME Keysign"
+msgstr "Keluar GNOME Keysign"
 
 #: keysign/gtkexcepthook.py:202
 msgid "Details..."
-msgstr "Detalhes…"
+msgstr "Detail..."
 
 #: keysign/gtkexcepthook.py:229 keysign/gtkexcepthook.py:232
 msgid "Exception while analyzing the exception."
-msgstr "Exceção enquanto analisava a exceção."
+msgstr "Pengecualian saat menganalisis pengecualian."
 
 #. TRANSLATORS: Crash report template for github, preceding a traceback.
 #. TRANSLATORS: Please ask users kindly to supply at least an English
@@ -231,42 +231,36 @@ msgid ""
 "            #### Traceback\n"
 "        "
 msgstr ""
-"            #### Description\n"
+"            #### Deskripsi\n"
 "\n"
-"            Dê a esse relatório um título descritivo curto.\n"
-"            Use algo como\n"
-"            “{recurso-que-falhou}: {o-que-deu-errado}”\n"
-"            como o título, se for possível.\n"
-"            Então, por favor, substitua esse texto\n"
-"            com uma descrição mais longa do erro.\n"
-"            Capturas de telas ou vídeos são bem-vindos também!\n"
+"             Berikan laporan ini judul deskriptif singkat.\n"
+"             Gunakan sesuatu seperti\n"
+"             \"{fitur-yang-rusak}: {apa-yang-salh}\"\n"
+"             untuk judul, jika Anda bisa.\n"
+"             Kemudian mohon ganti teks ini\n"
+"             dengan deskripsi kutu yang lebih panjang.\n"
+"             Tangkapan layar atau video juga bagus!\n"
 "\n"
-"            #### Steps to reproduce\n"
+"             #### Langkah-langkah untuk mereproduksi\n"
 "\n"
-"            Por favor, nos diga o que você estava fazendo\n"
-"            quando a mensagem de erro surgiu.\n"
-"            Se você puder fornecer o passo a passo\n"
-"            sobre como reproduzir este erro,\n"
-"            melhor ainda.\n"
+"             Tolong beri tahu kami apa yang Anda lakukan\n"
+"             ketika pesan kesalahan muncul.\n"
+"             Jika Anda dapat memberikan petunjuk langkah demi langkah\n"
+"             tentang cara mereproduksi kutu,\n"
+"             itu lebih baik.\n"
 "\n"
-"            #### Traceback\n"
+"             #### Melacak kembali\n"
 "        "
 
 #: keysign/keylistwidget.py:83
 msgid "Expires: "
-msgstr "Expira: "
+msgstr "Kedaluwarsa: "
 
 #: keysign/receive.py:158
 msgid "Sign Key"
-msgstr "Assinar chave"
+msgstr "Kunci Tanda Tangan"
 
 #: keysign/receive.ui:53
-#| msgid ""
-#| "No GNOME Keysign servers around :-(\n"
-#| "Find a friend to use GNOME Keysign with.\n"
-#| "You may also suffer from connectivity problems.\n"
-#| "For more information click <a href=\"https://wiki.gnome.org/Apps/Keysign/"
-#| "Doc/NoServers/1\">here</a>."
 msgid ""
 "No GNOME Keysign servers around :-(\n"
 "Find a friend to use GNOME Keysign with.\n"
@@ -274,42 +268,42 @@ msgid ""
 "For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "NoServers/1\">the documentation</a>."
 msgstr ""
-"Nenhum servidor do GNOME Keysign por aí :-(\n"
-"Encontre um amigo para usar GNOME Keysign com.\n"
-"Você também pode sofrer de problemas de conectividade.\n"
-"Para mais informações, visite <a href=\"https://wiki.gnome.org/Apps/Keysign/"
-"Doc/NoServers/1\">a documentação</a>."
+"Tidak ada peladen GNOME Keysign di sekitar Anda :-(\n"
+"Temukan teman untuk menggunakan GNOME Keysign.\n"
+"Anda mungkin juga mengalami masalah konektivitas.\n"
+"Untuk informasi lebih lanjut, kunjungi <a href=\"https://wiki.gnome.org/Apps/"
+"Keysign/Doc/NoServers/1\">di sini</a>."
 
 #: keysign/receive.ui:105
 msgid ""
 "<small>To sign someone's key, scan their QR or enter security code</small>"
 msgstr ""
-"<small>Para assinar a chave de alguém, leia o QR da pessoa ou digite o "
-"código de segurança</small>"
+"<small>Untuk menandatangani kunci seseorang, pindai QR mereka atau masukkan "
+"kode keamanan</small>"
 
 #: keysign/receive.ui:124
 msgid "<b>Camera</b>"
-msgstr "<b>Câmera</b>"
+msgstr "<b>Kamera</b>"
 
 #: keysign/receive.ui:139
 msgid "Integrated Web Cam"
-msgstr "Webcam integrada"
+msgstr "Kamera Web Terpadu"
 
 #: keysign/receive.ui:176 keysign/send.ui:435
 msgid "<b>Security Code</b>"
-msgstr "<b>Código de segurança</b>"
+msgstr "<b>Kode Keamanan</b>"
 
 #: keysign/receive.ui:209
 msgid "Scan Barcode"
-msgstr "Ler código de barra"
+msgstr "Pindai Kode Batang"
 
 #: keysign/receive.ui:226
 msgid "Downloading key-data. Please wait..."
-msgstr "Baixando dados da chave. Por favor, aguarde…"
+msgstr "Mengunduh data-kunci. Mohon tunggu..."
 
 #: keysign/receive.ui:251
 msgid "Key download was interrupted!"
-msgstr "Obtenção da chave foi interrompida!"
+msgstr "Unduhan kunci terputus!"
 
 #: keysign/receive.ui:337
 msgid ""
@@ -317,56 +311,56 @@ msgid ""
 "This will generate an email that must be sent in order to complete the "
 "signing process."
 msgstr ""
-"Para assinar a chave, confirme que você deseja assinar a chave a seguir.\n"
-"Isso vai gerar um e-mail que deve ser enviado para completar o processo de "
-"assinatura."
+"Untuk menandatangani kunci, konfirmasikan bahwa Anda ingin menandatangani "
+"kunci berikut.\n"
+"Ini akan menghasilkan surel yang harus dikirim untuk menyelesaikan proses "
+"penandatanganan."
 
 #: keysign/receive.ui:365
 msgid "Key"
-msgstr "Chave"
+msgstr "Kunci"
 
 #: keysign/receive.ui:398 keysign/send.ui:360
 msgid "UIDs"
-msgstr "UIDs"
+msgstr "UID"
 
 #: keysign/receive.ui:485
 msgid "C_onfirm"
-msgstr "C_onfirmar"
+msgstr "K_onfirmasi"
 
 #: keysign/receive.ui:539
 msgid "Signing the following UIDs:"
-msgstr "Assinando os seguintes UIDs:"
+msgstr "Menandatangani UID berikut:"
 
 #: keysign/send.py:156
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
 msgstr ""
-"Ainda tentando obter uma conexão com a Internet. Parece ser lento ou "
-"indisponível."
+"Masih mencoba mendapatkan koneksi ke Internet. Tampaknya lambat atau tidak "
+"tersedia."
 
 #: keysign/send.py:162
 msgid "There isn't an Internet connection!"
-msgstr "Não há conexão com a Internet!"
+msgstr "Tidak ada koneksi internet!"
 
 #: keysign/send.py:190 keysign/send.ui:545
 msgid ""
 "Key successfully sent.\n"
 "You should receive soon an email with the signature."
 msgstr ""
-"Chave enviada com sucesso.\n"
-"Você deve receber em breve um e-mail com a assinatura."
+"Kunci berhasil dikirim.\n"
+"Anda harus segera menerima surel dengan tanda tangan."
 
-# Traduzi "partner" para "pessoa" para evitar lidar com gênero de "parceiro(a)" -- Rafael Fontenelle
 #: keysign/send.py:195
 msgid ""
 "Could not establish a secure connection.\n"
 "Either your partner has entered a wrong code or someone tried to intercept "
 "your connection"
 msgstr ""
-"Não foi possível estabelecer uma conexão segura.\n"
-"A outra pessoa digitou um código errado ou alguém tentou interceptar sua "
-"conexão"
+"Tidak dapat membuat sambungan aman.\n"
+"Entah pasangan Anda memasukkan kode yang salah atau seseorang mencoba "
+"mencegat koneksi Anda"
 
 #: keysign/send.py:199
 #, python-format
@@ -374,70 +368,70 @@ msgid ""
 "An unexpected error occurred:\n"
 "%s"
 msgstr ""
-"Ocorreu um erro inesperado:\n"
+"Kesalahan tak terduga terjadi:\n"
 "%s"
 
 #: keysign/send.ui:7
 msgid "Select and send key"
-msgstr "Selecionar e enviar a chave"
+msgstr "Pilih dan kirim kunci"
 
 #: keysign/send.ui:58
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
 msgstr ""
-"Você tem nenhuma chave!\n"
-"Por favor use, p.ex., Seahorse para criar uma."
+"Anda tidak memiliki kunci apa pun!\n"
+"Silakan gunakan, mis. Seahorse untuk membuatnya."
 
 #: keysign/send.ui:135
 msgid "Very slow or no Internet connection!"
-msgstr "Conexão muito lenta ou sem conexão com a Internet!"
+msgstr "Koneksi internet sangat lambat atau tidak ada!"
 
 #. This refers to the key being certified by someone rather than the key used for
 #. certifying someone
 #: keysign/send.ui:190
 msgid "<b>Select a key for signing</b>"
-msgstr "<b>Selecione uma chave para assinar</b>"
+msgstr "<b>Pilih kunci untuk menandatangani</b>"
 
 #: keysign/send.ui:206
 msgid "<small>Times signed</small>"
-msgstr "<small>Quantidade de assinaturas</small>"
+msgstr "<small>Jumlah tanda tangan</small>"
 
 #: keysign/send.ui:272
 msgid "Keylist"
-msgstr "Lista de chaves"
+msgstr "Daftar kunci"
 
 #: keysign/send.ui:292
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
 msgstr ""
-"<small>Para ter uma chave assinada, a outra pessoa deve digitar o código de "
-"segurança ou ler o código QR</small>"
+"<small>Untuk memasukkan kunci yang ditandatangani, orang lain harus "
+"memasukkan kode keamanan, atau memindai kode QR</small>"
 
 #: keysign/send.ui:319
 msgid "<b>Key Details</b>"
-msgstr "<b>Detalhes da chave</b>"
+msgstr "<b>Detail Kunci</b>"
 
 #: keysign/send.ui:344
 msgid "Fingerprint"
-msgstr "Impressão digital"
+msgstr "Sidik Jari"
 
 #: keysign/send.ui:498
 msgid "<b>QR Code</b>"
-msgstr "<b>Código QR</b>"
+msgstr "<b>Kode QR</b>"
 
 #: keysign/send.ui:575
 msgid "Select and Send key"
-msgstr "Selecionar e enviar chave"
+msgstr "Pilih dan Kirim kunci"
 
 #: keysign/send.ui:594
 msgid ""
 "Uses the Internet to transport the key rather than the local network and "
 "Bluetooth (if available)"
 msgstr ""
-"Usa a Internet para transportar a chave em vez da rede local e Bluetooth (se "
-"disponível)"
+"Menggunakan Internet untuk memindahkan kunci daripada jaringan lokal dan "
+"Bluetooth (jika tersedia)"
 
 #: keysign/util.py:222
 msgid ""
@@ -454,40 +448,40 @@ msgid ""
 "--\n"
 "GNOME Keysign\n"
 msgstr ""
-"Olá $uid,\n"
+"Hai $uid,\n"
 "\n"
 "\n"
-"Eu acabei de assinar sua chave\n"
+"Saya baru saja menandatangani kunci Anda\n"
 "\n"
-"      $fingerprint\n"
+"       $sidikjari\n"
 "\n"
 "\n"
-"Obrigado por me deixar assiná-la!\n"
+"Terima kasih telah mengizinkan saya menandatangani kunci Anda!\n"
 "\n"
-"--\n"
+"-\n"
 "GNOME Keysign\n"
 
 #: keysign/wormholereceive.py:86
 msgid "Wrong message authentication code"
-msgstr "Código de autenticação de mensagem errado"
+msgstr "Kode autentikasi pesan salah"
 
 #~ msgid "Translated for gettext (C)"
-#~ msgstr "Traduzido para gettext (pt_BR)"
+#~ msgstr "Diterjemahkan untuk gettext (C)"
 
 #~ msgid "Translated for Python (C)"
-#~ msgstr "Traduzido para Python (pt_BR)"
-
-#~ msgid "installing symlinks for sockets from %s to %s"
-#~ msgstr "instalando links simbólicos para soquetes de %s para %s"
+#~ msgstr "Diterjemahkan untuk Python (C)"
 
 #~ msgid "page1"
-#~ msgstr "página1"
+#~ msgstr "halaman1"
 
 #~ msgid "page2"
-#~ msgstr "página2"
+#~ msgstr "halaman2"
 
 #~ msgid "page3"
-#~ msgstr "página3"
+#~ msgstr "halaman3"
 
 #~ msgid "Your signed key $fingerprint"
-#~ msgstr "Sua chave assinada $fingerprint"
+#~ msgstr "Kunci yang Anda tandatangani $sidikjari"
+
+#~ msgid "installing symlinks for sockets from %s to %s"
+#~ msgstr "memasang symlink untuk soket dari %s ke %s"

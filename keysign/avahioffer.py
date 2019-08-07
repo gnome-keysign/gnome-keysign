@@ -53,17 +53,19 @@ class AvahiHTTPOffer:
         self.keyserver = Keyserver.ServeKeyThread(keydata, fingerprint)
         self.mac = mac_generate(fingerprint.encode('ascii'), keydata)
 
-    def start(self):
-        """Starts offering the key"""
+    def allocate_code(self):
+        """Returns the information necessary to discover the key through Avahi"""
         fingerprint = self.fingerprint.upper()
         mac = self.mac.upper()
         discovery_info = 'OPENPGP4FPR:{0}#MAC={1}'.format(
                                 fingerprint, mac)
+        return format_fingerprint(self.key.fingerprint), discovery_info
 
+    def start(self):
+        """Starts offering the key"""
         log.info("Requesting to start")
         self.keyserver.start()
 
-        return format_fingerprint(self.key.fingerprint), discovery_info
 
     def stop(self):
         "Stops offering the key"
@@ -77,9 +79,10 @@ def main(args):
 
     key = get_usable_keys(pattern=args[0])[0]
     offer = AvahiHTTPOffer(key)
-    discovery_info = offer.start()
+    discovery_info = offer.allocate_code()
     print (_("Offering key: {}").format(key))
     print (_("Discovery info: {}").format(discovery_info))
+    offer.start()
     print (_("Press Enter to stop"))
     try: input_ = raw_input
     except NameError: input_ = input
