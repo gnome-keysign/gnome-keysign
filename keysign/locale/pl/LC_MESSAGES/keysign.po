@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2019-04-27 17:03+0000\n"
-"PO-Revision-Date: 2019-04-28 16:25+0200\n"
+"POT-Creation-Date: 2019-07-29 07:11+0000\n"
+"PO-Revision-Date: 2019-08-04 15:38+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -75,11 +75,11 @@ msgstr "gpg;gnupg;klucz;openpgp;podpisz;podpisywanie;"
 msgid "org.gnome.Keysign"
 msgstr "org.gnome.Keysign"
 
-#: keysign/app.py:181
+#: keysign/app.py:187
 msgid "Send"
 msgstr "Wyślij"
 
-#: keysign/app.py:183 keysign/receive.py:238
+#: keysign/app.py:189 keysign/receive.py:272
 msgid "Receive"
 msgstr "Odbierz"
 
@@ -87,15 +87,15 @@ msgstr "Odbierz"
 msgid "Internet"
 msgstr "Internet"
 
-#: keysign/avahioffer.py:81 keysign/bluetoothoffer.py:126
+#: keysign/avahioffer.py:83 keysign/bluetoothoffer.py:126
 msgid "Offering key: {}"
 msgstr "Proponowany klucz: {}"
 
-#: keysign/avahioffer.py:82 keysign/bluetoothoffer.py:127
+#: keysign/avahioffer.py:84 keysign/bluetoothoffer.py:127
 msgid "Discovery info: {}"
 msgstr "Informacje o wykrywaniu: {}"
 
-#: keysign/avahioffer.py:83
+#: keysign/avahioffer.py:86
 msgid "Press Enter to stop"
 msgstr "Naciśnięcie klawisza Enter zatrzyma"
 
@@ -260,6 +260,10 @@ msgstr "Wygasa: "
 msgid "Sign Key"
 msgstr "Podpisz klucz"
 
+#: keysign/receive.py:218
+msgid "Select file for saving"
+msgstr "Wybór pliku do zapisania"
+
 #: keysign/receive.ui:53
 msgid ""
 "No GNOME Keysign servers around :-(\n"
@@ -274,38 +278,66 @@ msgstr ""
 "<a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "NoServers/1\">Dokumentacja</a> zawiera więcej informacji."
 
-#: keysign/receive.ui:105
+#: keysign/receive.ui:108
 msgid ""
 "<small>To sign someone's key, scan their QR or enter security code</small>"
 msgstr ""
 "<small>Aby podpisać czyjś klucz, należy zeskanować jego kod QR lub wpisać "
 "kod zabezpieczeń</small>"
 
-#: keysign/receive.ui:124
+#: keysign/receive.ui:127
 msgid "<b>Camera</b>"
 msgstr "<b>Aparat</b>"
 
-#: keysign/receive.ui:139
+#: keysign/receive.ui:142
 msgid "Integrated Web Cam"
 msgstr "Zintegrowana kamerka internetowa"
 
-#: keysign/receive.ui:176 keysign/send.ui:435
+#: keysign/receive.ui:179 keysign/send.ui:435
 msgid "<b>Security Code</b>"
 msgstr "<b>Kod zabezpieczeń</b>"
 
-#: keysign/receive.ui:209
+#: keysign/receive.ui:212
 msgid "Scan Barcode"
 msgstr "Zeskanuj kod kreskowy"
 
-#: keysign/receive.ui:226
+#: keysign/receive.ui:229
 msgid "Downloading key-data. Please wait..."
 msgstr "Pobieranie danych klucza. Proszę czekać…"
 
-#: keysign/receive.ui:251
+#: keysign/receive.ui:254
 msgid "Key download was interrupted!"
 msgstr "Pobieranie klucza zostało przerwane."
 
-#: keysign/receive.ui:337
+#: keysign/receive.ui:345
+msgid ""
+"Saves the produced certifications as separate files in a custom directory"
+msgstr ""
+"Zapisuje utworzone certyfikaty jako oddzielne pliki w niestandardowym "
+"katalogu"
+
+#: keysign/receive.ui:360
+msgid ""
+"Imports a temporary version of the produced certifications into the local "
+"keyring"
+msgstr ""
+"Importuje tymczasową wersję utworzonych certyfikatów do lokalnej bazy kluczy"
+
+#: keysign/receive.ui:403
+msgid ""
+"Successfully produced certifications.\n"
+"You can import a temporary signature to start using the key as if it had "
+"already been properly verified.\n"
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"ProducedSignatures/1\">the documentation</a>."
+msgstr ""
+"Pomyślnie utworzono certyfikaty.\n"
+"Można zaimportować tymczasowy podpis, aby zacząć używać klucza, tak jakby "
+"już został poprawnie sprawdzony.\n"
+"<a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"ProducedSignatures/1\">Dokumentacja</a> zawiera więcej informacji."
+
+#: keysign/receive.ui:446
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
@@ -316,19 +348,19 @@ msgstr ""
 "Utworzy to wiadomość e-mail, którą należy wysłać, aby ukończyć proces "
 "podpisywania."
 
-#: keysign/receive.ui:365
+#: keysign/receive.ui:474
 msgid "Key"
 msgstr "Klucz"
 
-#: keysign/receive.ui:398 keysign/send.ui:360
+#: keysign/receive.ui:507 keysign/send.ui:360
 msgid "UIDs"
 msgstr "UID"
 
-#: keysign/receive.ui:485
+#: keysign/receive.ui:594
 msgid "C_onfirm"
 msgstr "P_otwierdź"
 
-#: keysign/receive.ui:539
+#: keysign/receive.ui:716
 msgid "Signing the following UIDs:"
 msgstr "Podpisywanie tych UID:"
 
