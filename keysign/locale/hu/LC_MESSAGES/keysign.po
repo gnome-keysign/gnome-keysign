@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2019-04-27 17:03+0000\n"
-"PO-Revision-Date: 2019-06-03 21:09+0200\n"
+"POT-Creation-Date: 2019-08-07 09:49+0000\n"
+"PO-Revision-Date: 2019-08-24 21:05+0200\n"
 "Last-Translator: Balázs Úr <ur.balazs at fsf dot hu>\n"
 "Language-Team: Hungarian <gnome-hu-list at gnome dot org>\n"
 "Language: hu\n"
@@ -76,27 +76,27 @@ msgstr "python;gpg;gnupg;kulcs;openpgp;"
 msgid "org.gnome.Keysign"
 msgstr "org.gnome.Keysign"
 
-#: keysign/app.py:181
+#: keysign/app.py:187
 msgid "Send"
 msgstr "Küldés"
 
-#: keysign/app.py:183 keysign/receive.py:238
+#: keysign/app.py:189 keysign/receive.py:272
 msgid "Receive"
 msgstr "Fogadás"
 
-#: keysign/app.ui:62 keysign/send.ui:617
+#: keysign/app.ui:62 keysign/send.ui:54
 msgid "Internet"
 msgstr "Internet"
 
-#: keysign/avahioffer.py:81 keysign/bluetoothoffer.py:126
+#: keysign/avahioffer.py:83 keysign/bluetoothoffer.py:126
 msgid "Offering key: {}"
 msgstr "Ajánló kulcs: {}"
 
-#: keysign/avahioffer.py:82 keysign/bluetoothoffer.py:127
+#: keysign/avahioffer.py:84 keysign/bluetoothoffer.py:127
 msgid "Discovery info: {}"
 msgstr "Felfedezési információ: {}"
 
-#: keysign/avahioffer.py:83
+#: keysign/avahioffer.py:86
 msgid "Press Enter to stop"
 msgstr "Nyomja meg az Entert a leállításhoz"
 
@@ -261,13 +261,12 @@ msgstr "Lejárat: "
 msgid "Sign Key"
 msgstr "Kulcs aláírása"
 
+#: keysign/receive.py:218
+#| msgid "<b>Select a key for signing</b>"
+msgid "Select file for saving"
+msgstr "Válasszon fájlt a mentéshez"
+
 #: keysign/receive.ui:53
-#| msgid ""
-#| "No GNOME Keysign servers around :-(\n"
-#| "Find a friend to use GNOME Keysign with.\n"
-#| "You may also suffer from connectivity problems.\n"
-#| "For more information click <a href=\"https://wiki.gnome.org/Apps/Keysign/"
-#| "Doc/NoServers/1\">here</a>."
 msgid ""
 "No GNOME Keysign servers around :-(\n"
 "Find a friend to use GNOME Keysign with.\n"
@@ -278,41 +277,76 @@ msgstr ""
 "A GNOME Kulcsaláíró kiszolgálók nem érhetőek el :-(\n"
 "Keressen egy barátot, akivel a GNOME Kulcsaláírót fogja használni.\n"
 "Kapcsolódási problémái is lehetnek.\n"
-"További információkért nézze meg a <a href=\"https://wiki.gnome.org/Apps/Keysi"
-"gn/Doc/NoServers/1\">dokumentációt</a>."
+"További információkért nézze meg a <a href=\"https://wiki.gnome.org/Apps/"
+"Keysign/Doc/NoServers/1\">dokumentációt</a>."
 
-#: keysign/receive.ui:105
+#: keysign/receive.ui:108
 msgid ""
 "<small>To sign someone's key, scan their QR or enter security code</small>"
 msgstr ""
 "<small>Más kulcsának aláírásához olvassa le a QR-kódját vagy adja meg a "
 "biztonsági kódot</small>"
 
-#: keysign/receive.ui:124
+#: keysign/receive.ui:127
 msgid "<b>Camera</b>"
 msgstr "<b>Kamera</b>"
 
-#: keysign/receive.ui:139
+#: keysign/receive.ui:142
 msgid "Integrated Web Cam"
 msgstr "Integrált webkamera"
 
-#: keysign/receive.ui:176 keysign/send.ui:435
+#: keysign/receive.ui:179 keysign/send.ui:568
 msgid "<b>Security Code</b>"
 msgstr "<b>Biztonsági kód</b>"
 
-#: keysign/receive.ui:209
+#: keysign/receive.ui:212
 msgid "Scan Barcode"
 msgstr "Vonalkód leolvasása"
 
-#: keysign/receive.ui:226
+#: keysign/receive.ui:229
 msgid "Downloading key-data. Please wait..."
 msgstr "Kulcsadatok letöltése. Kérem várjon…"
 
-#: keysign/receive.ui:251
+#: keysign/receive.ui:254
 msgid "Key download was interrupted!"
 msgstr "A kulcs letöltése megszakadt!"
 
-#: keysign/receive.ui:337
+#: keysign/receive.ui:345
+msgid ""
+"Saves the produced certifications as separate files in a custom directory"
+msgstr ""
+"Különálló fájlokként menti az előállított tanúsítványokat egy egyéni "
+"könyvtárba"
+
+#: keysign/receive.ui:360
+msgid ""
+"Imports a temporary version of the produced certifications into the local "
+"keyring"
+msgstr ""
+"Importálja az előállított tanúsítványok átmeneti verzióját a helyi "
+"kulcstartóba"
+
+#: keysign/receive.ui:403
+#| msgid ""
+#| "No GNOME Keysign servers around :-(\n"
+#| "Find a friend to use GNOME Keysign with.\n"
+#| "You may also suffer from connectivity problems.\n"
+#| "For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/"
+#| "Doc/NoServers/1\">the documentation</a>."
+msgid ""
+"Successfully produced certifications.\n"
+"You can import a temporary signature to start using the key as if it had "
+"already been properly verified.\n"
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"ProducedSignatures/1\">the documentation</a>."
+msgstr ""
+"A tanúsítványok sikeresen elő lettek állítva.\n"
+"Importálhat egy átmeneti aláírást a kulcs használatának megkezdéséhez, mintha "
+"az már megfelelően ellenőrizve lett volna.\n"
+"További információkért nézze meg a <a href=\"https://wiki.gnome.org/Apps/Keysi"
+"gn/Doc/ProducedSignatures/1\">dokumentációt</a>."
+
+#: keysign/receive.ui:446
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
@@ -322,23 +356,23 @@ msgstr ""
 "Ez egy e-mailt fog előállítani, amelyet el kell küldeni az aláírási folyamat "
 "befejezéséhez."
 
-#: keysign/receive.ui:365
+#: keysign/receive.ui:474
 msgid "Key"
 msgstr "Kulcs"
 
-#: keysign/receive.ui:398 keysign/send.ui:360
+#: keysign/receive.ui:507 keysign/send.ui:493
 msgid "UIDs"
 msgstr "UID-k"
 
-#: keysign/receive.ui:485
+#: keysign/receive.ui:594
 msgid "C_onfirm"
 msgstr "_Megerősítés"
 
-#: keysign/receive.ui:539
+#: keysign/receive.ui:716
 msgid "Signing the following UIDs:"
 msgstr "A következő UID-k aláírása:"
 
-#: keysign/send.py:156
+#: keysign/send.py:207
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
@@ -346,11 +380,23 @@ msgstr ""
 "Még mindig nem sikerült internetkapcsolatot szerezni. Lassúnak tűnik vagy "
 "nem érhető el."
 
-#: keysign/send.py:162
+#: keysign/send.py:213
 msgid "There isn't an Internet connection!"
 msgstr "Nincs internetkapcsolat!"
 
-#: keysign/send.py:190 keysign/send.ui:545
+#: keysign/send.py:219 keysign/send.ui:267
+msgid "The signature has been successfully imported!"
+msgstr "Az aláírás sikeresen importálva lett!"
+
+#: keysign/send.py:225
+msgid ""
+"An error occurred while trying to import the signature.\n"
+"Please double check the correctness of the chosen signature."
+msgstr ""
+"Hiba történt az aláírás importálásának kísérlete közben.\n"
+"Ellenőrizze még egyszer a választott aláírás helyességét."
+
+#: keysign/send.py:254 keysign/send.ui:678
 msgid ""
 "Key successfully sent.\n"
 "You should receive soon an email with the signature."
@@ -358,7 +404,7 @@ msgstr ""
 "Kulcs sikeresen elküldve.\n"
 "Hamarosan meg kell kapnia az e-mailt az aláírással."
 
-#: keysign/send.py:195
+#: keysign/send.py:259
 msgid ""
 "Could not establish a secure connection.\n"
 "Either your partner has entered a wrong code or someone tried to intercept "
@@ -368,7 +414,7 @@ msgstr ""
 "Vagy hibás kódot adott meg a partnere, vagy valaki megpróbálta elfogni a "
 "kapcsolatát"
 
-#: keysign/send.py:199
+#: keysign/send.py:263
 #, python-format
 msgid ""
 "An unexpected error occurred:\n"
@@ -381,7 +427,11 @@ msgstr ""
 msgid "Select and send key"
 msgstr "Kulcs kiválasztása és küldése"
 
-#: keysign/send.ui:58
+#: keysign/send.ui:13
+msgid "Select and Send key"
+msgstr "Kulcs kiválasztása és küldése"
+
+#: keysign/send.ui:121
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
@@ -389,25 +439,25 @@ msgstr ""
 "Nincs egyetlen kulcsa sem.\n"
 "Használja például a Seahorse programot a létrehozáshoz."
 
-#: keysign/send.ui:135
+#: keysign/send.ui:198
 msgid "Very slow or no Internet connection!"
 msgstr "Nagyon lassú vagy nincs internetkapcsolat."
 
 #. This refers to the key being certified by someone rather than the key used for
 #. certifying someone
-#: keysign/send.ui:190
+#: keysign/send.ui:322
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>Válassza ki az aláírandó kulcsot</b>"
 
-#: keysign/send.ui:206
+#: keysign/send.ui:338
 msgid "<small>Times signed</small>"
 msgstr "<small>Aláírások száma</small>"
 
-#: keysign/send.ui:272
+#: keysign/send.ui:405
 msgid "Keylist"
 msgstr "Kulcslista"
 
-#: keysign/send.ui:292
+#: keysign/send.ui:425
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
@@ -415,31 +465,19 @@ msgstr ""
 "<small>A kulcs aláírásához a másik személynek meg kell adnia a biztonsági "
 "kódját, vagy le kell olvasnia a QR-kódját</small>"
 
-#: keysign/send.ui:319
+#: keysign/send.ui:452
 msgid "<b>Key Details</b>"
 msgstr "<b>Kulcs részletei</b>"
 
-#: keysign/send.ui:344
+#: keysign/send.ui:477
 msgid "Fingerprint"
 msgstr "Ujjlenyomat"
 
-#: keysign/send.ui:498
+#: keysign/send.ui:631
 msgid "<b>QR Code</b>"
 msgstr "<b>QR-kód</b>"
 
-#: keysign/send.ui:575
-msgid "Select and Send key"
-msgstr "Kulcs kiválasztása és küldése"
-
-#: keysign/send.ui:594
-msgid ""
-"Uses the Internet to transport the key rather than the local network and "
-"Bluetooth (if available)"
-msgstr ""
-"Az internetet használja a kulcs elküldésére a helyi hálózat vagy a Bluetooth "
-"helyett (ha elérhető)"
-
-#: keysign/util.py:222
+#: keysign/util.py:223
 msgid ""
 "Hi $uid,\n"
 "\n"
