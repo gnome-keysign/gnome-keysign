@@ -469,8 +469,9 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
     ctx = TempContextWithAgent(oldctx)
     # We're trying to sign with all available secret keys
     available_secret_keys = [key for key in ctx.keylist(secret=True)
-        if not key.disabled or key.revoked or key.invalid or key.expired]
-    log.debug('Setting available sec keys to: %r', available_secret_keys)
+        if not (key.disabled or key.revoked or key.invalid or key.expired)]
+    log.debug('Setting available sec keys to (%d): %r',
+        len(available_secret_keys), available_secret_keys)
     ctx.signers = available_secret_keys
 
     ctx.op_import(minimise_key(keydata))
