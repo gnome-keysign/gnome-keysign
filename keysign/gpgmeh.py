@@ -503,6 +503,14 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
             if uid.revoked or uid.invalid:
                 continue
             else:
+                log.debug("The UID %s has %d signatures",
+                    uid, len(uid.signatures))
+                if len(uid.signatures) < 2:
+                    log.error("We seem to not have produced signatures correctly. "
+                        "%s has less than 2 signatures: %s",
+                        uid, uid.signatures,
+                    )
+
                 uid_data = UIDExport(signed_keydata, i)
                 # FIXME: Check whether this bug is resolved and the remove this conditional
                 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=884900
