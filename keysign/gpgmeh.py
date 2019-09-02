@@ -259,7 +259,7 @@ class DirectoryContext(gpg.Context):
 
 class TempContext(DirectoryContext):
     def __init__(self):
-        self.homedir = mkdtemp()
+        self.homedir = mkdtemp(suffix="-gnome-keysign")
         super(TempContext, self).__init__(homedir=self.homedir)
 
     def __del__(self):
