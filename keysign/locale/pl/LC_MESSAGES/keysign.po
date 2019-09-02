@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2019-07-29 07:11+0000\n"
-"PO-Revision-Date: 2019-08-04 15:38+0200\n"
+"POT-Creation-Date: 2019-08-07 09:49+0000\n"
+"PO-Revision-Date: 2019-08-11 14:49+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -83,7 +83,7 @@ msgstr "Wyślij"
 msgid "Receive"
 msgstr "Odbierz"
 
-#: keysign/app.ui:62 keysign/send.ui:617
+#: keysign/app.ui:62 keysign/send.ui:54
 msgid "Internet"
 msgstr "Internet"
 
@@ -293,7 +293,7 @@ msgstr "<b>Aparat</b>"
 msgid "Integrated Web Cam"
 msgstr "Zintegrowana kamerka internetowa"
 
-#: keysign/receive.ui:179 keysign/send.ui:435
+#: keysign/receive.ui:179 keysign/send.ui:568
 msgid "<b>Security Code</b>"
 msgstr "<b>Kod zabezpieczeń</b>"
 
@@ -352,7 +352,7 @@ msgstr ""
 msgid "Key"
 msgstr "Klucz"
 
-#: keysign/receive.ui:507 keysign/send.ui:360
+#: keysign/receive.ui:507 keysign/send.ui:493
 msgid "UIDs"
 msgstr "UID"
 
@@ -364,7 +364,7 @@ msgstr "P_otwierdź"
 msgid "Signing the following UIDs:"
 msgstr "Podpisywanie tych UID:"
 
-#: keysign/send.py:156
+#: keysign/send.py:207
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
@@ -372,11 +372,23 @@ msgstr ""
 "Nadal trwa próba uzyskania połączenia z Internetem. Jest ono wolne lub "
 "niedostępne."
 
-#: keysign/send.py:162
+#: keysign/send.py:213
 msgid "There isn't an Internet connection!"
 msgstr "Nie ma połączenia z Internetem."
 
-#: keysign/send.py:190 keysign/send.ui:545
+#: keysign/send.py:219 keysign/send.ui:267
+msgid "The signature has been successfully imported!"
+msgstr "Pomyślnie zaimportowano podpis."
+
+#: keysign/send.py:225
+msgid ""
+"An error occurred while trying to import the signature.\n"
+"Please double check the correctness of the chosen signature."
+msgstr ""
+"Wystąpił błąd podczas importowania podpisu.\n"
+"Proszę się upewnić, że wybrany podpis jest prawidłowy."
+
+#: keysign/send.py:254 keysign/send.ui:678
 msgid ""
 "Key successfully sent.\n"
 "You should receive soon an email with the signature."
@@ -384,7 +396,7 @@ msgstr ""
 "Pomyślnie wysłano klucz.\n"
 "Wkrótce powinna przyjść wiadomość e-mail z podpisem."
 
-#: keysign/send.py:195
+#: keysign/send.py:259
 msgid ""
 "Could not establish a secure connection.\n"
 "Either your partner has entered a wrong code or someone tried to intercept "
@@ -393,7 +405,7 @@ msgstr ""
 "Nie można nawiązać bezpiecznego połączenia.\n"
 "Partner wpisał błędny kod lub ktoś próbuje przechwycić połączenie"
 
-#: keysign/send.py:199
+#: keysign/send.py:263
 #, python-format
 msgid ""
 "An unexpected error occurred:\n"
@@ -406,7 +418,11 @@ msgstr ""
 msgid "Select and send key"
 msgstr "Wybierz i wyślij klucz"
 
-#: keysign/send.ui:58
+#: keysign/send.ui:13
+msgid "Select and Send key"
+msgstr "Wybierz i wyślij klucz"
+
+#: keysign/send.ui:121
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
@@ -414,25 +430,25 @@ msgstr ""
 "Nie ma żadnych kluczy.\n"
 "Proszę użyć np. programu Seahorse i utworzyć jakiś."
 
-#: keysign/send.ui:135
+#: keysign/send.ui:198
 msgid "Very slow or no Internet connection!"
 msgstr "Bardzo wolne lub niedziałające połączenie z Internetem."
 
 #. This refers to the key being certified by someone rather than the key used for
 #. certifying someone
-#: keysign/send.ui:190
+#: keysign/send.ui:322
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>Wybór klucza do podpisania</b>"
 
-#: keysign/send.ui:206
+#: keysign/send.ui:338
 msgid "<small>Times signed</small>"
 msgstr "<small>Ile razy podpisano</small>"
 
-#: keysign/send.ui:272
+#: keysign/send.ui:405
 msgid "Keylist"
 msgstr "Lista kluczy"
 
-#: keysign/send.ui:292
+#: keysign/send.ui:425
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
@@ -440,31 +456,19 @@ msgstr ""
 "<small>Aby klucz został podpisany, druga osoba musi wpisać kod zabezpieczeń "
 "lub zeskanować kod QR</small>"
 
-#: keysign/send.ui:319
+#: keysign/send.ui:452
 msgid "<b>Key Details</b>"
 msgstr "<b>Informacje o kluczu</b>"
 
-#: keysign/send.ui:344
+#: keysign/send.ui:477
 msgid "Fingerprint"
 msgstr "Odcisk"
 
-#: keysign/send.ui:498
+#: keysign/send.ui:631
 msgid "<b>QR Code</b>"
 msgstr "<b>Kod QR</b>"
 
-#: keysign/send.ui:575
-msgid "Select and Send key"
-msgstr "Wybierz i wyślij klucz"
-
-#: keysign/send.ui:594
-msgid ""
-"Uses the Internet to transport the key rather than the local network and "
-"Bluetooth (if available)"
-msgstr ""
-"Używa Internetu do przesłania klucza zamiast lokalnej sieci i Bluetooth "
-"(jeśli jest dostępny)"
-
-#: keysign/util.py:222
+#: keysign/util.py:223
 msgid ""
 "Hi $uid,\n"
 "\n"
