@@ -38,16 +38,6 @@ texttype = unicode if sys.version_info.major < 3 else str
 log = logging.getLogger(__name__)
 
 
-major, minor, patch = map(int, gpg.version.versionlist)
-# Due to https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=884900
-# we'd crash if we're accessing signatures on a key.
-# With this test we can try to avoid that as much as possible.
-on32bit = platform.architecture()[0] == "32bit"
-crashing_gpgme = on32bit  and  major <= 1  and  minor <= 10  and  patch <= 0
-log.info("Detected gpgme (%d.%d.%d). %s", major, minor, patch, "And it might crash" if crashing_gpgme else "")
-
-
-
 #####
 ## INTERNAL API
 ##
@@ -505,6 +495,7 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
             else:
                 log.debug("The UID %s has %d signatures",
                     uid, len(uid.signatures))
+                log.debug("Data for uid %d: %r, sigs: %r %r", i, uid, uid.signatures, uid_data)
                 if len(uid.signatures) < 2:
                     log.error("We seem to not have produced signatures correctly. "
                         "%s has less than 2 signatures: %s",
@@ -512,10 +503,6 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
                     )
 
                 uid_data = UIDExport(signed_keydata, i)
-                # FIXME: Check whether this bug is resolved and the remove this conditional
-                # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=884900
-                if not crashing_gpgme:
-                    log.debug("Data for uid %d: %r, sigs: %r %r", i, uid, uid.signatures, uid_data)
 
                 ciphertext, _, _ = ctx.encrypt(plaintext=uid_data,
                                                recipients=[key],
