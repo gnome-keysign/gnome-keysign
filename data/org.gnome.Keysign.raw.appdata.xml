@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2019 Tobias Mueller <tobiasmue@gnome.org> -->
 <component type="desktop">
-  <id>org.gnome.Keysign.desktop</id>
+  <id>org.gnome.Keysign</id>
   <metadata_license>CC0</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <name>Keysign</name>
