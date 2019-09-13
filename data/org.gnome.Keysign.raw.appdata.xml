@@ -21,7 +21,7 @@
     </p>
   </description>
   
-​  <launchable type="desktop-id">org.gnome.Keysign.desktop</launchable>
+  <launchable type="desktop-id">org.gnome.Keysign.desktop</launchable>
 
   <screenshots>
     <screenshot type="default">
@@ -39,22 +39,33 @@
 
  <url type="homepage">https://wiki.gnome.org/Apps/Keysign</url>
  <url type="bugtracker">https://github.com/gnome-keysign/gnome-keysign/issues</url>
-​ <!-- "Metainfo files may only contain 'stock' icons, icons of kind 'remote' are not allowed"...
+ <!-- "Metainfo files may only contain 'stock' icons, icons of kind 'remote' are not allowed"...
   icon type="remote">https://gitlab.gnome.org/GNOME/gnome-keysign/raw/master/data/gnome-keysign.svg</icon -->
  <project_group>GNOME</project_group>
 
   <releases>
-​​    <release version="1.0.1" date="2019-01-21">
-​      <description>
-​        <p>
+    <release version="1.1" date="2019-09-13">
+      <description>
+        <p>
+         * Allow to drag and drop an email or its attachment into the app
+         * show options to save produced certification as a file
+         * Added a tooltip to the Internet button
+         * Change logo to a wax seal
+         * select usable private keys for signing, only
+        </p>
+      </description>
+​    </release>
+    <release version="1.0.1" date="2019-01-21">
+      <description>
+        <p>
          * fixed up appdata
          * Cater for newer wormhole close() semantics
         </p>
-​      </description>
+      </description>
 ​    </release>
-​​    <release version="1.0.0" date="2019-01-08">
-​      <description>
-​        <p>
+    <release version="1.0.0" date="2019-01-08">
+      <description>
+        <p>
          * Run with python3 from the desktop file
          * Removed monkeysign support
          * Stop installing gks-qrcode
@@ -63,30 +74,30 @@
          * Ship a new icon for the app
          * Removed gpgmh wrapper module
         </p>
-​      </description>
+      </description>
 ​    </release>
-​​    <release version="0.9.9" date="2018-08-30">
-​      <description>
-​        <p>Transfer keys via the Internet through Magic Wormhole</p>
-​      </description>
+    <release version="0.9.9" date="2018-08-30">
+      <description>
+        <p>Transfer keys via the Internet through Magic Wormhole</p>
+      </description>
 ​    </release>
-​​    <release version="0.9.8" date="2018-07-04">
-​      <description>
-​        <p>Check for Bluetooth in a separate thread, detect powered off Bluetooth device, do not show offline keys</p>
-​      </description>
+    <release version="0.9.8" date="2018-07-04">
+      <description>
+        <p>Check for Bluetooth in a separate thread, detect powered off Bluetooth device, do not show offline keys</p>
+      </description>
 ​    </release>
     <release version="0.9.7.2" date="2018-05-17">
-​      <description>
-​        <p>Made Appdata go into right places</p>
-​      </description>
+      <description>
+        <p>Made Appdata go into right places</p>
+      </description>
 ​    </release>
 ​    <release version="0.9.5" date="2017-10-03">
-​      <description>
-​        <p>Add Bluetooth support</p>
-​        <p>Default to gpgme</p>
-​      </description>
+      <description>
+        <p>Add Bluetooth support</p>
+        <p>Default to gpgme</p>
+      </description>
 ​    </release>
-​  </releases>
+  </releases>
    
  <update_contact>tobiasmue@gnome.org</update_contact>
  <translation type="gettext">gnome-keysign</translation>
