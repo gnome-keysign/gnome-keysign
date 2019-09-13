@@ -44,7 +44,7 @@
  <project_group>GNOME</project_group>
 
   <releases>
-    <release version="1.1" date="2019-09-13">
+    <release version="1.1.1" date="2019-09-13">
       <description>
         <p>
          * Allow to drag and drop an email or its attachment into the app
@@ -52,6 +52,7 @@
          * Added a tooltip to the Internet button
          * Change logo to a wax seal
          * select usable private keys for signing, only
+         * made appdata file validate under stricter requirements
         </p>
       </description>
 ​    </release>
