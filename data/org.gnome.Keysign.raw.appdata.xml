@@ -25,10 +25,10 @@
 
   <screenshots>
     <screenshot type="default">
-      <image width="529" height="646">https://wiki.gnome.org/Apps/Keysign?action=AttachFile&amp;do=get&amp;target=send.png</image>
+      <image width="646" height="529">https://wiki.gnome.org/Apps/Keysign?action=AttachFile&amp;do=get&amp;target=send.png</image>
     </screenshot>
     <screenshot>
-      <image width="529" height="646">https://wiki.gnome.org/Apps/Keysign?action=AttachFile&amp;do=get&amp;target=receive.png</image>
+      <image width="646" height="529">https://wiki.gnome.org/Apps/Keysign?action=AttachFile&amp;do=get&amp;target=receive.png</image>
     </screenshot>
   </screenshots>
 
