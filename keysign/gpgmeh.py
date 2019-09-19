@@ -495,7 +495,6 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
             else:
                 log.debug("The UID %s has %d signatures",
                     uid, len(uid.signatures))
-                log.debug("Data for uid %d: %r, sigs: %r %r", i, uid, uid.signatures, uid_data)
                 if len(uid.signatures) < 2:
                     log.error("We seem to not have produced signatures correctly. "
                         "%s has less than 2 signatures: %s",
@@ -503,6 +502,7 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
                     )
 
                 uid_data = UIDExport(signed_keydata, i)
+                log.debug("Data for uid %d: %r, sigs: %r %r", i, uid, uid.signatures, uid_data)
 
                 ciphertext, _, _ = ctx.encrypt(plaintext=uid_data,
                                                recipients=[key],
