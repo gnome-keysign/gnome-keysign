@@ -213,7 +213,15 @@ I have just signed your key
       $fingerprint
 
 
+The certification is in an attachment encrypted to your key.
+You can either drag the attachment into GNOME Keysign or
+decrypt and import the attachment manually, e.g.
+
+    gpg --decrypt  |  gpg --import
+
+
 Thanks for letting me sign your key!
+And, if you can, send me copy of your key with the new certifications.
 
 --
 GNOME Keysign
