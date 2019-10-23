@@ -359,16 +359,18 @@ def strip_fingerprint(input_string):
 
 
 def download_key_http(address, port):
+    netloc = "[%s]:%d" if ':' in address else "%s:%d"
     url = ParseResult(
         scheme='http',
         # This seems to work well enough with both IPv6 and IPv4
-        netloc="[[%s]]:%d" % (address, port),
+        netloc=netloc % (address, port),
         path='/',
         params='',
         query='',
         fragment='')
-    log.debug("Starting HTTP request")
-    data = requests.get(url.geturl(), timeout=5).content
+    u = url.geturl()
+    log.debug("Starting HTTP request for %s", u)
+    data = requests.get(u, timeout=5).content
     log.debug("finished downloading %d bytes", len(data))
     return data
 
