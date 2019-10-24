@@ -34,7 +34,7 @@ class BuildWithCompile(build):
     sub_commands = [('compile_catalog', None)] + build.sub_commands
 
     def run(self):
-        # from babelglade import translate_desktop_file
+        from babelglade.translate import translate_desktop_file, translate_appdata_file
         translate_desktop_file('data/org.gnome.Keysign.raw.desktop', 'data/org.gnome.Keysign.desktop', 'keysign/locale')
         translate_appdata_file('data/org.gnome.Keysign.raw.appdata.xml', 'data/org.gnome.Keysign.appdata.xml', 'keysign/locale')
         build.run(self)
