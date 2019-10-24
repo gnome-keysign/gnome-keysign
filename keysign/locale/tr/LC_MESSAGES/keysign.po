@@ -1,24 +1,26 @@
-# Czech translation for gnome-keysign.
-# Copyright (C) 2018 gnome-keysign's COPYRIGHT HOLDER
+# Turkish translation for gnome-keysign.
+# Copyright (C) 2019 gnome-keysign's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-keysign package.
-# Marek Černocký <marek@manet.cz>, 2018.
+#
+# Sabri Ünal <libreajans@gmail.com>, 2019.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2019-08-07 09:49+0000\n"
-"PO-Revision-Date: 2018-10-05 10:37+0200\n"
-"Last-Translator: Marek Černocký <marek@manet.cz>\n"
-"Language-Team: čeština <gnome-cs-list@gnome.org>\n"
-"Language: cs\n"
+"POT-Creation-Date: 2019-08-21 08:35+0000\n"
+"PO-Revision-Date: 2019-08-23 23:44+0300\n"
+"Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
+"Language-Team: Turkish <tr@li.org>\n"
+"Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Gtranslator 2.91.7\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 2.0.6\n"
 
+# Boşlukların burada bir anlamı yok, o sebeple yok sayıldı.
 #: data/org.gnome.Keysign.raw.appdata.xml:10
 msgid ""
 "\n"
@@ -27,9 +29,10 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"Podepisování klíčů GNOME umožňuje pohodlné a bezpečné podepisování klíčů "
-"OpenPGP přes místní síť nebo Bluetooth. "
+"GNOME Keysign, OpenPGP anahtarlarını yerel ağ veya Bluetooth üzerinden kolay "
+"ve güvenli bir şekilde imzalamanızı sağlar."
 
+# Boşlukların burada bir anlamı yok, o sebeple yok sayıldı.
 #: data/org.gnome.Keysign.raw.appdata.xml:14
 msgid ""
 "\n"
@@ -41,15 +44,15 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"Umí číst čárový kód jiného klíče a klíče bezpečně přenášet, což se hodí pro "
-"dvoustranné podepisování klíčů. Drží se osvědčené praxe posílání šifrovaných "
-"podpisů do UID klíče pomocí e-mailového klienta, kterého pro daný účel "
-"uživatel nastavil."
+"Başka bir anahtarın barkodunu tarayabilir ve anahtarı güvenli bir şekilde "
+"aktarabilir, böylece yaygın çift taraflı anahtar imzalama oturumları "
+"yapılabilir. Şifrelenmiş imzaları, bir anahtarın UID'lerini kullanarak, "
+"kullanıcı tarafından belirlenmiş E-posta istemcisine gönderir."
 
 #. Name
 #: data/org.gnome.Keysign.raw.desktop:2
 msgid "Keysign"
-msgstr "Podepisování klíčů"
+msgstr "Keysign"
 
 #. Comment
 #: data/org.gnome.Keysign.raw.desktop:3
@@ -57,13 +60,13 @@ msgid ""
 "A keysigning helper to enable you to comfortably exchange OpenPGP keys with "
 "a friend"
 msgstr ""
-"Pomocník s podepisováním klíčů, abyste si mohli s přáteli pohodlně vyměňovat "
-"klíče OpenPGP"
+"OpenPGP anahtarlarını karşılıklı alıp vermenizi sağlayan bir anahtar "
+"imzalama yardımcısı"
 
 #. Keywords
 #: data/org.gnome.Keysign.raw.desktop:4
 msgid "python;gpg;gnupg;key;openpgp;"
-msgstr "python;gpg;gnupg;key;openpgp;"
+msgstr "python;gpg;gnupg;anahtar;openpgp;key;"
 
 #. Icon
 #: data/org.gnome.Keysign.raw.desktop:7
@@ -72,31 +75,31 @@ msgstr "org.gnome.Keysign"
 
 #: keysign/app.py:187
 msgid "Send"
-msgstr "Odeslání"
+msgstr "Gönder"
 
 #: keysign/app.py:189 keysign/receive.py:272
 msgid "Receive"
-msgstr "Příjem"
+msgstr "Al"
 
 #: keysign/app.ui:62 keysign/send.ui:54
 msgid "Internet"
-msgstr "Internet"
+msgstr "İnternet"
 
 #: keysign/avahioffer.py:83 keysign/bluetoothoffer.py:126
 msgid "Offering key: {}"
-msgstr "Nabízený klíč: {}"
+msgstr "Anahtar teklifleri: {}"
 
 #: keysign/avahioffer.py:84 keysign/bluetoothoffer.py:127
 msgid "Discovery info: {}"
-msgstr "Informace o vyhledávání: {}"
+msgstr "Keşif bilgisi: {}"
 
 #: keysign/avahioffer.py:86
 msgid "Press Enter to stop"
-msgstr "Zastavíte zmáčknutím Enter"
+msgstr "Durdurmak için Enter’a basın"
 
 #: keysign/bluetoothoffer.py:117
 msgid "You must provide an argument to identify the key"
-msgstr "Musíte zadat argument pro identifikaci klíče"
+msgstr "Anahtarı tanımlamak için bir açıklama giriniz"
 
 #: keysign/bluetoothoffer.py:128
 msgid "HMAC: {}"
@@ -104,15 +107,15 @@ msgstr "HMAC: {}"
 
 #: keysign/bluetoothoffer.py:129
 msgid "Port: {}"
-msgstr "Port: {}"
+msgstr "Bağlantı Noktası: {}"
 
 #: keysign/bluetoothoffer.py:132
 msgid "Bluetooth not available"
-msgstr "Bluetooth není k dispozici"
+msgstr "Bluetooth erişilebilir değil"
 
 #: keysign/bluetoothoffer.py:137
 msgid "Press Enter to cancel"
-msgstr "Zrušíte zmáčknutím Enter"
+msgstr "İptal etmek için Enter’a basın"
 
 #: keysign/bluetoothoffer.py:144
 msgid ""
@@ -120,7 +123,7 @@ msgid ""
 "Key successfully sent"
 msgstr ""
 "\n"
-"Klíč byl úspěšně odeslán"
+"Anahtar başarıyla gönderildi"
 
 #: keysign/bluetoothoffer.py:146
 msgid ""
@@ -128,39 +131,40 @@ msgid ""
 "An error occurred: {}"
 msgstr ""
 "\n"
-"Vyskytla se chyba: {}"
+"Hata oluştu: {}"
 
 #: keysign/bluetoothoffer.py:148
 msgid "Press Enter to exit"
-msgstr "Ukončíte zmáčknutím Enter"
+msgstr "Çıkış için Enter’a basın"
 
 #: keysign/bluetoothreceive.py:134
 msgid "Trying to download the key, please wait"
-msgstr "Zkouší se stáhnout klíč, čekejte prosím"
+msgstr "Anahtar indirilmeye çalışılıyor, lütfen bekleyin"
 
 #: keysign/dialog_avahi.ui:8
 msgid "Unable to Start Avahi"
-msgstr "Nelze spusti Avahi"
+msgstr "Avahi Uygulaması Başlatılamadı"
 
 #: keysign/dialog_avahi.ui:9
 msgid ""
 "Keysign is unable to automatically start Avahi. You can try to execute "
 "`systemctl start avahi-daemon` for solving this problem."
 msgstr ""
-"Podepisování klíčů není schopné automaticky spustit Avahi. Můžete zkusit "
-"spustit ručně „systemctl start avahi-daemon“, aby se problém vyřešil."
+"GNOME Keysing, Avahi uygulamasını kendiliğinden başlatamıyor. Bu sorunu "
+"çözmek için `systemctl start avahi-daemon` komutunu çalıştırmayı "
+"deneyebilirsiniz."
 
 #: keysign/dialog_avahi.ui:23
 msgid "OK"
-msgstr "Budiž"
+msgstr "Tamam"
 
 #: keysign/gtkexcepthook.py:173
 msgid "Bug Detected"
-msgstr "Zjištěna chyba"
+msgstr "Hata Algılandı"
 
 #: keysign/gtkexcepthook.py:175
 msgid "<big><b>A programming error has been detected.</b></big>"
-msgstr "<big><b>Byla zjištěna programová chyba.</b></big>"
+msgstr "<big><b>Bir programlama hatası algılandı.</b></big>"
 
 #: keysign/gtkexcepthook.py:178
 msgid ""
@@ -170,36 +174,37 @@ msgid ""
 "Please tell the developers about this using the issue tracker if no-one else "
 "has reported it yet."
 msgstr ""
-"Můžete tuto chybu ignorovat a pokračovat v práci, ale může to způsobit "
-"neočekávané výsledky.\n"
+"Bu hatayı yok sayıp çalışmaya devam edebilirsiniz, ancak beklenmedik "
+"sorunlar yaşayabilirsiniz.\n"
 "\n"
-"Pokud problém zatím nikdo nenahlásil, řekněte o něm prosím vývojářům pomoci "
-"systému pro sledování problémů."
+"Henüz bir başkası bildirmediyse, lütfen hata takipçisi kullanarak "
+"geliştiricileri bu konuda bilgilendirin."
 
 #: keysign/gtkexcepthook.py:187
 msgid "Search Tracker..."
-msgstr "Vyhledat v nahlášených…"
+msgstr "İzleyici Tara..."
 
 #: keysign/gtkexcepthook.py:189
 msgid "Report..."
-msgstr "Nahlásit…"
+msgstr "Raporla..."
 
 #: keysign/gtkexcepthook.py:191
 msgid "Ignore Error"
-msgstr "Ignorovat chyby"
+msgstr "Hataları Görmezden Gel"
 
 #: keysign/gtkexcepthook.py:192
 msgid "Quit GNOME Keysign"
-msgstr "Ukončit Podepisování klíčů"
+msgstr "GNOME Keysign uygulamasından çık"
 
 #: keysign/gtkexcepthook.py:202
 msgid "Details..."
-msgstr "Podrobnosti…"
+msgstr "Ayrıntılar..."
 
 #: keysign/gtkexcepthook.py:229 keysign/gtkexcepthook.py:232
 msgid "Exception while analyzing the exception."
-msgstr "Výjimka při analýze výjimky."
+msgstr "İstisna analiz edilirken istisna oluştu."
 
+# Hata raporlamaları İngilizce yapılacağı için çeviri yapmaya da gerek yok.
 #. TRANSLATORS: Crash report template for github, preceding a traceback.
 #. TRANSLATORS: Please ask users kindly to supply at least an English
 #. TRANSLATORS: title if they are able.
@@ -228,35 +233,36 @@ msgid ""
 msgstr ""
 "            #### Description\n"
 "\n"
-"            Dejte hlášení výstižný anglický název.\n"
-"            Pokud můžete, použijte něco jako\n"
-"            \"{vadná-funkce}: {co-je-špatně}\"\n"
-"            Po té nahraďte tento text delším popisem\n"
-"            chyby v angličtině. Hodit se mohou i\n"
-"            Snímky nebo nahrávky obrazovky.\n"
+"            Give this report a short descriptive title.\n"
+"            Use something like\n"
+"            \"{feature-that-broke}: {what-went-wrong}\"\n"
+"            for the title, if you can.\n"
+"            Then please replace this text\n"
+"            with a longer description of the bug.\n"
+"            Screenshots or videos are great, too!\n"
 "\n"
 "            #### Steps to reproduce\n"
 "\n"
-"            Sdělte nám anglicky, co přesně děláte,\n"
-"            když se chyba projeví.\n"
-"            Nejlepší je, pokud můžete napsat krok za\n"
-"            krokem instrukce, které vedou k vyvolání.\n"
-"            chyby.\n"
+"            Please tell us what you were doing\n"
+"            when the error message popped up.\n"
+"            If you can provide step-by-step instructions\n"
+"            on how to reproduce the bug,\n"
+"            that's even better.\n"
 "\n"
 "            #### Traceback\n"
 "        "
 
 #: keysign/keylistwidget.py:83
 msgid "Expires: "
-msgstr "Vyprší: "
+msgstr "Geçerlilik süresi: "
 
 #: keysign/receive.py:158
 msgid "Sign Key"
-msgstr "Podepisovací klíč"
+msgstr "Anahtar İmzala"
 
 #: keysign/receive.py:218
 msgid "Select file for saving"
-msgstr "Vyberte soubor k uložení"
+msgstr "Kaydetmek için dosya seç"
 
 #: keysign/receive.ui:53
 msgid ""
@@ -266,18 +272,18 @@ msgid ""
 "For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "NoServers/1\">the documentation</a>."
 msgstr ""
-"V okolí není žádný server pro podepisování klíčů :-(\n"
-"Domluvte se s přáteli na používání aplikace Podepisování klíčů.\n"
-"Nebo je také možné, že máte jen problémy s připojením k síti.\n"
-"Více informací najdete v <a href=\"https://wiki.gnome.org/Apps/"
-"Keysign/Doc/NoServers/1\">tomto dokumentu</a>."
+"Çevrenizde GNOME Keysign sunucu bulunamadı :-(\n"
+"Birlikte GNOME Keysign kullanmak için bir arkadaş bul.\n"
+"Bağlantı sorunları da yaşıyor olabilirsiniz.\n"
+"Daha fazla bilgi için <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"NoServers/1\">belgelendirme sayfamızı</a> ziyaret edebilirsiniz."
 
 #: keysign/receive.ui:108
 msgid ""
 "<small>To sign someone's key, scan their QR or enter security code</small>"
 msgstr ""
-"<small>Abyste mohl podepsat něčí klíč, musíte načíst QR kód neb zadat "
-"bezpečnostní kód</small>"
+"<small>Birisinin anahtarını imzalamak için, QR kodunu tarayın veya güvenlik "
+"kodunu girin</small>"
 
 #: keysign/receive.ui:127
 msgid "<b>Camera</b>"
@@ -285,36 +291,34 @@ msgstr "<b>Kamera</b>"
 
 #: keysign/receive.ui:142
 msgid "Integrated Web Cam"
-msgstr "Integrovaná webová kamera"
+msgstr "Tümleşik Kamera"
 
 #: keysign/receive.ui:179 keysign/send.ui:568
 msgid "<b>Security Code</b>"
-msgstr "<b>Bezpečnostní kód</b>"
+msgstr "<b>Güvenlik Kodu</b>"
 
 #: keysign/receive.ui:212
 msgid "Scan Barcode"
-msgstr "Načtení čárového kódu"
+msgstr "Barkod Tara"
 
 #: keysign/receive.ui:229
 msgid "Downloading key-data. Please wait..."
-msgstr "Stahují se data klíče. Čekejte prosím…"
+msgstr "Anahtar verisi indiriliyor. Lütfen bekleyin..."
 
 #: keysign/receive.ui:254
 msgid "Key download was interrupted!"
-msgstr "Stahování klíče bylo přerušeno!"
+msgstr "Anahtar indirme kesintiye uğradı!"
 
 #: keysign/receive.ui:345
 msgid ""
 "Saves the produced certifications as separate files in a custom directory"
-msgstr ""
-"Uložit vytvořené certifikáty jako samostatné soubory ve vlastní složce"
+msgstr "Üretilen sertifikaları özel bir dizine ayrı dosyalar olarak kaydeder"
 
 #: keysign/receive.ui:360
 msgid ""
 "Imports a temporary version of the produced certifications into the local "
 "keyring"
-msgstr ""
-"Naimportovat dočasné verze vytvořených certifikátů do místní klíčenky"
+msgstr "Üretilen sertifikaların geçici bir sürümünü yerel anahtarlığa aktarır"
 
 #: keysign/receive.ui:403
 msgid ""
@@ -324,11 +328,11 @@ msgid ""
 "For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "ProducedSignatures/1\">the documentation</a>."
 msgstr ""
-"Byly úspěšně vytvořeny klíče.\n"
-"Jestliže byl klíč ji řádně prověřen, můžete naimportovat dočasný podpis, aby "
-"se klíč začal používat.\n"
-"Více informací najdete v <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
-"ProducedSignatures/1\">tomto dokumentu</a>."
+"Başarıyla üretilen sertifikalar.\n"
+"Anahtarı, doğru bir şekilde doğrulanmış gibi kullanmaya başlamak için geçici "
+"bir imza içe aktarabilirsin.\n"
+"Daha fazla bilgi için <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"ProducedSignatures/1\">belgesini</a> ziyaret edin."
 
 #: keysign/receive.ui:446
 msgid ""
@@ -336,56 +340,56 @@ msgid ""
 "This will generate an email that must be sent in order to complete the "
 "signing process."
 msgstr ""
-"Jestli chcete klíč podepsat, potvrďte, že chcete podepsat následující klíč.\n"
-"Tím se vygeneruje e-mail, který musíte odeslat, aby bylo podepsání úplné."
+"Anahtarı imzalamak için, aşağıdaki anahtarı imzalamak istediğinizi "
+"doğrulayın.\n"
+"Bu, imzalama işlemini tamamlamak için bir e-posta gönderimi oluşturur."
 
 #: keysign/receive.ui:474
 msgid "Key"
-msgstr "Klíč"
+msgstr "Anahtar"
 
 #: keysign/receive.ui:507 keysign/send.ui:493
 msgid "UIDs"
-msgstr "UID"
+msgstr "UID’ler"
 
 #: keysign/receive.ui:594
 msgid "C_onfirm"
-msgstr "P_otvrdit"
+msgstr "_Onayla"
 
 #: keysign/receive.ui:716
 msgid "Signing the following UIDs:"
-msgstr "Podepisují se následující UID:"
+msgstr "Takip eden UID imzalanıyor:"
 
 #: keysign/send.py:207
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
 msgstr ""
-"Stále se zkouší získat připojení do Internetu. Vypadá to, že je pomalé nebo "
-"nedostupné."
+"Hala internete bağlanmaya çalışılıyor. Yavaş veya erişilemez olabilir."
 
 #: keysign/send.py:213
 msgid "There isn't an Internet connection!"
-msgstr "Není k dispozici internetové připojení!"
+msgstr "İnternet bağlantısı yok!"
 
 #: keysign/send.py:219 keysign/send.ui:267
 msgid "The signature has been successfully imported!"
-msgstr "Podpis byl úspěšně naimportován."
+msgstr "İmza başarıyla içe aktarıldı!"
 
 #: keysign/send.py:225
 msgid ""
 "An error occurred while trying to import the signature.\n"
 "Please double check the correctness of the chosen signature."
 msgstr ""
-"Při pokusu o import podpisu se vyskytla chyba.\n"
-"Zkontrolujte prosím raději dvakrát správnost zvoleného podpisu."
+"İmzayı içe aktarmaya çalışırken hata oluştu.\n"
+"Lütfen seçilen imzanın doğruluğunu iki kez kontrol edin."
 
 #: keysign/send.py:254 keysign/send.ui:678
 msgid ""
 "Key successfully sent.\n"
 "You should receive soon an email with the signature."
 msgstr ""
-"Klíč byl úspěšně odeslán.\n"
-"V krátké době byste měli obdržet e-mail s podpisem."
+"Anahtar başarıyla gönderildi\n"
+"Yakında imzalı bir e-posta almalısınız."
 
 #: keysign/send.py:259
 msgid ""
@@ -393,9 +397,9 @@ msgid ""
 "Either your partner has entered a wrong code or someone tried to intercept "
 "your connection"
 msgstr ""
-"Nelze ustavit bezpečné spojení.\n"
-"Buď váš partner zadal nesprávný kód nebo se někdo pokusil zachytit vaše "
-"spojení."
+"Güvenli bağlantı oluşturulamadı.\n"
+"Yanlış kod girilmiş olabilir veya internet bağlantınız kesintiye uğramış "
+"olabilir"
 
 #: keysign/send.py:263
 #, python-format
@@ -403,62 +407,62 @@ msgid ""
 "An unexpected error occurred:\n"
 "%s"
 msgstr ""
-"Vyskytla se neočekávaná chyba:\n"
+"Beklenmedik hata oluştu:\n"
 "%s"
 
 #: keysign/send.ui:7
 msgid "Select and send key"
-msgstr "Výběr a odeslání klíče"
+msgstr "Anahtar seç ve gönder"
 
 #: keysign/send.ui:13
 msgid "Select and Send key"
-msgstr "Výběr a odeslání klíče"
+msgstr "Anahtar Seç ve Gönder"
 
 #: keysign/send.ui:121
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
 msgstr ""
-"Nemáte žádné klíče!\n"
-"Použijte prosím třeba „Hesla a klíče“ k vytvoření nějakého."
+"Anahtarınız yok!\n"
+"Seahorse veya benzeri bir programla bir tane oluşturunuz."
 
 #: keysign/send.ui:198
 msgid "Very slow or no Internet connection!"
-msgstr "Připojení do Internetu je pomalé nebo nefunkční!"
+msgstr "İnternet bağlantınız çok yavaş veya bağlantı yok!"
 
 #. This refers to the key being certified by someone rather than the key used for
 #. certifying someone
 #: keysign/send.ui:322
 msgid "<b>Select a key for signing</b>"
-msgstr "<b>Vyberte klíč k podepsání</b>"
+msgstr "<b>İmzalamak için anahtar seç</b>"
 
 #: keysign/send.ui:338
 msgid "<small>Times signed</small>"
-msgstr "<small>Počet podepsání</small>"
+msgstr "<small>İmzalanma zamanı</small>"
 
 #: keysign/send.ui:405
 msgid "Keylist"
-msgstr "Seznam klíčů"
+msgstr "Anahtar listesi"
 
 #: keysign/send.ui:425
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
 msgstr ""
-"<small>Abyste měli klíč podepsaný, musí jiná osoba zadat bezpečnostní kód "
-"nebo načíst QR kód</small>"
+"<small>Anahtarın imzalanması için, diğer kişinin güvenlik kodunu girmesi "
+"veya QR kodunu taraması gerekir.</small>"
 
 #: keysign/send.ui:452
 msgid "<b>Key Details</b>"
-msgstr "<b>Údaje klíče</b>"
+msgstr "<b>Anahtar Ayrıntıları</b>"
 
 #: keysign/send.ui:477
 msgid "Fingerprint"
-msgstr "Otisk"
+msgstr "Parmak izi"
 
 #: keysign/send.ui:631
 msgid "<b>QR Code</b>"
-msgstr "<b>QR kód</b>"
+msgstr "<b>QR Kodu</b>"
 
 #: keysign/util.py:223
 msgid ""
@@ -475,19 +479,25 @@ msgid ""
 "--\n"
 "GNOME Keysign\n"
 msgstr ""
-"Milý uživateli/uživatelko $uid,\n"
+"Merhaba $uid,\n"
 "\n"
 "\n"
-"Právě byl podepsán váš klíč\n"
+"Anahtarınızı imzaladım.\n"
 "\n"
 "      $fingerprint\n"
 "\n"
 "\n"
-"Děkujeme, že jste umožnil(a) svůj klíč podepsat!\n"
+"Anahtarınızı imzalamaya izin verdiğiniz için teşekkür ederim!\n"
 "\n"
 "--\n"
-"Podepisování klíčů GNOME\n"
+"GNOME Keysign\n"
 
 #: keysign/wormholereceive.py:86
 msgid "Wrong message authentication code"
-msgstr "Nesprávný ověřovací kód zprávy"
+msgstr "Hatalı ileti kimlik doğrulama kodu"
+
+#~ msgid "Translated for gettext (C)"
+#~ msgstr "Gettext (tr) için çevirilmiştir."
+
+#~ msgid "Translated for Python (C)"
+#~ msgstr "Python (tr) için çevirilmiştir."
