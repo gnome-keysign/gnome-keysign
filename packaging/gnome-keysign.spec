@@ -11,15 +11,15 @@ URL:           https://wiki.gnome.org/GnomeKeysign
 Source0:       https://github.com/GNOME-Keysign/gnome-keysign/archive/%{commit}/%{name}-%{version}-%{shortcommit}.tar.gz
 
 BuildRequires: python-devel
-BuildRequires: python-lxml
-BuildRequires: python2-babel
+BuildRequires: python-babel
+BuildRequires: python-babel-BabelGladeExtractor
 BuildRequires: /usr/bin/desktop-file-validate
 Requires:      python-gobject  gtk3
 Requires:      dbus-python
 Requires:      gstreamer1-plugins-bad-free-extras gstreamer1-plugins-good
 Requires:      python-qrcode
 Requires:      python-requests avahi-ui-tools
-Requires:      python2-twisted
+Requires:      python-twisted
 Requires:      pybluez
 Requires:      gpgme
 BuildArch:     noarch
