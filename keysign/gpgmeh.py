@@ -206,7 +206,11 @@ def UIDExport(keydata, uid_i):
         return uid_bytes
 
 def export_uids(keydata):
-    """Export each valid and non-revoked UID of a key"""
+    """Export each valid and non-revoked UID of a key
+
+    Returns: An iterator over a tuple of the UID, i.e. the string and
+    the bytes making the OpenPGP with that UID only.
+    """
     ctx = TempContext()
     ctx.op_import(keydata)
     result = ctx.op_import_result()
