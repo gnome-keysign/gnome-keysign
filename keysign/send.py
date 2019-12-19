@@ -133,7 +133,7 @@ class SendApp:
 
         try:
             for signature in signatures:
-                gpgmeh.import_signature(signature)
+                gpgmeh.decrypt_and_import_signature(signature)
             self.signature_imported()
         except errors.GPGMEError as e:
             log.exception("Could not import signatures")

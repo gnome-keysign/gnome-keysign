@@ -513,13 +513,19 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
                 yield (UID.from_gpgme(uid), ciphertext, uid_data)
 
 
-def import_signature(encrypted_sig, homedir=None):
+def decrypt_signature(encrypted_sig, homedir=None):
+    """
+    Takes an encrypted signture, tries to decrypt it, and returns the
+    decrypted signature if it is does indeed contain a certification only
+    """
     ctx = DirectoryContext(homedir)
 
     # Check if we are really importing a signature
     temp_ctx = TempContextWithAgent(ctx)
     signature = temp_ctx.decrypt(encrypted_sig)
-    temp_ctx.op_import(signature[0])
+    log.debug("signature decryption result: %r", signature)
+    decrypted_sig = signature[0]
+    temp_ctx.op_import(decrypted_sig)
     result = temp_ctx.op_import_result()
 
     if result.imported != 0:
@@ -530,7 +536,10 @@ def import_signature(encrypted_sig, homedir=None):
         log.warning("The signature that we were importing is not as we expected!")
         raise GPGMEError
 
-    signature = ctx.decrypt(encrypted_sig)
+    return decrypted_sig
+
+def decrypt_and_import_signature(encrypted_sig, homedir=None):
+    signature = decrypt_signature(encrypted_sig, homedir=homedir)
 
     # Try Seahorse DBus
     name = "org.gnome.seahorse"
@@ -545,14 +554,16 @@ def import_signature(encrypted_sig, homedir=None):
     else:
         iface = "org.gnome.seahorse.KeyService"
         gpg_iface = dbus.Interface(proxy, iface)
-        payload = base64.b64encode(signature[0]).decode('latin-1')
+        payload = base64.b64encode(signature).decode('latin-1')
         payload = '\n'.join(payload[i:(i + 64)] for i in range(0, len(payload), 64))
         payload = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n\n" + payload + "\n-----END PGP PUBLIC KEY BLOCK-----"
         result = gpg_iface.ImportKeys("openpgp", payload)
+        log.debug("Importing via DBus: %r", result)
 
     # If Seahorse failed we try op_import
     if len(result) < 1:
-        ctx.op_import(signature[0])
+        ctx = DirectoryContext(homedir)
+        ctx.op_import(signature)
         result = ctx.op_import_result()
         if len(result.imports) < 1:
             raise GPGMEError
