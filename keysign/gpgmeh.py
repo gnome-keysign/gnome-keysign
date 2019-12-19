@@ -540,7 +540,18 @@ def decrypt_signature(encrypted_sig, homedir=None):
 
 def decrypt_and_import_signature(encrypted_sig, homedir=None):
     signature = decrypt_signature(encrypted_sig, homedir=homedir)
+    import_signature(signature)
 
+def import_signature(signature, homedir=None):
+    """
+    Imports an OpenPGP TPK to the local keyring
+
+    The purpose is to import a certification (hence the name of the function)
+    but it is in fact agnostic about what the TPK contains.
+
+    This function will try to import the TPK via DBus first and,
+    if that failed, resort to using gpgme directly.
+    """
     # Try Seahorse DBus
     name = "org.gnome.seahorse"
     path = "/org/gnome/seahorse/keys"
