@@ -1,14 +1,14 @@
 # Swedish translation for gnome-keysign.
-# Copyright © 2019 gnome-keysign's COPYRIGHT HOLDER
+# Copyright © 2019, 2020 gnome-keysign's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-keysign package.
-# Anders Jonsson <anders.jonsson@norsjovallen.se>, 2019.
+# Anders Jonsson <anders.jonsson@norsjovallen.se>, 2019, 2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2019-10-24 14:59+0000\n"
-"PO-Revision-Date: 2019-12-30 22:17+0100\n"
+"POT-Creation-Date: 2019-12-30 21:34+0000\n"
+"PO-Revision-Date: 2020-01-05 14:05+0100\n"
 "Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -87,7 +87,6 @@ msgid "Internet"
 msgstr "Internet"
 
 #: keysign/avahioffer.py:83 keysign/bluetoothoffer.py:126
-#, fuzzy
 msgid "Offering key: {}"
 msgstr "Erbjuden nyckel: {}"
 
@@ -259,7 +258,6 @@ msgid "Expires: "
 msgstr "Går ut: "
 
 #: keysign/receive.py:158
-#, fuzzy
 msgid "Sign Key"
 msgstr "Signera nyckel"
 
@@ -313,14 +311,12 @@ msgid "Key download was interrupted!"
 msgstr "Nyckelhämtning avbröts!"
 
 #: keysign/receive.ui:345
-#, fuzzy
 msgid ""
 "Saves the produced certifications as separate files in a custom directory"
 msgstr ""
 "Sparar de skapade certifieringarna som separata filer i en anpassad katalog"
 
 #: keysign/receive.ui:360
-#, fuzzy
 msgid ""
 "Imports a temporary version of the produced certifications into the local "
 "keyring"
@@ -329,7 +325,6 @@ msgstr ""
 "lokala nyckelringen"
 
 #: keysign/receive.ui:403
-#, fuzzy
 msgid ""
 "Successfully produced certifications.\n"
 "You can import a temporary signature to start using the key as if it had "
