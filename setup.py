@@ -150,7 +150,8 @@ setup(
     
     entry_points = {
         'console_scripts': [
-            'gnome-keysign-sign-key = keysign.SignKey:main'
+            'gnome-keysign-sign-key = keysign.SignKey:main',
+            'gnome-keysign-split-uids = keysign.export_uids:main',
         ],
         'gui_scripts': [
             'gnome-keysign = keysign:main',
