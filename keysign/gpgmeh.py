@@ -532,7 +532,7 @@ def decrypt_signature(encrypted_sig, homedir=None):
         log.warning("Trying to import a new key instead of a signature!")
         raise GPGMEError
 
-    if result.new_signatures == 0 or result.revocations != 0 or result.new_sub_keys != 0:
+    if result.new_signatures == 0 or result.new_revocations != 0 or result.new_sub_keys != 0:
         log.warning("The signature that we were importing is not as we expected!")
         raise GPGMEError
 
