@@ -1,0 +1,503 @@
+# Ukrainian translation for gnome-keysign.
+# Copyright (C) 2020 gnome-keysign's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-keysign package.
+#
+# Yuri Chornoivan <yurchor@ukr.net>, 2020.
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-keysign master\n"
+"Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
+"POT-Creation-Date: 2020-03-07 22:21+0000\n"
+"PO-Revision-Date: 2020-04-03 15:01+0300\n"
+"Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
+"Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+"Language: uk\n"
+"Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n"
+"%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Lokalize 20.07.70\n"
+
+#: data/org.gnome.Keysign.raw.appdata.xml:11
+msgid ""
+"\n"
+"      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
+"      via the local network or Bluetooth.\n"
+"    "
+msgstr ""
+"\n"
+"      За допомогою «Підписувача ключів» GNOME ви зможете зручно і безпечно"
+" підписувати\n"
+"      ключі OpenPGP за допомогою локальної мережі або Bluetooth.\n"
+"    "
+
+#: data/org.gnome.Keysign.raw.appdata.xml:15
+msgid ""
+"\n"
+"      It can scan another key's barcode and transfer the key securely,\n"
+"      allowing for casual two-party key signing sessions.\n"
+"      It follows best practises by sending the encrypted signatures\n"
+"      to the UIDs of a key using the Email client the user configured\n"
+"      to use.\n"
+"    "
+msgstr ""
+"\n"
+"      Програма може сканувати штрих-код іншого ключа і безпечно перенести"
+" ключ,\n"
+"      уможливлюючи двобічні сеанси підписування ключів.\n"
+"      У програмі враховано найкращі методики: виконується надсилання"
+" зашифрованих\n"
+"      підписів до UID ключа за допомогою клієнта електронної пошти, який\n"
+"      налаштовано користувачем.\n"
+"    "
+
+#. Name
+#: data/org.gnome.Keysign.raw.desktop:2
+msgid "Keysign"
+msgstr "Підписувач ключів"
+
+#. Comment
+#: data/org.gnome.Keysign.raw.desktop:3
+msgid ""
+"A keysigning helper to enable you to comfortably exchange OpenPGP keys with "
+"a friend"
+msgstr ""
+"Допоміжна програма для підписування ключів, за допомогою якої ви зможете"
+" зручно обмінюватися ключами OpenPGP з друзями"
+
+#. Keywords
+#: data/org.gnome.Keysign.raw.desktop:4
+msgid "python;gpg;gnupg;key;openpgp;"
+msgstr ""
+"python;gpg;gnupg;key;openpgp;пітон;пайтон;жпж;гпг;ключ;гнупг;опенпг;оупенпг;"
+
+#. Icon
+#: data/org.gnome.Keysign.raw.desktop:7
+msgid "org.gnome.Keysign"
+msgstr "org.gnome.Keysign"
+
+#: keysign/app.py:187
+msgid "Send"
+msgstr "Надіслати"
+
+#: keysign/app.py:189 keysign/receive.py:272
+msgid "Receive"
+msgstr "Отримати"
+
+#: keysign/app.ui:62 keysign/send.ui:54
+msgid "Internet"
+msgstr "Інтернет"
+
+#: keysign/avahioffer.py:83 keysign/bluetoothoffer.py:126
+msgid "Offering key: {}"
+msgstr "Пропонований ключ: {}"
+
+#: keysign/avahioffer.py:84 keysign/bluetoothoffer.py:127
+msgid "Discovery info: {}"
+msgstr "Дані виявлення: {}"
+
+#: keysign/avahioffer.py:86
+msgid "Press Enter to stop"
+msgstr "Натисніть Enter, щоб зупинити"
+
+#: keysign/bluetoothoffer.py:117
+msgid "You must provide an argument to identify the key"
+msgstr "Вам слід вказати аргумент для ідентифікації ключа"
+
+#: keysign/bluetoothoffer.py:128
+msgid "HMAC: {}"
+msgstr "HMAC: {}"
+
+#: keysign/bluetoothoffer.py:129
+msgid "Port: {}"
+msgstr "Порт: {}"
+
+#: keysign/bluetoothoffer.py:132
+msgid "Bluetooth not available"
+msgstr "Немає доступу до Bluetooth"
+
+#: keysign/bluetoothoffer.py:137
+msgid "Press Enter to cancel"
+msgstr "Натисніть Enter, щоб скасувати"
+
+#: keysign/bluetoothoffer.py:144
+msgid ""
+"\n"
+"Key successfully sent"
+msgstr ""
+"\n"
+"Ключ успішно надіслано"
+
+#: keysign/bluetoothoffer.py:146
+msgid ""
+"\n"
+"An error occurred: {}"
+msgstr ""
+"\n"
+"Сталася помилка: {}"
+
+#: keysign/bluetoothoffer.py:148
+msgid "Press Enter to exit"
+msgstr "Натисніть Enter, щоб вийти"
+
+#: keysign/bluetoothreceive.py:134
+msgid "Trying to download the key, please wait"
+msgstr "Намагаємося отримати ключ, будь ласка, зачекайте"
+
+#: keysign/dialog_avahi.ui:8
+msgid "Unable to Start Avahi"
+msgstr "Не вдалося запустити Avahi"
+
+#: keysign/dialog_avahi.ui:9
+msgid ""
+"Keysign is unable to automatically start Avahi. You can try to execute "
+"`systemctl start avahi-daemon` for solving this problem."
+msgstr ""
+"Keysign не вдалося автоматично запустити Avahi. Ви можете віддати команду"
+" «systemctl start avahi-daemon», щоб усунути цю проблему."
+
+#: keysign/dialog_avahi.ui:23
+msgid "OK"
+msgstr "Гаразд"
+
+#: keysign/gtkexcepthook.py:173
+msgid "Bug Detected"
+msgstr "Виявлено ваду"
+
+#: keysign/gtkexcepthook.py:175
+msgid "<big><b>A programming error has been detected.</b></big>"
+msgstr "<big><b>Було виявлено помилку у програмному коді.</b></big>"
+
+#: keysign/gtkexcepthook.py:178
+msgid ""
+"You may be able to ignore this error and carry on working, but you may get "
+"unexpected results.\n"
+"\n"
+"Please tell the developers about this using the issue tracker if no-one else "
+"has reported it yet."
+msgstr ""
+"Ви можете проігнорувати це повідомлення про помилку і продовжити обробку, але"
+" це може призвести до неочікуваних результатів.\n"
+"\n"
+"Будь ласка, повідомте про цю помилку розробникам за допомогою системи"
+" стеження за вадами, якщо про неї ще не повідомлено іншими користувачами."
+
+#: keysign/gtkexcepthook.py:187
+msgid "Search Tracker..."
+msgstr "Шукати Tracker…"
+
+#: keysign/gtkexcepthook.py:189
+msgid "Report..."
+msgstr "Звіт…"
+
+#: keysign/gtkexcepthook.py:191
+msgid "Ignore Error"
+msgstr "Ігнорувати помилку"
+
+#: keysign/gtkexcepthook.py:192
+msgid "Quit GNOME Keysign"
+msgstr "Вийти з «Підписувача ключів» GNOME"
+
+#: keysign/gtkexcepthook.py:202
+msgid "Details..."
+msgstr "Подробиці…"
+
+#: keysign/gtkexcepthook.py:229 keysign/gtkexcepthook.py:232
+msgid "Exception while analyzing the exception."
+msgstr "Виключення під час спроби проаналізувати виключення."
+
+#. TRANSLATORS: Crash report template for github, preceding a traceback.
+#. TRANSLATORS: Please ask users kindly to supply at least an English
+#. TRANSLATORS: title if they are able.
+#: keysign/gtkexcepthook.py:281
+msgid ""
+"            #### Description\n"
+"\n"
+"            Give this report a short descriptive title.\n"
+"            Use something like\n"
+"            \"{feature-that-broke}: {what-went-wrong}\"\n"
+"            for the title, if you can.\n"
+"            Then please replace this text\n"
+"            with a longer description of the bug.\n"
+"            Screenshots or videos are great, too!\n"
+"\n"
+"            #### Steps to reproduce\n"
+"\n"
+"            Please tell us what you were doing\n"
+"            when the error message popped up.\n"
+"            If you can provide step-by-step instructions\n"
+"            on how to reproduce the bug,\n"
+"            that's even better.\n"
+"\n"
+"            #### Traceback\n"
+"        "
+msgstr ""
+"            #### Description\n"
+"\n"
+"            Надайте цьому звіту короткої описової назви.\n"
+"            Скористайтеся таким заголовка форматом:\n"
+"            «{Можливість}: {помилка, яка сталася}»\n"
+"            якщо можна.\n"
+"            Далі, будь ласка, замініть цей текст\n"
+"            довшим описом вади.\n"
+"            Чудовим доповненням будуть знімки вікон та відео!\n"
+"\n"
+"            #### Steps to reproduce\n"
+"\n"
+"            Будь ласка, повідомте нам про дії, які ви виконували,\n"
+"            коли сталася помилка.\n"
+"            Буде навіть краще, якщо ви наведете покрокові\n"
+"            настанови щодо відтворення вади.\n"
+"\n"
+"            #### Traceback\n"
+"        "
+
+#: keysign/keylistwidget.py:83
+msgid "Expires: "
+msgstr "Строк дії: "
+
+#: keysign/receive.py:158
+msgid "Sign Key"
+msgstr "Підписати ключ"
+
+#: keysign/receive.py:218
+msgid "Select file for saving"
+msgstr "Виберіть файл для збереження"
+
+#: keysign/receive.ui:53
+msgid ""
+"No GNOME Keysign servers around :-(\n"
+"Find a friend to use GNOME Keysign with.\n"
+"You may also suffer from connectivity problems.\n"
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"NoServers/1\">the documentation</a>."
+msgstr ""
+"Не знайдено серверів «Підписувача ключів» GNOME :-(\n"
+"Знайдіть приятеля, щоб скористатися «Підписувачем ключів» GNOME.\n"
+"Також, можливо, у вас є певні проблеми із з'єднанням із мережею.\n"
+"Щоб дізнатися більше, ознайомтеся із <a href=\"https://wiki.gnome.org/Apps/Key"
+"sign/Doc/NoServers/1\">документацією</a>."
+
+#: keysign/receive.ui:108
+msgid ""
+"<small>To sign someone's key, scan their QR or enter security code</small>"
+msgstr ""
+"<small>Щоб підписати чийсь ключ, виконайте сканування QR-коду або введіть код"
+" захисту</small>"
+
+#: keysign/receive.ui:127
+msgid "<b>Camera</b>"
+msgstr "<b>Фотоапарат</b>"
+
+#: keysign/receive.ui:142
+msgid "Integrated Web Cam"
+msgstr "Інтегровано із вебкамерою"
+
+#: keysign/receive.ui:179 keysign/send.ui:568
+msgid "<b>Security Code</b>"
+msgstr "<b>Код захисту</b>"
+
+#: keysign/receive.ui:212
+msgid "Scan Barcode"
+msgstr "Сканувати штрих-код"
+
+#: keysign/receive.ui:229
+msgid "Downloading key-data. Please wait..."
+msgstr "Отримуємо дані ключа. Будь ласка, зачекайте…"
+
+#: keysign/receive.ui:254
+msgid "Key download was interrupted!"
+msgstr "Отримання даних ключа було перервано!"
+
+#: keysign/receive.ui:345
+msgid ""
+"Saves the produced certifications as separate files in a custom directory"
+msgstr ""
+"Зберігає створені дані сертифікації як окремі файли у нетиповому каталозі"
+
+#: keysign/receive.ui:360
+msgid ""
+"Imports a temporary version of the produced certifications into the local "
+"keyring"
+msgstr ""
+"Імпортує тимчасову версію створених даних сертифікації до локальної зв'язки"
+" ключів"
+
+#: keysign/receive.ui:403
+msgid ""
+"Successfully produced certifications.\n"
+"You can import a temporary signature to start using the key as if it had "
+"already been properly verified.\n"
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"ProducedSignatures/1\">the documentation</a>."
+msgstr ""
+"Сертифікацію успішно виконано.\n"
+"Ви можете імпортувати тимчасовий підпис, щоб розпочати користуватися ключем"
+" так, ніби його було належним чином засвідчено.\n"
+"Щоб дізнатися більше, ознайомтеся із <a href=\"https://wiki.gnome.org/Apps/Key"
+"sign/Doc/ProducedSignatures/1\">документацією</a>."
+
+#: keysign/receive.ui:446
+msgid ""
+"To sign the key, confirm that you want to sign the following key.\n"
+"This will generate an email that must be sent in order to complete the "
+"signing process."
+msgstr ""
+"Щоб підписати ключ, підтвердьте, що ви хочете підписати вказаний нижче ключ.\n"
+"У відповідь буде створено поштове повідомлення, яке слід надіслати, щоб"
+" завершити процедуру підписування."
+
+#: keysign/receive.ui:474
+msgid "Key"
+msgstr "Ключ"
+
+#: keysign/receive.ui:507 keysign/send.ui:493
+msgid "UIDs"
+msgstr "UID"
+
+#: keysign/receive.ui:594
+msgid "C_onfirm"
+msgstr "_Підтвердити"
+
+#: keysign/receive.ui:716
+msgid "Signing the following UIDs:"
+msgstr "Підписуємо такі UID:"
+
+#: keysign/send.py:207
+msgid ""
+"Still trying to get a connection to the Internet. It appears to be slow or "
+"unavailable."
+msgstr ""
+"Усе ще намагаємося встановити з'єднання із інтернетом. Здається, з'єднання є"
+" надто повільним або взагалі недоступним."
+
+#: keysign/send.py:213
+msgid "There isn't an Internet connection!"
+msgstr "Немає з'єднання із інтернетом!"
+
+#: keysign/send.py:219 keysign/send.ui:267
+msgid "The signature has been successfully imported!"
+msgstr "Підпис було успішно імпортовано!"
+
+#: keysign/send.py:225
+msgid ""
+"An error occurred while trying to import the signature.\n"
+"Please double check the correctness of the chosen signature."
+msgstr ""
+"Під час спроби імпортувати підпис сталася помилка.\n"
+"Будь ласка, ретельно перевірте правильність вибраного підпису."
+
+#: keysign/send.py:254 keysign/send.ui:678
+msgid ""
+"Key successfully sent.\n"
+"You should receive soon an email with the signature."
+msgstr ""
+"Ключ успішно надіслано.\n"
+"Невдовзі ви маєте отримати поштове повідомлення із підписом."
+
+#: keysign/send.py:259
+msgid ""
+"Could not establish a secure connection.\n"
+"Either your partner has entered a wrong code or someone tried to intercept "
+"your connection"
+msgstr ""
+"Не вдалося встановити безпечне з'єднання.\n"
+"Або вашим колегою введено помилковий код, або хтось спробував перехопити ваше"
+" з'єднання."
+
+#: keysign/send.py:263
+#, python-format
+msgid ""
+"An unexpected error occurred:\n"
+"%s"
+msgstr ""
+"Сталася неочікувана помилка:\n"
+"%s"
+
+#: keysign/send.ui:7
+msgid "Select and send key"
+msgstr "Виберіть і надішліть ключ"
+
+#: keysign/send.ui:13
+msgid "Select and Send key"
+msgstr "Виберіть і надішліть ключ"
+
+#: keysign/send.ui:121
+msgid ""
+"You don't have any keys!\n"
+"Please use, e.g. Seahorse to create one."
+msgstr ""
+"У вас немає жодного ключа!\n"
+"Будь ласка, скористайтеся, наприклад, Seahorse для створення ключа."
+
+#: keysign/send.ui:198
+msgid "Very slow or no Internet connection!"
+msgstr "З'єднання із інтернетом є дуже повільним або його немає взагалі!"
+
+#. This refers to the key being certified by someone rather than the key used for
+#. certifying someone
+#: keysign/send.ui:322
+msgid "<b>Select a key for signing</b>"
+msgstr "<b>Виберіть ключ для підписування</b>"
+
+#: keysign/send.ui:338
+msgid "<small>Times signed</small>"
+msgstr "<small>Разів підписано</small>"
+
+#: keysign/send.ui:405
+msgid "Keylist"
+msgstr "Список ключів"
+
+#: keysign/send.ui:425
+msgid ""
+"<small>To have the key signed, the other person must enter the security "
+"code, or scan the QR code</small>"
+msgstr ""
+"<small>Щоб підписати ключ, інша особа має ввести код захисту або виконати"
+" сканування QR-коду</small>"
+
+#: keysign/send.ui:452
+msgid "<b>Key Details</b>"
+msgstr "<b>Параметри ключа</b>"
+
+#: keysign/send.ui:477
+msgid "Fingerprint"
+msgstr "Відбиток"
+
+#: keysign/send.ui:631
+msgid "<b>QR Code</b>"
+msgstr "<b>QR-код</b>"
+
+#: keysign/util.py:231
+msgid ""
+"Hi $uid,\n"
+"\n"
+"\n"
+"I have just signed your key\n"
+"\n"
+"      $fingerprint\n"
+"\n"
+"\n"
+"Thanks for letting me sign your key!\n"
+"\n"
+"--\n"
+"GNOME Keysign\n"
+msgstr ""
+"Добрий день, $uid,\n"
+"\n"
+"\n"
+"Мною щойно виконано підписування вашого ключа\n"
+"\n"
+"      $fingerprint\n"
+"\n"
+"\n"
+"Дякую за можливість підписати ваш ключ!\n"
+"\n"
+"--\n"
+"«Підписувач ключів» GNOME\n"
+
+#: keysign/wormholereceive.py:86
+msgid "Wrong message authentication code"
+msgstr "Помилковий код розпізнавання з повідомлення"
