@@ -587,11 +587,13 @@ def import_signature(signature, homedir=None):
     if that failed, resort to using gpgme directly.
     """
     result = []
-    try:
-        # Try Seahorse DBus
-        result = import_signature_dbus(signature)
-    except dbus.exceptions.DBusException:
-        log.debug("Seahorse DBus is not available")
+    if not homedir:
+        # If a homedir is requested, we have to use the gpgme API, because we cannot specify a GnuPG keyring via DBus
+        try:
+            # Try Seahorse DBus
+            result = import_signature_dbus(signature)
+        except dbus.exceptions.DBusException:
+            log.debug("Seahorse DBus is not available")
 
     # If Seahorse failed we try op_import
     if len(result) < 1:
