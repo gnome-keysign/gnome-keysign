@@ -406,7 +406,9 @@ class TestSignAndEncrypt:
     RECEIVER_KEY = "seckey-no-pw-2.asc"
 
     def setup(self):
+        # The "sender" sends its certificate to have it certified by the receiver
         self.key_sender_key = get_fixture_file(self.SENDER_KEY)
+        # The "receiver" will receive the certificate, certify it, and send it back to the "sender"
         self.key_receiver_key = get_fixture_file(self.RECEIVER_KEY)
         # This should be a new, empty directory
         self.key_sender_homedir = tempfile.mkdtemp()
