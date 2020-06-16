@@ -31,11 +31,13 @@ from keysign.gpgmeh import DirectoryContext
 from keysign.gpgmeh import UIDExport
 from keysign.gpgmeh import export_uids
 from keysign.gpgmeh import fingerprint_from_keydata
+from keysign.gpgmeh import import_signature
 from keysign.gpgmeh import openpgpkey_from_data
 from keysign.gpgmeh import get_usable_keys
 from keysign.gpgmeh import get_usable_secret_keys
 from keysign.gpgmeh import get_public_key_data
 from keysign.gpgmeh import sign_keydata_and_encrypt
+from keysign.gpgmeh import ImportNewCertificationError
 
 from keysign.gpgkey import to_valid_utf8_string
 
@@ -401,6 +403,21 @@ def get_signatures_for_uids_on_key(ctx, key):
     return uid_sigs
 
 
+def export_public_key(keydata):
+    "Returns the public portion of the key even if you provide a private key"
+    # This might be a secret key, too, so we import and export to
+    # get hold of the public portion.
+    ctx = TempContext()
+    ctx.op_import(keydata)
+    result = ctx.op_import_result()
+    fpr = result.imports[0].fpr
+    sink = gpg.Data()
+    ctx.op_export(fpr, 0, sink)
+    sink.seek(0, 0)
+    public_key = sink.read()
+    assert len(public_key) > 0
+    return public_key
+
 class TestSignAndEncrypt:
     SENDER_KEY = "seckey-no-pw-1.asc"
     RECEIVER_KEY = "seckey-no-pw-2.asc"
@@ -544,6 +561,58 @@ class TestSignAndEncrypt:
 
         assert_greater(len(sigs_after), len(sigs_before))
 
+
+
+
+    def test_third_party_key(self):
+        """This test tries to trick the receiver by sending
+        an unrelated key of a third party.
+        The receiver must not import that key.
+        """
+        THIRD_PARTY_KEY = "third_party.pgp.asc"
+        self.third_party_key = get_fixture_file(THIRD_PARTY_KEY)
+        self.key_third_party_homedir = tempfile.mkdtemp()
+        third_party_gpgcmd = ["gpg", "--homedir={}".format(self.key_third_party_homedir)]
+        check_call(third_party_gpgcmd + ["--import", self.third_party_key])
+
+        keydata = open(self.third_party_key, "rb").read()
+        public_third_party_key = export_public_key(keydata)
+        # The "sender" sends its certificate via the app and then receives the email with the certification
+        public_sender_key = export_public_key(open(self.key_sender_key, 'rb'))
+
+
+        sender = DirectoryContext(homedir=self.key_sender_homedir)
+        before = list(sender.keylist())
+        third_party = DirectoryContext(homedir=self.key_third_party_homedir)
+
+        third_party.op_import(public_sender_key)
+        result = third_party.op_import_result()
+        if result.considered != 1 and result.imported != 1:
+            raise ValueError("Expected to load exactly one key. %r", result)
+        else:
+            imports = result.imports
+            assert len(imports) == 1, "Imported %d instead of 1" % len(imports)
+            fpr = result.imports[0].fpr
+            target_key = third_party.get_key(fpr)
+            ciphertext, _, _ = third_party.encrypt(
+                plaintext=public_third_party_key,
+                recipients=[target_key],
+                always_trust=True,
+                sign=False,
+            )
+
+            # Now we have transferred the ciphertext to the victim
+            plaintext, result, vrfy = sender.decrypt(ciphertext)
+            log.debug("Decrypt Result: %r", result)
+            result = assert_raises(ImportNewCertificationError,
+                import_signature,
+                    plaintext,
+                    homedir=self.key_sender_homedir)
+            log.debug("Import result: %s", result)
+
+            after = list(sender.keylist())
+
+            assert_equal(len(before), len(after))
 
 class TestLatin1(TestSignAndEncrypt):
     SENDER_KEY = "seckey-latin1.asc"
