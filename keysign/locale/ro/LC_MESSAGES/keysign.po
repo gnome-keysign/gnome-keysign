@@ -1,0 +1,504 @@
+# Romanian translation for gnome-keysign.
+# Copyright (C) 2020 gnome-keysign's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-keysign package.
+# Florentina Mușat <florentina.musat.28@gmail.com>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-keysign master\n"
+"Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
+"POT-Creation-Date: 2020-04-03 12:02+0000\n"
+"PO-Revision-Date: 2020-07-13 13:06+0300\n"
+"Language-Team: Romanian <gnomero-list@lists.sourceforge.net>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+"Language: ro\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
+"20)) ? 1 : 2);;\n"
+"Last-Translator: Florentina Mușat <florentina.musat.28@gmail.com>\n"
+"X-Generator: Poedit 2.3.1\n"
+
+#: data/org.gnome.Keysign.raw.appdata.xml:11
+msgid ""
+"\n"
+"      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
+"      via the local network or Bluetooth.\n"
+"    "
+msgstr ""
+"\n"
+"      Semnează cheia GNOME vă permite să semnați chei OpenPGP comfortabil și "
+"sigur\n"
+"      via rețelei locale sau Bluetooth.\n"
+"    "
+
+#: data/org.gnome.Keysign.raw.appdata.xml:15
+msgid ""
+"\n"
+"      It can scan another key's barcode and transfer the key securely,\n"
+"      allowing for casual two-party key signing sessions.\n"
+"      It follows best practises by sending the encrypted signatures\n"
+"      to the UIDs of a key using the Email client the user configured\n"
+"      to use.\n"
+"    "
+msgstr ""
+"\n"
+"      Poate să scaneze codul de bare a unei alte chei și să transfere cheia "
+"sigur,\n"
+"      permițând pentru sesiuni cazuale de semnat de cheie din două părți.\n"
+"      Urmărește cele mai bune practici prin trimiterea de semnături "
+"criptate\n"
+"      la UID-urile unei chei utilizând clientul de Email pe care "
+"utilizatorul l-a configurat\n"
+"      pentru utilizare.\n"
+"    "
+
+#. Name
+#: data/org.gnome.Keysign.raw.desktop:2
+msgid "Keysign"
+msgstr "Semnează cheia"
+
+#. Comment
+#: data/org.gnome.Keysign.raw.desktop:3
+msgid ""
+"A keysigning helper to enable you to comfortably exchange OpenPGP keys with "
+"a friend"
+msgstr ""
+"Un ajutor de semnat cheia pentru a vă permite să schimbați chei OpenPGP "
+"confortabil cu un prieten"
+
+#. Keywords
+#: data/org.gnome.Keysign.raw.desktop:4
+msgid "python;gpg;gnupg;key;openpgp;"
+msgstr "python;gpg;gnupg;key;openpgp;cheie;"
+
+#. Icon
+#: data/org.gnome.Keysign.raw.desktop:7
+msgid "org.gnome.Keysign"
+msgstr "org.gnome.Keysign"
+
+#: keysign/app.py:187
+msgid "Send"
+msgstr "Trimite"
+
+#: keysign/app.py:189 keysign/receive.py:272
+msgid "Receive"
+msgstr "Primește"
+
+#: keysign/app.ui:62 keysign/send.ui:54
+msgid "Internet"
+msgstr "Internet"
+
+#: keysign/avahioffer.py:83 keysign/bluetoothoffer.py:126
+msgid "Offering key: {}"
+msgstr "Oferind cheia: {}"
+
+#: keysign/avahioffer.py:84 keysign/bluetoothoffer.py:127
+msgid "Discovery info: {}"
+msgstr "Informații de descoperire: {}"
+
+#: keysign/avahioffer.py:86
+msgid "Press Enter to stop"
+msgstr "Apăsați Enter pentru a opri"
+
+#: keysign/bluetoothoffer.py:117
+msgid "You must provide an argument to identify the key"
+msgstr "Trebuie să furnizați un argument pentru a identifica cheia"
+
+#: keysign/bluetoothoffer.py:128
+msgid "HMAC: {}"
+msgstr "HMAC: {}"
+
+#: keysign/bluetoothoffer.py:129
+msgid "Port: {}"
+msgstr "Port: {}"
+
+#: keysign/bluetoothoffer.py:132
+msgid "Bluetooth not available"
+msgstr "Bluetooth nu este disponibil"
+
+#: keysign/bluetoothoffer.py:137
+msgid "Press Enter to cancel"
+msgstr "Apăsați Enter pentru a anula"
+
+#: keysign/bluetoothoffer.py:144
+msgid ""
+"\n"
+"Key successfully sent"
+msgstr ""
+"\n"
+"Cheia trimisă cu succes"
+
+#: keysign/bluetoothoffer.py:146
+msgid ""
+"\n"
+"An error occurred: {}"
+msgstr ""
+"\n"
+"A apărut o eroare: {}"
+
+#: keysign/bluetoothoffer.py:148
+msgid "Press Enter to exit"
+msgstr "Apăsați Enter pentru a ieși"
+
+#: keysign/bluetoothreceive.py:134
+msgid "Trying to download the key, please wait"
+msgstr "Se încearcă să se descarce cheia, așteptați"
+
+#: keysign/dialog_avahi.ui:8
+msgid "Unable to Start Avahi"
+msgstr "Nu se poate porni Avahi"
+
+#: keysign/dialog_avahi.ui:9
+msgid ""
+"Keysign is unable to automatically start Avahi. You can try to execute "
+"`systemctl start avahi-daemon` for solving this problem."
+msgstr ""
+"Semnează cheia nu poate să pornească automat Avahi. Puteți încerca să "
+"executați „systemctl start avahi-daemon” pentru rezolvarea acestei probleme."
+
+#: keysign/dialog_avahi.ui:23
+msgid "OK"
+msgstr "OK"
+
+#: keysign/gtkexcepthook.py:173
+msgid "Bug Detected"
+msgstr "Defecțiune detectată"
+
+#: keysign/gtkexcepthook.py:175
+msgid "<big><b>A programming error has been detected.</b></big>"
+msgstr "<big><b>A fost detectată o eroare de programare.</b></big>"
+
+#: keysign/gtkexcepthook.py:178
+msgid ""
+"You may be able to ignore this error and carry on working, but you may get "
+"unexpected results.\n"
+"\n"
+"Please tell the developers about this using the issue tracker if no-one else "
+"has reported it yet."
+msgstr ""
+"Este posibil să puteți ignora această eroare și să continuați să lucrați, "
+"dar puteți obține rezultate neașteptate.\n"
+"\n"
+"Spuneți dezvoltatorilor despre acest lucru utilizând urmăritorul de probleme "
+"dacă nimeni nu a raportat-o încă."
+
+#: keysign/gtkexcepthook.py:187
+msgid "Search Tracker..."
+msgstr "Caută urmăritor..."
+
+#: keysign/gtkexcepthook.py:189
+msgid "Report..."
+msgstr "Raportează..."
+
+#: keysign/gtkexcepthook.py:191
+msgid "Ignore Error"
+msgstr "Ignoră eroarea"
+
+#: keysign/gtkexcepthook.py:192
+msgid "Quit GNOME Keysign"
+msgstr "Ieșire din Semnează cheia GNOME"
+
+#: keysign/gtkexcepthook.py:202
+msgid "Details..."
+msgstr "Detalii..."
+
+#: keysign/gtkexcepthook.py:229 keysign/gtkexcepthook.py:232
+msgid "Exception while analyzing the exception."
+msgstr "Excepție în timpul analizării excepției."
+
+#. TRANSLATORS: Crash report template for github, preceding a traceback.
+#. TRANSLATORS: Please ask users kindly to supply at least an English
+#. TRANSLATORS: title if they are able.
+#: keysign/gtkexcepthook.py:281
+msgid ""
+"            #### Description\n"
+"\n"
+"            Give this report a short descriptive title.\n"
+"            Use something like\n"
+"            \"{feature-that-broke}: {what-went-wrong}\"\n"
+"            for the title, if you can.\n"
+"            Then please replace this text\n"
+"            with a longer description of the bug.\n"
+"            Screenshots or videos are great, too!\n"
+"\n"
+"            #### Steps to reproduce\n"
+"\n"
+"            Please tell us what you were doing\n"
+"            when the error message popped up.\n"
+"            If you can provide step-by-step instructions\n"
+"            on how to reproduce the bug,\n"
+"            that's even better.\n"
+"\n"
+"            #### Traceback\n"
+"        "
+msgstr ""
+"            #### Descriere\n"
+"\n"
+"            Dați acestui raport un scurt titlu descriptiv.\n"
+"            Utilizați ceva precum\n"
+"            „{funcționalitate-care-s-a-defectat}: {ce-a-mers-greșit}”\n"
+"            pentru titlu, dacă puteți.\n"
+"            Apoi înlocuiți acest text\n"
+"            cu o descriere mai lungă a defecțiunii.\n"
+"            Capturile de ecran sau video-urile sunt și ele grozave!\n"
+"\n"
+"            #### Pași de reproducere\n"
+"\n"
+"            Spuneți-ne ce făceați\n"
+"            când a apărut mesajul de eroare.\n"
+"            Dacă puteți furniza instrucțiuni pas-cu-pas\n"
+"            despre cum să se reproducă defecțiunea,\n"
+"            asta e și mai bine.\n"
+"\n"
+"            #### Urmărire\n"
+"        "
+
+#: keysign/keylistwidget.py:83
+msgid "Expires: "
+msgstr "Expiră: "
+
+#: keysign/receive.py:158
+msgid "Sign Key"
+msgstr "Semnează cheia"
+
+#: keysign/receive.py:218
+msgid "Select file for saving"
+msgstr "Selectează fișierul pentru salvare"
+
+#: keysign/receive.ui:53
+msgid ""
+"No GNOME Keysign servers around :-(\n"
+"Find a friend to use GNOME Keysign with.\n"
+"You may also suffer from connectivity problems.\n"
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"NoServers/1\">the documentation</a>."
+msgstr ""
+"Nu există servere Semnează cheia GNOME prin preajmă :-(\n"
+"Găsește un prieten cu care să utilizați Semnează cheia GNOME.\n"
+"Puteți, de asemenea, suferi de probleme de conectivitate.\n"
+"Pentru mai multe informații vizitați <a href=\"https://wiki.gnome.org/Apps/"
+"Keysign/Doc/NoServers/1\">documentația</a>."
+
+#: keysign/receive.ui:108
+msgid ""
+"<small>To sign someone's key, scan their QR or enter security code</small>"
+msgstr ""
+"<small>Pentru a semna cheia cuiva, scanați codul lor QR sau introduceți "
+"codul de securitate</small>"
+
+#: keysign/receive.ui:127
+msgid "<b>Camera</b>"
+msgstr "<b>Camera</b>"
+
+#: keysign/receive.ui:142
+msgid "Integrated Web Cam"
+msgstr "Cameră web integrată"
+
+#: keysign/receive.ui:179 keysign/send.ui:568
+msgid "<b>Security Code</b>"
+msgstr "<b>Cod de securitate</b>"
+
+#: keysign/receive.ui:212
+msgid "Scan Barcode"
+msgstr "Scanează codul de bare"
+
+#: keysign/receive.ui:229
+msgid "Downloading key-data. Please wait..."
+msgstr "Se descarcă datele cheii. Așteptați..."
+
+#: keysign/receive.ui:254
+msgid "Key download was interrupted!"
+msgstr "Descărcarea cheii a fost întreruptă!"
+
+#: keysign/receive.ui:345
+msgid ""
+"Saves the produced certifications as separate files in a custom directory"
+msgstr ""
+"Salvează certificările produse ca fișiere separate într-un director "
+"personalizat"
+
+#: keysign/receive.ui:360
+msgid ""
+"Imports a temporary version of the produced certifications into the local "
+"keyring"
+msgstr ""
+"Importă o versiune temporară a certificărilor produce în inelul de chei local"
+
+#: keysign/receive.ui:403
+msgid ""
+"Successfully produced certifications.\n"
+"You can import a temporary signature to start using the key as if it had "
+"already been properly verified.\n"
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"ProducedSignatures/1\">the documentation</a>."
+msgstr ""
+"S-au produs cu succes certificările.\n"
+"Puteți importa o semnătură temporară pentru a începe să utilizați cheia ca "
+"și cum ar fi fost deja verificată cum trebuie.\n"
+"Pentru mai multe informații vizitați <a href=\"https://wiki.gnome.org/Apps/"
+"Keysign/Doc/ProducedSignatures/1\">documentația</a>."
+
+#: keysign/receive.ui:446
+msgid ""
+"To sign the key, confirm that you want to sign the following key.\n"
+"This will generate an email that must be sent in order to complete the "
+"signing process."
+msgstr ""
+"Pentru a semna cheia, confirmați că doriți să semnați următoarea cheie.\n"
+"Acest lucru va genera un email care trebuie trimis pentru a completa "
+"procesul de semnare."
+
+#: keysign/receive.ui:474
+msgid "Key"
+msgstr "Tastă"
+
+#: keysign/receive.ui:507 keysign/send.ui:493
+msgid "UIDs"
+msgstr "UID-uri"
+
+#: keysign/receive.ui:594
+msgid "C_onfirm"
+msgstr "C_onfirmă"
+
+#: keysign/receive.ui:716
+msgid "Signing the following UIDs:"
+msgstr "Se semnează următoarele UID-uri:"
+
+#: keysign/send.py:207
+msgid ""
+"Still trying to get a connection to the Internet. It appears to be slow or "
+"unavailable."
+msgstr ""
+"Se încearcă încă să se obțină o conexiune la Internet. Se pare că este lentă "
+"sau nedisponibilă."
+
+#: keysign/send.py:213
+msgid "There isn't an Internet connection!"
+msgstr "Nu există o conexiune la Internet!"
+
+#: keysign/send.py:219 keysign/send.ui:267
+msgid "The signature has been successfully imported!"
+msgstr "Semnătura a fost importată cu succes!"
+
+#: keysign/send.py:225
+msgid ""
+"An error occurred while trying to import the signature.\n"
+"Please double check the correctness of the chosen signature."
+msgstr ""
+"A apărut o eroare în timpul încercării de importare a semnăturii.\n"
+"Verificați de două ori corectitudinea semnăturii alese."
+
+#: keysign/send.py:254 keysign/send.ui:678
+msgid ""
+"Key successfully sent.\n"
+"You should receive soon an email with the signature."
+msgstr ""
+"Cheie trimisă cu succes.\n"
+"Ar trebui să primiți în curând un email cu semnătura."
+
+#: keysign/send.py:259
+msgid ""
+"Could not establish a secure connection.\n"
+"Either your partner has entered a wrong code or someone tried to intercept "
+"your connection"
+msgstr ""
+"Nu s-a putut stabili o conexiune sigură.\n"
+"Ori partenerul dumneavoastră a introdus un cod greșit ori cineva a încercat "
+"să vă intercepteze conexiunea"
+
+#: keysign/send.py:263
+#, python-format
+msgid ""
+"An unexpected error occurred:\n"
+"%s"
+msgstr ""
+"A apărut o eroare neașteptată:\n"
+"%s"
+
+#: keysign/send.ui:7
+msgid "Select and send key"
+msgstr "Selectați și trimiteți cheia"
+
+#: keysign/send.ui:13
+msgid "Select and Send key"
+msgstr "Selectați și trimiteți cheia"
+
+#: keysign/send.ui:121
+msgid ""
+"You don't have any keys!\n"
+"Please use, e.g. Seahorse to create one."
+msgstr ""
+"Nu aveți nicio cheie!\n"
+"Utilizați, de ex. Seahorse pentru a crea una."
+
+#: keysign/send.ui:198
+msgid "Very slow or no Internet connection!"
+msgstr "Conexiune la Internet foarte înceată sau inexistentă!"
+
+#. This refers to the key being certified by someone rather than the key used for
+#. certifying someone
+#: keysign/send.ui:322
+msgid "<b>Select a key for signing</b>"
+msgstr "<b>Selectați o cheie pentru semnare</b>"
+
+#: keysign/send.ui:338
+msgid "<small>Times signed</small>"
+msgstr "<small>De câte ori a fost semnată</small>"
+
+#: keysign/send.ui:405
+msgid "Keylist"
+msgstr "Listă de chei"
+
+#: keysign/send.ui:425
+msgid ""
+"<small>To have the key signed, the other person must enter the security "
+"code, or scan the QR code</small>"
+msgstr ""
+"<small>Pentru a avea cheia semnată, cealaltă persoană trebuie să introducă "
+"codul de securitate, sau să scaneze codul QR</small>"
+
+#: keysign/send.ui:452
+msgid "<b>Key Details</b>"
+msgstr "<b>Detalii cheie</b>"
+
+#: keysign/send.ui:477
+msgid "Fingerprint"
+msgstr "Amprentă"
+
+#: keysign/send.ui:631
+msgid "<b>QR Code</b>"
+msgstr "<b>Cod QR</b>"
+
+#: keysign/util.py:231
+msgid ""
+"Hi $uid,\n"
+"\n"
+"\n"
+"I have just signed your key\n"
+"\n"
+"      $fingerprint\n"
+"\n"
+"\n"
+"Thanks for letting me sign your key!\n"
+"\n"
+"--\n"
+"GNOME Keysign\n"
+msgstr ""
+"Bună $uid,\n"
+"\n"
+"\n"
+"Tocmai ți-am semnat cheia\n"
+"\n"
+"      $fingerprint\n"
+"\n"
+"\n"
+"Mulțumesc pentru că m-ai lăsat să îți semnez cheia!\n"
+"\n"
+"--\n"
+"Semnează cheia GNOME\n"
+
+#: keysign/wormholereceive.py:86
+msgid "Wrong message authentication code"
+msgstr "Cod de autentificare de mesaj greșit"
