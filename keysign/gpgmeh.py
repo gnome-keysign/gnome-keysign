@@ -27,7 +27,7 @@ import platform
 
 import dbus
 import gpg
-from gpg.constants import PROTOCOL_OpenPGP
+from gpg.constants import PROTOCOL_OpenPGP, IMPORT_NEW, IMPORT_SIG
 from gpg.errors import GPGMEError
 
 
@@ -322,6 +322,36 @@ class TempContextWithAgent(TempContext):
 
 
 
+def import_signature_dbus(signature):
+    "Imports a TPK into the user's keyring by using Seahorse's DBus API"
+    name = "org.gnome.seahorse"
+    path = "/org/gnome/seahorse/keys"
+    bus = dbus.SessionBus()
+    result = []
+
+    proxy = bus.get_object(name, path)
+    iface = "org.gnome.seahorse.KeyService"
+    gpg_iface = dbus.Interface(proxy, iface)
+    payload = base64.b64encode(signature).decode('latin-1')
+    payload = '\n'.join(payload[i:(i + 64)] for i in range(0, len(payload), 64))
+    payload = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n\n" + payload + "\n-----END PGP PUBLIC KEY BLOCK-----"
+    result = gpg_iface.ImportKeys("openpgp", payload)
+    log.debug("Importing via DBus: %r", result)
+
+    return result
+
+def import_signature_gpgme(signature, homedir=None):
+    "Imports an OpenPGP TPK into a keyring via GPGME"
+    ctx = DirectoryContext(homedir)
+    ctx.op_import(signature)
+    result = ctx.op_import_result()
+    if len(result.imports) < 1:
+        raise GPGMEError
+
+    return result
+
+
+
 ##
 ## END OF INTERNAL API
 #####
@@ -546,6 +576,13 @@ def decrypt_and_import_signature(encrypted_sig, homedir=None):
     signature = decrypt_signature(encrypted_sig, homedir=homedir)
     import_signature(signature)
 
+
+
+
+class ImportNewCertificationError(GPGMEError):
+    "The import of a TPK failed, probably due to containing a new certificate rather than new 'signatures'"
+
+
 def import_signature(signature, homedir=None):
     """
     Imports an OpenPGP TPK to the local keyring
@@ -556,29 +593,36 @@ def import_signature(signature, homedir=None):
     This function will try to import the TPK via DBus first and,
     if that failed, resort to using gpgme directly.
     """
-    # Try Seahorse DBus
-    name = "org.gnome.seahorse"
-    path = "/org/gnome/seahorse/keys"
-    bus = dbus.SessionBus()
     result = []
 
-    try:
-        proxy = bus.get_object(name, path)
-    except dbus.exceptions.DBusException:
-        log.debug("Seahorse DBus is not available")
+    ctx = TempContextWithAgent(DirectoryContext(homedir=homedir))
+    ctx.op_import(signature)
+    res = ctx.op_import_result()
+    log.debug("ImportSignature: Testing for new certificate: %r", res)
+    imports = res.imports
+    if len(imports) != 1:
+        log.error("We expected to import only one certificate, "
+                  "but it seems we have %d", len(import_))
+        raise ImportNewCertificationError
     else:
-        iface = "org.gnome.seahorse.KeyService"
-        gpg_iface = dbus.Interface(proxy, iface)
-        payload = base64.b64encode(signature).decode('latin-1')
-        payload = '\n'.join(payload[i:(i + 64)] for i in range(0, len(payload), 64))
-        payload = "-----BEGIN PGP PUBLIC KEY BLOCK-----\n\n" + payload + "\n-----END PGP PUBLIC KEY BLOCK-----"
-        result = gpg_iface.ImportKeys("openpgp", payload)
-        log.debug("Importing via DBus: %r", result)
+        import_ = imports[0]
+        if import_.status & gpg.constants.IMPORT_NEW:
+            log.error("We did not expect to import a *new* certificate, "
+                      "but this seems to be new: %r", import_)
+            raise ImportNewCertificationError
+        else:
+            assert import_.status & gpg.constants.IMPORT_SIG
 
-    # If Seahorse failed we try op_import
-    if len(result) < 1:
-        ctx = DirectoryContext(homedir)
-        ctx.op_import(signature)
-        result = ctx.op_import_result()
-        if len(result.imports) < 1:
-            raise GPGMEError
+            if not homedir:
+                # If a homedir is requested, we have to use the gpgme API, because we cannot specify a GnuPG keyring via DBus
+                try:
+                    # Try Seahorse DBus
+                    result = import_signature_dbus(signature)
+                except dbus.exceptions.DBusException:
+                    log.debug("Seahorse DBus is not available")
+
+            # If Seahorse failed we try op_import
+            if len(result) < 1:
+                result = import_signature_gpgme(signature, homedir=homedir)
+
+        return result
