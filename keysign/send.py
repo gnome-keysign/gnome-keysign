@@ -137,7 +137,7 @@ class SendApp:
             self.signature_imported()
         except errors.GPGMEError as e:
             log.exception("Could not import signatures")
-            self.signature_import_error()
+            self.signature_import_error(e)
 
     @inlineCallbacks
     def on_key_activated(self, widget, key):
@@ -215,16 +215,13 @@ class SendApp:
         log.info("No Internet connection")
 
     def signature_imported(self):
-        self.klw.image_ib_import.set_from_icon_name(Gtk.STOCK_OK, Gtk.IconSize.BUTTON)
-        self.klw.label_ib_import.set_label(_("The signature has been successfully imported!"))
-        self.klw.ib_import.show()
+        self.klw.ib_import_okay.show()
         log.info("Signature imported")
 
-    def signature_import_error(self):
-        self.klw.image_ib_import.set_from_icon_name(Gtk.STOCK_DIALOG_ERROR, Gtk.IconSize.BUTTON)
-        self.klw.label_ib_import.set_label(_("An error occurred while trying to import the signature.\n"
-                                           "Please double check the correctness of the chosen signature."))
-        self.klw.ib_import.show()
+    def signature_import_error(self, e):
+        self.klw.ib_import_error.show()
+        # We hide the error details button, because we don't have that functionality just yet
+        self.klw.button_ib_import_error.hide()
         log.info("Signature import error")
 
     def create_keypresent(self, discovery_code, discovery_data):

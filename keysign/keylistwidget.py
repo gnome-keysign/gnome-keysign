@@ -140,10 +140,18 @@ class KeyListWidget(Gtk.HBox):
         fix_infobar(self.ib_internet)
         self.label_ib_internet = builder.get_object('label_internet')
 
-        self.ib_import = builder.get_object('infobar_import')
-        fix_infobar(self.ib_import)
-        self.label_ib_import = builder.get_object('label_import')
-        self.image_ib_import = builder.get_object('image_import')
+        self.ib_import_okay = builder.get_object('infobar_import_okay')
+        self.ib_import_error = builder.get_object('infobar_import_error')
+        assert self.ib_import_okay
+        assert self.ib_import_error
+        fix_infobar(self.ib_import_okay)
+        fix_infobar(self.ib_import_error)
+        self.label_ib_import_okay = builder.get_object('label_import_okay')
+        self.image_ib_import_okay = builder.get_object('image_import_okay')
+        self.label_ib_import_error = builder.get_object('label_import_error')
+        self.image_ib_import_error = builder.get_object('image_import_error')
+        self.button_ib_import_error = builder.get_object('import_error_details_button')
+        self.button_ib_import_okay = builder.get_object('return_signature')
 
         if len(list(keys)) <= 0:
             infobar = builder.get_object("infobar")
