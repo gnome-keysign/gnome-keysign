@@ -216,6 +216,9 @@ class SendApp:
 
     def signature_imported(self):
         self.klw.ib_import_okay.show()
+        def return_certification(button):
+            log.info("Return certification")
+        self.klw.button_ib_import_okay.connect('clicked', return_certification)
         log.info("Signature imported")
 
     def signature_import_error(self, e):
