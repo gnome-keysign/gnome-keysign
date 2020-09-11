@@ -7,31 +7,31 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2019-01-22 20:53+0000\n"
-"PO-Revision-Date: 2019-02-09 17:08+0100\n"
+"POT-Creation-Date: 2020-07-13 10:07+0000\n"
+"PO-Revision-Date: 2020-09-11 17:15+0200\n"
+"Last-Translator: Fabio Tomat <f.t.public@gmail.com>\n"
 "Language-Team: Friulian <fur@li.org>\n"
+"Language: fur\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
-"Language: fur\n"
-"Last-Translator: Fabio Tomat <f.t.public@gmail.com>\n"
-"X-Generator: Poedit 2.2\n"
+"X-Generator: Poedit 2.4.1\n"
 
-#: data/org.gnome.Keysign.raw.appdata.xml:10
+#: data/org.gnome.Keysign.raw.appdata.xml:11
 msgid ""
 "\n"
-"      GNOME-Keysign allows signing OpenPGP keys comfortably and securely\n"
+"      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
 "      via the local network or Bluetooth.\n"
 "    "
 msgstr ""
 "\n"
-"      GNOME-Keysign al permet di firmâ lis clâfs OpenPGP in maniere comude e "
+"      GNOME Keysign al permet di firmâ lis clâfs OpenPGP in maniere comude e "
 "sigure\n"
 "      vie rêt locâl o Bluetooth.\n"
 "    "
 
-#: data/org.gnome.Keysign.raw.appdata.xml:14
+#: data/org.gnome.Keysign.raw.appdata.xml:15
 msgid ""
 "\n"
 "      It can scan another key's barcode and transfer the key securely,\n"
@@ -75,27 +75,27 @@ msgstr "python;gpg;gnupg;clâf;openpgp;"
 msgid "org.gnome.Keysign"
 msgstr "org.gnome.Keysign"
 
-#: keysign/app.py:181
+#: keysign/app.py:187
 msgid "Send"
 msgstr "Invie"
 
-#: keysign/app.py:183 keysign/receive.py:238
+#: keysign/app.py:189 keysign/receive.py:272
 msgid "Receive"
 msgstr "Ricêf"
 
-#: keysign/app.ui:62 keysign/send.ui:616
+#: keysign/app.ui:62 keysign/send.ui:54
 msgid "Internet"
 msgstr "Internet"
 
-#: keysign/avahioffer.py:81 keysign/bluetoothoffer.py:126
+#: keysign/avahioffer.py:83 keysign/bluetoothoffer.py:126
 msgid "Offering key: {}"
 msgstr "Ufrint la clâf: {}"
 
-#: keysign/avahioffer.py:82 keysign/bluetoothoffer.py:127
+#: keysign/avahioffer.py:84 keysign/bluetoothoffer.py:127
 msgid "Discovery info: {}"
 msgstr "Informazion pe ricercje : {}"
 
-#: keysign/avahioffer.py:83
+#: keysign/avahioffer.py:86
 msgid "Press Enter to stop"
 msgstr "Frache Invie par fermâ"
 
@@ -246,23 +246,11 @@ msgstr ""
 "            Continus ce che si stave fasint\n"
 "            cuant che al è vignût fûr l'erôr.\n"
 "            Se tu puedis furnî lis istruzions pas-dopo-pas\n"
-"            su ce mût riprodusi l'erôr,\n"
+"            su cemût riprodusi l'erôr,\n"
 "            al è ancjemò miôr.\n"
 "\n"
 "            #### Traceback\n"
 "        "
-
-#. TRANSLATORS: Please include your locale, e.g. "de". We're trying to debug native
-#. gettext
-#: keysign/i18n.py:39
-msgid "Translated for gettext (C)"
-msgstr "Tradot par gettext (C)"
-
-#. TRANSLATORS: Please include your locale, e.g. "de". We're trying to debug pure
-#. python gettext
-#: keysign/i18n.py:47
-msgid "Translated for Python (C)"
-msgstr "Tradot par Python (C)"
 
 #: keysign/keylistwidget.py:83
 msgid "Expires: "
@@ -272,52 +260,85 @@ msgstr "Scjadence: "
 msgid "Sign Key"
 msgstr "Firme clâf"
 
+#: keysign/receive.py:218
+msgid "Select file for saving"
+msgstr "Selezione il file pal salvament"
+
 #: keysign/receive.ui:53
 msgid ""
 "No GNOME Keysign servers around :-(\n"
 "Find a friend to use GNOME Keysign with.\n"
 "You may also suffer from connectivity problems.\n"
-"For more information click <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
-"NoServers/1\">here</a>."
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"NoServers/1\">the documentation</a>."
 msgstr ""
 "Nissun server di GNOME Keysign ator :-(\n"
 "Cîr un amì par doprâ cun lui GNOME Keysign.\n"
 "Tu podaressis vê di problemis di conession.\n"
-"Par vê plui informazions fâs clic <a href=\"https://wiki.gnome.org/Apps/"
-"Keysign/Doc/NoServers/1\">achì</a>."
+"Par vê plui informazions lei <a href=\"https://wiki.gnome.org/Apps/Keysign/"
+"Doc/NoServers/1\">la documentazion</a>."
 
-#: keysign/receive.ui:105
+#: keysign/receive.ui:108
 msgid ""
 "<small>To sign someone's key, scan their QR or enter security code</small>"
 msgstr ""
 "<small>Par firmâ la clâf di cualchidun, scansione il so QR o inserìs il "
 "codiç di sigurece</small>"
 
-#: keysign/receive.ui:124
+#: keysign/receive.ui:127
 msgid "<b>Camera</b>"
 msgstr "<b>Fotocjamare</b>"
 
-#: keysign/receive.ui:139
+#: keysign/receive.ui:142
 msgid "Integrated Web Cam"
 msgstr "Web Cam integrade"
 
-#: keysign/receive.ui:176 keysign/send.ui:435
+#: keysign/receive.ui:179 keysign/send.ui:568
 msgid "<b>Security Code</b>"
 msgstr "<b>Codiç di sigurece</b>"
 
-#: keysign/receive.ui:209
+#: keysign/receive.ui:212
 msgid "Scan Barcode"
 msgstr "Scansione codiç a sbaris"
 
-#: keysign/receive.ui:226
-msgid "Downloading key-data. Please wait ..."
-msgstr "Daûr a discjariâ i dâts de clâf. Spiete ..."
+#: keysign/receive.ui:229
+msgid "Downloading key-data. Please wait..."
+msgstr "Daûr a discjariâ i dâts de clâf. Spiete..."
 
-#: keysign/receive.ui:251
+#: keysign/receive.ui:254
 msgid "Key download was interrupted!"
 msgstr "Il discjariament de clâf al è stât interot!"
 
-#: keysign/receive.ui:337
+#: keysign/receive.ui:345
+msgid ""
+"Saves the produced certifications as separate files in a custom directory"
+msgstr ""
+"Al salve i certificâts prodots come file separâts intune cartele "
+"personalizade"
+
+#: keysign/receive.ui:360
+msgid ""
+"Imports a temporary version of the produced certifications into the local "
+"keyring"
+msgstr ""
+"Al impuarte une version temporanie dai certificâts prodots intal puarteclâfs "
+"locâl"
+
+#: keysign/receive.ui:403
+msgid ""
+"Successfully produced certifications.\n"
+"You can import a temporary signature to start using the key as if it had "
+"already been properly verified.\n"
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"ProducedSignatures/1\">the documentation</a>."
+msgstr ""
+"Certificâts prodots cun sucès.\n"
+"Tu puedis impuartâ une firme temporanie par tacâ a doprâ la clâf come che e "
+"fos za stade verificade in maniere apropriade.\n"
+"Par vê plui informazions lei <a href=\"https://wiki.gnome.org/Apps/Keysign/"
+"Doc/ProducedSignatures/1\">la documentazion</a>."
+
+#: keysign/receive.ui:446
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
@@ -327,23 +348,23 @@ msgstr ""
 "Chest al gjenerarà une e-mail che e scugne jessi inviade par podê completâ "
 "il procès di firme."
 
-#: keysign/receive.ui:365
+#: keysign/receive.ui:474
 msgid "Key"
 msgstr "Clâf"
 
-#: keysign/receive.ui:398 keysign/send.ui:360
+#: keysign/receive.ui:507 keysign/send.ui:493
 msgid "UIDs"
 msgstr "UID"
 
-#: keysign/receive.ui:485
+#: keysign/receive.ui:594
 msgid "C_onfirm"
 msgstr "C_onferme"
 
-#: keysign/receive.ui:539
+#: keysign/receive.ui:716
 msgid "Signing the following UIDs:"
 msgstr "Daûr a firmâ i UID chi sot:"
 
-#: keysign/send.py:156
+#: keysign/send.py:207
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
@@ -351,11 +372,23 @@ msgstr ""
 "Si sta ancjemò cirint di otignî une conession a internet. E semee jessi "
 "lente o no disponibile."
 
-#: keysign/send.py:162
+#: keysign/send.py:213
 msgid "There isn't an Internet connection!"
 msgstr "No si à une conession a internet!"
 
-#: keysign/send.py:190 keysign/send.ui:545
+#: keysign/send.py:219 keysign/send.ui:267
+msgid "The signature has been successfully imported!"
+msgstr "La firme e je stade impuartade cun sucès!"
+
+#: keysign/send.py:225
+msgid ""
+"An error occurred while trying to import the signature.\n"
+"Please double check the correctness of the chosen signature."
+msgstr ""
+"Si è verificât un erôr intant che si cirive di impuartâ la firme.\n"
+"Par plasê torne controle la coretece de firme sielte."
+
+#: keysign/send.py:254 keysign/send.ui:678
 msgid ""
 "Key successfully sent.\n"
 "You should receive soon an email with the signature."
@@ -363,7 +396,7 @@ msgstr ""
 "Clâf inviade cun sucès.\n"
 "Chi di pôc tu ricevarâs une e-mail cun la firme."
 
-#: keysign/send.py:195
+#: keysign/send.py:259
 msgid ""
 "Could not establish a secure connection.\n"
 "Either your partner has entered a wrong code or someone tried to intercept "
@@ -373,7 +406,7 @@ msgstr ""
 "O il to amì nol à inserît il codiç just o cualchidun al à cirût di intercetâ "
 "la conession"
 
-#: keysign/send.py:199
+#: keysign/send.py:263
 #, python-format
 msgid ""
 "An unexpected error occurred:\n"
@@ -386,7 +419,11 @@ msgstr ""
 msgid "Select and send key"
 msgstr "Selezione e invie la clâf"
 
-#: keysign/send.ui:58
+#: keysign/send.ui:13
+msgid "Select and Send key"
+msgstr "Selezione e invie clâf"
+
+#: keysign/send.ui:121
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
@@ -394,23 +431,25 @@ msgstr ""
 "No tu âs nissune clâf!\n"
 "Par plasê dopre par esempli Seahorse par creâ'nt une."
 
-#: keysign/send.ui:135
+#: keysign/send.ui:198
 msgid "Very slow or no Internet connection!"
 msgstr "Une vore lente o nissune conession a internet!"
 
-#: keysign/send.ui:190
+#. This refers to the key being certified by someone rather than the key used for
+#. certifying someone
+#: keysign/send.ui:322
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>Selezione une clâf par firmâ</b>"
 
-#: keysign/send.ui:206
+#: keysign/send.ui:338
 msgid "<small>Times signed</small>"
 msgstr "<small>Voltis firmade</small>"
 
-#: keysign/send.ui:272
+#: keysign/send.ui:405
 msgid "Keylist"
 msgstr "Liste des clâfs"
 
-#: keysign/send.ui:292
+#: keysign/send.ui:425
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
@@ -418,23 +457,19 @@ msgstr ""
 "<small>Par vê la clâf firmade, chê altre persone e scugne inserî il codiç di "
 "sigurece o scansionâ il codiç QR</small>"
 
-#: keysign/send.ui:319
+#: keysign/send.ui:452
 msgid "<b>Key Details</b>"
 msgstr "<b>Detais clâf</b>"
 
-#: keysign/send.ui:344
+#: keysign/send.ui:477
 msgid "Fingerprint"
 msgstr "Impronte"
 
-#: keysign/send.ui:498
+#: keysign/send.ui:631
 msgid "<b>QR Code</b>"
 msgstr "<b>Codiç QR</b>"
 
-#: keysign/send.ui:575
-msgid "Select and Send key"
-msgstr "Selezione e invie clâf"
-
-#: keysign/util.py:222
+#: keysign/util.py:231
 msgid ""
 "Hi $uid,\n"
 "\n"
@@ -465,3 +500,9 @@ msgstr ""
 #: keysign/wormholereceive.py:86
 msgid "Wrong message authentication code"
 msgstr "Codiç di autenticazion dal messaç sbaliât"
+
+#~ msgid "Translated for gettext (C)"
+#~ msgstr "Tradot par gettext (C)"
+
+#~ msgid "Translated for Python (C)"
+#~ msgstr "Tradot par Python (C)"

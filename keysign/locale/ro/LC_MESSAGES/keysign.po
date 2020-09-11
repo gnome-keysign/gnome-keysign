@@ -1,25 +1,26 @@
-# Dutch translation for gnome-keysign.
-# Copyright (C) 2019 gnome-keysign's COPYRIGHT HOLDER
+# Romanian translation for gnome-keysign.
+# Copyright (C) 2020 gnome-keysign's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-keysign package.
-# Nathan Follens <nthn@unseen.is>, 2019-2020.
+# Florentina Mușat <florentina.musat.28@gmail.com>, 2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2019-10-06 20:01+0000\n"
-"PO-Revision-Date: 2020-02-26 14:23+0100\n"
-"Last-Translator: Nathan Follens <nthn@unseen.is>\n"
-"Language-Team: Dutch <gnome-nl-list@gnome.org>\n"
-"Language: nl\n"
+"POT-Creation-Date: 2020-04-03 12:02+0000\n"
+"PO-Revision-Date: 2020-07-13 13:06+0300\n"
+"Language-Team: Romanian <gnomero-list@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.3\n"
+"Language: ro\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
+"20)) ? 1 : 2);;\n"
+"Last-Translator: Florentina Mușat <florentina.musat.28@gmail.com>\n"
+"X-Generator: Poedit 2.3.1\n"
 
-#: data/org.gnome.Keysign.raw.appdata.xml:10
+#: data/org.gnome.Keysign.raw.appdata.xml:11
 msgid ""
 "\n"
 "      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
@@ -27,12 +28,12 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"      Gnome Keysign laat u eenvoudig en veilig OpenPGP-sleutels "
-"ondertekenen\n"
-"      via het lokale netwerk of Bluetooth.\n"
+"      Semnează cheia GNOME vă permite să semnați chei OpenPGP comfortabil și "
+"sigur\n"
+"      via rețelei locale sau Bluetooth.\n"
 "    "
 
-#: data/org.gnome.Keysign.raw.appdata.xml:14
+#: data/org.gnome.Keysign.raw.appdata.xml:15
 msgid ""
 "\n"
 "      It can scan another key's barcode and transfer the key securely,\n"
@@ -43,19 +44,20 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"      Het kan de barcode van een andere sleutel scannen en de sleutel veilig "
-"overdragen,\n"
-"      wat informele sleutelondertekeningssessies tussen twee partijen "
-"mogelijk maakt.\n"
-"      Het verzendt de versleutelde ondertekeningen naar de UID’s van een "
-"sleutel\n"
-"      met de door de gebruiker ingestelde e-mailcliënt.\n"
+"      Poate să scaneze codul de bare a unei alte chei și să transfere cheia "
+"sigur,\n"
+"      permițând pentru sesiuni cazuale de semnat de cheie din două părți.\n"
+"      Urmărește cele mai bune practici prin trimiterea de semnături "
+"criptate\n"
+"      la UID-urile unei chei utilizând clientul de Email pe care "
+"utilizatorul l-a configurat\n"
+"      pentru utilizare.\n"
 "    "
 
 #. Name
 #: data/org.gnome.Keysign.raw.desktop:2
 msgid "Keysign"
-msgstr "Keysign"
+msgstr "Semnează cheia"
 
 #. Comment
 #: data/org.gnome.Keysign.raw.desktop:3
@@ -63,13 +65,13 @@ msgid ""
 "A keysigning helper to enable you to comfortably exchange OpenPGP keys with "
 "a friend"
 msgstr ""
-"Een hulpprogramma dat u eenvoudig OpenPGP-sleutels laat uitwisselen met een "
-"vriend"
+"Un ajutor de semnat cheia pentru a vă permite să schimbați chei OpenPGP "
+"confortabil cu un prieten"
 
 #. Keywords
 #: data/org.gnome.Keysign.raw.desktop:4
 msgid "python;gpg;gnupg;key;openpgp;"
-msgstr "python;gpg;gnupg;key;openpgp;sleutel;versleuteling;"
+msgstr "python;gpg;gnupg;key;openpgp;cheie;"
 
 #. Icon
 #: data/org.gnome.Keysign.raw.desktop:7
@@ -78,11 +80,11 @@ msgstr "org.gnome.Keysign"
 
 #: keysign/app.py:187
 msgid "Send"
-msgstr "Verzenden"
+msgstr "Trimite"
 
 #: keysign/app.py:189 keysign/receive.py:272
 msgid "Receive"
-msgstr "Ontvangen"
+msgstr "Primește"
 
 #: keysign/app.ui:62 keysign/send.ui:54
 msgid "Internet"
@@ -90,19 +92,19 @@ msgstr "Internet"
 
 #: keysign/avahioffer.py:83 keysign/bluetoothoffer.py:126
 msgid "Offering key: {}"
-msgstr "Sleutel wordt aangeboden: {}"
+msgstr "Oferind cheia: {}"
 
 #: keysign/avahioffer.py:84 keysign/bluetoothoffer.py:127
 msgid "Discovery info: {}"
-msgstr "Ontdekkingsinfo: {}"
+msgstr "Informații de descoperire: {}"
 
 #: keysign/avahioffer.py:86
 msgid "Press Enter to stop"
-msgstr "Druk op Enter om te stoppen"
+msgstr "Apăsați Enter pentru a opri"
 
 #: keysign/bluetoothoffer.py:117
 msgid "You must provide an argument to identify the key"
-msgstr "U dient een parameter in te voeren om de sleutel te identificeren"
+msgstr "Trebuie să furnizați un argument pentru a identifica cheia"
 
 #: keysign/bluetoothoffer.py:128
 msgid "HMAC: {}"
@@ -110,15 +112,15 @@ msgstr "HMAC: {}"
 
 #: keysign/bluetoothoffer.py:129
 msgid "Port: {}"
-msgstr "Poort: {}"
+msgstr "Port: {}"
 
 #: keysign/bluetoothoffer.py:132
 msgid "Bluetooth not available"
-msgstr "Bluetooth niet beschikbaar"
+msgstr "Bluetooth nu este disponibil"
 
 #: keysign/bluetoothoffer.py:137
 msgid "Press Enter to cancel"
-msgstr "Druk op Enter om te annuleren"
+msgstr "Apăsați Enter pentru a anula"
 
 #: keysign/bluetoothoffer.py:144
 msgid ""
@@ -126,7 +128,7 @@ msgid ""
 "Key successfully sent"
 msgstr ""
 "\n"
-"Sleutel verzonden"
+"Cheia trimisă cu succes"
 
 #: keysign/bluetoothoffer.py:146
 msgid ""
@@ -134,39 +136,39 @@ msgid ""
 "An error occurred: {}"
 msgstr ""
 "\n"
-"Er is een fout opgetreden: {}"
+"A apărut o eroare: {}"
 
 #: keysign/bluetoothoffer.py:148
 msgid "Press Enter to exit"
-msgstr "Druk op Enter om af te sluiten"
+msgstr "Apăsați Enter pentru a ieși"
 
 #: keysign/bluetoothreceive.py:134
 msgid "Trying to download the key, please wait"
-msgstr "Poging tot downloaden van sleutel, even geduld"
+msgstr "Se încearcă să se descarce cheia, așteptați"
 
 #: keysign/dialog_avahi.ui:8
 msgid "Unable to Start Avahi"
-msgstr "Kan Avahi niet starten"
+msgstr "Nu se poate porni Avahi"
 
 #: keysign/dialog_avahi.ui:9
 msgid ""
 "Keysign is unable to automatically start Avahi. You can try to execute "
 "`systemctl start avahi-daemon` for solving this problem."
 msgstr ""
-"Keysign kan Avahi niet automatisch starten. U kunt `systemctl start avahi-"
-"daemon` proberen uitvoeren om dit probleem op te lossen."
+"Semnează cheia nu poate să pornească automat Avahi. Puteți încerca să "
+"executați „systemctl start avahi-daemon” pentru rezolvarea acestei probleme."
 
 #: keysign/dialog_avahi.ui:23
 msgid "OK"
-msgstr "Oké"
+msgstr "OK"
 
 #: keysign/gtkexcepthook.py:173
 msgid "Bug Detected"
-msgstr "Fout gedetecteerd"
+msgstr "Defecțiune detectată"
 
 #: keysign/gtkexcepthook.py:175
 msgid "<big><b>A programming error has been detected.</b></big>"
-msgstr "<big><b>Er is een programmeerfout gedetecteerd.</b></big>"
+msgstr "<big><b>A fost detectată o eroare de programare.</b></big>"
 
 #: keysign/gtkexcepthook.py:178
 msgid ""
@@ -176,35 +178,35 @@ msgid ""
 "Please tell the developers about this using the issue tracker if no-one else "
 "has reported it yet."
 msgstr ""
-"U kunt deze fout negeren en verderwerken, maar dit kan tot onverwachte "
-"resultate leiden.\n"
+"Este posibil să puteți ignora această eroare și să continuați să lucrați, "
+"dar puteți obține rezultate neașteptate.\n"
 "\n"
-"Gelieve de ontwikkelaars over deze fout te informeren indien niemand anders "
-"dit al heeft gedaan."
+"Spuneți dezvoltatorilor despre acest lucru utilizând urmăritorul de probleme "
+"dacă nimeni nu a raportat-o încă."
 
 #: keysign/gtkexcepthook.py:187
 msgid "Search Tracker..."
-msgstr "Tracker doorzoeken…"
+msgstr "Caută urmăritor..."
 
 #: keysign/gtkexcepthook.py:189
 msgid "Report..."
-msgstr "Melden…"
+msgstr "Raportează..."
 
 #: keysign/gtkexcepthook.py:191
 msgid "Ignore Error"
-msgstr "Fout negeren"
+msgstr "Ignoră eroarea"
 
 #: keysign/gtkexcepthook.py:192
 msgid "Quit GNOME Keysign"
-msgstr "Gnome Keysign afsluiten"
+msgstr "Ieșire din Semnează cheia GNOME"
 
 #: keysign/gtkexcepthook.py:202
 msgid "Details..."
-msgstr "Details…"
+msgstr "Detalii..."
 
 #: keysign/gtkexcepthook.py:229 keysign/gtkexcepthook.py:232
 msgid "Exception while analyzing the exception."
-msgstr "Uitzondering bij analyseren van uitzondering."
+msgstr "Excepție în timpul analizării excepției."
 
 #. TRANSLATORS: Crash report template for github, preceding a traceback.
 #. TRANSLATORS: Please ask users kindly to supply at least an English
@@ -232,38 +234,38 @@ msgid ""
 "            #### Traceback\n"
 "        "
 msgstr ""
-"            #### Beschrijving\n"
+"            #### Descriere\n"
 "\n"
-"            Geef deze melding een korte, beschrijvende titel.\n"
-"            Gebruik iets als\n"
-"            \"{functie-die-niet-juist-werkt}: {wat-ging-er-mis}\"\n"
-"            als titel, indien mogelijk.\n"
-"            Vervang dan deze tekst met\n"
-"            een uitgebreidere beschrijving van de fout.\n"
-"            Schermafdrukken of filmpjes zijn ook nuttig!\n"
+"            Dați acestui raport un scurt titlu descriptiv.\n"
+"            Utilizați ceva precum\n"
+"            „{funcționalitate-care-s-a-defectat}: {ce-a-mers-greșit}”\n"
+"            pentru titlu, dacă puteți.\n"
+"            Apoi înlocuiți acest text\n"
+"            cu o descriere mai lungă a defecțiunii.\n"
+"            Capturile de ecran sau video-urile sunt și ele grozave!\n"
 "\n"
-"            #### Stappen om te reproduceren\n"
+"            #### Pași de reproducere\n"
 "\n"
-"            Vertel ons wat u aan het doen was\n"
-"            toen het foutbericht te voorschijn kwam.\n"
-"            Als u stap-voor-stap-instructies kunt geven\n"
-"            over hoe u de fout kunt reproduceren,\n"
-"            is dat nog beter.\n"
+"            Spuneți-ne ce făceați\n"
+"            când a apărut mesajul de eroare.\n"
+"            Dacă puteți furniza instrucțiuni pas-cu-pas\n"
+"            despre cum să se reproducă defecțiunea,\n"
+"            asta e și mai bine.\n"
 "\n"
-"            #### Traceback\n"
+"            #### Urmărire\n"
 "        "
 
 #: keysign/keylistwidget.py:83
 msgid "Expires: "
-msgstr "Verloopt: "
+msgstr "Expiră: "
 
 #: keysign/receive.py:158
 msgid "Sign Key"
-msgstr "Sleutel ondertekenen"
+msgstr "Semnează cheia"
 
 #: keysign/receive.py:218
 msgid "Select file for saving"
-msgstr "Kies een bestand om op te slaan"
+msgstr "Selectează fișierul pentru salvare"
 
 #: keysign/receive.ui:53
 msgid ""
@@ -273,18 +275,18 @@ msgid ""
 "For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "NoServers/1\">the documentation</a>."
 msgstr ""
-"Geen Gnome Keysign-servers in de buurt :-(\n"
-"Probeer Gnome Keysign uit met een vriend.\n"
-"U kunt mogelijk last ondervinden van verbindingsproblemen.\n"
-"Bekijk <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/NoServers/1\">de "
-"documentatie</a> voor meer informatie."
+"Nu există servere Semnează cheia GNOME prin preajmă :-(\n"
+"Găsește un prieten cu care să utilizați Semnează cheia GNOME.\n"
+"Puteți, de asemenea, suferi de probleme de conectivitate.\n"
+"Pentru mai multe informații vizitați <a href=\"https://wiki.gnome.org/Apps/"
+"Keysign/Doc/NoServers/1\">documentația</a>."
 
 #: keysign/receive.ui:108
 msgid ""
 "<small>To sign someone's key, scan their QR or enter security code</small>"
 msgstr ""
-"<small>Om iemands sleutel te ondertekenen, scant u hun QR-code of voert u de "
-"beveiligingscode in</small>"
+"<small>Pentru a semna cheia cuiva, scanați codul lor QR sau introduceți "
+"codul de securitate</small>"
 
 #: keysign/receive.ui:127
 msgid "<b>Camera</b>"
@@ -292,38 +294,37 @@ msgstr "<b>Camera</b>"
 
 #: keysign/receive.ui:142
 msgid "Integrated Web Cam"
-msgstr "Geïntegreerde webcam"
+msgstr "Cameră web integrată"
 
 #: keysign/receive.ui:179 keysign/send.ui:568
 msgid "<b>Security Code</b>"
-msgstr "<b>Beveiligingscode</b>"
+msgstr "<b>Cod de securitate</b>"
 
 #: keysign/receive.ui:212
 msgid "Scan Barcode"
-msgstr "Barcode scannen"
+msgstr "Scanează codul de bare"
 
 #: keysign/receive.ui:229
 msgid "Downloading key-data. Please wait..."
-msgstr "Sleutelgegevens worden gedownload. Even geduld…"
+msgstr "Se descarcă datele cheii. Așteptați..."
 
 #: keysign/receive.ui:254
 msgid "Key download was interrupted!"
-msgstr "Downloaden van sleutel onderbroken!"
+msgstr "Descărcarea cheii a fost întreruptă!"
 
 #: keysign/receive.ui:345
 msgid ""
 "Saves the produced certifications as separate files in a custom directory"
 msgstr ""
-"Slaat de geproduceerde certificaties op als aparte bestanden in een map naar "
-"keuze"
+"Salvează certificările produse ca fișiere separate într-un director "
+"personalizat"
 
 #: keysign/receive.ui:360
 msgid ""
 "Imports a temporary version of the produced certifications into the local "
 "keyring"
 msgstr ""
-"Lijst een tijdelijke versie van de geproduceerde certificaties in de lokale "
-"sleutelbos in"
+"Importă o versiune temporară a certificărilor produce în inelul de chei local"
 
 #: keysign/receive.ui:403
 msgid ""
@@ -333,11 +334,11 @@ msgid ""
 "For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "ProducedSignatures/1\">the documentation</a>."
 msgstr ""
-"Certificaties geproduceerd.\n"
-"U kunt een tijdelijke ondertekening inlezen om de sleutel al te gebruiken "
-"alsof hij reeds volledig geverifieerd is.\n"
-"Bekijk <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
-"ProducedSignatures/1\">de documentatie</a> voor meer informatie."
+"S-au produs cu succes certificările.\n"
+"Puteți importa o semnătură temporară pentru a începe să utilizați cheia ca "
+"și cum ar fi fost deja verificată cum trebuie.\n"
+"Pentru mai multe informații vizitați <a href=\"https://wiki.gnome.org/Apps/"
+"Keysign/Doc/ProducedSignatures/1\">documentația</a>."
 
 #: keysign/receive.ui:446
 msgid ""
@@ -345,58 +346,57 @@ msgid ""
 "This will generate an email that must be sent in order to complete the "
 "signing process."
 msgstr ""
-"Om de sleutel te onderteken, bevestigt u dat u volgende sleutel wilt "
-"ondertekenen.\n"
-"Dit zal een e-mail genereren die verzonden meot worden om het "
-"ondertekeningsproces te voltooien."
+"Pentru a semna cheia, confirmați că doriți să semnați următoarea cheie.\n"
+"Acest lucru va genera un email care trebuie trimis pentru a completa "
+"procesul de semnare."
 
 #: keysign/receive.ui:474
 msgid "Key"
-msgstr "Sleutel"
+msgstr "Tastă"
 
 #: keysign/receive.ui:507 keysign/send.ui:493
 msgid "UIDs"
-msgstr "UID’s"
+msgstr "UID-uri"
 
 #: keysign/receive.ui:594
 msgid "C_onfirm"
-msgstr "B_evestigen"
+msgstr "C_onfirmă"
 
 #: keysign/receive.ui:716
 msgid "Signing the following UIDs:"
-msgstr "Volgende UID’s worden ondertekend:"
+msgstr "Se semnează următoarele UID-uri:"
 
 #: keysign/send.py:207
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
 msgstr ""
-"Nog steeds geen toegang tot het internet. Het lijkt traag of niet "
-"beschikbaar te zijn."
+"Se încearcă încă să se obțină o conexiune la Internet. Se pare că este lentă "
+"sau nedisponibilă."
 
 #: keysign/send.py:213
 msgid "There isn't an Internet connection!"
-msgstr "Er is geen internetverbinding!"
+msgstr "Nu există o conexiune la Internet!"
 
 #: keysign/send.py:219 keysign/send.ui:267
 msgid "The signature has been successfully imported!"
-msgstr "De ondertekening is ingelezen!"
+msgstr "Semnătura a fost importată cu succes!"
 
 #: keysign/send.py:225
 msgid ""
 "An error occurred while trying to import the signature.\n"
 "Please double check the correctness of the chosen signature."
 msgstr ""
-"Er is een fout opgetreden bij het inlezen van de ondertekening.\n"
-"Kijk even na of de gekozen ondertekening zeker correct is."
+"A apărut o eroare în timpul încercării de importare a semnăturii.\n"
+"Verificați de două ori corectitudinea semnăturii alese."
 
 #: keysign/send.py:254 keysign/send.ui:678
 msgid ""
 "Key successfully sent.\n"
 "You should receive soon an email with the signature."
 msgstr ""
-"Sleutel verzonden.\n"
-"U ontvangt normaal gezien binnenkort een e-mail met de ondertekening."
+"Cheie trimisă cu succes.\n"
+"Ar trebui să primiți în curând un email cu semnătura."
 
 #: keysign/send.py:259
 msgid ""
@@ -404,9 +404,9 @@ msgid ""
 "Either your partner has entered a wrong code or someone tried to intercept "
 "your connection"
 msgstr ""
-"Kon geen beveiligde verbinding instellen.\n"
-"Uw partner heeft een verkeerde code ingevoerd, of iemand heeft uw verbinding "
-"proberen onderscheppen"
+"Nu s-a putut stabili o conexiune sigură.\n"
+"Ori partenerul dumneavoastră a introdus un cod greșit ori cineva a încercat "
+"să vă intercepteze conexiunea"
 
 #: keysign/send.py:263
 #, python-format
@@ -414,64 +414,64 @@ msgid ""
 "An unexpected error occurred:\n"
 "%s"
 msgstr ""
-"Er is een onverwachte fout opgetreden:\n"
+"A apărut o eroare neașteptată:\n"
 "%s"
 
 #: keysign/send.ui:7
 msgid "Select and send key"
-msgstr "Sleutel kiezen en verzenden"
+msgstr "Selectați și trimiteți cheia"
 
 #: keysign/send.ui:13
 msgid "Select and Send key"
-msgstr "Sleutel kiezen en verzenden"
+msgstr "Selectați și trimiteți cheia"
 
 #: keysign/send.ui:121
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
 msgstr ""
-"U heeft geen sleutels!\n"
-"Gebruik bv. Seahorse om er een aan te maken."
+"Nu aveți nicio cheie!\n"
+"Utilizați, de ex. Seahorse pentru a crea una."
 
 #: keysign/send.ui:198
 msgid "Very slow or no Internet connection!"
-msgstr "Zeer trage of geen internetverbinding!"
+msgstr "Conexiune la Internet foarte înceată sau inexistentă!"
 
 #. This refers to the key being certified by someone rather than the key used for
 #. certifying someone
 #: keysign/send.ui:322
 msgid "<b>Select a key for signing</b>"
-msgstr "<b>Selecteer een sleutel voor ondertekenen</b>"
+msgstr "<b>Selectați o cheie pentru semnare</b>"
 
 #: keysign/send.ui:338
 msgid "<small>Times signed</small>"
-msgstr "<small>Aantal keer ondertekend</small>"
+msgstr "<small>De câte ori a fost semnată</small>"
 
 #: keysign/send.ui:405
 msgid "Keylist"
-msgstr "Sleutellijst"
+msgstr "Listă de chei"
 
 #: keysign/send.ui:425
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
 msgstr ""
-"<small>Om de sleutel te laten ondertekenen, moet de andere persoon de "
-"beveiligingscode invoeren of de QR-code scannen</small>"
+"<small>Pentru a avea cheia semnată, cealaltă persoană trebuie să introducă "
+"codul de securitate, sau să scaneze codul QR</small>"
 
 #: keysign/send.ui:452
 msgid "<b>Key Details</b>"
-msgstr "<b>Sleuteldetails</b>"
+msgstr "<b>Detalii cheie</b>"
 
 #: keysign/send.ui:477
 msgid "Fingerprint"
-msgstr "Vingerafdruk"
+msgstr "Amprentă"
 
 #: keysign/send.ui:631
 msgid "<b>QR Code</b>"
-msgstr "<b>QR-code</b>"
+msgstr "<b>Cod QR</b>"
 
-#: keysign/util.py:223
+#: keysign/util.py:231
 msgid ""
 "Hi $uid,\n"
 "\n"
@@ -486,32 +486,19 @@ msgid ""
 "--\n"
 "GNOME Keysign\n"
 msgstr ""
-"Hallo $uid,\n"
+"Bună $uid,\n"
 "\n"
 "\n"
-"Ik heb uw sleutel net ondertekend\n"
+"Tocmai ți-am semnat cheia\n"
 "\n"
 "      $fingerprint\n"
 "\n"
 "\n"
-"Bedankt dat ik uw sleutel mocht ondertekenen!\n"
+"Mulțumesc pentru că m-ai lăsat să îți semnez cheia!\n"
 "\n"
 "--\n"
-"Gnome Keysign\n"
+"Semnează cheia GNOME\n"
 
 #: keysign/wormholereceive.py:86
 msgid "Wrong message authentication code"
-msgstr "Verkeerde berichtauthenticatiecode"
-
-#~ msgid ""
-#~ "Uses the Internet to transport the key rather than the local network and "
-#~ "Bluetooth (if available)"
-#~ msgstr ""
-#~ "Gebruikt het internet om de sleutel te transporteren in plaats van het "
-#~ "lokale netwerk en Bluetooth (indien beschikbaar)"
-
-#~ msgid "Translated for gettext (C)"
-#~ msgstr "Vertaald voor gettext (C)"
-
-#~ msgid "Translated for Python (C)"
-#~ msgstr "Vertaald voor Python (C)"
+msgstr "Cod de autentificare de mesaj greșit"
