@@ -59,7 +59,6 @@ from . import gpgmeh
 from .i18n import _
 from .receive import ReceiveApp
 from .send import SendApp
-from .util import sign_keydata_and_send
 from . import gtkexcepthook
 
 
