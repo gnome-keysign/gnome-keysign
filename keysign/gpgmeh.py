@@ -575,6 +575,7 @@ def decrypt_signature(encrypted_sig, homedir=None):
 def decrypt_and_import_signature(encrypted_sig, homedir=None):
     signature = decrypt_signature(encrypted_sig, homedir=homedir)
     import_signature(signature)
+    return signature
 
 
 
