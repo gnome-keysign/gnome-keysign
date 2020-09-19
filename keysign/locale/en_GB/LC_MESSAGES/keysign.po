@@ -1,0 +1,499 @@
+# British English translation for gnome-keysign.
+# Copyright (C) 2020 gnome-keysign's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-keysign package.
+# Stephan Woidowski <swoidowski@t-online.de>, 2020.
+# Bruce Cowan <bruce@bcowan.me.uk>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-keysign master\n"
+"Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
+"POT-Creation-Date: 2020-09-16 21:24+0000\n"
+"PO-Revision-Date: 2020-09-19 12:25+0100\n"
+"Last-Translator: Bruce Cowan <bruce@bcowan.me.uk>\n"
+"Language-Team: English - United Kingdom <en@li.org>\n"
+"Language: en_GB\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.6.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Gtranslator 3.36.0\n"
+
+#: data/org.gnome.Keysign.raw.appdata.xml:11
+msgid ""
+"\n"
+"      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
+"      via the local network or Bluetooth.\n"
+"    "
+msgstr ""
+"\n"
+"      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
+"      via the local network or Bluetooth.\n"
+"    "
+
+#: data/org.gnome.Keysign.raw.appdata.xml:15
+msgid ""
+"\n"
+"      It can scan another key's barcode and transfer the key securely,\n"
+"      allowing for casual two-party key signing sessions.\n"
+"      It follows best practises by sending the encrypted signatures\n"
+"      to the UIDs of a key using the Email client the user configured\n"
+"      to use.\n"
+"    "
+msgstr ""
+"\n"
+"      It can scan another key's barcode and transfer the key securely,\n"
+"      allowing for casual two-party key signing sessions.\n"
+"      It follows best practices by sending the encrypted signatures\n"
+"      to the UIDs of a key using the E-mail client the user configured\n"
+"      to use.\n"
+"    "
+
+#. Name
+#: data/org.gnome.Keysign.raw.desktop:2
+msgid "Keysign"
+msgstr "Keysign"
+
+#. Comment
+#: data/org.gnome.Keysign.raw.desktop:3
+msgid ""
+"A keysigning helper to enable you to comfortably exchange OpenPGP keys with "
+"a friend"
+msgstr ""
+"A keysigning helper to enable you to comfortably exchange OpenPGP keys with "
+"a friend"
+
+#. Keywords
+#: data/org.gnome.Keysign.raw.desktop:4
+msgid "python;gpg;gnupg;key;openpgp;"
+msgstr "python;gpg;gnupg;key;openpgp;"
+
+#. Icon
+#: data/org.gnome.Keysign.raw.desktop:7
+msgid "org.gnome.Keysign"
+msgstr "org.gnome.Keysign"
+
+#: keysign/app.py:186
+msgid "Send"
+msgstr "Send"
+
+#: keysign/app.py:188 keysign/receive.py:272
+msgid "Receive"
+msgstr "Receive"
+
+#: keysign/app.ui:62 keysign/send.ui:54
+msgid "Internet"
+msgstr "Internet"
+
+#: keysign/avahioffer.py:83 keysign/bluetoothoffer.py:126
+msgid "Offering key: {}"
+msgstr "Offering key: {}"
+
+#: keysign/avahioffer.py:84 keysign/bluetoothoffer.py:127
+msgid "Discovery info: {}"
+msgstr "Discovery info: {}"
+
+#: keysign/avahioffer.py:86
+msgid "Press Enter to stop"
+msgstr "Press Enter to stop"
+
+#: keysign/bluetoothoffer.py:117
+msgid "You must provide an argument to identify the key"
+msgstr "You must provide an argument to identify the key"
+
+#: keysign/bluetoothoffer.py:128
+msgid "HMAC: {}"
+msgstr "HMAC: {}"
+
+#: keysign/bluetoothoffer.py:129
+msgid "Port: {}"
+msgstr "Port: {}"
+
+#: keysign/bluetoothoffer.py:132
+msgid "Bluetooth not available"
+msgstr "Bluetooth not available"
+
+#: keysign/bluetoothoffer.py:137
+msgid "Press Enter to cancel"
+msgstr "Press Enter to cancel"
+
+#: keysign/bluetoothoffer.py:144
+msgid ""
+"\n"
+"Key successfully sent"
+msgstr ""
+"\n"
+"Key successfully sent"
+
+#: keysign/bluetoothoffer.py:146
+msgid ""
+"\n"
+"An error occurred: {}"
+msgstr ""
+"\n"
+"An error occurred: {}"
+
+#: keysign/bluetoothoffer.py:148
+msgid "Press Enter to exit"
+msgstr "Press Enter to exit"
+
+#: keysign/bluetoothreceive.py:134
+msgid "Trying to download the key, please wait"
+msgstr "Trying to download the key, please wait"
+
+#: keysign/dialog_avahi.ui:8
+msgid "Unable to Start Avahi"
+msgstr "Unable to Start Avahi"
+
+#: keysign/dialog_avahi.ui:9
+msgid ""
+"Keysign is unable to automatically start Avahi. You can try to execute "
+"`systemctl start avahi-daemon` for solving this problem."
+msgstr ""
+"Keysign is unable to automatically start Avahi. You can try to execute "
+"`systemctl start avahi-daemon` for solving this problem."
+
+#: keysign/dialog_avahi.ui:23
+msgid "OK"
+msgstr "OK"
+
+#: keysign/gtkexcepthook.py:173
+msgid "Bug Detected"
+msgstr "Bug Detected"
+
+#: keysign/gtkexcepthook.py:175
+msgid "<big><b>A programming error has been detected.</b></big>"
+msgstr "<big><b>A programming error has been detected.</b></big>"
+
+#: keysign/gtkexcepthook.py:178
+msgid ""
+"You may be able to ignore this error and carry on working, but you may get "
+"unexpected results.\n"
+"\n"
+"Please tell the developers about this using the issue tracker if no-one else "
+"has reported it yet."
+msgstr ""
+"You may be able to ignore this error and carry on working, but you may get "
+"unexpected results.\n"
+"\n"
+"Please tell the developers about this using the issue tracker if no-one else "
+"has reported it yet."
+
+#: keysign/gtkexcepthook.py:187
+msgid "Search Tracker..."
+msgstr "Search Tracker..."
+
+#: keysign/gtkexcepthook.py:189
+msgid "Report..."
+msgstr "Report..."
+
+#: keysign/gtkexcepthook.py:191
+msgid "Ignore Error"
+msgstr "Ignore Error"
+
+#: keysign/gtkexcepthook.py:192
+msgid "Quit GNOME Keysign"
+msgstr "Quit GNOME Keysign"
+
+#: keysign/gtkexcepthook.py:202
+msgid "Details..."
+msgstr "Details..."
+
+#: keysign/gtkexcepthook.py:229 keysign/gtkexcepthook.py:232
+msgid "Exception while analyzing the exception."
+msgstr "Exception while analysing the exception."
+
+#. TRANSLATORS: Crash report template for github, preceding a traceback.
+#. TRANSLATORS: Please ask users kindly to supply at least an English
+#. TRANSLATORS: title if they are able.
+#: keysign/gtkexcepthook.py:281
+msgid ""
+"            #### Description\n"
+"\n"
+"            Give this report a short descriptive title.\n"
+"            Use something like\n"
+"            \"{feature-that-broke}: {what-went-wrong}\"\n"
+"            for the title, if you can.\n"
+"            Then please replace this text\n"
+"            with a longer description of the bug.\n"
+"            Screenshots or videos are great, too!\n"
+"\n"
+"            #### Steps to reproduce\n"
+"\n"
+"            Please tell us what you were doing\n"
+"            when the error message popped up.\n"
+"            If you can provide step-by-step instructions\n"
+"            on how to reproduce the bug,\n"
+"            that's even better.\n"
+"\n"
+"            #### Traceback\n"
+"        "
+msgstr ""
+"            #### Description\n"
+"\n"
+"            Give this report a short descriptive title.\n"
+"            Use something like\n"
+"            \"{feature-that-broke}: {what-went-wrong}\"\n"
+"            for the title, if you can.\n"
+"            Then please replace this text\n"
+"            with a longer description of the bug.\n"
+"            Screenshots or videos are great, too!\n"
+"\n"
+"            #### Steps to reproduce\n"
+"\n"
+"            Please tell us what you were doing\n"
+"            when the error message popped up.\n"
+"            If you can provide step-by-step instructions\n"
+"            on how to reproduce the bug,\n"
+"            that's even better.\n"
+"\n"
+"            #### Traceback\n"
+"        "
+
+#: keysign/keylistwidget.py:83
+msgid "Expires: "
+msgstr "Expires: "
+
+#: keysign/receive.py:158
+msgid "Sign Key"
+msgstr "Sign Key"
+
+#: keysign/receive.py:218
+msgid "Select file for saving"
+msgstr "Select file for saving"
+
+#: keysign/receive.ui:53
+msgid ""
+"No GNOME Keysign servers around :-(\n"
+"Find a friend to use GNOME Keysign with.\n"
+"You may also suffer from connectivity problems.\n"
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"NoServers/1\">the documentation</a>."
+msgstr ""
+"No GNOME Keysign servers around :-(\n"
+"Find a friend to use GNOME Keysign with.\n"
+"You may also suffer from connectivity problems.\n"
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"NoServers/1\">the documentation</a>."
+
+#: keysign/receive.ui:108
+msgid ""
+"<small>To sign someone's key, scan their QR or enter security code</small>"
+msgstr ""
+"<small>To sign someone's key, scan their QR or enter security code</small>"
+
+#: keysign/receive.ui:127
+msgid "<b>Camera</b>"
+msgstr "<b>Camera</b>"
+
+#: keysign/receive.ui:142
+msgid "Integrated Web Cam"
+msgstr "Integrated Web Cam"
+
+#: keysign/receive.ui:179 keysign/send.ui:568
+msgid "<b>Security Code</b>"
+msgstr "<b>Security Code</b>"
+
+#: keysign/receive.ui:212
+msgid "Scan Barcode"
+msgstr "Scan Barcode"
+
+#: keysign/receive.ui:229
+msgid "Downloading key-data. Please wait..."
+msgstr "Downloading key-data. Please wait..."
+
+#: keysign/receive.ui:254
+msgid "Key download was interrupted!"
+msgstr "Key download was interrupted!"
+
+#: keysign/receive.ui:345
+msgid ""
+"Saves the produced certifications as separate files in a custom directory"
+msgstr ""
+"Saves the produced certifications as separate files in a custom directory"
+
+#: keysign/receive.ui:360
+msgid ""
+"Imports a temporary version of the produced certifications into the local "
+"keyring"
+msgstr ""
+"Imports a temporary version of the produced certifications into the local "
+"keyring"
+
+#: keysign/receive.ui:403
+msgid ""
+"Successfully produced certifications.\n"
+"You can import a temporary signature to start using the key as if it had "
+"already been properly verified.\n"
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"ProducedSignatures/1\">the documentation</a>."
+msgstr ""
+"Successfully produced certifications.\n"
+"You can import a temporary signature to start using the key as if it had "
+"already been properly verified.\n"
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"ProducedSignatures/1\">the documentation</a>."
+
+#: keysign/receive.ui:446
+msgid ""
+"To sign the key, confirm that you want to sign the following key.\n"
+"This will generate an email that must be sent in order to complete the "
+"signing process."
+msgstr ""
+"To sign the key, confirm that you want to sign the following key.\n"
+"This will generate an e-mail that must be sent in order to complete the "
+"signing process."
+
+#: keysign/receive.ui:474
+msgid "Key"
+msgstr "Key"
+
+#: keysign/receive.ui:507 keysign/send.ui:493
+msgid "UIDs"
+msgstr "UIDs"
+
+#: keysign/receive.ui:594
+msgid "C_onfirm"
+msgstr "C_onfirm"
+
+#: keysign/receive.ui:716
+msgid "Signing the following UIDs:"
+msgstr "Signing the following UIDs:"
+
+#: keysign/send.py:207
+msgid ""
+"Still trying to get a connection to the Internet. It appears to be slow or "
+"unavailable."
+msgstr ""
+"Still trying to get a connection to the Internet. It appears to be slow or "
+"unavailable."
+
+#: keysign/send.py:213
+msgid "There isn't an Internet connection!"
+msgstr "There isn't an Internet connection!"
+
+#: keysign/send.py:219 keysign/send.ui:267
+msgid "The signature has been successfully imported!"
+msgstr "The signature has been successfully imported!"
+
+#: keysign/send.py:225
+msgid ""
+"An error occurred while trying to import the signature.\n"
+"Please double check the correctness of the chosen signature."
+msgstr ""
+"An error occurred while trying to import the signature.\n"
+"Please double check the correctness of the chosen signature."
+
+#: keysign/send.py:254 keysign/send.ui:678
+msgid ""
+"Key successfully sent.\n"
+"You should receive soon an email with the signature."
+msgstr ""
+"Key successfully sent.\n"
+"You should receive soon an e-mail with the signature."
+
+#: keysign/send.py:259
+msgid ""
+"Could not establish a secure connection.\n"
+"Either your partner has entered a wrong code or someone tried to intercept "
+"your connection"
+msgstr ""
+"Could not establish a secure connection.\n"
+"Either your partner has entered a wrong code or someone tried to intercept "
+"your connection"
+
+#: keysign/send.py:263
+#, python-format
+msgid ""
+"An unexpected error occurred:\n"
+"%s"
+msgstr ""
+"An unexpected error occurred:\n"
+"%s"
+
+#: keysign/send.ui:7
+msgid "Select and send key"
+msgstr "Select and send key"
+
+#: keysign/send.ui:13
+msgid "Select and Send key"
+msgstr "Select and Send key"
+
+#: keysign/send.ui:121
+msgid ""
+"You don't have any keys!\n"
+"Please use, e.g. Seahorse to create one."
+msgstr ""
+"You don't have any keys!\n"
+"Please use, e.g. Seahorse to create one."
+
+#: keysign/send.ui:198
+msgid "Very slow or no Internet connection!"
+msgstr "Very slow or no Internet connection!"
+
+#. This refers to the key being certified by someone rather than the key used for
+#. certifying someone
+#: keysign/send.ui:322
+msgid "<b>Select a key for signing</b>"
+msgstr "<b>Select a key for signing</b>"
+
+#: keysign/send.ui:338
+msgid "<small>Times signed</small>"
+msgstr "<small>Times signed</small>"
+
+#: keysign/send.ui:405
+msgid "Keylist"
+msgstr "Keylist"
+
+#: keysign/send.ui:425
+msgid ""
+"<small>To have the key signed, the other person must enter the security "
+"code, or scan the QR code</small>"
+msgstr ""
+"<small>To have the key signed, the other person must enter the security "
+"code, or scan the QR code</small>"
+
+#: keysign/send.ui:452
+msgid "<b>Key Details</b>"
+msgstr "<b>Key Details</b>"
+
+#: keysign/send.ui:477
+msgid "Fingerprint"
+msgstr "Fingerprint"
+
+#: keysign/send.ui:631
+msgid "<b>QR Code</b>"
+msgstr "<b>QR Code</b>"
+
+#: keysign/util.py:231
+msgid ""
+"Hi $uid,\n"
+"\n"
+"\n"
+"I have just signed your key\n"
+"\n"
+"      $fingerprint\n"
+"\n"
+"\n"
+"Thanks for letting me sign your key!\n"
+"\n"
+"--\n"
+"GNOME Keysign\n"
+msgstr ""
+"Hi $uid,\n"
+"\n"
+"\n"
+"I have just signed your key\n"
+"\n"
+"      $fingerprint\n"
+"\n"
+"\n"
+"Thanks for letting me sign your key!\n"
+"\n"
+"--\n"
+"GNOME Keysign\n"
+
+#: keysign/wormholereceive.py:86
+msgid "Wrong message authentication code"
+msgstr "Wrong message authentication code"
