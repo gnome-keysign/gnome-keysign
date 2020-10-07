@@ -80,7 +80,7 @@ so it should be easy for you to install it.
 If your version is older than that,
 this list of packages seems to make it work:
 
-    python  python-lxml  avahi-daemon  python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad gstreamer1.0-plugins-good gstreamer1.0-gtk3  python-gi-cairo python-gpg  python-twisted python-future
+    python  python-babelgladeextractor avahi-daemon  python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad gstreamer1.0-plugins-good gstreamer1.0-gtk3  python-gi-cairo python-gpg  python-twisted python-future
 
 Magic Wormhole can be installed with pip:
 
@@ -113,7 +113,7 @@ assuming that pip and git are already installed:
 
 .. code::
 
-    sudo dnf install -y python-lxml python-gobject dbus-python gstreamer1-plugins-bad-free-gtk gstreamer1-plugins-good  gnupg python-gnupg  python-twisted
+    sudo dnf install -y python-babel-BabelGladeExtractor python-gobject dbus-python gstreamer1-plugins-bad-free-gtk gstreamer1-plugins-good  gnupg python-gnupg  python-twisted
     pip install magic-wormhole
 
 As optional:

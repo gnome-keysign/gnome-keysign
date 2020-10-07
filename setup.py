@@ -136,7 +136,6 @@ setup(
     },
     setup_requires=[
         "babel",
-        "lxml",
         "BabelGladeExtractor",
     ],
     tests_require=[
