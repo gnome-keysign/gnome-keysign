@@ -4,6 +4,7 @@
 ATTESTEE_DIR=/tmp/gks-attestee
 
 rm -rf "${ATTESTEE_DIR}.bak"
+mkdir -p $ATTESTEE_DIR
 mv -f "$ATTESTEE_DIR" "${ATTESTEE_DIR}.bak"
 mkdir -p $ATTESTEE_DIR
 echo -n | env GNUPGHOME=${ATTESTEE_DIR}  gpg --pinentry-mode loopback --batch --no-tty --yes --passphrase-fd 0 --quick-generate-key attestee@example.com
