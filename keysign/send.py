@@ -131,13 +131,24 @@ class SendApp:
             with open(filename, "rb") as si:
                 signatures.append(si.read())
 
+        # We currently do not know how to obtain the sender of the email.
+        # We could parse the email for a From: header.
+        # But if only the attachment is dropped, we don't have that information.
+        # We could probably find the issuer in the hashed area of the certification packet,
+        # and then try to find that key in our keyring.
+        sender = None
+
         try:
+            decrypted_certifications = []
             for signature in signatures:
-                gpgmeh.decrypt_and_import_signature(signature)
-            self.signature_imported()
+                decrypted_certification = gpgmeh.decrypt_signature(signature)
+                import_result = gpgmeh.import_signature(decrypted_certification)
+                decrypted_certifications.append(decrypted_certification)
         except errors.GPGMEError as e:
             log.exception("Could not import signatures")
-            self.signature_import_error()
+            self.signature_import_error(e)
+        else:
+            self.signature_imported(decrypted_certifications, sender)
 
     @inlineCallbacks
     def on_key_activated(self, widget, key):
@@ -214,17 +225,32 @@ class SendApp:
         self.klw.ib_internet.show()
         log.info("No Internet connection")
 
-    def signature_imported(self):
-        self.klw.image_ib_import.set_from_icon_name(Gtk.STOCK_OK, Gtk.IconSize.BUTTON)
-        self.klw.label_ib_import.set_label(_("The signature has been successfully imported!"))
-        self.klw.ib_import.show()
+    def signature_imported(self, decrypted_certifications, sender=None):
+        """When we have received, decrypted, and imported a certification,
+        this function will show the infobar and offer to return the certification
+        to the sender.
+        We appreciate that the sender, i.e. an email address, is not always known,
+        simply because that information is currently not included in the certification
+        the attestor sends.
+        """
+        self.klw.ib_import_okay.show()
+        if not sender:
+            # We do not know where to return the certification to, so we hide the button
+            self.klw.button_ib_import_okay.hide()
+        else:
+            def return_certification(button):
+                log.info("Return certification to %s (%d)",
+                    sender, len(decrypted_certifications))
+                
+            self.klw.button_ib_import_okay.connect('clicked', return_certification)
+            self.klw.button_ib_import_okay.show()
+
         log.info("Signature imported")
 
-    def signature_import_error(self):
-        self.klw.image_ib_import.set_from_icon_name(Gtk.STOCK_DIALOG_ERROR, Gtk.IconSize.BUTTON)
-        self.klw.label_ib_import.set_label(_("An error occurred while trying to import the signature.\n"
-                                           "Please double check the correctness of the chosen signature."))
-        self.klw.ib_import.show()
+    def signature_import_error(self, e):
+        self.klw.ib_import_error.show()
+        # We hide the error details button, because we don't have that functionality just yet
+        self.klw.button_ib_import_error.hide()
         log.info("Signature import error")
 
     def create_keypresent(self, discovery_code, discovery_data):
