@@ -7,18 +7,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2020-03-07 22:21+0000\n"
-"PO-Revision-Date: 2020-04-03 15:01+0300\n"
+"POT-Creation-Date: 2020-10-07 18:17+0000\n"
+"PO-Revision-Date: 2020-10-08 09:34+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
+"Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
-"Language: uk\n"
 "Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n"
 "%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Lokalize 20.07.70\n"
+"X-Generator: Lokalize 20.11.70\n"
 
 #: data/org.gnome.Keysign.raw.appdata.xml:11
 msgid ""
@@ -28,8 +28,8 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"      За допомогою «Підписувача ключів» GNOME ви зможете зручно і безпечно"
-" підписувати\n"
+"      За допомогою «Підписувача ключів» GNOME ви зможете зручно і безпечно "
+"підписувати\n"
 "      ключі OpenPGP за допомогою локальної мережі або Bluetooth.\n"
 "    "
 
@@ -44,11 +44,11 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"      Програма може сканувати штрих-код іншого ключа і безпечно перенести"
-" ключ,\n"
+"      Програма може сканувати штрих-код іншого ключа і безпечно перенести "
+"ключ,\n"
 "      уможливлюючи двобічні сеанси підписування ключів.\n"
-"      У програмі враховано найкращі методики: виконується надсилання"
-" зашифрованих\n"
+"      У програмі враховано найкращі методики: виконується надсилання "
+"зашифрованих\n"
 "      підписів до UID ключа за допомогою клієнта електронної пошти, який\n"
 "      налаштовано користувачем.\n"
 "    "
@@ -64,8 +64,8 @@ msgid ""
 "A keysigning helper to enable you to comfortably exchange OpenPGP keys with "
 "a friend"
 msgstr ""
-"Допоміжна програма для підписування ключів, за допомогою якої ви зможете"
-" зручно обмінюватися ключами OpenPGP з друзями"
+"Допоміжна програма для підписування ключів, за допомогою якої ви зможете "
+"зручно обмінюватися ключами OpenPGP з друзями"
 
 #. Keywords
 #: data/org.gnome.Keysign.raw.desktop:4
@@ -78,15 +78,15 @@ msgstr ""
 msgid "org.gnome.Keysign"
 msgstr "org.gnome.Keysign"
 
-#: keysign/app.py:187
+#: keysign/app.py:186
 msgid "Send"
 msgstr "Надіслати"
 
-#: keysign/app.py:189 keysign/receive.py:272
+#: keysign/app.py:188 keysign/receive.py:272
 msgid "Receive"
 msgstr "Отримати"
 
-#: keysign/app.ui:62 keysign/send.ui:54
+#: keysign/app.ui:62 keysign/send.ui:55
 msgid "Internet"
 msgstr "Інтернет"
 
@@ -155,8 +155,8 @@ msgid ""
 "Keysign is unable to automatically start Avahi. You can try to execute "
 "`systemctl start avahi-daemon` for solving this problem."
 msgstr ""
-"Keysign не вдалося автоматично запустити Avahi. Ви можете віддати команду"
-" «systemctl start avahi-daemon», щоб усунути цю проблему."
+"Keysign не вдалося автоматично запустити Avahi. Ви можете віддати команду "
+"«systemctl start avahi-daemon», щоб усунути цю проблему."
 
 #: keysign/dialog_avahi.ui:23
 msgid "OK"
@@ -178,11 +178,11 @@ msgid ""
 "Please tell the developers about this using the issue tracker if no-one else "
 "has reported it yet."
 msgstr ""
-"Ви можете проігнорувати це повідомлення про помилку і продовжити обробку, але"
-" це може призвести до неочікуваних результатів.\n"
+"Ви можете проігнорувати це повідомлення про помилку і продовжити обробку, "
+"але це може призвести до неочікуваних результатів.\n"
 "\n"
-"Будь ласка, повідомте про цю помилку розробникам за допомогою системи"
-" стеження за вадами, якщо про неї ще не повідомлено іншими користувачами."
+"Будь ласка, повідомте про цю помилку розробникам за допомогою системи "
+"стеження за вадами, якщо про неї ще не повідомлено іншими користувачами."
 
 #: keysign/gtkexcepthook.py:187
 msgid "Search Tracker..."
@@ -277,15 +277,15 @@ msgstr ""
 "Не знайдено серверів «Підписувача ключів» GNOME :-(\n"
 "Знайдіть приятеля, щоб скористатися «Підписувачем ключів» GNOME.\n"
 "Також, можливо, у вас є певні проблеми із з'єднанням із мережею.\n"
-"Щоб дізнатися більше, ознайомтеся із <a href=\"https://wiki.gnome.org/Apps/Key"
-"sign/Doc/NoServers/1\">документацією</a>."
+"Щоб дізнатися більше, ознайомтеся із <a href=\"https://wiki.gnome.org/Apps/"
+"Keysign/Doc/NoServers/1\">документацією</a>."
 
 #: keysign/receive.ui:108
 msgid ""
 "<small>To sign someone's key, scan their QR or enter security code</small>"
 msgstr ""
-"<small>Щоб підписати чийсь ключ, виконайте сканування QR-коду або введіть код"
-" захисту</small>"
+"<small>Щоб підписати чийсь ключ, виконайте сканування QR-коду або введіть "
+"код захисту</small>"
 
 #: keysign/receive.ui:127
 msgid "<b>Camera</b>"
@@ -295,7 +295,7 @@ msgstr "<b>Фотоапарат</b>"
 msgid "Integrated Web Cam"
 msgstr "Інтегровано із вебкамерою"
 
-#: keysign/receive.ui:179 keysign/send.ui:568
+#: keysign/receive.ui:179 keysign/send.ui:673
 msgid "<b>Security Code</b>"
 msgstr "<b>Код захисту</b>"
 
@@ -322,8 +322,8 @@ msgid ""
 "Imports a temporary version of the produced certifications into the local "
 "keyring"
 msgstr ""
-"Імпортує тимчасову версію створених даних сертифікації до локальної зв'язки"
-" ключів"
+"Імпортує тимчасову версію створених даних сертифікації до локальної зв'язки "
+"ключів"
 
 #: keysign/receive.ui:403
 msgid ""
@@ -334,10 +334,10 @@ msgid ""
 "ProducedSignatures/1\">the documentation</a>."
 msgstr ""
 "Сертифікацію успішно виконано.\n"
-"Ви можете імпортувати тимчасовий підпис, щоб розпочати користуватися ключем"
-" так, ніби його було належним чином засвідчено.\n"
-"Щоб дізнатися більше, ознайомтеся із <a href=\"https://wiki.gnome.org/Apps/Key"
-"sign/Doc/ProducedSignatures/1\">документацією</a>."
+"Ви можете імпортувати тимчасовий підпис, щоб розпочати користуватися ключем "
+"так, ніби його було належним чином засвідчено.\n"
+"Щоб дізнатися більше, ознайомтеся із <a href=\"https://wiki.gnome.org/Apps/"
+"Keysign/Doc/ProducedSignatures/1\">документацією</a>."
 
 #: keysign/receive.ui:446
 msgid ""
@@ -345,15 +345,16 @@ msgid ""
 "This will generate an email that must be sent in order to complete the "
 "signing process."
 msgstr ""
-"Щоб підписати ключ, підтвердьте, що ви хочете підписати вказаний нижче ключ.\n"
-"У відповідь буде створено поштове повідомлення, яке слід надіслати, щоб"
-" завершити процедуру підписування."
+"Щоб підписати ключ, підтвердьте, що ви хочете підписати вказаний нижче "
+"ключ.\n"
+"У відповідь буде створено поштове повідомлення, яке слід надіслати, щоб "
+"завершити процедуру підписування."
 
 #: keysign/receive.ui:474
 msgid "Key"
 msgstr "Ключ"
 
-#: keysign/receive.ui:507 keysign/send.ui:493
+#: keysign/receive.ui:507 keysign/send.ui:598
 msgid "UIDs"
 msgstr "UID"
 
@@ -365,31 +366,19 @@ msgstr "_Підтвердити"
 msgid "Signing the following UIDs:"
 msgstr "Підписуємо такі UID:"
 
-#: keysign/send.py:207
+#: keysign/send.py:218
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
 msgstr ""
-"Усе ще намагаємося встановити з'єднання із інтернетом. Здається, з'єднання є"
-" надто повільним або взагалі недоступним."
+"Усе ще намагаємося встановити з'єднання із інтернетом. Здається, з'єднання є "
+"надто повільним або взагалі недоступним."
 
-#: keysign/send.py:213
+#: keysign/send.py:224
 msgid "There isn't an Internet connection!"
 msgstr "Немає з'єднання із інтернетом!"
 
-#: keysign/send.py:219 keysign/send.ui:267
-msgid "The signature has been successfully imported!"
-msgstr "Підпис було успішно імпортовано!"
-
-#: keysign/send.py:225
-msgid ""
-"An error occurred while trying to import the signature.\n"
-"Please double check the correctness of the chosen signature."
-msgstr ""
-"Під час спроби імпортувати підпис сталася помилка.\n"
-"Будь ласка, ретельно перевірте правильність вибраного підпису."
-
-#: keysign/send.py:254 keysign/send.ui:678
+#: keysign/send.py:280 keysign/send.ui:783
 msgid ""
 "Key successfully sent.\n"
 "You should receive soon an email with the signature."
@@ -397,17 +386,17 @@ msgstr ""
 "Ключ успішно надіслано.\n"
 "Невдовзі ви маєте отримати поштове повідомлення із підписом."
 
-#: keysign/send.py:259
+#: keysign/send.py:285
 msgid ""
 "Could not establish a secure connection.\n"
 "Either your partner has entered a wrong code or someone tried to intercept "
 "your connection"
 msgstr ""
 "Не вдалося встановити безпечне з'єднання.\n"
-"Або вашим колегою введено помилковий код, або хтось спробував перехопити ваше"
-" з'єднання."
+"Або вашим колегою введено помилковий код, або хтось спробував перехопити "
+"ваше з'єднання."
 
-#: keysign/send.py:263
+#: keysign/send.py:289
 #, python-format
 msgid ""
 "An unexpected error occurred:\n"
@@ -424,7 +413,11 @@ msgstr "Виберіть і надішліть ключ"
 msgid "Select and Send key"
 msgstr "Виберіть і надішліть ключ"
 
-#: keysign/send.ui:121
+#: keysign/send.ui:53
+msgid "Also use the Internet to transfer the certificate"
+msgstr "Крім того, скористайтеся інтернетом для передавання сертифіката"
+
+#: keysign/send.ui:122
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
@@ -432,41 +425,64 @@ msgstr ""
 "У вас немає жодного ключа!\n"
 "Будь ласка, скористайтеся, наприклад, Seahorse для створення ключа."
 
-#: keysign/send.ui:198
+#: keysign/send.ui:199
 msgid "Very slow or no Internet connection!"
 msgstr "З'єднання із інтернетом є дуже повільним або його немає взагалі!"
 
+#: keysign/send.ui:268
+msgid "The signature has been successfully imported!"
+msgstr "Підпис було успішно імпортовано!"
+
+#: keysign/send.ui:294
+msgid ""
+"Returns the received certification back to the sender, so that the sender "
+"can make use of your OpenPGP certificate"
+msgstr ""
+"Повертає отриманий сертифікат відправнику, щоб відправник міг скористатися"
+" вашим сертифікатом OpenPGP"
+
+#: keysign/send.ui:341
+msgid "Display more details for the error."
+msgstr "Показати більше подробиць щодо помилки."
+
+#: keysign/send.ui:372
+#| msgid ""
+#| "An error occurred while trying to import the signature.\n"
+#| "Please double check the correctness of the chosen signature."
+msgid "An error occurred while trying to import the signature."
+msgstr "Під час спроби імпортувати підпис сталася помилка."
+
 #. This refers to the key being certified by someone rather than the key used for
 #. certifying someone
-#: keysign/send.ui:322
+#: keysign/send.ui:427
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>Виберіть ключ для підписування</b>"
 
-#: keysign/send.ui:338
+#: keysign/send.ui:443
 msgid "<small>Times signed</small>"
 msgstr "<small>Разів підписано</small>"
 
-#: keysign/send.ui:405
+#: keysign/send.ui:510
 msgid "Keylist"
 msgstr "Список ключів"
 
-#: keysign/send.ui:425
+#: keysign/send.ui:530
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
 msgstr ""
-"<small>Щоб підписати ключ, інша особа має ввести код захисту або виконати"
-" сканування QR-коду</small>"
+"<small>Щоб підписати ключ, інша особа має ввести код захисту або виконати "
+"сканування QR-коду</small>"
 
-#: keysign/send.ui:452
+#: keysign/send.ui:557
 msgid "<b>Key Details</b>"
 msgstr "<b>Параметри ключа</b>"
 
-#: keysign/send.ui:477
+#: keysign/send.ui:582
 msgid "Fingerprint"
 msgstr "Відбиток"
 
-#: keysign/send.ui:631
+#: keysign/send.ui:736
 msgid "<b>QR Code</b>"
 msgstr "<b>QR-код</b>"
 
