@@ -7,18 +7,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2019-10-06 20:01+0000\n"
-"PO-Revision-Date: 2020-01-15 19:35+0700\n"
-"Last-Translator: Kukuh Syafaat <kukuhsyafaat@gnome.org>\n"
+"POT-Creation-Date: 2020-10-07 18:17+0000\n"
+"PO-Revision-Date: 2020-10-08 10:47+0700\n"
+"Last-Translator: Andika Triwidada <andika@gmail.com>\n"
 "Language-Team: Indonesian <gnome-l10n-id@googlegroups.com>\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
-"X-Generator: Poedit 2.2.4\n"
+"X-Generator: Poedit 2.4.1\n"
+"Plural-Forms: nplurals=2; plural= n!=1;\n"
 
-#: data/org.gnome.Keysign.raw.appdata.xml:10
+#: data/org.gnome.Keysign.raw.appdata.xml:11
 msgid ""
 "\n"
 "      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
@@ -31,7 +32,7 @@ msgstr ""
 "      melalui jaringan lokal atau Bluetooth.\n"
 "    "
 
-#: data/org.gnome.Keysign.raw.appdata.xml:14
+#: data/org.gnome.Keysign.raw.appdata.xml:15
 msgid ""
 "\n"
 "      It can scan another key's barcode and transfer the key securely,\n"
@@ -75,15 +76,15 @@ msgstr "python;gpg;gnupg;kunci;openpgp;"
 msgid "org.gnome.Keysign"
 msgstr "org.gnome.Keysign"
 
-#: keysign/app.py:187
+#: keysign/app.py:186
 msgid "Send"
 msgstr "Kirim"
 
-#: keysign/app.py:189 keysign/receive.py:272
+#: keysign/app.py:188 keysign/receive.py:272
 msgid "Receive"
 msgstr "Terima"
 
-#: keysign/app.ui:62 keysign/send.ui:54
+#: keysign/app.ui:62 keysign/send.ui:55
 msgid "Internet"
 msgstr "Internet"
 
@@ -293,7 +294,7 @@ msgstr "<b>Kamera</b>"
 msgid "Integrated Web Cam"
 msgstr "Kamera Web Terpadu"
 
-#: keysign/receive.ui:179 keysign/send.ui:568
+#: keysign/receive.ui:179 keysign/send.ui:673
 msgid "<b>Security Code</b>"
 msgstr "<b>Kode Keamanan</b>"
 
@@ -352,7 +353,7 @@ msgstr ""
 msgid "Key"
 msgstr "Kunci"
 
-#: keysign/receive.ui:507 keysign/send.ui:493
+#: keysign/receive.ui:507 keysign/send.ui:598
 msgid "UIDs"
 msgstr "UID"
 
@@ -364,7 +365,7 @@ msgstr "K_onfirmasi"
 msgid "Signing the following UIDs:"
 msgstr "Menandatangani UID berikut:"
 
-#: keysign/send.py:207
+#: keysign/send.py:218
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
@@ -372,23 +373,11 @@ msgstr ""
 "Masih mencoba mendapatkan koneksi ke Internet. Tampaknya lambat atau tidak "
 "tersedia."
 
-#: keysign/send.py:213
+#: keysign/send.py:224
 msgid "There isn't an Internet connection!"
 msgstr "Tidak ada koneksi internet!"
 
-#: keysign/send.py:219 keysign/send.ui:267
-msgid "The signature has been successfully imported!"
-msgstr "Tanda tangan telah berhasil diimpor!"
-
-#: keysign/send.py:225
-msgid ""
-"An error occurred while trying to import the signature.\n"
-"Please double check the correctness of the chosen signature."
-msgstr ""
-"Terjadi galat saat mencoba mengimpor tanda tangan.\n"
-"Periksa kembali kebenaran tanda tangan yang dipilih."
-
-#: keysign/send.py:254 keysign/send.ui:678
+#: keysign/send.py:280 keysign/send.ui:783
 msgid ""
 "Key successfully sent.\n"
 "You should receive soon an email with the signature."
@@ -396,7 +385,7 @@ msgstr ""
 "Kunci berhasil dikirim.\n"
 "Anda harus segera menerima surel dengan tanda tangan."
 
-#: keysign/send.py:259
+#: keysign/send.py:285
 msgid ""
 "Could not establish a secure connection.\n"
 "Either your partner has entered a wrong code or someone tried to intercept "
@@ -406,7 +395,7 @@ msgstr ""
 "Entah pasangan Anda memasukkan kode yang salah atau seseorang mencoba "
 "mencegat koneksi Anda"
 
-#: keysign/send.py:263
+#: keysign/send.py:289
 #, python-format
 msgid ""
 "An unexpected error occurred:\n"
@@ -423,7 +412,11 @@ msgstr "Pilih dan kirim kunci"
 msgid "Select and Send key"
 msgstr "Pilih dan Kirim kunci"
 
-#: keysign/send.ui:121
+#: keysign/send.ui:53
+msgid "Also use the Internet to transfer the certificate"
+msgstr "Gunakan juga Internet untuk mentransfer sertifikat"
+
+#: keysign/send.ui:122
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
@@ -431,25 +424,45 @@ msgstr ""
 "Anda tidak memiliki kunci apa pun!\n"
 "Silakan gunakan, mis. Seahorse untuk membuatnya."
 
-#: keysign/send.ui:198
+#: keysign/send.ui:199
 msgid "Very slow or no Internet connection!"
 msgstr "Koneksi internet sangat lambat atau tidak ada!"
 
+#: keysign/send.ui:268
+msgid "The signature has been successfully imported!"
+msgstr "Tanda tangan telah berhasil diimpor!"
+
+#: keysign/send.ui:294
+msgid ""
+"Returns the received certification back to the sender, so that the sender "
+"can make use of your OpenPGP certificate"
+msgstr ""
+"Mengembalikan sertifikasi yang diterima kembali ke pengirim, sehingga "
+"pengirim dapat menggunakan sertifikat OpenPGP Anda"
+
+#: keysign/send.ui:341
+msgid "Display more details for the error."
+msgstr "Tampilkan detil lebih lanjut untuk galat tersebut."
+
+#: keysign/send.ui:372
+msgid "An error occurred while trying to import the signature."
+msgstr "Timbul galat saat coba mengimpor tanda tangan."
+
 #. This refers to the key being certified by someone rather than the key used for
 #. certifying someone
-#: keysign/send.ui:322
+#: keysign/send.ui:427
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>Pilih kunci untuk menandatangani</b>"
 
-#: keysign/send.ui:338
+#: keysign/send.ui:443
 msgid "<small>Times signed</small>"
 msgstr "<small>Jumlah tanda tangan</small>"
 
-#: keysign/send.ui:405
+#: keysign/send.ui:510
 msgid "Keylist"
 msgstr "Daftar kunci"
 
-#: keysign/send.ui:425
+#: keysign/send.ui:530
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
@@ -457,19 +470,19 @@ msgstr ""
 "<small>Untuk memasukkan kunci yang ditandatangani, orang lain harus "
 "memasukkan kode keamanan, atau memindai kode QR</small>"
 
-#: keysign/send.ui:452
+#: keysign/send.ui:557
 msgid "<b>Key Details</b>"
 msgstr "<b>Detail Kunci</b>"
 
-#: keysign/send.ui:477
+#: keysign/send.ui:582
 msgid "Fingerprint"
 msgstr "Sidik Jari"
 
-#: keysign/send.ui:631
+#: keysign/send.ui:736
 msgid "<b>QR Code</b>"
 msgstr "<b>Kode QR</b>"
 
-#: keysign/util.py:223
+#: keysign/util.py:231
 msgid ""
 "Hi $uid,\n"
 "\n"
@@ -500,31 +513,3 @@ msgstr ""
 #: keysign/wormholereceive.py:86
 msgid "Wrong message authentication code"
 msgstr "Kode autentikasi pesan salah"
-
-#~ msgid ""
-#~ "Uses the Internet to transport the key rather than the local network and "
-#~ "Bluetooth (if available)"
-#~ msgstr ""
-#~ "Menggunakan Internet untuk memindahkan kunci daripada jaringan lokal dan "
-#~ "Bluetooth (jika tersedia)"
-
-#~ msgid "Translated for gettext (C)"
-#~ msgstr "Diterjemahkan untuk gettext (C)"
-
-#~ msgid "Translated for Python (C)"
-#~ msgstr "Diterjemahkan untuk Python (C)"
-
-#~ msgid "page1"
-#~ msgstr "halaman1"
-
-#~ msgid "page2"
-#~ msgstr "halaman2"
-
-#~ msgid "page3"
-#~ msgstr "halaman3"
-
-#~ msgid "Your signed key $fingerprint"
-#~ msgstr "Kunci yang Anda tandatangani $sidikjari"
-
-#~ msgid "installing symlinks for sockets from %s to %s"
-#~ msgstr "memasang symlink untuk soket dari %s ke %s"
