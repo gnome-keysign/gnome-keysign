@@ -1,26 +1,27 @@
 # Portuguese (Brazil) translations for gnome-keysign.
-# Copyright (C) 2019 Tobias Mueller
+# Copyright (C) 2020 Tobias Mueller
 # This file is distributed under the same license as the gnome-keysign project.
 # Rafael Fontenelle <rafaelff@gnome.org>, 2017-2019.
+# Enrico Nicoletto <liverig@gmail.com>, 2020.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2019-08-07 09:49+0000\n"
-"PO-Revision-Date: 2019-08-18 01:14-0300\n"
-"Last-Translator: Rafael Fontenelle <rafaelff@gnome.org>\n"
+"POT-Creation-Date: 2020-10-07 18:17+0000\n"
+"PO-Revision-Date: 2020-11-17 12:27-0300\n"
+"Last-Translator: Enrico Nicoletto <liverig@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <gnome-pt_br-list@gnome.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
-"X-Generator: Gtranslator 3.32.0\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Poedit 2.4.2\n"
 "Generated-By: Babel 2.5.1\n"
 "X-Project-Style: gnome\n"
 
-#: data/org.gnome.Keysign.raw.appdata.xml:10
+#: data/org.gnome.Keysign.raw.appdata.xml:11
 msgid ""
 "\n"
 "      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
@@ -32,7 +33,7 @@ msgstr ""
 "      confortável e segura por meio da rede local ou do Bluetooth.\n"
 "    "
 
-#: data/org.gnome.Keysign.raw.appdata.xml:14
+#: data/org.gnome.Keysign.raw.appdata.xml:15
 msgid ""
 "\n"
 "      It can scan another key's barcode and transfer the key securely,\n"
@@ -75,15 +76,15 @@ msgstr "python;gpg;gnupg;chave;openpgp;"
 msgid "org.gnome.Keysign"
 msgstr "org.gnome.Keysign"
 
-#: keysign/app.py:187
+#: keysign/app.py:186
 msgid "Send"
 msgstr "Enviar"
 
-#: keysign/app.py:189 keysign/receive.py:272
+#: keysign/app.py:188 keysign/receive.py:272
 msgid "Receive"
 msgstr "Receber"
 
-#: keysign/app.ui:62 keysign/send.ui:54
+#: keysign/app.ui:62 keysign/send.ui:55
 msgid "Internet"
 msgstr "Internet"
 
@@ -293,7 +294,7 @@ msgstr "<b>Câmera</b>"
 msgid "Integrated Web Cam"
 msgstr "Webcam integrada"
 
-#: keysign/receive.ui:179 keysign/send.ui:568
+#: keysign/receive.ui:179 keysign/send.ui:673
 msgid "<b>Security Code</b>"
 msgstr "<b>Código de segurança</b>"
 
@@ -351,7 +352,7 @@ msgstr ""
 msgid "Key"
 msgstr "Chave"
 
-#: keysign/receive.ui:507 keysign/send.ui:493
+#: keysign/receive.ui:507 keysign/send.ui:598
 msgid "UIDs"
 msgstr "UIDs"
 
@@ -363,7 +364,7 @@ msgstr "C_onfirmar"
 msgid "Signing the following UIDs:"
 msgstr "Assinando os seguintes UIDs:"
 
-#: keysign/send.py:207
+#: keysign/send.py:218
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
@@ -371,23 +372,11 @@ msgstr ""
 "Ainda tentando obter uma conexão com a Internet. Parece ser lento ou "
 "indisponível."
 
-#: keysign/send.py:213
+#: keysign/send.py:224
 msgid "There isn't an Internet connection!"
 msgstr "Não há conexão com a Internet!"
 
-#: keysign/send.py:219 keysign/send.ui:267
-msgid "The signature has been successfully imported!"
-msgstr "A assinatura foi importada com sucesso!"
-
-#: keysign/send.py:225
-msgid ""
-"An error occurred while trying to import the signature.\n"
-"Please double check the correctness of the chosen signature."
-msgstr ""
-"Ocorreu um erro ao tentar importar a assinatura.\n"
-"Por favor, verifique se a assinatura escolhida está correta."
-
-#: keysign/send.py:254 keysign/send.ui:678
+#: keysign/send.py:280 keysign/send.ui:783
 msgid ""
 "Key successfully sent.\n"
 "You should receive soon an email with the signature."
@@ -396,7 +385,7 @@ msgstr ""
 "Você deve receber em breve um e-mail com a assinatura."
 
 # Traduzi "partner" para "pessoa" para evitar lidar com gênero de "parceiro(a)" -- Rafael Fontenelle
-#: keysign/send.py:259
+#: keysign/send.py:285
 msgid ""
 "Could not establish a secure connection.\n"
 "Either your partner has entered a wrong code or someone tried to intercept "
@@ -406,7 +395,7 @@ msgstr ""
 "A outra pessoa digitou um código errado ou alguém tentou interceptar sua "
 "conexão"
 
-#: keysign/send.py:263
+#: keysign/send.py:289
 #, python-format
 msgid ""
 "An unexpected error occurred:\n"
@@ -423,7 +412,11 @@ msgstr "Selecionar e enviar a chave"
 msgid "Select and Send key"
 msgstr "Selecionar e enviar chave"
 
-#: keysign/send.ui:121
+#: keysign/send.ui:53
+msgid "Also use the Internet to transfer the certificate"
+msgstr "Use também a Internet para transferir o certificado"
+
+#: keysign/send.ui:122
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
@@ -431,25 +424,45 @@ msgstr ""
 "Você tem nenhuma chave!\n"
 "Por favor use, p.ex., Seahorse para criar uma."
 
-#: keysign/send.ui:198
+#: keysign/send.ui:199
 msgid "Very slow or no Internet connection!"
 msgstr "Conexão muito lenta ou sem conexão com a Internet!"
 
+#: keysign/send.ui:268
+msgid "The signature has been successfully imported!"
+msgstr "A assinatura foi importada com sucesso!"
+
+#: keysign/send.ui:294
+msgid ""
+"Returns the received certification back to the sender, so that the sender "
+"can make use of your OpenPGP certificate"
+msgstr ""
+"Retorna a certificação recebida de volta ao remetente, para que o remetente "
+"possa fazer uso do seu certificado OpenPGP"
+
+#: keysign/send.ui:341
+msgid "Display more details for the error."
+msgstr "Exibir mais detalhes sobre o erro."
+
+#: keysign/send.ui:372
+msgid "An error occurred while trying to import the signature."
+msgstr "Ocorreu um erro ao tentar importar a assinatura."
+
 #. This refers to the key being certified by someone rather than the key used for
 #. certifying someone
-#: keysign/send.ui:322
+#: keysign/send.ui:427
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>Selecione uma chave para assinar</b>"
 
-#: keysign/send.ui:338
+#: keysign/send.ui:443
 msgid "<small>Times signed</small>"
 msgstr "<small>Quantidade de assinaturas</small>"
 
-#: keysign/send.ui:405
+#: keysign/send.ui:510
 msgid "Keylist"
 msgstr "Lista de chaves"
 
-#: keysign/send.ui:425
+#: keysign/send.ui:530
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
@@ -457,19 +470,19 @@ msgstr ""
 "<small>Para ter uma chave assinada, a outra pessoa deve digitar o código de "
 "segurança ou ler o código QR</small>"
 
-#: keysign/send.ui:452
+#: keysign/send.ui:557
 msgid "<b>Key Details</b>"
 msgstr "<b>Detalhes da chave</b>"
 
-#: keysign/send.ui:477
+#: keysign/send.ui:582
 msgid "Fingerprint"
 msgstr "Impressão digital"
 
-#: keysign/send.ui:631
+#: keysign/send.ui:736
 msgid "<b>QR Code</b>"
 msgstr "<b>Código QR</b>"
 
-#: keysign/util.py:223
+#: keysign/util.py:231
 msgid ""
 "Hi $uid,\n"
 "\n"
@@ -500,31 +513,3 @@ msgstr ""
 #: keysign/wormholereceive.py:86
 msgid "Wrong message authentication code"
 msgstr "Código de autenticação de mensagem errado"
-
-#~ msgid ""
-#~ "Uses the Internet to transport the key rather than the local network and "
-#~ "Bluetooth (if available)"
-#~ msgstr ""
-#~ "Usa a Internet para transportar a chave em vez da rede local e Bluetooth "
-#~ "(se disponível)"
-
-#~ msgid "Translated for gettext (C)"
-#~ msgstr "Traduzido para gettext (pt_BR)"
-
-#~ msgid "Translated for Python (C)"
-#~ msgstr "Traduzido para Python (pt_BR)"
-
-#~ msgid "installing symlinks for sockets from %s to %s"
-#~ msgstr "instalando links simbólicos para soquetes de %s para %s"
-
-#~ msgid "page1"
-#~ msgstr "página1"
-
-#~ msgid "page2"
-#~ msgstr "página2"
-
-#~ msgid "page3"
-#~ msgstr "página3"
-
-#~ msgid "Your signed key $fingerprint"
-#~ msgstr "Sua chave assinada $fingerprint"
