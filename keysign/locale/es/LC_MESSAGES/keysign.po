@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the gnome-keysign
 # project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
-# Daniel Mustieles <daniel.mustieles@gmail.com>, 2018-2019.
+# Daniel Mustieles <daniel.mustieles@gmail.com>, 2018-2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign 0.9.7.2\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2019-08-07 09:49+0000\n"
-"PO-Revision-Date: 2019-08-21 10:34+0200\n"
+"POT-Creation-Date: 2020-10-07 18:17+0000\n"
+"PO-Revision-Date: 2021-02-16 16:34+0100\n"
 "Last-Translator: Daniel Mustieles <daniel.mustieles@gmail.com>\n"
 "Language-Team: Spanish - Spain <gnome-es-list@gnome.org>\n"
 "Language: es_ES\n"
@@ -19,9 +19,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Generated-By: Babel 2.5.1\n"
-"X-Generator: Gtranslator 3.32.1\n"
+"X-Generator: Gtranslator 3.38.0\n"
 
-#: data/org.gnome.Keysign.raw.appdata.xml:10
+#: data/org.gnome.Keysign.raw.appdata.xml:11
 msgid ""
 "\n"
 "      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
@@ -33,7 +33,7 @@ msgstr ""
 "      a través de la red local o Bluetooth.\n"
 "    "
 
-#: data/org.gnome.Keysign.raw.appdata.xml:14
+#: data/org.gnome.Keysign.raw.appdata.xml:15
 msgid ""
 "\n"
 "      It can scan another key's barcode and transfer the key securely,\n"
@@ -76,15 +76,15 @@ msgstr "python;gpg;gnupg;key;openpgp;"
 msgid "org.gnome.Keysign"
 msgstr "org.gnome.Keysign"
 
-#: keysign/app.py:187
+#: keysign/app.py:186
 msgid "Send"
 msgstr "Enviar"
 
-#: keysign/app.py:189 keysign/receive.py:272
+#: keysign/app.py:188 keysign/receive.py:272
 msgid "Receive"
 msgstr "Recibir"
 
-#: keysign/app.ui:62 keysign/send.ui:54
+#: keysign/app.ui:62 keysign/send.ui:55
 msgid "Internet"
 msgstr "Internet"
 
@@ -262,7 +262,6 @@ msgid "Sign Key"
 msgstr "Firmar clave"
 
 #: keysign/receive.py:218
-#| msgid "<b>Select a key for signing</b>"
 msgid "Select file for saving"
 msgstr "Seleccione un archivo para guardar"
 
@@ -295,7 +294,7 @@ msgstr "<b>Cámara</b>"
 msgid "Integrated Web Cam"
 msgstr "Cámara web Integrada"
 
-#: keysign/receive.ui:179 keysign/send.ui:568
+#: keysign/receive.ui:179 keysign/send.ui:673
 msgid "<b>Security Code</b>"
 msgstr "<b>Código de seguridad</b>"
 
@@ -327,12 +326,6 @@ msgstr ""
 "local"
 
 #: keysign/receive.ui:403
-#| msgid ""
-#| "No GNOME Keysign servers around :-(\n"
-#| "Find a friend to use GNOME Keysign with.\n"
-#| "You may also suffer from connectivity problems.\n"
-#| "For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/"
-#| "Doc/NoServers/1\">the documentation</a>."
 msgid ""
 "Successfully produced certifications.\n"
 "You can import a temporary signature to start using the key as if it had "
@@ -360,7 +353,7 @@ msgstr ""
 msgid "Key"
 msgstr "Llave"
 
-#: keysign/receive.ui:507 keysign/send.ui:493
+#: keysign/receive.ui:507 keysign/send.ui:598
 msgid "UIDs"
 msgstr "UID"
 
@@ -372,7 +365,7 @@ msgstr "C_onfirmar"
 msgid "Signing the following UIDs:"
 msgstr "Firmando los siguientes UID:"
 
-#: keysign/send.py:207
+#: keysign/send.py:218
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
@@ -380,23 +373,11 @@ msgstr ""
 "Intentado obtener conexión a Internet. Parece que va muy lento o que no está "
 "disponible."
 
-#: keysign/send.py:213
+#: keysign/send.py:224
 msgid "There isn't an Internet connection!"
 msgstr "No hay conexión a Internet."
 
-#: keysign/send.py:219 keysign/send.ui:267
-msgid "The signature has been successfully imported!"
-msgstr "La firma se ha importado correctamente."
-
-#: keysign/send.py:225
-msgid ""
-"An error occurred while trying to import the signature.\n"
-"Please double check the correctness of the chosen signature."
-msgstr ""
-"A ocurrido un error al intentar importar la firma.\n"
-"Compruebe que la firma elegida es correcta."
-
-#: keysign/send.py:254 keysign/send.ui:678
+#: keysign/send.py:280 keysign/send.ui:783
 msgid ""
 "Key successfully sent.\n"
 "You should receive soon an email with the signature."
@@ -404,7 +385,7 @@ msgstr ""
 "Clave enviada correctamente.\n"
 "Debería recibir un correo con la firma en breve."
 
-#: keysign/send.py:259
+#: keysign/send.py:285
 msgid ""
 "Could not establish a secure connection.\n"
 "Either your partner has entered a wrong code or someone tried to intercept "
@@ -414,7 +395,7 @@ msgstr ""
 "O bien la otra parte ha introducido mal el código o alguien ha intentado "
 "interceptar la conexión."
 
-#: keysign/send.py:263
+#: keysign/send.py:289
 #, python-format
 msgid ""
 "An unexpected error occurred:\n"
@@ -431,7 +412,11 @@ msgstr "Seleccionar y enviar clave"
 msgid "Select and Send key"
 msgstr "Seleccionar y enviar clave"
 
-#: keysign/send.ui:121
+#: keysign/send.ui:53
+msgid "Also use the Internet to transfer the certificate"
+msgstr "Usar también Internet para transferir el certificado"
+
+#: keysign/send.ui:122
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
@@ -439,25 +424,48 @@ msgstr ""
 "No tiene ninguna clave.\n"
 "Use algo como Seahorse para crear una."
 
-#: keysign/send.ui:198
+#: keysign/send.ui:199
 msgid "Very slow or no Internet connection!"
 msgstr "Conexión a Internet muy lenta o no hay conexión."
 
+#: keysign/send.ui:268
+msgid "The signature has been successfully imported!"
+msgstr "La firma se ha importado correctamente."
+
+#: keysign/send.ui:294
+msgid ""
+"Returns the received certification back to the sender, so that the sender "
+"can make use of your OpenPGP certificate"
+msgstr ""
+"Devuelve la certificación recibida al remitente, por lo que éste puede usar "
+"su certificado openPGP"
+
+#: keysign/send.ui:341
+msgid "Display more details for the error."
+msgstr "Mostrar más detalles sobre el error."
+
+#: keysign/send.ui:372
+#| msgid ""
+#| "An error occurred while trying to import the signature.\n"
+#| "Please double check the correctness of the chosen signature."
+msgid "An error occurred while trying to import the signature."
+msgstr "Ha ocurrido un error al intentar importar la firma."
+
 #. This refers to the key being certified by someone rather than the key used for
 #. certifying someone
-#: keysign/send.ui:322
+#: keysign/send.ui:427
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>Seleccione una clave para firmar</b>"
 
-#: keysign/send.ui:338
+#: keysign/send.ui:443
 msgid "<small>Times signed</small>"
 msgstr "<small>Veces firmada</small>"
 
-#: keysign/send.ui:405
+#: keysign/send.ui:510
 msgid "Keylist"
 msgstr "Lista de claves"
 
-#: keysign/send.ui:425
+#: keysign/send.ui:530
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
@@ -465,19 +473,19 @@ msgstr ""
 "<small>Para firmar la clave, la otra persona debe introducir el código de "
 "seguridad, o escanear el código QR</small>"
 
-#: keysign/send.ui:452
+#: keysign/send.ui:557
 msgid "<b>Key Details</b>"
 msgstr "<b>Detalles de la clave</b>"
 
-#: keysign/send.ui:477
+#: keysign/send.ui:582
 msgid "Fingerprint"
 msgstr "Huella dactilar"
 
-#: keysign/send.ui:631
+#: keysign/send.ui:736
 msgid "<b>QR Code</b>"
 msgstr "<b>Código QR</b>"
 
-#: keysign/util.py:223
+#: keysign/util.py:231
 msgid ""
 "Hi $uid,\n"
 "\n"
