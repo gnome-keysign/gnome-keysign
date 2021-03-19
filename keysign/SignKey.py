@@ -27,7 +27,12 @@ if sys.version_info.major < 3:
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser(description="Sign an OpenPGP key from a file.  The program will open each file, exrtact exactly one OpenPGP key, sign each UID separately, encrypt and send each signed UID using xdg-email.")
+    parser = argparse.ArgumentParser(description=""
+        "Certify UIDs of given OpenPGP certificates (aka sign OpenPGP keys) "
+        " from a file.  "
+        "The program will open each file, extract exactly one "
+        "OpenPGP certificate, sign each UID separately, encrypt and send "
+        "each signed UID using xdg-email.")
     parser.add_argument('-v', '--verbose', action='count', default=0,
         help="Increase detail of logging")
     parser.add_argument("file", nargs='+', type=argparse.FileType('rb'),
