@@ -1,14 +1,14 @@
 # Swedish translation for gnome-keysign.
-# Copyright © 2019, 2020 gnome-keysign's COPYRIGHT HOLDER
+# Copyright © 2019-2021 gnome-keysign's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-keysign package.
-# Anders Jonsson <anders.jonsson@norsjovallen.se>, 2019, 2020.
+# Anders Jonsson <anders.jonsson@norsjovallen.se>, 2019, 2020, 2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2020-10-08 06:35+0000\n"
-"PO-Revision-Date: 2020-12-30 17:36+0100\n"
+"POT-Creation-Date: 2021-04-15 09:07+0000\n"
+"PO-Revision-Date: 2021-04-15 22:06+0200\n"
 "Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
 "Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
 "Language: sv\n"
@@ -78,7 +78,7 @@ msgstr "org.gnome.Keysign"
 msgid "Send"
 msgstr "Skicka"
 
-#: keysign/app.py:188 keysign/receive.py:272
+#: keysign/app.py:188 keysign/receive.py:279
 msgid "Receive"
 msgstr "Ta emot"
 
@@ -261,7 +261,7 @@ msgstr "Går ut: "
 msgid "Sign Key"
 msgstr "Signera nyckel"
 
-#: keysign/receive.py:218
+#: keysign/receive.py:225
 msgid "Select file for saving"
 msgstr "Välj fil för sparning"
 
@@ -310,13 +310,27 @@ msgstr "Hämtar nyckeldata. Vänta…"
 msgid "Key download was interrupted!"
 msgstr "Nyckelhämtning avbröts!"
 
-#: keysign/receive.ui:345
+#: keysign/receive.ui:346
+msgid "Show details about the error"
+msgstr "Visa detaljer om felet"
+
+#: keysign/receive.ui:379
+msgid ""
+"Error producing certifications ☹\n"
+"Something went wrong. Sometime, the passphrase was not correctly entered.\n"
+"You may try again by clicking the \"confirm\" button."
+msgstr ""
+"Fel vid skapande av certifieringar ☹\n"
+"Något gick fel. Kanske lösenfrasen inte matades in korrekt.\n"
+"Du kan försöka igen genom att klicka på knappen ”bekräfta”."
+
+#: keysign/receive.ui:427
 msgid ""
 "Saves the produced certifications as separate files in a custom directory"
 msgstr ""
 "Sparar de skapade certifieringarna som separata filer i en anpassad katalog"
 
-#: keysign/receive.ui:360
+#: keysign/receive.ui:442
 msgid ""
 "Imports a temporary version of the produced certifications into the local "
 "keyring"
@@ -324,7 +338,7 @@ msgstr ""
 "Importerar en temporär version av de skapade certifieringarna till den "
 "lokala nyckelringen"
 
-#: keysign/receive.ui:403
+#: keysign/receive.ui:485
 msgid ""
 "Successfully produced certifications.\n"
 "You can import a temporary signature to start using the key as if it had "
@@ -338,7 +352,15 @@ msgstr ""
 "Besök <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "ProducedSignatures/1\">dokumentationen</a> för mer information."
 
-#: keysign/receive.ui:446
+#: keysign/receive.ui:541
+msgid "Key"
+msgstr "Nyckel"
+
+#: keysign/receive.ui:574 keysign/send.ui:598
+msgid "UIDs"
+msgstr "UID:n"
+
+#: keysign/receive.ui:651
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
@@ -348,19 +370,11 @@ msgstr ""
 "Detta kommer att skapa ett e-postmeddelande som måste skickas för att "
 "slutföra signeringsprocessen."
 
-#: keysign/receive.ui:474
-msgid "Key"
-msgstr "Nyckel"
-
-#: keysign/receive.ui:507 keysign/send.ui:598
-msgid "UIDs"
-msgstr "UID:n"
-
-#: keysign/receive.ui:594
+#: keysign/receive.ui:676
 msgid "C_onfirm"
 msgstr "_Bekräfta"
 
-#: keysign/receive.ui:716
+#: keysign/receive.ui:798
 msgid "Signing the following UIDs:"
 msgstr "Signerar följande UID:n:"
 
