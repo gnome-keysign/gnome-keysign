@@ -42,6 +42,9 @@ log = logging.getLogger(__name__)
 ## INTERNAL API
 ##
 
+class GPGRuntimeError(RuntimeError):
+    pass
+
 class GenEdit:
     _ignored_status = (gpg.constants.STATUS_EOF,
                        gpg.constants.STATUS_GOT_IT,
@@ -161,7 +164,7 @@ def sign_key(uid=0, sign_cmd=u"sign", expire=False, check=3,
             if error_cb:
                 error_cb(prompt)
             else:
-                raise RuntimeError("Error signing key: %s" % prompt)
+                raise GPGRuntimeError("Error signing key: %s" % prompt)
             status, prompt = yield None
         else:
             raise AssertionError("Unexpected state %r %r" % (status, prompt))

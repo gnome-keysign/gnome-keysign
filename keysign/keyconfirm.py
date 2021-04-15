@@ -134,9 +134,30 @@ class PreSignWidget(Gtk.VBox):
         # API. The infobar should probably be part of the caller's responsibility,
         # i.e. not part of this widget.
         self.infobar_success = builder.get_object('infobar_certifications_produced')
+        self.infobar_errors = builder.get_object('infobar_certifications_errors')
         self.infobar_save_as_button = builder.get_object('btn_local_import_save_as')
         self.infobar_import_button = builder.get_object('btn_local_import')
+        self.infobar_show_error_button = builder.get_object('btn_show_error_details')
 
+        ib_error_show = self.infobar_errors.show
+        def show(exception):
+            self.infobar_errors.exception = exception
+            ib_error_show()
+            def show_error(btn):
+                dialog = Gtk.MessageDialog(
+                    transient_for=self.get_toplevel(),
+                    flags=0,
+                    message_type=Gtk.MessageType.ERROR,
+                    buttons=Gtk.ButtonsType.CLOSE,
+                    text="Error certifying key"
+                )
+                dialog.format_secondary_text(
+                    str(exception) + "\n"
+                    "We don't know any more, sorry :(")
+                dialog.run()
+                dialog.destroy()
+            self.infobar_show_error_button.connect("clicked", show_error)
+        self.infobar_errors.show = show
 
     def on_confirm_button_clicked(self, buttonObject, *args):
         self.emit('sign-key-confirmed', self.key, *args)
