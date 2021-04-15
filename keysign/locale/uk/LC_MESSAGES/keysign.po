@@ -2,13 +2,13 @@
 # Copyright (C) 2020 gnome-keysign's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-keysign package.
 #
-# Yuri Chornoivan <yurchor@ukr.net>, 2020.
+# Yuri Chornoivan <yurchor@ukr.net>, 2020, 2021.
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2020-10-07 18:17+0000\n"
-"PO-Revision-Date: 2020-10-08 09:34+0300\n"
+"POT-Creation-Date: 2021-04-15 09:07+0000\n"
+"PO-Revision-Date: 2021-04-15 18:42+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -16,9 +16,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
-"Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n"
-"%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Lokalize 20.11.70\n"
+"Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Lokalize 20.12.0\n"
 
 #: data/org.gnome.Keysign.raw.appdata.xml:11
 msgid ""
@@ -82,7 +81,7 @@ msgstr "org.gnome.Keysign"
 msgid "Send"
 msgstr "Надіслати"
 
-#: keysign/app.py:188 keysign/receive.py:272
+#: keysign/app.py:188 keysign/receive.py:279
 msgid "Receive"
 msgstr "Отримати"
 
@@ -262,7 +261,7 @@ msgstr "Строк дії: "
 msgid "Sign Key"
 msgstr "Підписати ключ"
 
-#: keysign/receive.py:218
+#: keysign/receive.py:225
 msgid "Select file for saving"
 msgstr "Виберіть файл для збереження"
 
@@ -311,13 +310,28 @@ msgstr "Отримуємо дані ключа. Будь ласка, зачек�
 msgid "Key download was interrupted!"
 msgstr "Отримання даних ключа було перервано!"
 
-#: keysign/receive.ui:345
+#: keysign/receive.ui:346
+#| msgid "Display more details for the error."
+msgid "Show details about the error"
+msgstr "Показати подробиці щодо помилки"
+
+#: keysign/receive.ui:379
+msgid ""
+"Error producing certifications ☹\n"
+"Something went wrong. Sometime, the passphrase was not correctly entered.\n"
+"You may try again by clicking the \"confirm\" button."
+msgstr ""
+"Сертифікація із помилками ☹\n"
+"Щось сталося. Іноді, причиною помилки є неправильно введений пароль.\n"
+"Ви можете повторити спробу, натиснувши кнопку «Підтвердити»."
+
+#: keysign/receive.ui:427
 msgid ""
 "Saves the produced certifications as separate files in a custom directory"
 msgstr ""
 "Зберігає створені дані сертифікації як окремі файли у нетиповому каталозі"
 
-#: keysign/receive.ui:360
+#: keysign/receive.ui:442
 msgid ""
 "Imports a temporary version of the produced certifications into the local "
 "keyring"
@@ -325,7 +339,7 @@ msgstr ""
 "Імпортує тимчасову версію створених даних сертифікації до локальної зв'язки "
 "ключів"
 
-#: keysign/receive.ui:403
+#: keysign/receive.ui:485
 msgid ""
 "Successfully produced certifications.\n"
 "You can import a temporary signature to start using the key as if it had "
@@ -339,7 +353,15 @@ msgstr ""
 "Щоб дізнатися більше, ознайомтеся із <a href=\"https://wiki.gnome.org/Apps/"
 "Keysign/Doc/ProducedSignatures/1\">документацією</a>."
 
-#: keysign/receive.ui:446
+#: keysign/receive.ui:541
+msgid "Key"
+msgstr "Ключ"
+
+#: keysign/receive.ui:574 keysign/send.ui:598
+msgid "UIDs"
+msgstr "UID"
+
+#: keysign/receive.ui:651
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
@@ -350,19 +372,11 @@ msgstr ""
 "У відповідь буде створено поштове повідомлення, яке слід надіслати, щоб "
 "завершити процедуру підписування."
 
-#: keysign/receive.ui:474
-msgid "Key"
-msgstr "Ключ"
-
-#: keysign/receive.ui:507 keysign/send.ui:598
-msgid "UIDs"
-msgstr "UID"
-
-#: keysign/receive.ui:594
+#: keysign/receive.ui:676
 msgid "C_onfirm"
 msgstr "_Підтвердити"
 
-#: keysign/receive.ui:716
+#: keysign/receive.ui:798
 msgid "Signing the following UIDs:"
 msgstr "Підписуємо такі UID:"
 
@@ -438,17 +452,14 @@ msgid ""
 "Returns the received certification back to the sender, so that the sender "
 "can make use of your OpenPGP certificate"
 msgstr ""
-"Повертає отриманий сертифікат відправнику, щоб відправник міг скористатися"
-" вашим сертифікатом OpenPGP"
+"Повертає отриманий сертифікат відправнику, щоб відправник міг скористатися "
+"вашим сертифікатом OpenPGP"
 
 #: keysign/send.ui:341
 msgid "Display more details for the error."
 msgstr "Показати більше подробиць щодо помилки."
 
 #: keysign/send.ui:372
-#| msgid ""
-#| "An error occurred while trying to import the signature.\n"
-#| "Please double check the correctness of the chosen signature."
 msgid "An error occurred while trying to import the signature."
 msgstr "Під час спроби імпортувати підпис сталася помилка."
 
