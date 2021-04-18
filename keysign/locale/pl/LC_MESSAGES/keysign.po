@@ -1,15 +1,15 @@
 # Polish translation for gnome-keysign.
-# Copyright © 2018-2020 the gnome-keysign authors.
+# Copyright © 2018-2021 the gnome-keysign authors.
 # This file is distributed under the same license as the gnome-keysign package.
-# Piotr Drąg <piotrdrag@gmail.com>, 2018-2020.
-# Aviary.pl <community-poland@mozilla.org>, 2018-2020.
+# Piotr Drąg <piotrdrag@gmail.com>, 2018-2021.
+# Aviary.pl <community-poland@mozilla.org>, 2018-2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2020-10-07 18:17+0000\n"
-"PO-Revision-Date: 2020-10-11 10:20+0200\n"
+"POT-Creation-Date: 2021-04-15 09:07+0000\n"
+"PO-Revision-Date: 2021-04-18 12:25+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -79,7 +79,7 @@ msgstr "org.gnome.Keysign"
 msgid "Send"
 msgstr "Wyślij"
 
-#: keysign/app.py:188 keysign/receive.py:272
+#: keysign/app.py:188 keysign/receive.py:279
 msgid "Receive"
 msgstr "Odbierz"
 
@@ -260,7 +260,7 @@ msgstr "Wygasa: "
 msgid "Sign Key"
 msgstr "Podpisz klucz"
 
-#: keysign/receive.py:218
+#: keysign/receive.py:225
 msgid "Select file for saving"
 msgstr "Wybór pliku do zapisania"
 
@@ -272,7 +272,7 @@ msgid ""
 "For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "NoServers/1\">the documentation</a>."
 msgstr ""
-"Nie ma żadnych serwerów GNOME Keysign. :(\n"
+"Nie ma żadnych serwerów GNOME Keysign. ☹\n"
 "Należy znaleźć znajomego, aby móc użyć GNOME Keysign.\n"
 "Mogą też występować problemy z łącznością.\n"
 "<a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
@@ -309,21 +309,35 @@ msgstr "Pobieranie danych klucza. Proszę czekać…"
 msgid "Key download was interrupted!"
 msgstr "Pobieranie klucza zostało przerwane."
 
-#: keysign/receive.ui:345
+#: keysign/receive.ui:346
+msgid "Show details about the error"
+msgstr "Wyświetla informacje o błędzie"
+
+#: keysign/receive.ui:379
+msgid ""
+"Error producing certifications ☹\n"
+"Something went wrong. Sometime, the passphrase was not correctly entered.\n"
+"You may try again by clicking the \"confirm\" button."
+msgstr ""
+"Błąd podczas tworzenia certyfikacji. ☹\n"
+"Coś się nie powiodło. Czasami okazuje się, że hasło zostało błędnie podane.\n"
+"Można spróbować ponownie klikając przycisk „Potwierdź”."
+
+#: keysign/receive.ui:427
 msgid ""
 "Saves the produced certifications as separate files in a custom directory"
 msgstr ""
 "Zapisuje utworzone certyfikaty jako oddzielne pliki w niestandardowym "
 "katalogu"
 
-#: keysign/receive.ui:360
+#: keysign/receive.ui:442
 msgid ""
 "Imports a temporary version of the produced certifications into the local "
 "keyring"
 msgstr ""
 "Importuje tymczasową wersję utworzonych certyfikatów do lokalnej bazy kluczy"
 
-#: keysign/receive.ui:403
+#: keysign/receive.ui:485
 msgid ""
 "Successfully produced certifications.\n"
 "You can import a temporary signature to start using the key as if it had "
@@ -337,7 +351,15 @@ msgstr ""
 "<a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "ProducedSignatures/1\">Dokumentacja</a> zawiera więcej informacji."
 
-#: keysign/receive.ui:446
+#: keysign/receive.ui:541
+msgid "Key"
+msgstr "Klucz"
+
+#: keysign/receive.ui:574 keysign/send.ui:598
+msgid "UIDs"
+msgstr "UID"
+
+#: keysign/receive.ui:651
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
@@ -348,19 +370,11 @@ msgstr ""
 "Utworzy to wiadomość e-mail, którą należy wysłać, aby ukończyć proces "
 "podpisywania."
 
-#: keysign/receive.ui:474
-msgid "Key"
-msgstr "Klucz"
-
-#: keysign/receive.ui:507 keysign/send.ui:598
-msgid "UIDs"
-msgstr "UID"
-
-#: keysign/receive.ui:594
+#: keysign/receive.ui:676
 msgid "C_onfirm"
 msgstr "P_otwierdź"
 
-#: keysign/receive.ui:716
+#: keysign/receive.ui:798
 msgid "Signing the following UIDs:"
 msgstr "Podpisywanie tych UID:"
 
