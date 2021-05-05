@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2020-10-07 18:17+0000\n"
-"PO-Revision-Date: 2021-01-07 16:09+0200\n"
+"POT-Creation-Date: 2021-04-15 09:07+0000\n"
+"PO-Revision-Date: 2021-05-05 13:59+0200\n"
 "Last-Translator: Florentina Mușat <florentina.musat.28@gmail.com>\n"
 "Language-Team: Romanian <gnomero-list@lists.sourceforge.net>\n"
 "Language: ro\n"
@@ -82,7 +82,7 @@ msgstr "org.gnome.Keysign"
 msgid "Send"
 msgstr "Trimite"
 
-#: keysign/app.py:188 keysign/receive.py:272
+#: keysign/app.py:188 keysign/receive.py:279
 msgid "Receive"
 msgstr "Primește"
 
@@ -263,7 +263,7 @@ msgstr "Expiră: "
 msgid "Sign Key"
 msgstr "Semnează cheia"
 
-#: keysign/receive.py:218
+#: keysign/receive.py:225
 msgid "Select file for saving"
 msgstr "Selectează fișierul pentru salvare"
 
@@ -312,21 +312,35 @@ msgstr "Se descarcă datele cheii. Așteptați..."
 msgid "Key download was interrupted!"
 msgstr "Descărcarea cheii a fost întreruptă!"
 
-#: keysign/receive.ui:345
+#: keysign/receive.ui:346
+msgid "Show details about the error"
+msgstr "Afișează detalii pentru eroare"
+
+#: keysign/receive.ui:379
+msgid ""
+"Error producing certifications ☹\n"
+"Something went wrong. Sometime, the passphrase was not correctly entered.\n"
+"You may try again by clicking the \"confirm\" button."
+msgstr ""
+"Eroare la producerea certificărilor ☹\n"
+"Ceva nu a funcționat. O dată, fraza parolă nu a fost introdusă corect.\n"
+"Puteți încerca din nou apăsând butonul „Confirmă”."
+
+#: keysign/receive.ui:427
 msgid ""
 "Saves the produced certifications as separate files in a custom directory"
 msgstr ""
 "Salvează certificările produse ca fișiere separate într-un director "
 "personalizat"
 
-#: keysign/receive.ui:360
+#: keysign/receive.ui:442
 msgid ""
 "Imports a temporary version of the produced certifications into the local "
 "keyring"
 msgstr ""
 "Importă o versiune temporară a certificărilor produce în inelul de chei local"
 
-#: keysign/receive.ui:403
+#: keysign/receive.ui:485
 msgid ""
 "Successfully produced certifications.\n"
 "You can import a temporary signature to start using the key as if it had "
@@ -340,7 +354,15 @@ msgstr ""
 "Pentru mai multe informații vizitați <a href=\"https://wiki.gnome.org/Apps/"
 "Keysign/Doc/ProducedSignatures/1\">documentația</a>."
 
-#: keysign/receive.ui:446
+#: keysign/receive.ui:541
+msgid "Key"
+msgstr "Tastă"
+
+#: keysign/receive.ui:574 keysign/send.ui:598
+msgid "UIDs"
+msgstr "UID-uri"
+
+#: keysign/receive.ui:651
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
@@ -350,19 +372,11 @@ msgstr ""
 "Acest lucru va genera un email care trebuie trimis pentru a completa "
 "procesul de semnare."
 
-#: keysign/receive.ui:474
-msgid "Key"
-msgstr "Tastă"
-
-#: keysign/receive.ui:507 keysign/send.ui:598
-msgid "UIDs"
-msgstr "UID-uri"
-
-#: keysign/receive.ui:594
+#: keysign/receive.ui:676
 msgid "C_onfirm"
 msgstr "C_onfirmă"
 
-#: keysign/receive.ui:716
+#: keysign/receive.ui:798
 msgid "Signing the following UIDs:"
 msgstr "Se semnează următoarele UID-uri:"
 
