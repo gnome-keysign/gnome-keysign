@@ -1,14 +1,15 @@
 # Czech translation for gnome-keysign.
 # Copyright (C) 2018 gnome-keysign's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-keysign package.
-# Marek Černocký <marek@manet.cz>, 2018, 2020.
+#
+# Marek Černocký <marek@manet.cz>, 2018, 2020, 2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2020-10-07 18:17+0000\n"
-"PO-Revision-Date: 2020-11-15 12:17+0100\n"
+"POT-Creation-Date: 2021-04-15 09:07+0000\n"
+"PO-Revision-Date: 2021-09-06 07:42+0200\n"
 "Last-Translator: Marek Černocký <marek@manet.cz>\n"
 "Language-Team: čeština <gnome-cs-list@gnome.org>\n"
 "Language: cs\n"
@@ -74,7 +75,7 @@ msgstr "org.gnome.Keysign"
 msgid "Send"
 msgstr "Odeslání"
 
-#: keysign/app.py:188 keysign/receive.py:272
+#: keysign/app.py:188 keysign/receive.py:279
 msgid "Receive"
 msgstr "Příjem"
 
@@ -254,7 +255,7 @@ msgstr "Vyprší: "
 msgid "Sign Key"
 msgstr "Podepisovací klíč"
 
-#: keysign/receive.py:218
+#: keysign/receive.py:225
 msgid "Select file for saving"
 msgstr "Vyberte soubor k uložení"
 
@@ -303,18 +304,32 @@ msgstr "Stahují se data klíče. Čekejte prosím…"
 msgid "Key download was interrupted!"
 msgstr "Stahování klíče bylo přerušeno!"
 
-#: keysign/receive.ui:345
+#: keysign/receive.ui:346
+msgid "Show details about the error"
+msgstr "Zobrazit k chybě podrobností"
+
+#: keysign/receive.ui:379
+msgid ""
+"Error producing certifications ☹\n"
+"Something went wrong. Sometime, the passphrase was not correctly entered.\n"
+"You may try again by clicking the \"confirm\" button."
+msgstr ""
+"Certifikát produkující chyby ☹\n"
+"Něco bylo špatně. Někdy bývá nesprávně zadaná heslová fráze.\n"
+"Můžete to zkusit znovu zmáčknutím tlačítka „Potvrdit“."
+
+#: keysign/receive.ui:427
 msgid ""
 "Saves the produced certifications as separate files in a custom directory"
 msgstr "Uložit vytvořené certifikáty jako samostatné soubory ve vlastní složce"
 
-#: keysign/receive.ui:360
+#: keysign/receive.ui:442
 msgid ""
 "Imports a temporary version of the produced certifications into the local "
 "keyring"
 msgstr "Naimportovat dočasné verze vytvořených certifikátů do místní klíčenky"
 
-#: keysign/receive.ui:403
+#: keysign/receive.ui:485
 msgid ""
 "Successfully produced certifications.\n"
 "You can import a temporary signature to start using the key as if it had "
@@ -328,7 +343,15 @@ msgstr ""
 "Více informací najdete v <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "ProducedSignatures/1\">tomto dokumentu</a>."
 
-#: keysign/receive.ui:446
+#: keysign/receive.ui:541
+msgid "Key"
+msgstr "Klíč"
+
+#: keysign/receive.ui:574 keysign/send.ui:598
+msgid "UIDs"
+msgstr "UID"
+
+#: keysign/receive.ui:651
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
@@ -337,19 +360,11 @@ msgstr ""
 "Jestli chcete klíč podepsat, potvrďte, že chcete podepsat následující klíč.\n"
 "Tím se vygeneruje e-mail, který musíte odeslat, aby bylo podepsání úplné."
 
-#: keysign/receive.ui:474
-msgid "Key"
-msgstr "Klíč"
-
-#: keysign/receive.ui:507 keysign/send.ui:598
-msgid "UIDs"
-msgstr "UID"
-
-#: keysign/receive.ui:594
+#: keysign/receive.ui:676
 msgid "C_onfirm"
 msgstr "P_otvrdit"
 
-#: keysign/receive.ui:716
+#: keysign/receive.ui:798
 msgid "Signing the following UIDs:"
 msgstr "Podepisují se následující UID:"
 
