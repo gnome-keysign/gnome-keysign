@@ -1,15 +1,15 @@
 # Dutch translation for gnome-keysign.
 # Copyright (C) 2019 gnome-keysign's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-keysign package.
-# Nathan Follens <nthn@unseen.is>, 2019-2021.
+# Nathan Follens <nfollens@gnome.org>, 2019-2021.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2020-10-07 18:17+0000\n"
-"PO-Revision-Date: 2021-04-02 16:34+0200\n"
-"Last-Translator: Nathan Follens <nthn@unseen.is>\n"
+"POT-Creation-Date: 2021-05-31 10:45+0000\n"
+"PO-Revision-Date: 2021-09-07 20:58+0200\n"
+"Last-Translator: Nathan Follens <nfollens@gnome.org>\n"
 "Language-Team: Dutch <gnome-nl-list@gnome.org>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Poedit 3.0\n"
 
 #: data/org.gnome.Keysign.raw.appdata.xml:11
 msgid ""
@@ -80,7 +80,7 @@ msgstr "org.gnome.Keysign"
 msgid "Send"
 msgstr "Verzenden"
 
-#: keysign/app.py:188 keysign/receive.py:272
+#: keysign/app.py:188 keysign/receive.py:279
 msgid "Receive"
 msgstr "Ontvangen"
 
@@ -261,7 +261,7 @@ msgstr "Verloopt: "
 msgid "Sign Key"
 msgstr "Sleutel ondertekenen"
 
-#: keysign/receive.py:218
+#: keysign/receive.py:225
 msgid "Select file for saving"
 msgstr "Kies een bestand om op te slaan"
 
@@ -310,22 +310,36 @@ msgstr "Sleutelgegevens worden gedownload. Even geduld…"
 msgid "Key download was interrupted!"
 msgstr "Downloaden van sleutel onderbroken!"
 
-#: keysign/receive.ui:345
+#: keysign/receive.ui:346
+msgid "Show details about the error"
+msgstr "Informatie over de fout weergeven"
+
+#: keysign/receive.ui:379
+msgid ""
+"Error producing certifications ☹\n"
+"Something went wrong. Sometime, the passphrase was not correctly entered.\n"
+"You may try again by clicking the \"confirm\" button."
+msgstr ""
+"Fout bij produceren van certificaten ☹\n"
+"Er is iets misgegaan. Mogelijk is het wachtwoord niet correct ingevoerd.\n"
+"U kunt het opnieuw proberen door op de knop ‘Bevestigen’ te drukken."
+
+#: keysign/receive.ui:427
 msgid ""
 "Saves the produced certifications as separate files in a custom directory"
 msgstr ""
-"Slaat de geproduceerde certificaties op als aparte bestanden in een map naar "
+"Slaat de geproduceerde certificaten op als aparte bestanden in een map naar "
 "keuze"
 
-#: keysign/receive.ui:360
+#: keysign/receive.ui:442
 msgid ""
 "Imports a temporary version of the produced certifications into the local "
 "keyring"
 msgstr ""
-"Lijst een tijdelijke versie van de geproduceerde certificaties in de lokale "
+"Leest een tijdelijke versie van de geproduceerde certificaten in de lokale "
 "sleutelbos in"
 
-#: keysign/receive.ui:403
+#: keysign/receive.ui:485
 msgid ""
 "Successfully produced certifications.\n"
 "You can import a temporary signature to start using the key as if it had "
@@ -333,13 +347,21 @@ msgid ""
 "For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "ProducedSignatures/1\">the documentation</a>."
 msgstr ""
-"Certificaties geproduceerd.\n"
+"Certificaten geproduceerd.\n"
 "U kunt een tijdelijke ondertekening inlezen om de sleutel al te gebruiken "
 "alsof hij reeds volledig geverifieerd is.\n"
 "Bekijk <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "ProducedSignatures/1\">de documentatie</a> voor meer informatie."
 
-#: keysign/receive.ui:446
+#: keysign/receive.ui:541
+msgid "Key"
+msgstr "Sleutel"
+
+#: keysign/receive.ui:574 keysign/send.ui:598
+msgid "UIDs"
+msgstr "UID’s"
+
+#: keysign/receive.ui:651
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
@@ -350,19 +372,11 @@ msgstr ""
 "Dit zal een e-mail genereren die verzonden meot worden om het "
 "ondertekeningsproces te voltooien."
 
-#: keysign/receive.ui:474
-msgid "Key"
-msgstr "Sleutel"
-
-#: keysign/receive.ui:507 keysign/send.ui:598
-msgid "UIDs"
-msgstr "UID’s"
-
-#: keysign/receive.ui:594
+#: keysign/receive.ui:676
 msgid "C_onfirm"
 msgstr "B_evestigen"
 
-#: keysign/receive.ui:716
+#: keysign/receive.ui:798
 msgid "Signing the following UIDs:"
 msgstr "Volgende UID’s worden ondertekend:"
 
