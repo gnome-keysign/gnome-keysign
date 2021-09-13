@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2020-10-07 18:17+0000\n"
-"PO-Revision-Date: 2021-02-15 01:10+0100\n"
+"POT-Creation-Date: 2021-05-31 10:45+0000\n"
+"PO-Revision-Date: 2021-09-14 01:57+0200\n"
 "Last-Translator: Balázs Úr <ur.balazs at fsf dot hu>\n"
 "Language-Team: Hungarian <gnome-hu-list at gnome dot org>\n"
 "Language: hu\n"
@@ -80,7 +80,7 @@ msgstr "org.gnome.Keysign"
 msgid "Send"
 msgstr "Küldés"
 
-#: keysign/app.py:188 keysign/receive.py:272
+#: keysign/app.py:188 keysign/receive.py:279
 msgid "Receive"
 msgstr "Fogadás"
 
@@ -261,7 +261,7 @@ msgstr "Lejárat: "
 msgid "Sign Key"
 msgstr "Kulcs aláírása"
 
-#: keysign/receive.py:218
+#: keysign/receive.py:225
 msgid "Select file for saving"
 msgstr "Válasszon fájlt a mentéshez"
 
@@ -310,14 +310,29 @@ msgstr "Kulcsadatok letöltése. Kérem várjon…"
 msgid "Key download was interrupted!"
 msgstr "A kulcs letöltése megszakadt!"
 
-#: keysign/receive.ui:345
+#: keysign/receive.ui:346
+#| msgid "Display more details for the error."
+msgid "Show details about the error"
+msgstr "Részletek megjelenítése a hibával kapcsolatban"
+
+#: keysign/receive.ui:379
+msgid ""
+"Error producing certifications ☹\n"
+"Something went wrong. Sometime, the passphrase was not correctly entered.\n"
+"You may try again by clicking the \"confirm\" button."
+msgstr ""
+"Hiba a tanúsítványok előállításakor ☹\n"
+"Valami elromlott. Valamikor a jelmondatot nem helyesen adták meg.\n"
+"A „megerősítés” gombra kattintva újra megpróbálhatja."
+
+#: keysign/receive.ui:427
 msgid ""
 "Saves the produced certifications as separate files in a custom directory"
 msgstr ""
 "Különálló fájlokként menti az előállított tanúsítványokat egy egyéni "
 "könyvtárba"
 
-#: keysign/receive.ui:360
+#: keysign/receive.ui:442
 msgid ""
 "Imports a temporary version of the produced certifications into the local "
 "keyring"
@@ -325,7 +340,7 @@ msgstr ""
 "Importálja az előállított tanúsítványok átmeneti verzióját a helyi "
 "kulcstartóba"
 
-#: keysign/receive.ui:403
+#: keysign/receive.ui:485
 msgid ""
 "Successfully produced certifications.\n"
 "You can import a temporary signature to start using the key as if it had "
@@ -339,7 +354,15 @@ msgstr ""
 "További információkért nézze meg a <a href=\"https://wiki.gnome.org/Apps/"
 "Keysign/Doc/ProducedSignatures/1\">dokumentációt</a>."
 
-#: keysign/receive.ui:446
+#: keysign/receive.ui:541
+msgid "Key"
+msgstr "Kulcs"
+
+#: keysign/receive.ui:574 keysign/send.ui:598
+msgid "UIDs"
+msgstr "UID-k"
+
+#: keysign/receive.ui:651
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
@@ -349,19 +372,11 @@ msgstr ""
 "Ez egy e-mailt fog előállítani, amelyet el kell küldeni az aláírási folyamat "
 "befejezéséhez."
 
-#: keysign/receive.ui:474
-msgid "Key"
-msgstr "Kulcs"
-
-#: keysign/receive.ui:507 keysign/send.ui:598
-msgid "UIDs"
-msgstr "UID-k"
-
-#: keysign/receive.ui:594
+#: keysign/receive.ui:676
 msgid "C_onfirm"
 msgstr "_Megerősítés"
 
-#: keysign/receive.ui:716
+#: keysign/receive.ui:798
 msgid "Signing the following UIDs:"
 msgstr "A következő UID-k aláírása:"
 
@@ -437,17 +452,14 @@ msgid ""
 "Returns the received certification back to the sender, so that the sender "
 "can make use of your OpenPGP certificate"
 msgstr ""
-"Visszaadja a megkapott tanúsítványt a küldőnek, azért hogy a küldő"
-" használhassa az OpenPGP tanúsítványát"
+"Visszaadja a megkapott tanúsítványt a küldőnek, azért hogy a küldő "
+"használhassa az OpenPGP tanúsítványát"
 
 #: keysign/send.ui:341
 msgid "Display more details for the error."
 msgstr "Több részlet megjelenítése a hibánál."
 
 #: keysign/send.ui:372
-#| msgid ""
-#| "An error occurred while trying to import the signature.\n"
-#| "Please double check the correctness of the chosen signature."
 msgid "An error occurred while trying to import the signature."
 msgstr "Hiba történt az aláírás importálásának kísérlete közben."
 
