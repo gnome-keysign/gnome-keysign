@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2021-02-22 18:38+0000\n"
-"PO-Revision-Date: 2021-02-23 20:09+0200\n"
+"POT-Creation-Date: 2021-05-31 10:45+0000\n"
+"PO-Revision-Date: 2021-09-18 09:01+0200\n"
 "Last-Translator: Мирослав Николић <miroslavnikolic@rocketmail.com>\n"
 "Language-Team: српски <gnome-sr@googlegroups.org>\n"
 "Language: sr\n"
@@ -78,7 +78,7 @@ msgstr "org.gnome.Keysign"
 msgid "Send"
 msgstr "Пошаљи"
 
-#: keysign/app.py:188 keysign/receive.py:272
+#: keysign/app.py:188 keysign/receive.py:279
 msgid "Receive"
 msgstr "Прими"
 
@@ -151,8 +151,8 @@ msgid ""
 "Keysign is unable to automatically start Avahi. You can try to execute "
 "`systemctl start avahi-daemon` for solving this problem."
 msgstr ""
-"Потпис кључа није могао сам да покрене Авахи. Можете покушати да извршите „"
-"systemctl start avahi-daemon“ за решавање овог проблема."
+"Потпис кључа није могао сам да покрене Авахи. Можете покушати да извршите "
+"„systemctl start avahi-daemon“ за решавање овог проблема."
 
 #: keysign/dialog_avahi.ui:23
 msgid "OK"
@@ -259,7 +259,7 @@ msgstr "Истиче: "
 msgid "Sign Key"
 msgstr "Потпиши кључ"
 
-#: keysign/receive.py:218
+#: keysign/receive.py:225
 msgid "Select file for saving"
 msgstr "Изаберите датотеку за чување"
 
@@ -308,19 +308,35 @@ msgstr "Преузимам податке кључа. Сачекајте..."
 msgid "Key download was interrupted!"
 msgstr "Преузимање кључа је прекинуто!"
 
-#: keysign/receive.ui:345
+#: keysign/receive.ui:346
+#| msgid "Display more details for the error."
+msgid "Show details about the error"
+msgstr "Прикажите појединости о грешци"
+
+#: keysign/receive.ui:379
+msgid ""
+"Error producing certifications ☹\n"
+"Something went wrong. Sometime, the passphrase was not correctly entered.\n"
+"You may try again by clicking the \"confirm\" button."
+msgstr ""
+"Грешка стварања уверења ☹\n"
+"Нешто је пошло по злу. Понекад, лозинка није исправно унета.\n"
+"Можете покушати поново кликом на дугме „потврди“."
+
+#: keysign/receive.ui:427
 msgid ""
 "Saves the produced certifications as separate files in a custom directory"
 msgstr ""
 "Чува произведена уверења као одвојене датотеке у произвољном директоријуму"
 
-#: keysign/receive.ui:360
+#: keysign/receive.ui:442
 msgid ""
 "Imports a temporary version of the produced certifications into the local "
 "keyring"
-msgstr "Увози привремено издање произведених уверења у локални привезак кључева"
+msgstr ""
+"Увози привремено издање произведених уверења у локални привезак кључева"
 
-#: keysign/receive.ui:403
+#: keysign/receive.ui:485
 msgid ""
 "Successfully produced certifications.\n"
 "You can import a temporary signature to start using the key as if it had "
@@ -334,7 +350,15 @@ msgstr ""
 "За више информација посетите <a href=\"https://wiki.gnome.org/Apps/Keysign/"
 "Doc/ProducedSignatures/1\">документацију</a>."
 
-#: keysign/receive.ui:446
+#: keysign/receive.ui:541
+msgid "Key"
+msgstr "Кључ"
+
+#: keysign/receive.ui:574 keysign/send.ui:598
+msgid "UIDs"
+msgstr "УИБ-и"
+
+#: keysign/receive.ui:651
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
@@ -344,19 +368,11 @@ msgstr ""
 "То ће створити е-пошту која мора бити послата да би се завршио поступак "
 "потписивања."
 
-#: keysign/receive.ui:474
-msgid "Key"
-msgstr "Кључ"
-
-#: keysign/receive.ui:507 keysign/send.ui:598
-msgid "UIDs"
-msgstr "УИБ-и"
-
-#: keysign/receive.ui:594
+#: keysign/receive.ui:676
 msgid "C_onfirm"
 msgstr "_Потврди"
 
-#: keysign/receive.ui:716
+#: keysign/receive.ui:798
 msgid "Signing the following UIDs:"
 msgstr "Потписујем следеће УИБ-е:"
 
