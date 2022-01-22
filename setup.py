@@ -128,6 +128,8 @@ setup(
         'twisted[tls]>=17.5.0',
         'future',
         'magic-wormhole>=0.10.2',
+        # Required by magic-wormhole, force a newer version to avoid CVE-2020-35678
+        'autobahn[twisted]==21.2.1',
         # avahi # Also no entry in the cheeseshop
         # dbus # dbus-python is in the cheeseshop but not pip-able
         ],
