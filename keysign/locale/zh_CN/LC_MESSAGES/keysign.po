@@ -3,21 +3,22 @@
 # This file is distributed under the same license as the gnome-keysign package.
 # Damned <damnedlies@163.com>, 2020.
 # Dingzhong Chen <wsxy162@gmail.com>, 2020.
+# lumingzh <lumingzh@qq.com>, 2022.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2020-10-07 18:17+0000\n"
-"PO-Revision-Date: 2020-10-21 23:59+0800\n"
-"Last-Translator: Dingzhong Chen <wsxy162@gmail.com>\n"
+"POT-Creation-Date: 2021-05-31 10:45+0000\n"
+"PO-Revision-Date: 2022-02-07 18:17+0800\n"
+"Last-Translator: lumingzh <lumingzh@qq.com>\n"
 "Language-Team: Chinese - China <i18n-zh@googlegroups.com>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
-"X-Generator: Gtranslator 3.36.0\n"
+"X-Generator: Gtranslator 41.0\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
 #: data/org.gnome.Keysign.raw.appdata.xml:11
@@ -74,7 +75,7 @@ msgstr "org.gnome.Keysign"
 msgid "Send"
 msgstr "发送"
 
-#: keysign/app.py:188 keysign/receive.py:272
+#: keysign/app.py:188 keysign/receive.py:279
 msgid "Receive"
 msgstr "接收"
 
@@ -249,7 +250,7 @@ msgstr "到期："
 msgid "Sign Key"
 msgstr "签署密钥"
 
-#: keysign/receive.py:218
+#: keysign/receive.py:225
 msgid "Select file for saving"
 msgstr "选择要保存的文件"
 
@@ -296,18 +297,33 @@ msgstr "正在下载密钥数据。请稍候……"
 msgid "Key download was interrupted!"
 msgstr "密钥下载已中断！"
 
-#: keysign/receive.ui:345
+#: keysign/receive.ui:346
+#| msgid "Display more details for the error."
+msgid "Show details about the error"
+msgstr "显示该错误详情"
+
+#: keysign/receive.ui:379
+msgid ""
+"Error producing certifications ☹\n"
+"Something went wrong. Sometime, the passphrase was not correctly entered.\n"
+"You may try again by clicking the \"confirm\" button."
+msgstr ""
+"生成证书出错 ☹\n"
+"有地方出错了。有时候可能没有正确输入密码。\n"
+"您可以通过点击“确认”按钮重试。"
+
+#: keysign/receive.ui:427
 msgid ""
 "Saves the produced certifications as separate files in a custom directory"
 msgstr "将生成的证书以单独的文件保存在自定义目录中"
 
-#: keysign/receive.ui:360
+#: keysign/receive.ui:442
 msgid ""
 "Imports a temporary version of the produced certifications into the local "
 "keyring"
 msgstr "将生成的证书的临时版本导入到本地密钥环中"
 
-#: keysign/receive.ui:403
+#: keysign/receive.ui:485
 msgid ""
 "Successfully produced certifications.\n"
 "You can import a temporary signature to start using the key as if it had "
@@ -320,7 +336,15 @@ msgstr ""
 "要了解更多信息，访问<a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "ProducedSignatures/1\">文档</a>。"
 
-#: keysign/receive.ui:446
+#: keysign/receive.ui:541
+msgid "Key"
+msgstr "密钥"
+
+#: keysign/receive.ui:574 keysign/send.ui:598
+msgid "UIDs"
+msgstr "UID"
+
+#: keysign/receive.ui:651
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
@@ -329,19 +353,11 @@ msgstr ""
 "要签署密钥，确认您希望签署下列密钥。\n"
 "这将生成一封电子邮件，必须将其发送才能完成签署过程。"
 
-#: keysign/receive.ui:474
-msgid "Key"
-msgstr "密钥"
-
-#: keysign/receive.ui:507 keysign/send.ui:598
-msgid "UIDs"
-msgstr "UID"
-
-#: keysign/receive.ui:594
+#: keysign/receive.ui:676
 msgid "C_onfirm"
 msgstr "确认(_O)"
 
-#: keysign/receive.ui:716
+#: keysign/receive.ui:798
 msgid "Signing the following UIDs:"
 msgstr "正在签署下列 UID："
 
