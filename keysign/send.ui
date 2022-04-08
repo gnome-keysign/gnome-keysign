@@ -713,11 +713,30 @@ FDFB F70A 0290 6C30 1813</property>
             <property name="orientation">vertical</property>
             <property name="spacing">6</property>
             <child>
-              <object class="GtkLabel" id="result_label">
+              <object class="GtkLabel" id="success_label">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="label" translatable="yes">Key successfully sent.
 You should receive an email with the signature soon.</property>
+                <property name="justify">center</property>
+                <property name="selectable">True</property>
+                <attributes>
+                  <attribute name="weight" value="heavy"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="result_label">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="label" translatable="yes">Key successfully sent.
+You should receive an email with the signature soon.
+You can drag and drop the email here to import your certification.</property>
                 <property name="justify">center</property>
                 <property name="wrap">True</property>
                 <property name="wrap-mode">char</property>
@@ -729,7 +748,7 @@ You should receive an email with the signature soon.</property>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">0</property>
+                <property name="position">1</property>
               </packing>
             </child>
           </object>

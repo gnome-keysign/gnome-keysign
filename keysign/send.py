@@ -101,6 +101,7 @@ class SendApp:
         self.stack.remove(self.rb)
         self.key = None
         self.result_label = builder.get_object("result_label")
+        self.success_label = builder.get_object("success_label")
         self.notify = None
         self.internet_option = False
 
@@ -277,15 +278,19 @@ class SendApp:
         self.kpw = None
 
         if success:
-            self.result_label.set_label(_("Key successfully sent.\n"
-                                          "You should receive an email with the signature soon."))
+            self.result_label.hide()
+            self.success_label.show()
             self.stack.set_visible_child(self.rb)
         else:
             if type(message) == WrongPasswordError:
+                self.success_label.hide()
+                self.result_label.show()
                 self.result_label.set_label(_("Could not establish a secure connection.\n"
                                               "Either your partner has entered a wrong code or "
                                               "someone tried to intercept your connection"))
             else:
+                self.success_label.hide()
+                self.result_label.show()
                 self.result_label.set_label(_("An unexpected error occurred:\n%s" % message))
             self.stack.set_visible_child(self.rb)
 
