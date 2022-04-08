@@ -102,6 +102,7 @@ class SendApp:
         self.key = None
         self.result_label = builder.get_object("result_label")
         self.success_label = builder.get_object("success_label")
+        self.password_error_label = builder.get_object("password_error_label")
         self.notify = None
         self.internet_option = False
 
@@ -280,16 +281,16 @@ class SendApp:
         if success:
             self.result_label.hide()
             self.success_label.show()
+            self.password_error_label.hide()
             self.stack.set_visible_child(self.rb)
         else:
             if type(message) == WrongPasswordError:
                 self.success_label.hide()
-                self.result_label.show()
-                self.result_label.set_label(_("Could not establish a secure connection.\n"
-                                              "Either your partner has entered a wrong code or "
-                                              "someone tried to intercept your connection"))
+                self.result_label.hide()
+                self.password_error_label.show()
             else:
                 self.success_label.hide()
+                self.password_error_label.hide()
                 self.result_label.show()
                 self.result_label.set_label(_("An unexpected error occurred:\n%s" % message))
             self.stack.set_visible_child(self.rb)

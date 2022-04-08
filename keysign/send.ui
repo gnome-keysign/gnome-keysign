@@ -717,7 +717,8 @@ FDFB F70A 0290 6C30 1813</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="label" translatable="yes">Key successfully sent.
-You should receive an email with the signature soon.</property>
+You should receive an email with the signature soon.
+You can drag and drop the email here to import your certification.</property>
                 <property name="justify">center</property>
                 <property name="selectable">True</property>
                 <attributes>
@@ -734,9 +735,7 @@ You should receive an email with the signature soon.</property>
               <object class="GtkLabel" id="result_label">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="label" translatable="yes">Key successfully sent.
-You should receive an email with the signature soon.
-You can drag and drop the email here to import your certification.</property>
+                <property name="label" translatable="yes">An unexpected error occurred.</property>
                 <property name="justify">center</property>
                 <property name="wrap">True</property>
                 <property name="wrap-mode">char</property>
@@ -749,6 +748,22 @@ You can drag and drop the email here to import your certification.</property>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="password_error_label">
+                <property name="can-focus">False</property>
+                <property name="label" translatable="yes">Could not establish a secure connection.
+Either your partner has entered a wrong code or someone tried to intercept your connection.</property>
+                <property name="justify">center</property>
+                <attributes>
+                  <attribute name="weight" value="heavy"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
               </packing>
             </child>
           </object>
