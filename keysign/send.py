@@ -278,7 +278,7 @@ class SendApp:
 
         if success:
             self.result_label.set_label(_("Key successfully sent.\n"
-                                          "You should receive soon an email with the signature."))
+                                          "You should receive an email with the signature soon."))
             self.stack.set_visible_child(self.rb)
         else:
             if type(message) == WrongPasswordError:
