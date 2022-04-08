@@ -717,7 +717,7 @@ FDFB F70A 0290 6C30 1813</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="label" translatable="yes">Key successfully sent.
-You should receive soon an email with the signature.</property>
+You should receive an email with the signature soon.</property>
                 <property name="justify">center</property>
                 <property name="wrap">True</property>
                 <property name="wrap-mode">char</property>
