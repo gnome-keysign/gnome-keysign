@@ -550,6 +550,13 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
                 yield (UID.from_gpgme(uid), ciphertext, uid_data)
 
 
+class NoNewSignatures(GPGMEError):
+    pass
+class NewRevocations(GPGMEError):
+    pass
+class NewSubkey(GPGMEError):
+    pass
+
 def decrypt_signature(encrypted_sig, homedir=None):
     """
     Takes an encrypted signture, tries to decrypt it, and returns the
@@ -569,9 +576,12 @@ def decrypt_signature(encrypted_sig, homedir=None):
         log.warning("Trying to import a new key instead of a signature!")
         raise GPGMEError
 
-    if result.new_signatures == 0 or result.new_revocations != 0 or result.new_sub_keys != 0:
-        log.warning("The signature that we were importing is not as we expected!")
-        raise GPGMEError
+    if result.new_signatures == 0:
+        raise NoNewSignatures()
+    if result.new_revocations != 0:
+        raise NewRevocations()
+    if result.new_sub_keys != 0:
+        raise NewSubkey()
 
     return decrypted_sig
 
