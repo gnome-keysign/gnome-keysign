@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.2 -->
+<!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.16"/>
   <object class="GtkImage" id="confirm-button-image">
     <property name="visible">True</property>
-    <property name="can_focus">False</property>
+    <property name="can-focus">False</property>
     <property name="stock">gtk-apply</property>
   </object>
   <object class="GtkStack" id="receive_stack">
     <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="transition_type">slide-left-right</property>
+    <property name="can-focus">False</property>
+    <property name="transition-type">slide-left-right</property>
     <child>
       <object class="GtkBox" id="box20">
         <property name="name">scanner</property>
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
+        <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
         <child>
           <object class="GtkInfoBar" id="infobar_discovery">
-            <property name="can_focus">False</property>
-            <property name="no_show_all">True</property>
+            <property name="can-focus">False</property>
+            <property name="no-show-all">True</property>
             <child internal-child="action_area">
               <object class="GtkButtonBox">
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="spacing">6</property>
-                <property name="layout_style">end</property>
+                <property name="layout-style">end</property>
                 <child>
                   <placeholder/>
                 </child>
@@ -44,17 +44,17 @@
             </child>
             <child internal-child="content_area">
               <object class="GtkBox">
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="spacing">16</property>
                 <child>
                   <object class="GtkLabel" id="infobar_discover">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can-focus">False</property>
                     <property name="label" translatable="yes">No GNOME Keysign servers around :-(
 Find a friend to use GNOME Keysign with.
 You may also suffer from connectivity problems.
 For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/NoServers/1"&gt;the documentation&lt;/a&gt;.</property>
-                    <property name="use_markup">True</property>
+                    <property name="use-markup">True</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -91,11 +91,11 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
         <child>
           <object class="GtkBox" id="scanner_widget">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="margin_left">100</property>
-            <property name="margin_right">100</property>
-            <property name="margin_top">10</property>
-            <property name="margin_bottom">5</property>
+            <property name="can-focus">False</property>
+            <property name="margin-left">100</property>
+            <property name="margin-right">100</property>
+            <property name="margin-top">10</property>
+            <property name="margin-bottom">5</property>
             <property name="orientation">vertical</property>
             <property name="spacing">6</property>
             <child>
@@ -104,9 +104,9 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
             <child>
               <object class="GtkLabel" id="label30">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="label" translatable="yes">&lt;small&gt;To sign someone's key, scan their QR or enter security code&lt;/small&gt;</property>
-                <property name="use_markup">True</property>
+                <property name="use-markup">True</property>
                 <property name="xalign">0</property>
               </object>
               <packing>
@@ -118,14 +118,14 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
             <child>
               <object class="GtkBox" id="box40">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="spacing">20</property>
                 <child>
                   <object class="GtkLabel" id="label40">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can-focus">False</property>
                     <property name="label" translatable="yes">&lt;b&gt;Camera&lt;/b&gt;</property>
-                    <property name="use_markup">True</property>
+                    <property name="use-markup">True</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -136,7 +136,7 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
                 <child>
                   <object class="GtkComboBoxText" id="comboboxtext1">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can-focus">False</property>
                     <property name="active">0</property>
                     <items>
                       <item id="0" translatable="yes">Integrated Web Cam</item>
@@ -145,7 +145,7 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
-                    <property name="pack_type">end</property>
+                    <property name="pack-type">end</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
@@ -159,7 +159,7 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
             <child>
               <object class="GtkBox" id="scanner">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="orientation">vertical</property>
                 <child>
                   <placeholder/>
@@ -174,10 +174,10 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
             <child>
               <object class="GtkLabel" id="label50">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="halign">start</property>
                 <property name="label" translatable="yes">&lt;b&gt;Security Code&lt;/b&gt;</property>
-                <property name="use_markup">True</property>
+                <property name="use-markup">True</property>
                 <property name="xalign">0</property>
               </object>
               <packing>
@@ -190,7 +190,7 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
               <object class="GtkEntry" id="fingerprint_entry">
                 <property name="name">fingerprint_entry</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
+                <property name="can-focus">True</property>
                 <signal name="changed" handler="on_text_changed" swapped="no"/>
               </object>
               <packing>
@@ -215,17 +215,17 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
     <child>
       <object class="GtkBox" id="box50">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="margin_left">20</property>
-        <property name="margin_right">20</property>
-        <property name="margin_top">10</property>
-        <property name="margin_bottom">10</property>
+        <property name="can-focus">False</property>
+        <property name="margin-left">20</property>
+        <property name="margin-right">20</property>
+        <property name="margin-top">10</property>
+        <property name="margin-bottom">10</property>
         <property name="orientation">vertical</property>
         <property name="spacing">6</property>
         <child>
           <object class="GtkLabel" id="label10">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="label" translatable="yes">Downloading key-data. Please wait...</property>
             <attributes>
               <attribute name="weight" value="heavy"/>
@@ -240,7 +240,7 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
         <child>
           <object class="GtkSpinner" id="spinner1">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
           </object>
           <packing>
             <property name="expand">True</property>
@@ -250,10 +250,10 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
         </child>
         <child>
           <object class="GtkLabel" id="error_download_label">
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="label" translatable="yes">Key download was interrupted!</property>
             <property name="wrap">True</property>
-            <property name="wrap_mode">char</property>
+            <property name="wrap-mode">char</property>
             <attributes>
               <attribute name="weight" value="heavy"/>
               <attribute name="foreground" value="#000000000000"/>
@@ -268,21 +268,21 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
         <child>
           <object class="GtkBox" id="box60">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <child>
               <object class="GtkButton" id="cancel_download_button">
                 <property name="label">gtk-cancel</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-                <property name="always_show_image">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="use-stock">True</property>
+                <property name="always-show-image">True</property>
                 <signal name="clicked" handler="on_cancel_download_button_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="pack_type">end</property>
+                <property name="pack-type">end</property>
                 <property name="position">0</property>
               </packing>
             </child>
@@ -290,16 +290,16 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
               <object class="GtkButton" id="redo_download_button">
                 <property name="label">gtk-redo</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-                <property name="always_show_image">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="use-stock">True</property>
+                <property name="always-show-image">True</property>
                 <signal name="clicked" handler="on_redo_button_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="pack_type">end</property>
+                <property name="pack-type">end</property>
                 <property name="position">1</property>
               </packing>
             </child>
@@ -321,30 +321,30 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
       <object class="GtkBox" id="keyconfirmbox">
         <property name="name">Confirm Signing Key</property>
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="margin_left">20</property>
-        <property name="margin_right">20</property>
-        <property name="margin_top">10</property>
-        <property name="margin_bottom">10</property>
+        <property name="can-focus">False</property>
+        <property name="margin-left">20</property>
+        <property name="margin-right">20</property>
+        <property name="margin-top">10</property>
+        <property name="margin-bottom">10</property>
         <property name="orientation">vertical</property>
         <property name="spacing">6</property>
         <child>
           <object class="GtkInfoBar" id="infobar_certifications_errors">
-            <property name="can_focus">False</property>
-            <property name="message_type">error</property>
+            <property name="can-focus">False</property>
+            <property name="message-type">error</property>
             <child internal-child="action_area">
               <object class="GtkButtonBox">
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="spacing">6</property>
-                <property name="layout_style">end</property>
+                <property name="layout-style">end</property>
                 <child>
                   <object class="GtkButton" id="btn_show_error_details">
                     <property name="label">gtk-help</property>
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">Show details about the error</property>
-                    <property name="use_stock">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">True</property>
+                    <property name="tooltip-text" translatable="yes">Show details about the error</property>
+                    <property name="use-stock">True</property>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -370,16 +370,16 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
             </child>
             <child internal-child="content_area">
               <object class="GtkBox">
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="spacing">16</property>
                 <child>
                   <object class="GtkLabel" id="infobar_discover2">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
+                    <property name="can-focus">True</property>
                     <property name="label" translatable="yes">Error producing certifications ☹
 Something went wrong. Sometime, the passphrase was not correctly entered.
 You may try again by clicking the "confirm" button.</property>
-                    <property name="use_markup">True</property>
+                    <property name="use-markup">True</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -412,20 +412,20 @@ You may try again by clicking the "confirm" button.</property>
         </child>
         <child>
           <object class="GtkInfoBar" id="infobar_certifications_produced">
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <child internal-child="action_area">
               <object class="GtkButtonBox">
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="spacing">6</property>
-                <property name="layout_style">end</property>
+                <property name="layout-style">end</property>
                 <child>
                   <object class="GtkButton" id="btn_local_import_save_as">
                     <property name="label">gtk-save-as</property>
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">Saves the produced certifications as separate files in a custom directory</property>
-                    <property name="use_stock">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">True</property>
+                    <property name="tooltip-text" translatable="yes">Saves the produced certifications as separate files in a custom directory</property>
+                    <property name="use-stock">True</property>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -437,11 +437,11 @@ You may try again by clicking the "confirm" button.</property>
                   <object class="GtkButton" id="btn_local_import">
                     <property name="label">gtk-jump-to</property>
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <property name="tooltip_text" translatable="yes">Imports a temporary version of the produced certifications into the local keyring</property>
-                    <property name="use_stock">True</property>
-                    <property name="always_show_image">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">True</property>
+                    <property name="tooltip-text" translatable="yes">Imports a temporary version of the produced certifications into the local keyring</property>
+                    <property name="use-stock">True</property>
+                    <property name="always-show-image">True</property>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -452,11 +452,11 @@ You may try again by clicking the "confirm" button.</property>
                 <child>
                   <object class="GtkButton" id="btn_upload">
                     <property name="label">gtk-go-up</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <property name="no_show_all">True</property>
-                    <property name="use_stock">True</property>
-                    <property name="always_show_image">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">True</property>
+                    <property name="no-show-all">True</property>
+                    <property name="use-stock">True</property>
+                    <property name="always-show-image">True</property>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -476,16 +476,16 @@ You may try again by clicking the "confirm" button.</property>
             </child>
             <child internal-child="content_area">
               <object class="GtkBox">
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="spacing">16</property>
                 <child>
                   <object class="GtkLabel" id="infobar_discover1">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can-focus">False</property>
                     <property name="label" translatable="yes">Successfully produced certifications.
 You can import a temporary signature to start using the key as if it had already been properly verified.
 For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/ProducedSignatures/1"&gt;the documentation&lt;/a&gt;.</property>
-                    <property name="use_markup">True</property>
+                    <property name="use-markup">True</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -519,24 +519,24 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/P
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="orientation">vertical</property>
             <child>
               <object class="GtkBox">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="margin_top">15</property>
-                <property name="margin_bottom">2</property>
+                <property name="can-focus">False</property>
+                <property name="margin-top">15</property>
+                <property name="margin-bottom">2</property>
                 <property name="spacing">3</property>
                 <child>
                   <object class="GtkBox">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can-focus">False</property>
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkLabel" id="label80">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="halign">start</property>
                         <property name="label" translatable="yes">Key</property>
                         <property name="xalign">0</property>
@@ -552,9 +552,9 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/P
                     </child>
                     <child>
                       <object class="GtkLabel" id="key_ids_label">
-                        <property name="width_request">200</property>
+                        <property name="width-request">200</property>
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="label">23FD 347A 4194 29BA CCD5 E72D 6BC4 7780 54AC D246</property>
                         <property name="selectable">True</property>
                         <property name="xalign">0</property>
@@ -568,9 +568,9 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/P
                     <child>
                       <object class="GtkLabel" id="label90">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="halign">start</property>
-                        <property name="margin_top">5</property>
+                        <property name="margin-top">5</property>
                         <property name="label" translatable="yes">UIDs</property>
                         <property name="xalign">0</property>
                         <attributes>
@@ -586,7 +586,7 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/P
                     <child>
                       <object class="GtkLabel" id="uids_label">
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="label">Zulu Test &lt;foo@example.com&gt;
 Alpha Bar &lt;example@example.com&gt;</property>
                         <property name="selectable">True</property>
@@ -607,19 +607,19 @@ Alpha Bar &lt;example@example.com&gt;</property>
                 </child>
                 <child>
                   <object class="GtkBox" id="imagebox">
-                    <property name="width_request">200</property>
-                    <property name="height_request">200</property>
+                    <property name="width-request">200</property>
+                    <property name="height-request">200</property>
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="border_width">5</property>
-                    <property name="resize_mode">immediate</property>
+                    <property name="can-focus">False</property>
+                    <property name="border-width">5</property>
+                    <property name="resize-mode">immediate</property>
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkImage" id="image">
-                        <property name="width_request">200</property>
-                        <property name="height_request">200</property>
+                        <property name="width-request">200</property>
+                        <property name="height-request">200</property>
                         <property name="visible">True</property>
-                        <property name="can_focus">False</property>
+                        <property name="can-focus">False</property>
                         <property name="valign">end</property>
                         <property name="stock">gtk-missing-image</property>
                       </object>
@@ -647,7 +647,7 @@ Alpha Bar &lt;example@example.com&gt;</property>
             <child>
               <object class="GtkLabel" id="label70">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="label" translatable="yes">To sign the key, confirm that you want to sign the following key.
 This will generate an email that must be sent in order to complete the signing process.</property>
                 <property name="wrap">True</property>
@@ -669,20 +669,20 @@ This will generate an email that must be sent in order to complete the signing p
         <child>
           <object class="GtkBox" id="box30">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="spacing">6</property>
             <child>
               <object class="GtkButton" id="confirm_sign_button">
                 <property name="label" translatable="yes">C_onfirm</property>
                 <property name="name">confirm_button</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="is_focus">True</property>
-                <property name="can_default">True</property>
-                <property name="receives_default">True</property>
+                <property name="can-focus">True</property>
+                <property name="is-focus">True</property>
+                <property name="can-default">True</property>
+                <property name="receives-default">True</property>
                 <property name="image">confirm-button-image</property>
-                <property name="use_underline">True</property>
-                <property name="always_show_image">True</property>
+                <property name="use-underline">True</property>
+                <property name="always-show-image">True</property>
                 <signal name="clicked" handler="on_confirm_button_clicked" swapped="no"/>
                 <accessibility>
                   <action action_name="click" description="Confirm signing the OpenPGP Key"/>
@@ -694,7 +694,7 @@ This will generate an email that must be sent in order to complete the signing p
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="pack_type">end</property>
+                <property name="pack-type">end</property>
                 <property name="position">0</property>
               </packing>
             </child>
@@ -702,7 +702,7 @@ This will generate an email that must be sent in order to complete the signing p
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="pack_type">end</property>
+            <property name="pack-type">end</property>
             <property name="position">5</property>
           </packing>
         </child>
@@ -716,11 +716,11 @@ This will generate an email that must be sent in order to complete the signing p
     <child>
       <object class="GtkBox" id="box70">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="margin_left">20</property>
-        <property name="margin_right">20</property>
-        <property name="margin_top">10</property>
-        <property name="margin_bottom">10</property>
+        <property name="can-focus">False</property>
+        <property name="margin-left">20</property>
+        <property name="margin-right">20</property>
+        <property name="margin-top">10</property>
+        <property name="margin-bottom">10</property>
         <property name="orientation">vertical</property>
         <property name="spacing">6</property>
         <child>
@@ -729,7 +729,7 @@ This will generate an email that must be sent in order to complete the signing p
         <child>
           <object class="GtkLabel" id="uids_signed_label">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -740,7 +740,7 @@ This will generate an email that must be sent in order to complete the signing p
         <child>
           <object class="GtkSpinner" id="spinner2">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
           </object>
           <packing>
             <property name="expand">True</property>
@@ -750,7 +750,7 @@ This will generate an email that must be sent in order to complete the signing p
         </child>
         <child>
           <object class="GtkLabel" id="succes_fail_signing_label">
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <attributes>
               <attribute name="weight" value="heavy"/>
               <attribute name="foreground" value="#000000000000"/>
@@ -765,21 +765,21 @@ This will generate an email that must be sent in order to complete the signing p
         <child>
           <object class="GtkBox" id="box90">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <child>
               <object class="GtkButton" id="cancel_signing_button">
                 <property name="label">gtk-cancel</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-                <property name="always_show_image">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="use-stock">True</property>
+                <property name="always-show-image">True</property>
                 <signal name="clicked" handler="on_cancel_signing_button_clicked" swapped="no"/>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="pack_type">end</property>
+                <property name="pack-type">end</property>
                 <property name="position">0</property>
               </packing>
             </child>
@@ -787,14 +787,14 @@ This will generate an email that must be sent in order to complete the signing p
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="pack_type">end</property>
+            <property name="pack-type">end</property>
             <property name="position">4</property>
           </packing>
         </child>
         <child>
           <object class="GtkLabel" id="label20">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="label" translatable="yes">Signing the following UIDs:</property>
           </object>
           <packing>
