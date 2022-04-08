@@ -114,11 +114,42 @@ class SendApp:
         self.label.drag_dest_add_text_targets()
         self.label.drag_dest_add_uri_targets()
 
+        self.rb.connect('drag-data-received', self.on_rb_drag_data_received)
+        # We should probably only accept drag data when we have successfully sent the key.
+        # Now we're unconditionally accepting drags.
+        self.rb.drag_dest_set(Gtk.DestDefaults.ALL, [], DRAG_ACTION)
+        self.rb.drag_dest_set_target_list(None)
+        self.rb.drag_dest_add_text_targets()
+        self.rb.drag_dest_add_uri_targets()
+        self.rb_import_okay = builder.get_object('rb_infobar_import_okay')
+        self.rb_button_ib_return_signature = builder.get_object('rb_return_signature')
+        self.rb_import_error = builder.get_object('rb_infobar_import_error')
+        assert self.rb_import_error
+        self.button_rb_import_error = builder.get_object('rb_import_error_details_button')
+
+
+
     def on_drag_data_received(self, widget, drag_context, x, y, data, info, time):
         if self.notify is not None:
             log.debug("We are trying to send a key, no imports at this stage")
             return
+        try:
+            self.decrypt_and_import_certifications(data)
+        except errors.GPGMEError as e:
+            self.signature_import_error(e)
+        else:
+            self.signature_imported(decrypted_certifications, sender)
 
+    def on_rb_drag_data_received(self, widget, drag_context, x, y, data, info, time):
+        try:
+            decrypted_certifications = self.decrypt_and_import_certifications(data)
+        except errors.GPGMEError as e:
+            self.rb_signature_import_error(e)
+        else:
+            self.rb_signature_imported(decrypted_certifications)
+
+
+    def decrypt_and_import_certifications(self, data):
         filename = data.get_text()
         # If we don't have a filename it means that the user maybe dropped
         # an attachment or an entire email.
@@ -140,17 +171,17 @@ class SendApp:
         # and then try to find that key in our keyring.
         sender = None
 
+        decrypted_certifications = []
         try:
-            decrypted_certifications = []
             for signature in signatures:
                 decrypted_certification = gpgmeh.decrypt_signature(signature)
                 import_result = gpgmeh.import_signature(decrypted_certification)
                 decrypted_certifications.append(decrypted_certification)
         except errors.GPGMEError as e:
             log.exception("Could not import signatures")
-            self.signature_import_error(e)
+            raise
         else:
-            self.signature_imported(decrypted_certifications, sender)
+            return decrypted_certifications
 
     @inlineCallbacks
     def on_key_activated(self, widget, key):
@@ -255,6 +286,28 @@ class SendApp:
         self.klw.button_ib_import_error.hide()
         log.info("Signature import error")
 
+    def rb_signature_imported(self, decrypted_certifications):
+        self.rb_import_okay.show()
+        sender = None
+        if not sender:
+            # We do not know where to return the certification to, so we hide the button
+            self.rb_button_ib_return_signature.hide()
+        else:
+            def return_certification(button):
+                log.info("Return certification to %s (%d)",
+                    sender, len(decrypted_certifications))
+
+            self.rb_button_ib_return_signature.connect('clicked', return_certification)
+            self.rb_button_ib_return_signature.show()
+
+        log.info("Signature imported")
+
+    def rb_signature_import_error(self, e):
+        self.rb_import_error.show()
+        # We hide the error details button, because we don't have that functionality just yet
+        self.button_rb_import_error.hide()
+        log.info("Signature import error")
+
     def create_keypresent(self, discovery_code, discovery_data):
         self._deactivate_timer()
         log.info("Use this for discovering the other key: %r", discovery_data)
@@ -328,6 +381,7 @@ class SendApp:
             self.offer.stop()
             self.offer = None
             log.debug("Stopped network services")
+
 
 
 class App(Gtk.Application):
