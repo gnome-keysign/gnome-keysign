@@ -158,7 +158,7 @@ you may want to clone the repository and install from there.
 
     git clone --recursive https://github.com/gnome-keysign/gnome-keysign.git
     cd gnome-keysign
-    virtualenv --system-site-packages --python=python2 /tmp/keysign
+    virtualenv --system-site-packages --python=python3 /tmp/keysign
     /tmp/keysign/bin/pip install .
 
 Note that this installs the application in the virtual environment,
