@@ -59,17 +59,16 @@ class InstallWithCompile(install):
         install.run(self)
 
 
-# Inspired by the example at https://pytest.org/latest/goodpractises.html
-class NoseTestCommand(TestCommand):
+class PytestTestCommand(TestCommand):
     def finalize_options(self):
         TestCommand.finalize_options(self)
         self.test_args = []
         self.test_suite = True
 
     def run_tests(self):
-        # Run nose ensuring that argv simulates running nosetests directly
-        import nose
-        nose.run_exit(argv=['nosetests' , 'tests'])
+        print ("We're just running pytest...", file=sys.stderr)
+        import subprocess
+        subprocess.call(['pytest'])
 
 
 setup(
@@ -139,7 +138,8 @@ setup(
         "BabelGladeExtractor",
     ],
     tests_require=[
-        "nose",
+        "pytest",
+        "pytest_twisted",
         "tox",
         "pycodestyle",
         "pylint",
@@ -199,7 +199,6 @@ setup(
         cmdclass={
             'build': BuildWithCompile,
             #'install': InstallWithCompile,
-            'test': NoseTestCommand,
+            'test': PytestTestCommand,
         },
-        # test_suite = 'nose.collector',
     )
