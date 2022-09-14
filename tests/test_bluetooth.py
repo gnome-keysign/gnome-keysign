@@ -8,10 +8,8 @@ import unittest
 import gi
 gi.require_version('Gtk', '3.0')
 
-from nose.twistedtools import deferred
-from nose.tools import *
 from twisted.internet import threads
-from twisted.internet.defer import inlineCallbacks
+from pytest_twisted import inlineCallbacks
 
 try:
     from keysign.bluetoothoffer import BluetoothOffer
@@ -51,7 +49,6 @@ def import_key_from_file(fixture, homedir):
     return openpgpkey_from_data(original)
 
 
-@deferred(timeout=15)
 @inlineCallbacks
 @unittest.skipUnless(HAVE_BT, "requires bluetooth module")
 def test_bt():
@@ -74,12 +71,11 @@ def test_bt():
     receive = BluetoothReceive(port)
     msg_tuple = yield receive.find_key(code, hmac)
     downloaded_key_data, success, _ = msg_tuple
-    assert_true(success)
+    assert success
     log.info("Checking with key: %r", downloaded_key_data)
-    assert_equal(downloaded_key_data.encode("utf-8"), file_key_data)
+    assert downloaded_key_data.encode("utf-8") == file_key_data
 
 
-@deferred(timeout=15)
 @inlineCallbacks
 @unittest.skipUnless(HAVE_BT, "requires bluetooth module")
 def test_bt_wrong_hmac():
@@ -101,10 +97,9 @@ def test_bt_wrong_hmac():
     receive = BluetoothReceive(port)
     msg_tuple = yield receive.find_key(code, hmac)
     downloaded_key_data, success, _ = msg_tuple
-    assert_false(success)
+    assert not success
 
 
-@deferred(timeout=15)
 @inlineCallbacks
 @unittest.skipUnless(HAVE_BT, "requires bluetooth module")
 def test_bt_wrong_mac():
@@ -112,12 +107,11 @@ def test_bt_wrong_mac():
     receive = BluetoothReceive()
     msg_tuple = yield receive.find_key("01:23:45:67:89:AB", "hmac")
     downloaded_key_data, success, error = msg_tuple
-    assert_is_none(downloaded_key_data)
-    assert_false(success)
-    assert_equal(error.args[0], "(112, 'Host is down')")
+    assert downloaded_key_data is None
+    assert not success
+    assert error.args[0] == "(112, 'Host is down')"
 
 
-@deferred(timeout=15)
 @inlineCallbacks
 @unittest.skipUnless(HAVE_BT, "requires bluetooth module")
 def test_bt_corrupted_key():
@@ -167,5 +161,5 @@ def test_bt_corrupted_key():
     receive = BluetoothReceive(port)
     msg_tuple = yield receive.find_key(code, hmac)
     downloaded_key_data, result, error = msg_tuple
-    assert_false(result)
-    assert_equal(type(error), ValueError)
+    assert not result
+    assert isinstance(error, ValueError)

@@ -23,10 +23,8 @@ import tempfile
 import gi
 gi.require_version('Gtk', '3.0')
 
-from nose.twistedtools import deferred
-from nose.tools import *
 from wormhole.errors import WrongPasswordError, LonelyError
-from twisted.internet.defer import inlineCallbacks
+from pytest_twisted import inlineCallbacks
 
 from keysign.gpgmeh import openpgpkey_from_data
 from keysign.gpgmeh import get_public_key_data
@@ -61,7 +59,6 @@ def import_key_from_file(fixture, homedir):
     return openpgpkey_from_data(original)
 
 
-@deferred(timeout=10)
 @inlineCallbacks
 def test_wrmhl():
     # This should be a new, empty directory
@@ -78,12 +75,11 @@ def test_wrmhl():
     receive = WormholeReceive(code)
     msg_tuple = yield receive.start()
     downloaded_key_data, success, _ = msg_tuple
-    assert_true(success)
+    assert success
     log.info("Checking with key: %r", downloaded_key_data)
-    assert_equal(downloaded_key_data, file_key_data)
+    assert downloaded_key_data == file_key_data
 
 
-@deferred(timeout=10)
 @inlineCallbacks
 def test_wrmhl_offline_code():
     # This should be a new, empty directory
@@ -101,12 +97,11 @@ def test_wrmhl_offline_code():
     receive = WormholeReceive(code)
     msg_tuple = yield receive.start()
     downloaded_key_data, success, _ = msg_tuple
-    assert_true(success)
+    assert success
     log.info("Checking with key: %r", downloaded_key_data)
-    assert_equal(downloaded_key_data, file_key_data)
+    assert downloaded_key_data == file_key_data
 
 
-@deferred(timeout=10)
 @inlineCallbacks
 def test_wrmhl_wrong_code():
     # This should be a new, empty directory
@@ -122,12 +117,11 @@ def test_wrmhl_wrong_code():
     receive = WormholeReceive(code+"-wrong")
     msg_tuple = yield receive.start()
     downloaded_key_data, success, message = msg_tuple
-    assert_false(success)
-    assert_is_not_none(message)
-    assert_equal(message, WrongPasswordError)
+    assert not success
+    assert message is not None
+    assert message == WrongPasswordError
 
 
-@deferred(timeout=10)
 @inlineCallbacks
 def test_wrmhl_wrong_hmac():
     # This should be a new, empty directory
@@ -144,12 +138,11 @@ def test_wrmhl_wrong_hmac():
     receive = WormholeReceive(code, mac=hmac)
     msg_tuple = yield receive.start()
     downloaded_key_data, success, message = msg_tuple
-    assert_false(success)
-    assert_is_not_none(message)
-    assert_equal(message, WrongPasswordError)
+    assert not success
+    assert message is not None
+    assert message == WrongPasswordError
 
 
-@deferred(timeout=10)
 @inlineCallbacks
 def test_wrmhl_with_hmac():
     # This should be a new, empty directory
@@ -167,19 +160,18 @@ def test_wrmhl_with_hmac():
     receive = WormholeReceive(code, mac=hmac)
     msg_tuple = yield receive.start()
     downloaded_key_data, success, _ = msg_tuple
-    assert_true(success)
+    assert success
     log.info("Checking with key: %r", downloaded_key_data)
-    assert_equal(downloaded_key_data, file_key_data)
+    assert downloaded_key_data == file_key_data
 
 
-@deferred(timeout=10)
 @inlineCallbacks
 def test_offer_cancel():
 
     def _received(start_data):
         success, message = start_data
-        assert_is_not_none(message)
-        assert_equal(type(message), LonelyError)
+        assert message is not None
+        assert isinstance(message, LonelyError)
 
     # This should be a new, empty directory
     homedir = tempfile.mkdtemp()
