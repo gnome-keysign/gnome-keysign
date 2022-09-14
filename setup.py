@@ -166,13 +166,8 @@ setup(
         'Intended Audience :: End Users/Desktop',
         'Intended Audience :: Information Technology',
         'Intended Audience :: Legal Industry',
-        'Intended Audience :: Telecommunications Industry',    
-    
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        # I think we are only 2.7 compatible
-        'Programming Language :: Python :: 2.7',
-        # We're still lacking support for 3
+        'Intended Audience :: Telecommunications Industry',
+
         'Programming Language :: Python :: 3',
 
         'License :: OSI Approved :: GNU General Public License (GPL)',
