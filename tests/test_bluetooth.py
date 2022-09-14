@@ -13,7 +13,7 @@ from pytest_twisted import inlineCallbacks
 
 try:
     from keysign.bluetoothoffer import BluetoothOffer
-    from keysign.bluetoothreceive import BluetoothReceive
+    from keysign.bluetoothreceive import BluetoothReceive, BluetoothError
     HAVE_BT = True
 except ImportError:
     HAVE_BT = False
@@ -63,6 +63,8 @@ def test_bt():
     # Start offering the key
     offer = BluetoothOffer(key)
     data = yield offer.allocate_code()
+    if data is None:
+        log.warning("No code allocated (%r), probably no Bluetooth adapter!", data)
     # getting the code from "BT=code;...."
     code = data.split("=", 1)[1]
     code = code.split(";", 1)[0]
@@ -70,8 +72,9 @@ def test_bt():
     offer.start()
     receive = BluetoothReceive(port)
     msg_tuple = yield receive.find_key(code, hmac)
+    log.debug("Receiving yielded: %r", msg_tuple)
     downloaded_key_data, success, _ = msg_tuple
-    assert success
+    assert success, "No success :( %r" % msg_tuple
     log.info("Checking with key: %r", downloaded_key_data)
     assert downloaded_key_data.encode("utf-8") == file_key_data
 
@@ -96,8 +99,9 @@ def test_bt_wrong_hmac():
     offer.start()
     receive = BluetoothReceive(port)
     msg_tuple = yield receive.find_key(code, hmac)
-    downloaded_key_data, success, _ = msg_tuple
+    downloaded_key_data, success, err = msg_tuple
     assert not success
+    assert not isinstance(err, BluetoothError), "We expect a ValidationError or something else, anyway, than a Bluetooth error, because the transfer ought to have worked. How else do we distinguish a broken Bluetooth (won't work at all) from a tampered connection (may work next time)"
 
 
 @inlineCallbacks
