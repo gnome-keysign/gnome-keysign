@@ -1,25 +1,25 @@
 # Turkish translation for gnome-keysign.
-# Copyright (C) 2019 gnome-keysign's COPYRIGHT HOLDER
+# Copyright (C) 2019-2022 gnome-keysign's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-keysign package.
 #
-# Sabri Ünal <libreajans@gmail.com>, 2019.
-# Emin Tufan Çetin <etcetin@gmail.com>, 2021.
+# Emin Tufan Çetin <etcetin@gmail.com>, 2021, 2022.
+# Sabri Ünal <libreajans@gmail.com>, 2019, 2022.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2020-10-07 18:17+0000\n"
-"PO-Revision-Date: 2021-02-22 21:36+0300\n"
+"POT-Creation-Date: 2021-05-31 10:45+0000\n"
+"PO-Revision-Date: 2022-05-14 14:41+0300\n"
 "Last-Translator: Emin Tufan Çetin <etcetin@gmail.com>\n"
 "Language-Team: Türkçe <gnome-turk@gnome.org>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.6.0\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Poedit 2.4.2\n"
+"Generated-By: Babel 2.6.0\n"
+"X-Generator: Poedit 3.0.1\n"
 
 #: data/org.gnome.Keysign.raw.appdata.xml:11
 msgid ""
@@ -80,7 +80,7 @@ msgstr "org.gnome.Keysign"
 msgid "Send"
 msgstr "Gönder"
 
-#: keysign/app.py:188 keysign/receive.py:272
+#: keysign/app.py:188 keysign/receive.py:279
 msgid "Receive"
 msgstr "Al"
 
@@ -263,7 +263,7 @@ msgstr "Geçerlilik süresi: "
 msgid "Sign Key"
 msgstr "Anahtar İmzala"
 
-#: keysign/receive.py:218
+#: keysign/receive.py:225
 msgid "Select file for saving"
 msgstr "Kaydetmek için dosya seç"
 
@@ -312,18 +312,32 @@ msgstr "Anahtar verisi indiriliyor. Lütfen bekleyin..."
 msgid "Key download was interrupted!"
 msgstr "Anahtar indirme kesintiye uğradı!"
 
-#: keysign/receive.ui:345
+#: keysign/receive.ui:346
+msgid "Show details about the error"
+msgstr "Hatayla ilgili ayrıntıları göster"
+
+#: keysign/receive.ui:379
+msgid ""
+"Error producing certifications ☹\n"
+"Something went wrong. Sometime, the passphrase was not correctly entered.\n"
+"You may try again by clicking the \"confirm\" button."
+msgstr ""
+"Sertifikalar oluşturulurken hata ☹\n"
+"Bir şeyler yanlış gitti. Parola metni doğru girilmedi.\n"
+"\"Onayla\" düğmesine tıklayarak yeniden deneyebilirsiniz."
+
+#: keysign/receive.ui:427
 msgid ""
 "Saves the produced certifications as separate files in a custom directory"
 msgstr "Üretilen sertifikaları özel bir dizine ayrı dosyalar olarak kaydeder"
 
-#: keysign/receive.ui:360
+#: keysign/receive.ui:442
 msgid ""
 "Imports a temporary version of the produced certifications into the local "
 "keyring"
 msgstr "Üretilen sertifikaların geçici bir sürümünü yerel anahtarlığa aktarır"
 
-#: keysign/receive.ui:403
+#: keysign/receive.ui:485
 msgid ""
 "Successfully produced certifications.\n"
 "You can import a temporary signature to start using the key as if it had "
@@ -337,7 +351,15 @@ msgstr ""
 "Daha çok bilgi için <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "ProducedSignatures/1\">belgesini</a> ziyaret edin."
 
-#: keysign/receive.ui:446
+#: keysign/receive.ui:541
+msgid "Key"
+msgstr "Anahtar"
+
+#: keysign/receive.ui:574 keysign/send.ui:598
+msgid "UIDs"
+msgstr "UID’ler"
+
+#: keysign/receive.ui:651
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
@@ -347,19 +369,11 @@ msgstr ""
 "doğrulayın.\n"
 "Bu, imzalama işlemini tamamlamak için bir e-posta gönderimi oluşturur."
 
-#: keysign/receive.ui:474
-msgid "Key"
-msgstr "Anahtar"
-
-#: keysign/receive.ui:507 keysign/send.ui:598
-msgid "UIDs"
-msgstr "UID’ler"
-
-#: keysign/receive.ui:594
+#: keysign/receive.ui:676
 msgid "C_onfirm"
 msgstr "_Onayla"
 
-#: keysign/receive.ui:716
+#: keysign/receive.ui:798
 msgid "Signing the following UIDs:"
 msgstr "Şu UIDʼler imzalanıyor:"
 
@@ -462,8 +476,8 @@ msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
 msgstr ""
-"<small>Anahtarın imzalanması için, diğer kişinin güvenlik kodunu girmesi "
-"veya QR kodunu taraması gerekir.</small>"
+"<small>Anahtarın imzalanması için, diğer kişi güvenlik kodunu girmeli veya "
+"QR kodunu taramalıdır.</small>"
 
 #: keysign/send.ui:557
 msgid "<b>Key Details</b>"
