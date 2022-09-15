@@ -22,9 +22,8 @@ from subprocess import CalledProcessError, check_call
 import tempfile
 import unittest
 
-from nose.tools import *
-
 import gpg
+import pytest
 
 from keysign.gpgmeh import TempContext
 from keysign.gpgmeh import DirectoryContext
@@ -62,12 +61,12 @@ def read_fixture_file(fixture):
     return data
 
 
-@raises(ValueError)
 def test_uid_export_0():
     "You should not be able to export uid < 1"
     data = read_fixture_file("pubkey-1.asc")
-    uid_data = UIDExport(data, 0)
-    assert False
+    pytest.raises(ValueError,
+        UIDExport,
+            data, 0)
 
 
 def test_uid_export_single():
@@ -86,7 +85,7 @@ def test_uid_export_single():
     logging.info("Result: %r", result)
     fpr = result.imports[0].fpr
     uids = c.get_key(fpr).uids
-    assert_equal(1, len(uids))
+    assert 1 == len(uids)
 
     # The first exported UID
     c = TempContext()
@@ -94,12 +93,12 @@ def test_uid_export_single():
     c.op_import(uid1_data)
     result = c.op_import_result()
     imports = result.imports
-    assert_equal(1, len(imports))
+    assert 1 == len(imports)
     uids1_key = c.get_key(fpr).uids
-    assert_equal(1, len(uids1_key))
+    assert 1 == len(uids1_key)
     uid1 = uids1_key[0]
-    # assert_equal(uid1, uids[0])
-    assert_equal(uid1.uid, uids[0].uid)
+    # assert uid1 == uids[0]
+    assert uid1.uid == uids[0].uid
 
 
 def test_uid_export_double():
@@ -113,7 +112,7 @@ def test_uid_export_double():
         log.exception("Meh.")
         raise RuntimeError()
 
-    assert_not_equal(uid1_data, uid2_data)
+    assert uid1_data != uid2_data
 
     # The original key
     c = TempContext()
@@ -122,7 +121,7 @@ def test_uid_export_double():
     logging.info("Result: %r", result)
     fpr = result.imports[0].fpr
     uids = c.get_key(fpr).uids
-    assert_equal(2, len(uids))
+    assert 2 == len(uids)
 
     # The first exported UID
     c = TempContext()
@@ -130,25 +129,25 @@ def test_uid_export_double():
     c.op_import(uid1_data)
     result = c.op_import_result()
     imports = result.imports
-    assert_equal(1, len(imports))
+    assert 1 == len(imports)
     uids1_key = c.get_key(fpr).uids
-    assert_equal(1, len(uids1_key))
+    assert 1 == len(uids1_key)
     uid1 = uids1_key[0]
-    # assert_equal(uid1, uids[0])
-    assert_equal(uid1.uid, uids[0].uid)
+    # assert uid1 == uids[0]
+    assert uid1.uid == uids[0].uid
 
     # The second exported UID
     c = TempContext()
     c.op_import(uid2_data)
     result = c.op_import_result()
     imports = result.imports
-    assert_equal(1, len(imports))
+    assert 1 == len(imports)
     uids2_key = c.get_key(fpr).uids
-    assert_equal(1, len(uids2_key))
+    assert 1 == len(uids2_key)
     uid2 = uids2_key[0]
     # FIXME: The objects don't implement __eq__ it seems :-/
-    # assert_equal(uid2, uids[1])
-    assert_equal(uid2.uid, uids[1].uid)
+    # assert uid2 == uids[1]
+    assert uid2.uid == uids[1].uid
 
 
 def test_export_uids():
@@ -163,42 +162,42 @@ def test_export_uids():
     logging.info("Result: %r", result)
     fpr = result.imports[0].fpr
     uids = c.get_key(fpr).uids
-    assert_equal(2, len(uids))
+    assert 2 == len(uids)
 
     exported_uids = list(export_uids(data))
-    assert_equal(2, len(exported_uids))
+    assert 2 == len(exported_uids)
 
     exported_uid1 = exported_uids[0]
     uid1, uid1_data = exported_uid1
     exported_uid2 = exported_uids[1]
     uid2, uid2_data = exported_uid2
-    assert_equal(uids[0].uid, uid1)
-    assert_equal(uids[1].uid, uid2)
+    assert uids[0].uid == uid1
+    assert uids[1].uid == uid2
 
     # The first exported UID
     c = TempContext()
     c.op_import(uid1_data)
     result = c.op_import_result()
     imports = result.imports
-    assert_equal(1, len(imports))
+    assert 1 == len(imports)
     uids1_key = c.get_key(fpr).uids
-    assert_equal(1, len(uids1_key))
+    assert 1 == len(uids1_key)
     uid1_key = uids1_key[0]
-    # assert_equal(uid1, uids[0])
-    assert_equal(uid1_key.uid, uids[0].uid)
+    # assert uid1 == uids[0]
+    assert uid1_key.uid == uids[0].uid
 
     # The second exported UID
     c = TempContext()
     c.op_import(uid2_data)
     result = c.op_import_result()
     imports = result.imports
-    assert_equal(1, len(imports))
+    assert 1 == len(imports)
     uids2_key = c.get_key(fpr).uids
-    assert_equal(1, len(uids2_key))
+    assert 1 == len(uids2_key)
     uid2_key = uids2_key[0]
     # FIXME: The objects don't implement __eq__ it seems :-/
-    # assert_equal(uid2, uids[1])
-    assert_equal(uid2_key.uid, uids[1].uid)
+    # assert uid2 == uids[1]
+    assert uid2_key.uid == uids[1].uid
 
 
 def test_export_alpha_uids():
@@ -216,7 +215,7 @@ def test_export_alpha_uids():
     fpr = result.imports[0].fpr
     uids = c.get_key(fpr).uids
     logging.info("UIDs: %r", uids)
-    assert_equal(3, len(uids))
+    assert 3 == len(uids)
     
     for i, uid in enumerate(uids, start=1):
         exported_uid = UIDExport(data, i)
@@ -225,18 +224,18 @@ def test_export_alpha_uids():
         result = tmp.op_import_result()
         logging.debug("UID %d %r import result: %r", i, uid, result)
         uid_key = tmp.get_key(result.imports[0].fpr)
-        assert_equal(1, len(uid_key.uids))
+        assert 1 == len(uid_key.uids)
         key_uid = uid_key.uids[0]
         # FIXME: Enable __eq__
-        # assert_equal(uids[i-1], key_uid)
-        assert_equal(uids[i-1].name, key_uid.name)
-        assert_equal(uids[i-1].email, key_uid.email)
+        # assert uids[i-1] == key_uid
+        assert uids[i-1].name == key_uid.name
+        assert uids[i-1].email == key_uid.email
 
 
-@raises(ValueError)
 def test_fingerprint_from_data():
-    fingerprint = fingerprint_from_keydata("This is not a key...")
-    assert False
+    pytest.raises(ValueError,
+        fingerprint_from_keydata,
+            "This is not a key...")
 
 
 class TestKey1:
@@ -245,24 +244,21 @@ class TestKey1:
         self.key = openpgpkey_from_data(data)
 
     def test_fingerprint(self):
-        assert_equal("ADAB7FCC1F4DE2616ECFA402AF82244F9CD9FD55",
-                     self.key.fingerprint)
+        assert "ADAB7FCC1F4DE2616ECFA402AF82244F9CD9FD55" == self.key.fingerprint
 
     def test_uids(self):
         uids = self.key.uidslist
-        assert_equal(1, len(uids))
+        assert 1 == len(uids)
         uid = uids[0]
-        assert_equal('Joe Random Hacker',
-                     uid.name)
-        assert_equal('joe@example.com',
-                     uid.email)
+        assert 'Joe Random Hacker' == uid.name
+        assert 'joe@example.com' == uid.email
 
 
-@raises(ValueError)
 def test_get_public_key_no_data():
     tmp = tempfile.mkdtemp()
-    d = get_public_key_data(None, homedir=tmp)
-    assert_equal("", d)
+    pytest.raises(ValueError,
+        get_public_key_data,
+            None, homedir=tmp)
 
 
 class TestGetPublicKeyData:
@@ -290,26 +286,25 @@ class TestGetPublicKeyData:
         newkey = openpgpkey_from_data(data)
         # Hrm. We may be better off checking for a few things
         # we actually care about rather than delegating to the Key() itself.
-        assert_equal(self.originalkey, newkey)
+        assert self.originalkey == newkey
 
     def test_get_public_key_data(self):
         fpr = self.originalkey.fingerprint
         data = get_public_key_data(fpr, homedir=self.homedir)
         newkey = openpgpkey_from_data(data)
-        assert_equal(fpr, newkey.fingerprint)
+        assert fpr == newkey.fingerprint
 
-    @raises(ValueError)
     def test_no_match(self):
-        data = get_public_key_data("nothing should match this",
-                                   homedir=self.homedir)
-        newkey = openpgpkey_from_data(data)
-        assert False
+        pytest.raises(ValueError,
+            get_public_key_data,
+               "nothing should match this",
+                homedir=self.homedir)
 
 
 def test_get_empty_usable_keys():
     homedir = tempfile.mkdtemp()
     keys = get_usable_keys(homedir=homedir)
-    assert_equal(0, len(keys))
+    assert 0 == len(keys)
 
 
 class TestGetUsableKeys:
@@ -332,16 +327,16 @@ class TestGetUsableKeys:
 
     def test_get_usable_key_no_pattern(self):
         keys = get_usable_keys(homedir=self.homedir)
-        assert_equal(1, len(keys))
+        assert 1 == len(keys)
         key = keys[0]
-        assert_equal(self.originalkey, key)
+        assert self.originalkey == key
 
     def test_get_usable_key_fpr(self):
         fpr = self.originalkey.fingerprint
         keys = get_usable_keys(fpr, homedir=self.homedir)
-        assert_equal(1, len(keys))
+        assert 1 == len(keys)
         key = keys[0]
-        assert_equal(self.originalkey, key)
+        assert self.originalkey == key
 
 
 class TestGetUsableSecretKeys:
@@ -364,16 +359,16 @@ class TestGetUsableSecretKeys:
 
     def test_get_usable_key_no_pattern(self):
         keys = get_usable_secret_keys(homedir=self.homedir)
-        assert_equal(1, len(keys))
+        assert 1 == len(keys)
         key = keys[0]
-        assert_equal(self.originalkey, key)
+        assert self.originalkey == key
 
     def test_get_usable_key_fpr(self):
         fpr = self.originalkey.fingerprint
         keys = get_usable_secret_keys(fpr, homedir=self.homedir)
-        assert_equal(1, len(keys))
+        assert 1 == len(keys)
         key = keys[0]
-        assert_equal(self.originalkey, key)
+        assert self.originalkey == key
 
 
 def get_signatures_for_uids_on_key(ctx, key):
@@ -456,17 +451,17 @@ class TestSignAndEncrypt:
         public_sender_key = sink.read()
 
         keys = get_usable_keys(homedir=self.key_sender_homedir)
-        assert_equal(1, len(keys))
+        assert 1 == len(keys)
         key = keys[0]
         uids = key.uidslist
         # Now finally call the function under test
         uid_encrypted = list(sign_keydata_and_encrypt(public_sender_key,
                              error_cb=None, homedir=self.key_receiver_homedir))
-        assert_equal(len(uids), len(uid_encrypted))
+        assert len(uids) == len(uid_encrypted)
 
         # We need to explicitly request signatures
         uids_before = uids
-        assert_equal(len(uids_before), len(sender.get_key(fpr).uids))
+        assert len(uids_before) == len(sender.get_key(fpr).uids)
 
         sigs_before = [s for l in get_signatures_for_uids_on_key(sender,
                                     key).values() for s in l]
@@ -476,9 +471,9 @@ class TestSignAndEncrypt:
             uid_enc_str = uid_enc[0].uid
             # The test doesn't work so well, because comments
             # are not rendered :-/
-            # assert_equal(uid, uid_enc[0])
-            assert_in(uid.name, uid_enc_str)
-            assert_in(uid.email, uid_enc_str)
+            # assert uid == uid_enc[0]
+            assert uid.name in uid_enc_str
+            assert uid.email in uid_enc_str
             ciphertext = uid_enc[1]
             log.debug("Decrypting %r", ciphertext)
             plaintext, result, vrfy = sender.decrypt(ciphertext)
@@ -486,14 +481,14 @@ class TestSignAndEncrypt:
             sender.op_import(plaintext)
             import_result = sender.op_import_result()
             log.debug("Import Result: %r", import_result)
-            assert_equal(1, import_result.new_signatures)
+            assert 1 == import_result.new_signatures
             updated_key = sender.get_key(fpr)
             log.debug("updated key: %r", updated_key)
             log.debug("updated key sigs: %r", [(uid, uid.signatures) for uid in updated_key.uids])
 
         sigs_after = [s for l in get_signatures_for_uids_on_key(sender,
                                     key).values() for s in l]
-        assert_greater(len(sigs_after), len(sigs_before))
+        assert len(sigs_after) > len(sigs_before)
 
     def test_sign_and_encrypt_double_secret(self):
         "We want to produce as many signatures as possible"
@@ -512,12 +507,12 @@ class TestSignAndEncrypt:
         """
         recv.op_genkey(params, None, None)
         gen_result = recv.op_genkey_result()
-        assert_equal(2, len(list(recv.keylist(secret=True))))
+        assert 2 == len(list(recv.keylist(secret=True)))
         
         sender = DirectoryContext(homedir=self.key_sender_homedir)
         sender.set_keylist_mode(gpg.constants.KEYLIST_MODE_SIGS)
         sender_keys = list(sender.keylist())
-        assert_equal(1, len(sender_keys))
+        assert 1 == len(sender_keys)
         sender_key = sender_keys[0]
         fpr = sender_key.fpr
         sink = gpg.Data()
@@ -527,7 +522,7 @@ class TestSignAndEncrypt:
         # Now finally call the function under test
         uid_encrypted = list(sign_keydata_and_encrypt(public_sender_key,
                              error_cb=None, homedir=self.key_receiver_homedir))
-        assert_equal(len(sender_key.uids), len(uid_encrypted))
+        assert len(sender_key.uids) == len(uid_encrypted)
 
         uids_before = sender.get_key(fpr).uids
         sigs_before = [s for l in get_signatures_for_uids_on_key(sender,
@@ -536,13 +531,13 @@ class TestSignAndEncrypt:
             uid_enc_str = uid_enc[0].uid
             log.info("Uid enc str: %r", uid_enc_str)
             log.info("Uid name: %r", uid.name)
-            # FIXME: assert_equal(uid, uid_enc[0])
+            # FIXME: assert uid == uid_enc[0]
             # It's a bit weird to re-use the string treatment here.
             # But gpgme may return unencodable bytes (and uid, here, is
             # coming straight from gpgme).  We opted for our UID wrapper
             # to return consumable strings, i.e. safe to encode
-            assert_in(to_valid_utf8_string(uid.name), uid_enc_str)
-            assert_in(to_valid_utf8_string(uid.email), uid_enc_str)
+            assert to_valid_utf8_string(uid.name) in uid_enc_str
+            assert to_valid_utf8_string(uid.email) in uid_enc_str
             ciphertext = uid_enc[1]
             log.debug("Decrypting %r", ciphertext)
             plaintext, result, vrfy = sender.decrypt(ciphertext)
@@ -551,7 +546,7 @@ class TestSignAndEncrypt:
             import_result = sender.op_import_result()
             log.debug("Import Result: %r", import_result)
             # Here is the important check for two new signatures
-            assert_equal(2, import_result.new_signatures)
+            assert 2 == import_result.new_signatures
             updated_key = sender.get_key(fpr)
             log.debug("updated key: %r", updated_key)
             log.debug("updated key sigs: %r", [(uid, uid.signatures) for uid in updated_key.uids])
@@ -559,7 +554,7 @@ class TestSignAndEncrypt:
         sigs_after = [s for l in get_signatures_for_uids_on_key(sender,
                                     sender_key).values() for s in l]
 
-        assert_greater(len(sigs_after), len(sigs_before))
+        assert len(sigs_after) > len(sigs_before)
 
 
 
@@ -604,7 +599,7 @@ class TestSignAndEncrypt:
             # Now we have transferred the ciphertext to the victim
             plaintext, result, vrfy = sender.decrypt(ciphertext)
             log.debug("Decrypt Result: %r", result)
-            result = assert_raises(ImportNewCertificationError,
+            result = pytest.raises(ImportNewCertificationError,
                 import_signature,
                     plaintext,
                     homedir=self.key_sender_homedir)
@@ -612,7 +607,7 @@ class TestSignAndEncrypt:
 
             after = list(sender.keylist())
 
-            assert_equal(len(before), len(after))
+            assert len(before) == len(after)
 
 class TestLatin1(TestSignAndEncrypt):
     SENDER_KEY = "seckey-latin1.asc"

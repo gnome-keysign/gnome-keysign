@@ -8,14 +8,12 @@ import unittest
 import gi
 gi.require_version('Gtk', '3.0')
 
-from nose.twistedtools import deferred
-from nose.tools import *
 from twisted.internet import threads
-from twisted.internet.defer import inlineCallbacks
+from pytest_twisted import inlineCallbacks
 
 try:
     from keysign.bluetoothoffer import BluetoothOffer
-    from keysign.bluetoothreceive import BluetoothReceive
+    from keysign.bluetoothreceive import BluetoothReceive, BluetoothError
     HAVE_BT = True
 except ImportError:
     HAVE_BT = False
@@ -51,7 +49,6 @@ def import_key_from_file(fixture, homedir):
     return openpgpkey_from_data(original)
 
 
-@deferred(timeout=15)
 @inlineCallbacks
 @unittest.skipUnless(HAVE_BT, "requires bluetooth module")
 def test_bt():
@@ -66,6 +63,8 @@ def test_bt():
     # Start offering the key
     offer = BluetoothOffer(key)
     data = yield offer.allocate_code()
+    if data is None:
+        log.warning("No code allocated (%r), probably no Bluetooth adapter!", data)
     # getting the code from "BT=code;...."
     code = data.split("=", 1)[1]
     code = code.split(";", 1)[0]
@@ -73,13 +72,13 @@ def test_bt():
     offer.start()
     receive = BluetoothReceive(port)
     msg_tuple = yield receive.find_key(code, hmac)
+    log.debug("Receiving yielded: %r", msg_tuple)
     downloaded_key_data, success, _ = msg_tuple
-    assert_true(success)
+    assert success, "No success :( %r" % msg_tuple
     log.info("Checking with key: %r", downloaded_key_data)
-    assert_equal(downloaded_key_data.encode("utf-8"), file_key_data)
+    assert downloaded_key_data.encode("utf-8") == file_key_data
 
 
-@deferred(timeout=15)
 @inlineCallbacks
 @unittest.skipUnless(HAVE_BT, "requires bluetooth module")
 def test_bt_wrong_hmac():
@@ -100,11 +99,11 @@ def test_bt_wrong_hmac():
     offer.start()
     receive = BluetoothReceive(port)
     msg_tuple = yield receive.find_key(code, hmac)
-    downloaded_key_data, success, _ = msg_tuple
-    assert_false(success)
+    downloaded_key_data, success, err = msg_tuple
+    assert not success
+    assert not isinstance(err, BluetoothError), "We expect a ValidationError or something else, anyway, than a Bluetooth error, because the transfer ought to have worked. How else do we distinguish a broken Bluetooth (won't work at all) from a tampered connection (may work next time)"
 
 
-@deferred(timeout=15)
 @inlineCallbacks
 @unittest.skipUnless(HAVE_BT, "requires bluetooth module")
 def test_bt_wrong_mac():
@@ -112,12 +111,11 @@ def test_bt_wrong_mac():
     receive = BluetoothReceive()
     msg_tuple = yield receive.find_key("01:23:45:67:89:AB", "hmac")
     downloaded_key_data, success, error = msg_tuple
-    assert_is_none(downloaded_key_data)
-    assert_false(success)
-    assert_equal(error.args[0], "(112, 'Host is down')")
+    assert downloaded_key_data is None
+    assert not success
+    assert error.args[0] == "(112, 'Host is down')"
 
 
-@deferred(timeout=15)
 @inlineCallbacks
 @unittest.skipUnless(HAVE_BT, "requires bluetooth module")
 def test_bt_corrupted_key():
@@ -167,5 +165,5 @@ def test_bt_corrupted_key():
     receive = BluetoothReceive(port)
     msg_tuple = yield receive.find_key(code, hmac)
     downloaded_key_data, result, error = msg_tuple
-    assert_false(result)
-    assert_equal(type(error), ValueError)
+    assert not result
+    assert isinstance(error, ValueError)

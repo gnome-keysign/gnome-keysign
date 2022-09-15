@@ -46,6 +46,7 @@ class BluetoothReceive:
         try:
             self.client_socket.setblocking(False)
             try:
+                log.info("Trying to connect to %s port %s", bt_mac, self.port)
                 self.client_socket.connect((bt_mac, self.port))
             except BluetoothError as be:
                 if be.args[0] == "(115, 'Operation now in progress')":
