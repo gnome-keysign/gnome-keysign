@@ -399,7 +399,7 @@ def get_public_key_data(fpr, homedir=None):
 def fingerprint_from_keydata(keydata):
     '''Returns the OpenPGP Fingerprint for a given key'''
     openpgpkey = openpgpkey_from_data(keydata)
-    return openpgpkey.fpr
+    return openpgpkey.fingerprint
 
 def get_usable_keys_from_context(ctx, pattern="", secret=False):
     keys = [Key.from_gpgme(key)
