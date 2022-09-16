@@ -113,7 +113,11 @@ class Key(namedtuple("Key", ["expiry", "fingerprint", "uidslist"])):
 
     @property
     def fpr(self):
-        "Legacy compatibility, use fingerprint instead"
+        """Legacy compatibility, use fingerprint instead.
+        However, this is useful for compatibility with gpgme.
+        It returns keys with the "fpr" property and we may want
+        to be able to run gpgme functions with both their keys and our keys.
+        """
         warnings.warn("Legacy fpr, use the fingerprint property",
                       DeprecationWarning)
         return self.fingerprint
