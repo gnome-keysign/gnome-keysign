@@ -194,7 +194,7 @@ class QRImage(Gtk.DrawingArea):
     def get_data(self):
         return self._data
 
-    data = GObject.property(getter=get_data, setter=set_data)
+    data = GObject.Property(getter=get_data, setter=set_data)
 
 
 def fullscreen_at_monitor(window, n):
