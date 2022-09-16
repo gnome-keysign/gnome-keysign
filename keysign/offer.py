@@ -51,7 +51,7 @@ class Offer:
         # If we have a Bluetooth code, so if the Bluetooth has been
         # correctly initialized
         if not self.b_data:
-            log.info("Bluetooth as been skipped")
+            log.info("Bluetooth has been skipped")
         else:
             bt_d = self.bt_offer.start()
             d.append(bt_d)
