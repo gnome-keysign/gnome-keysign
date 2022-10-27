@@ -185,7 +185,7 @@ def parse_command_line(argv):
                         version="%(prog)s {}".format(__version__))
     parser.add_argument("-v", "--verbose", dest="verbose_count",
                         action="count", default=0,
-                        help="increases log verbosity for each occurence.")
+                        help="increases log verbosity for each occurrence.")
     #parser.add_argument("-g", "--gpg",
     #                    action="store_true", default=False,
     #                    help="Use local GnuPG Keyring instead of file.")
