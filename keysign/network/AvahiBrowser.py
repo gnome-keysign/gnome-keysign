@@ -145,7 +145,7 @@ class AvahiBrowser(GObject.GObject):
 def main():
     loop = GObject.MainLoop()
     # We're not passing the loop to DBus, because... well, it
-    # does't work... It seems to expect a DBusMainLoop, not
+    # doesn't work... It seems to expect a DBusMainLoop, not
     # an ordinary main loop...
     ab = AvahiBrowser()
 

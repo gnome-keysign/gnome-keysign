@@ -145,7 +145,7 @@ def sign_key(uid=0, sign_cmd=u"sign", expire=False, check=3,
             status, prompt = yield 'Y'
         elif status == gpg.constants.STATUS_INV_SGNR:
             # seems to happen if you have an expired
-            # (or otherwise unsuable) signing key.
+            # (or otherwise unusable) signing key.
             # The CONSIDERED line should have been issued
             # with details.
             # We don't maintain that state at the moment which is
@@ -488,7 +488,7 @@ def local_sign_keydata(keydata, expires_in=60*60*24*1, error_cb=None, homedir=No
         # Unfortunately, key_sign does not report back how many
         # signatures were produced (or not produced...)
         # It may raise an error, but I have yet to see that it does...
-        log.info("Locally signed key %s with an exiry in %d secods", fpr, expires_in)
+        log.info("Locally signed key %s with an exiry in %d seconds", fpr, expires_in)
 
 
 def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
