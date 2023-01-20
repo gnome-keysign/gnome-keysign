@@ -113,7 +113,7 @@ class QRImage(Gtk.DrawingArea):
         background = self.background
         foreground = self.foreground
 
-        # This seems to set tje background,
+        # This seems to set the background,
         # but I'm not sure...
         cr.set_source_rgb(background, background, background)
         #cr.fill()

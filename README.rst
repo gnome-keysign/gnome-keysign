@@ -91,7 +91,7 @@ Magic Wormhole can be installed with pip:
 In Ubuntu, the package
 gstreamer1.0-plugins-bad provides the zbar element and in versions older
 than 18.04 the gtksink element.
-In newer versions of Ubuntu, the gtksink elment is provided by the
+In newer versions of Ubuntu, the gtksink element is provided by the
 gstreamer1.0-gtk3 packages.
 gstreamer1.0-plugins-good provides the autovideosrc element.
 

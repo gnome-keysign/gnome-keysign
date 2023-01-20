@@ -60,7 +60,7 @@ class KeyFprScanWidget(Gtk.VBox):
                         (GObject.TYPE_PYOBJECT,)),
         # It's probably not the best name for that signal.
         # While "barcode_scanned" might be better, it is probably
-        # unneccesarily specific.
+        # unnecessarily specific.
         str('barcode'): (GObject.SignalFlags.RUN_LAST, None,
                         (str, # The barcode string
                          Gst.Message.__gtype__, # The GStreamer message itself
@@ -99,7 +99,7 @@ class KeyFprScanWidget(Gtk.VBox):
         reader.set_size_request(150,150)
         reader.connect('barcode', self.on_barcode)
         self.scanner.add(reader)
-        # We keep a referece here to not "lose" the object.
+        # We keep a reference here to not "lose" the object.
         # If we don't, Gtk crashes. With a segfault. Probably
         # because the object is freed but still used.
         # Somebody should look at that...
