@@ -7,18 +7,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2020-10-07 18:17+0000\n"
-"PO-Revision-Date: 2021-01-22 10:56+0100\n"
-"Last-Translator: Fabio Tomat <f.t.public@gmail.com>\n"
-"Language-Team: Friulian <fur@li.org>\n"
+"POT-Creation-Date: 2022-12-12 13:18+0000\n"
+"PO-Revision-Date: 2023-01-17 10:44+0000\n"
+"Last-Translator: Fabio T. <f.t.public@gmail.com>\n"
+"Language-Team: Friulian <f.t.public@gmail.com>\n"
 "Language: fur\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
+"X-Editor: HaiPO 1.4 beta\n"
 "X-Generator: Poedit 2.4.2\n"
 
-#: data/org.gnome.Keysign.raw.appdata.xml:11
+#: data/org.gnome.Keysign.raw.appdata.xml:14
 msgid ""
 "\n"
 "      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
@@ -26,12 +27,11 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"      GNOME Keysign al permet di firmâ lis clâfs OpenPGP in maniere comude e "
-"sigure\n"
+"      GNOME Keysign al permet di firmâ lis clâfs OpenPGP in maniere comude e sigure\n"
 "      vie rêt locâl o Bluetooth.\n"
 "    "
 
-#: data/org.gnome.Keysign.raw.appdata.xml:15
+#: data/org.gnome.Keysign.raw.appdata.xml:21
 msgid ""
 "\n"
 "      It can scan another key's barcode and transfer the key securely,\n"
@@ -43,11 +43,9 @@ msgid ""
 msgstr ""
 "\n"
 "      Al pues scansionâ un codiç a sbaris di une altre clâf e trasferî la \n"
-"      clâf in sigurece, permetint a dôs personis di fâ sessions casuâls di "
-"firme des clâfs.\n"
+"      clâf in sigurece, permetint a dôs personis di fâ sessions casuâls di firme des clâfs.\n"
 "      Al seguìs il miôr costum di inviâ lis firmis cifradis\n"
-"      al UIDs di une clâf doprant il client E-mail che l'utent al à "
-"configurât\n"
+"      al UIDs di une clâf doprant il client E-mail che l'utent al à configurât\n"
 "      di doprâ.\n"
 "    "
 
@@ -79,11 +77,11 @@ msgstr "org.gnome.Keysign"
 msgid "Send"
 msgstr "Invie"
 
-#: keysign/app.py:188 keysign/receive.py:272
+#: keysign/app.py:188 keysign/receive.py:279
 msgid "Receive"
 msgstr "Ricêf"
 
-#: keysign/app.ui:62 keysign/send.ui:55
+#: keysign/app.ui:62 keysign/send.ui:1003
 msgid "Internet"
 msgstr "Internet"
 
@@ -139,7 +137,7 @@ msgstr ""
 msgid "Press Enter to exit"
 msgstr "Frache Invie par jessî"
 
-#: keysign/bluetoothreceive.py:134
+#: keysign/bluetoothreceive.py:135
 msgid "Trying to download the key, please wait"
 msgstr "Daûr a cirî di discjariâ la clâf, par plasê spiete"
 
@@ -169,17 +167,13 @@ msgstr "<big><b>Al è stât cjatât un erôr di programazion.</b></big>"
 
 #: keysign/gtkexcepthook.py:178
 msgid ""
-"You may be able to ignore this error and carry on working, but you may get "
-"unexpected results.\n"
+"You may be able to ignore this error and carry on working, but you may get unexpected results.\n"
 "\n"
-"Please tell the developers about this using the issue tracker if no-one else "
-"has reported it yet."
+"Please tell the developers about this using the issue tracker if no-one else has reported it yet."
 msgstr ""
-"Si pues ignorâ chest erôr e continuâ cul lavôr, ma si podarès la incuintri a "
-"risultâts inspietâts.\n"
+"Si pues ignorâ chest erôr e continuâ cul lavôr, ma si podarès la incuintri a risultâts inspietâts.\n"
 "\n"
-"Par plasê, comunichilu ai svilupadôrs doprant l'analizadôr (tracker) dai "
-"problemis se nissun altri lu à za segnalât."
+"Par plasê, comunichilu ai svilupadôrs doprant l'analizadôr (tracker) dai problemis se nissun altri lu à za segnalât."
 
 #: keysign/gtkexcepthook.py:187
 msgid "Search Tracker..."
@@ -260,23 +254,21 @@ msgstr "Scjadence: "
 msgid "Sign Key"
 msgstr "Firme clâf"
 
-#: keysign/receive.py:218
+#: keysign/receive.py:225
 msgid "Select file for saving"
 msgstr "Selezione il file pal salvament"
 
-#: keysign/receive.ui:53
+#: keysign/receive.ui:56
 msgid ""
 "No GNOME Keysign servers around :-(\n"
 "Find a friend to use GNOME Keysign with.\n"
 "You may also suffer from connectivity problems.\n"
-"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
-"NoServers/1\">the documentation</a>."
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/NoServers/1\">the documentation</a>."
 msgstr ""
 "Nissun server di GNOME Keysign ator :-(\n"
 "Cîr un amì par doprâ cun lui GNOME Keysign.\n"
 "Tu podaressis vê di problemis di conession.\n"
-"Par vê plui informazions lei <a href=\"https://wiki.gnome.org/Apps/Keysign/"
-"Doc/NoServers/1\">la documentazion</a>."
+"Par vê plui informazions lei <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/NoServers/1\">la documentazion</a>."
 
 #: keysign/receive.ui:108
 msgid ""
@@ -293,7 +285,7 @@ msgstr "<b>Fotocjamare</b>"
 msgid "Integrated Web Cam"
 msgstr "Web Cam integrade"
 
-#: keysign/receive.ui:179 keysign/send.ui:673
+#: keysign/receive.ui:179 keysign/send.ui:609
 msgid "<b>Security Code</b>"
 msgstr "<b>Codiç di sigurece</b>"
 
@@ -309,62 +301,70 @@ msgstr "Daûr a discjariâ i dâts de clâf. Spiete..."
 msgid "Key download was interrupted!"
 msgstr "Il discjariament de clâf al è stât interot!"
 
-#: keysign/receive.ui:345
+#: keysign/receive.ui:346
+msgid "Show details about the error"
+msgstr "Mostre i detais par chest erôr"
+
+#: keysign/receive.ui:381
+msgid ""
+"Error producing certifications ☹\n"
+"Something went wrong. Sometime, the passphrase was not correctly entered.\n"
+"You may try again by clicking the \"confirm\" button."
+msgstr ""
+"Erôr tal produsi lis certificazions ☹\n"
+"Alc al è lât strucj. Cualchi volte al sucêt che la passphrase no ven inseride juste.\n"
+"Tu puedis tornâ a provâ fasint clic sul boton \"conferme\"."
+
+#: keysign/receive.ui:427
 msgid ""
 "Saves the produced certifications as separate files in a custom directory"
 msgstr ""
 "Al salve i certificâts prodots come files separâts intune cartele "
 "personalizade"
 
-#: keysign/receive.ui:360
+#: keysign/receive.ui:442
 msgid ""
 "Imports a temporary version of the produced certifications into the local "
 "keyring"
 msgstr ""
-"Al impuarte une version temporanie dai certificâts prodots intal puarteclâfs "
-"locâl"
+"Al impuarte une version temporanie dai certificâts prodots intal puarteclâfs"
+" locâl"
 
-#: keysign/receive.ui:403
+#: keysign/receive.ui:487
 msgid ""
 "Successfully produced certifications.\n"
-"You can import a temporary signature to start using the key as if it had "
-"already been properly verified.\n"
-"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
-"ProducedSignatures/1\">the documentation</a>."
+"You can import a temporary signature to start using the key as if it had already been properly verified.\n"
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/ProducedSignatures/1\">the documentation</a>."
 msgstr ""
 "Certificâts prodots cun sucès.\n"
-"Tu puedis impuartâ une firme temporanie par tacâ a doprâ la clâf come che e "
-"fos za stade verificade in maniere apropriade.\n"
-"Par vê plui informazions lei <a href=\"https://wiki.gnome.org/Apps/Keysign/"
-"Doc/ProducedSignatures/1\">la documentazion</a>."
+"Tu puedis impuartâ une firme temporanie par tacâ a doprâ la clâf come che e fos za stade verificade in maniere apropriade.\n"
+"Par vê plui informazions lei <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/ProducedSignatures/1\">la documentazion</a>."
 
-#: keysign/receive.ui:446
-msgid ""
-"To sign the key, confirm that you want to sign the following key.\n"
-"This will generate an email that must be sent in order to complete the "
-"signing process."
-msgstr ""
-"Par firmâ la clâf, conferme che tu desideris firmâ la clâf chi daurman.\n"
-"Chest al gjenerarà une e-mail che e scugne jessi inviade par podê completâ "
-"il procès di firme."
-
-#: keysign/receive.ui:474
+#: keysign/receive.ui:541
 msgid "Key"
 msgstr "Clâf"
 
-#: keysign/receive.ui:507 keysign/send.ui:598
+#: keysign/receive.ui:574 keysign/send.ui:534
 msgid "UIDs"
 msgstr "UID"
 
-#: keysign/receive.ui:594
+#: keysign/receive.ui:652
+msgid ""
+"To sign the key, confirm that you want to sign the following key.\n"
+"This will generate an email that must be sent in order to complete the signing process."
+msgstr ""
+"Par firmâ la clâf, conferme che tu desideris firmâ la clâf chi daurman.\n"
+"Chest al gjenerarà une e-mail che e scugne jessi inviade par podê completâ il procès di firme."
+
+#: keysign/receive.ui:676
 msgid "C_onfirm"
 msgstr "C_onferme"
 
-#: keysign/receive.ui:716
+#: keysign/receive.ui:798
 msgid "Signing the following UIDs:"
 msgstr "Daûr a firmâ i UID chi sot:"
 
-#: keysign/send.py:218
+#: keysign/send.py:251
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
@@ -372,29 +372,11 @@ msgstr ""
 "Si sta ancjemò cirint di otignî une conession a internet. E somee jessi "
 "lente o no disponibile."
 
-#: keysign/send.py:224
+#: keysign/send.py:257
 msgid "There isn't an Internet connection!"
 msgstr "No si à une conession a internet!"
 
-#: keysign/send.py:280 keysign/send.ui:783
-msgid ""
-"Key successfully sent.\n"
-"You should receive soon an email with the signature."
-msgstr ""
-"Clâf inviade cun sucès.\n"
-"Chi di pôc tu ricevarâs une e-mail cun la firme."
-
-#: keysign/send.py:285
-msgid ""
-"Could not establish a secure connection.\n"
-"Either your partner has entered a wrong code or someone tried to intercept "
-"your connection"
-msgstr ""
-"Impussibil stabilî une conession sigure.\n"
-"O il to amì nol à inserît il codiç just o cualchidun al à cirût di intercetâ "
-"la conession"
-
-#: keysign/send.py:289
+#: keysign/send.py:348
 #, python-format
 msgid ""
 "An unexpected error occurred:\n"
@@ -407,15 +389,7 @@ msgstr ""
 msgid "Select and send key"
 msgstr "Selezione e invie la clâf"
 
-#: keysign/send.ui:13
-msgid "Select and Send key"
-msgstr "Selezione e invie clâf"
-
-#: keysign/send.ui:53
-msgid "Also use the Internet to transfer the certificate"
-msgstr "Dopre ancje Internet par trasferî il certificât"
-
-#: keysign/send.ui:122
+#: keysign/send.ui:59
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
@@ -423,15 +397,15 @@ msgstr ""
 "No tu âs nissune clâf!\n"
 "Par plasê dopre par esempli Seahorse par creâ'nt une."
 
-#: keysign/send.ui:199
+#: keysign/send.ui:135
 msgid "Very slow or no Internet connection!"
 msgstr "Une vore lente o nissune conession a internet!"
 
-#: keysign/send.ui:268
+#: keysign/send.ui:204 keysign/send.ui:751
 msgid "The signature has been successfully imported!"
 msgstr "La firme e je stade impuartade cun sucès!"
 
-#: keysign/send.ui:294
+#: keysign/send.ui:230 keysign/send.ui:777
 msgid ""
 "Returns the received certification back to the sender, so that the sender "
 "can make use of your OpenPGP certificate"
@@ -439,47 +413,78 @@ msgstr ""
 "Al torne indaûr al mitent la certificazion ricevude, cussì che il mitent al "
 "podedi doprâ il tô certificât OpenPGP"
 
-#: keysign/send.ui:341
+#: keysign/send.ui:277 keysign/send.ui:822
 msgid "Display more details for the error."
 msgstr "Mostre plui detais par chest erôr."
 
-#: keysign/send.ui:372
+#: keysign/send.ui:308 keysign/send.ui:853
 msgid "An error occurred while trying to import the signature."
 msgstr "Si è verificât un erôr intant che si cirive di impuartâ la firme."
 
-#. This refers to the key being certified by someone rather than the key used for
+#. This refers to the key being certified by someone rather than the key used
+#. for
 #. certifying someone
-#: keysign/send.ui:427
+#: keysign/send.ui:363
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>Selezione une clâf par firmâ</b>"
 
-#: keysign/send.ui:443
+#: keysign/send.ui:379
 msgid "<small>Times signed</small>"
 msgstr "<small>Voltis firmade</small>"
 
-#: keysign/send.ui:510
+#: keysign/send.ui:446
 msgid "Keylist"
 msgstr "Liste des clâfs"
 
-#: keysign/send.ui:530
+#: keysign/send.ui:466
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
 msgstr ""
-"<small>Par vê la clâf firmade, chê altre persone e scugne inserî il codiç di "
-"sigurece o scansionâ il codiç QR</small>"
+"<small>Par vê la clâf firmade, chê altre persone e scugne inserî il codiç di"
+" sigurece o scansionâ il codiç QR</small>"
 
-#: keysign/send.ui:557
+#: keysign/send.ui:493
 msgid "<b>Key Details</b>"
 msgstr "<b>Detais clâf</b>"
 
-#: keysign/send.ui:582
+#: keysign/send.ui:518
 msgid "Fingerprint"
 msgstr "Impronte"
 
-#: keysign/send.ui:736
+#: keysign/send.ui:672
 msgid "<b>QR Code</b>"
 msgstr "<b>Codiç QR</b>"
+
+#: keysign/send.ui:897
+msgid ""
+"Could not establish a secure connection.\n"
+"Either your partner has entered a wrong code or someone tried to intercept your connection."
+msgstr ""
+"Impussibil stabilî une conession sigure.\n"
+"O il to amì nol à inserît il codiç just o cualchidun al à cirût di intercetâ la conession."
+
+#: keysign/send.ui:915
+msgid ""
+"Key successfully sent.\n"
+"You should receive an email with the signature soon.\n"
+"You can drag and drop the email here to import your certification."
+msgstr ""
+"Clâf inviade cun sucès.\n"
+"Chi di pôc tu varessis di ricevi une e-mail cu la firme.\n"
+"Tu puedis strissinâle e molâle achì par impuartâ la tô certificazion."
+
+#: keysign/send.ui:932
+msgid "An unexpected error occurred."
+msgstr "Al è vignût fûr un erôr inspietât."
+
+#: keysign/send.ui:961
+msgid "Select and Send key"
+msgstr "Selezione e invie clâf"
+
+#: keysign/send.ui:1001
+msgid "Also use the Internet to transfer the certificate"
+msgstr "Dopre ancje Internet par trasferî il certificât"
 
 #: keysign/util.py:231
 msgid ""
