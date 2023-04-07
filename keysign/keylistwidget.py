@@ -142,8 +142,10 @@ class KeyListWidget(Gtk.HBox):
 
         self.ib_import_okay = builder.get_object('infobar_import_okay')
         self.ib_import_error = builder.get_object('infobar_import_error')
+        self.ib_import_error_no_new_sigs = builder.get_object('infobar_import_error_no_new_signatures')
         assert self.ib_import_okay
         assert self.ib_import_error
+        assert self.ib_import_error_no_new_sigs
         fix_infobar(self.ib_import_okay)
         fix_infobar(self.ib_import_error)
         self.label_ib_import_okay = builder.get_object('label_import_okay')

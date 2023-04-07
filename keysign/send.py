@@ -135,6 +135,8 @@ class SendApp:
             return
         try:
             self.decrypt_and_import_certifications(data)
+        except gpgmeh.NoNewSignatures as e:
+            self.no_new_signatures_import_error(e)
         except errors.GPGMEError as e:
             self.signature_import_error(e)
         else:
@@ -280,11 +282,15 @@ class SendApp:
 
         log.info("Signature imported")
 
+    def no_new_signatures_import_error(self, e):
+        self.klw.ib_import_error_no_new_sigs.show()
+        log.info("No new signatures: %r", e)
+
     def signature_import_error(self, e):
         self.klw.ib_import_error.show()
         # We hide the error details button, because we don't have that functionality just yet
         self.klw.button_ib_import_error.hide()
-        log.info("Signature import error")
+        log.info("Signature import error: %r", e)
 
     def rb_signature_imported(self, decrypted_certifications):
         self.rb_import_okay.show()
