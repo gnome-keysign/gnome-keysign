@@ -362,7 +362,7 @@ def import_signature_gpgme(signature, homedir=None):
 
 
 
-def get_signatures_for_uids_on_key(ctx, key):
+def get_signatures_for_uids_on_key(key, homedir=None):
     """It seems to be a bit hard to get a key with its signatures,
     so this is a small helper function"""
     # esp. get_key does not take a SIGS argument.
@@ -377,6 +377,7 @@ def get_signatures_for_uids_on_key(ctx, key):
     # 1.8 and 1.9 we have to set_keylist_mode and NOT call ctx.keylist
     # but rather the bare op_keylist_all.  In 1.8 that requires two
     # arguments.
+    ctx = DirectoryContext(homedir)
     mode = gpg.constants.keylist.mode.LOCAL | gpg.constants.keylist.mode.SIGS
     secret = False
     ctx.set_keylist_mode(mode)

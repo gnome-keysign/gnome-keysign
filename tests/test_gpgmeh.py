@@ -437,8 +437,8 @@ class TestSignAndEncrypt:
         uids_before = uids
         assert len(uids_before) == len(sender.get_key(fpr).uids)
 
-        sigs_before = [s for l in get_signatures_for_uids_on_key(sender,
-                                    key).values() for s in l]
+        sigs_before = [s for l in get_signatures_for_uids_on_key(key,
+                                    homedir=sender.homedir).values() for s in l]
         # FIXME: Refactor this a little bit.
         # We have duplication of code with the other test below.
         for uid, uid_enc in zip(uids_before, uid_encrypted):
@@ -460,8 +460,8 @@ class TestSignAndEncrypt:
             log.debug("updated key: %r", updated_key)
             log.debug("updated key sigs: %r", [(uid, uid.signatures) for uid in updated_key.uids])
 
-        sigs_after = [s for l in get_signatures_for_uids_on_key(sender,
-                                    key).values() for s in l]
+        sigs_after = [s for l in get_signatures_for_uids_on_key(key,
+                                    homedir=sender.homedir).values() for s in l]
         assert len(sigs_after) > len(sigs_before)
 
     def test_sign_and_encrypt_double_secret(self):
@@ -499,8 +499,8 @@ class TestSignAndEncrypt:
         assert len(sender_key.uids) == len(uid_encrypted)
 
         uids_before = sender.get_key(fpr).uids
-        sigs_before = [s for l in get_signatures_for_uids_on_key(sender,
-                                    sender_key).values() for s in l]
+        sigs_before = [s for l in get_signatures_for_uids_on_key(sender_key,
+                                    sender.homedir).values() for s in l]
         for uid, uid_enc in zip(uids_before, uid_encrypted):
             uid_enc_str = uid_enc[0].uid
             log.info("Uid enc str: %r", uid_enc_str)
@@ -525,8 +525,8 @@ class TestSignAndEncrypt:
             log.debug("updated key: %r", updated_key)
             log.debug("updated key sigs: %r", [(uid, uid.signatures) for uid in updated_key.uids])
 
-        sigs_after = [s for l in get_signatures_for_uids_on_key(sender,
-                                    sender_key).values() for s in l]
+        sigs_after = [s for l in get_signatures_for_uids_on_key(sender_key,
+                                    sender.homedir).values() for s in l]
 
         assert len(sigs_after) > len(sigs_before)
 
