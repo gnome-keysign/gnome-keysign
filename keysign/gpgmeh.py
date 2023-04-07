@@ -362,6 +362,33 @@ def import_signature_gpgme(signature, homedir=None):
 
 
 
+def get_signatures_for_uids_on_key(ctx, key):
+    """It seems to be a bit hard to get a key with its signatures,
+    so this is a small helper function"""
+    # esp. get_key does not take a SIGS argument.
+    # What happens if keylist returns multiple keys, e.g. because there
+    # is another key with a UID named as the fpr?  How can I make sure I
+    # get the signatures of any given key?
+    
+    # *sigh* gpgme is killing me. With gpgme 1.8 we have to
+    # set_keylist_mode before we can call keylist.  With gpgme 1.9
+    # keylist takes a mode argument and overrides whatever has been
+    # set before.  In order to come with something compatible with both
+    # 1.8 and 1.9 we have to set_keylist_mode and NOT call ctx.keylist
+    # but rather the bare op_keylist_all.  In 1.8 that requires two
+    # arguments.
+    mode = gpg.constants.keylist.mode.LOCAL | gpg.constants.keylist.mode.SIGS
+    secret = False
+    ctx.set_keylist_mode(mode)
+    keys = list(ctx.op_keylist_all(key.fpr, secret))
+    # With gpgme 1.9 we can simply do:
+    # keys = list(ctx.keylist(key.fpr), mode=mode)
+    assert len(keys) == 1
+    uid_sigs = {uid.uid: [s for s in uid.signatures] for uid in keys[0].uids}
+    log.info("Signatures: %r", uid_sigs)
+    return uid_sigs
+
+
 
 def openpgpkey_from_data(keydata):
     c = TempContext()
