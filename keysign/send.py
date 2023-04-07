@@ -134,7 +134,7 @@ class SendApp:
             log.debug("We are trying to send a key, no imports at this stage")
             return
         try:
-            self.decrypt_and_import_certifications(data)
+            decrypted_certifications = self.decrypt_and_import_certifications(data)
         except gpgmeh.NoNewSignatures as e:
             self.no_new_signatures_import_error(e)
         except errors.GPGMEError as e:
