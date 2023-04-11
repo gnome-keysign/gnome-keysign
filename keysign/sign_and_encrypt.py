@@ -30,6 +30,8 @@ def main():
         "sign each UID separately, encrypt and write the result out to a file.")
     parser.add_argument('-v', '--verbose', action='count', default=0,
         help="Increase detail of logging")
+    parser.add_argument("--preserve", action='store_true',
+        help="Write files with plaintext next to the ciphertext, e.g. .plain.pgp")
     parser.add_argument("file", nargs='+', type=argparse.FileType('rb'),
         help="File containing OpenPGP keys")
     args = parser.parse_args()
@@ -49,6 +51,11 @@ def main():
             with open(fname, 'wb') as outfile:
                 outfile.write(ciphertext)
                 print ("Written to %s \t for UID %s" % (fname, uid))
+
+            fname = "%s-%d.plain.pgp" % (fingerprint, i)
+            with open(fname, 'wb') as outfile:
+                outfile.write(plaintext)
+                print ("Written Plaintext to %s \t for UID %s" % (fname, uid))
 
 
 
