@@ -140,7 +140,7 @@ class SendApp:
         except errors.GPGMEError as e:
             self.signature_import_error(e)
         else:
-            self.signature_imported(decrypted_certifications, sender)
+            self.signature_imported(decrypted_certifications)
 
     def on_rb_drag_data_received(self, widget, drag_context, x, y, data, info, time):
         try:
