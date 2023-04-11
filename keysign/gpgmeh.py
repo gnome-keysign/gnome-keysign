@@ -385,7 +385,7 @@ def get_signatures_for_uids_on_key(key, homedir=None):
     # With gpgme 1.9 we can simply do:
     # keys = list(ctx.keylist(key.fpr), mode=mode)
     assert len(keys) == 1
-    uid_sigs = {uid.uid: [s for s in uid.signatures] for uid in keys[0].uids}
+    uid_sigs = {uid.uid: {s.keyid for s in uid.signatures} for uid in keys[0].uids}
     log.info("Signatures: %r", uid_sigs)
     return uid_sigs
 
