@@ -134,21 +134,21 @@ class SendApp:
             log.debug("We are trying to send a key, no imports at this stage")
             return
         try:
-            decrypted_certifications = self.decrypt_and_import_certifications(data)
+            decrypted_certifications, attestors = self.decrypt_and_import_certifications(data)
         except gpgmeh.NoNewSignatures as e:
             self.no_new_signatures_import_error(e)
         except errors.GPGMEError as e:
             self.signature_import_error(e)
         else:
-            self.signature_imported(decrypted_certifications)
+            self.signature_imported(decrypted_certifications, attestors)
 
     def on_rb_drag_data_received(self, widget, drag_context, x, y, data, info, time):
         try:
-            decrypted_certifications = self.decrypt_and_import_certifications(data)
+            decrypted_certifications, attestors = self.decrypt_and_import_certifications(data)
         except errors.GPGMEError as e:
             self.rb_signature_import_error(e)
         else:
-            self.rb_signature_imported(decrypted_certifications)
+            self.rb_signature_imported(decrypted_certifications, attestors)
 
 
     def decrypt_and_import_certifications(self, data):
@@ -205,7 +205,7 @@ class SendApp:
                                     log.debug("Now, attestors is %s", attestors)
 
             log.debug("Found attestors: %s", attestors)
-            return decrypted_certifications
+            return decrypted_certifications, attestors
 
     @inlineCallbacks
     def on_key_activated(self, widget, key):
@@ -282,7 +282,7 @@ class SendApp:
         self.klw.ib_internet.show()
         log.info("No Internet connection")
 
-    def signature_imported(self, decrypted_certifications, sender=None):
+    def signature_imported(self, decrypted_certifications, attestors):
         """When we have received, decrypted, and imported a certification,
         this function will show the infobar and offer to return the certification
         to the sender.
@@ -290,15 +290,17 @@ class SendApp:
         simply because that information is currently not included in the certification
         the attestor sends.
         """
+        log.debug("s_i Attestors: %s", attestors)
         self.klw.ib_import_okay.show()
-        if not sender:
+        if not attestors:
             # We do not know where to return the certification to, so we hide the button
             self.klw.button_ib_import_okay.hide()
         else:
             def return_certification(button):
-                log.info("Return certification to %s (%d)",
-                    sender, len(decrypted_certifications))
-                
+                for sender in attestors:
+                    log.info("Return certification to %s (%d)",
+                        sender, len(decrypted_certifications))
+
             self.klw.button_ib_import_okay.connect('clicked', return_certification)
             self.klw.button_ib_import_okay.show()
 
@@ -314,16 +316,17 @@ class SendApp:
         self.klw.button_ib_import_error.hide()
         log.info("Signature import error: %r", e)
 
-    def rb_signature_imported(self, decrypted_certifications):
+    def rb_signature_imported(self, decrypted_certifications, attestors):
         self.rb_import_okay.show()
-        sender = None
-        if not sender:
+        log.debug("rb_s_i Attestors: %s", attestors)
+        if not attestors:
             # We do not know where to return the certification to, so we hide the button
             self.rb_button_ib_return_signature.hide()
         else:
             def return_certification(button):
-                log.info("Return certification to %s (%d)",
-                    sender, len(decrypted_certifications))
+                for sender in attestors:
+                    log.info("Return certification to %s (%d)",
+                        sender, len(decrypted_certifications))
 
             self.rb_button_ib_return_signature.connect('clicked', return_certification)
             self.rb_button_ib_return_signature.show()
