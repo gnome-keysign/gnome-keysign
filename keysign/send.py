@@ -166,6 +166,8 @@ class SendApp:
             with open(filename, "rb") as si:
                 signatures.append(si.read())
 
+        sigs_before = {key.fingerprint: gpgmeh.get_signatures_for_uids_on_key(key)
+                       for key in gpgmeh.get_usable_secret_keys()}
         # We currently do not know how to obtain the sender of the email.
         # We could parse the email for a From: header.
         # But if only the attachment is dropped, we don't have that information.
@@ -183,6 +185,26 @@ class SendApp:
             log.exception("Could not import signatures")
             raise
         else:
+            sigs_after = {key.fingerprint: gpgmeh.get_signatures_for_uids_on_key(key)
+                          for key in gpgmeh.get_usable_secret_keys()}
+            log.debug("Delta Sigs, before: %s", sigs_before)
+            attestors = set()
+            for fpr, uid_sigs in sigs_after.items():
+                for uid, sigs in uid_sigs.items():
+                    sig_delta = sigs - sigs_before[fpr][uid]
+                    log.info("These certifications are new: %s", sig_delta)
+                    for keyid in sig_delta:
+                        for key in gpgmeh.get_usable_keys(pattern=keyid):
+                            log.debug("Attestor key has UIDs: %s", key.uidslist)
+                            for uid in key.uidslist:
+                                email = uid.email
+                                log.debug("Attestor key %s has UID %s with Email %s", key, uid, email)
+                                if email:
+                                    log.debug("Adding %s to %s", email, attestors)
+                                    attestors.add(email)
+                                    log.debug("Now, attestors is %s", attestors)
+
+            log.debug("Found attestors: %s", attestors)
             return decrypted_certifications
 
     @inlineCallbacks
