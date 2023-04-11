@@ -579,7 +579,11 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
 
 
 class NoNewSignatures(GPGMEError):
-    pass
+    "We couldn't find a new certification, so the certification is already known"
+    def __init__(self, signature, import_result):
+        self.signature = signature
+        self.import_result = import_result
+        super().__init__()
 class NewRevocations(GPGMEError):
     pass
 class NewSubkey(GPGMEError):
@@ -605,7 +609,7 @@ def decrypt_signature(encrypted_sig, homedir=None):
         raise GPGMEError
 
     if result.new_signatures == 0:
-        raise NoNewSignatures()
+        raise NoNewSignatures(signature=decrypted_sig, import_result=result)
     if result.new_revocations != 0:
         raise NewRevocations()
     if result.new_sub_keys != 0:
