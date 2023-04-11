@@ -603,6 +603,7 @@ def decrypt_signature(encrypted_sig, homedir=None):
     decrypted_sig = signature[0]
     temp_ctx.op_import(decrypted_sig)
     result = temp_ctx.op_import_result()
+    log.debug("signature import result: %r", result)
 
     if result.imported != 0:
         log.warning("Trying to import a new key instead of a signature!")
