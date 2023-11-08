@@ -4,6 +4,8 @@ import logging
 import mailbox
 import os
 import signal
+from string import Template
+from tempfile import NamedTemporaryFile
 
 try:
     from urllib.parse import unquote
@@ -38,7 +40,7 @@ if  __name__ == "__main__" and __package__ is None:
 from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
 from .offer import Offer
-from .util import get_attachments
+from .util import get_attachments, send_email
 from . import gpgmeh
 # We import i18n to have the locale set up for Glade
 from .i18n import _
@@ -52,6 +54,21 @@ except ImportError:
 
 
 DRAG_ACTION = Gdk.DragAction.COPY
+
+
+
+RETURN_SUBJECT = "Your OpenPGP certifications on my key"
+RETURN_BODY = """Hi $uid,
+
+thanks for having signed my key.
+Here are the certifications you produced.
+
+Please import them by, e.g., spawning a terminal and typing
+
+    gpg --import
+
+Then, drag and drop the attachment into your terminal and press Enter.
+"""
 
 
 class SendApp:
@@ -297,9 +314,26 @@ class SendApp:
             self.klw.button_ib_import_okay.hide()
         else:
             def return_certification(button):
+                self._tempfiles = []
                 for sender in attestors:
                     log.info("Return certification to %s (%d)",
                         sender, len(decrypted_certifications))
+
+                    tempfiles = []
+                    for cert in decrypted_certifications:
+                        tempfile = NamedTemporaryFile(prefix='gnome-keysign-certifications',
+                                                     suffix='.asc',
+                                                     delete=True)
+                        tempfile.write(cert)
+                        tempfile.file.close()
+                        tempfiles.append(tempfile)
+
+                    ctx = {'uid': sender}
+                    subject = Template(RETURN_SUBJECT).safe_substitute(ctx)
+                    body = Template(RETURN_BODY).safe_substitute(ctx)
+                    send_email(sender, subject=subject, body=body, files=[f.name for f in tempfiles])
+                    # We just keep the object around so that the files do not get deleted before the email has been sent. Once the app quits, we are happy with the files being cleaned up.
+                    self._tempfiles.append(tempfiles)
 
             self.klw.button_ib_import_okay.connect('clicked', return_certification)
             self.klw.button_ib_import_okay.show()
