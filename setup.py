@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 #
-from __future__ import print_function
-# We can't use unicode_literals because there seems to be
-# a bug in setuptools:
-# https://stackoverflow.com/a/23175194/2015768
-# from __future__ import unicode_literals
 
 import codecs
 import glob
@@ -125,7 +120,6 @@ setup(
         
         'qrcode',
         'twisted[tls]>=17.5.0',
-        'future',
         'magic-wormhole>=0.10.2',
         # avahi # Also no entry in the cheeseshop
         # dbus # dbus-python is in the cheeseshop but not pip-able
