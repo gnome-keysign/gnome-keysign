@@ -22,10 +22,12 @@ import os
 import signal
 import sys
 from textwrap import dedent
+from urllib.parse import unquote
 
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
+from gi.repository import Gdk
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 if __name__ == "__main__":
@@ -105,6 +107,13 @@ class ReceiveApp:
         self.scanner = scanner
         self.stack = receive_stack
 
+        DRAG_ACTION = Gdk.DragAction.COPY
+        self.scanner.drag_dest_set(Gtk.DestDefaults.ALL, [], DRAG_ACTION)
+        self.scanner.drag_dest_set_target_list(None)
+        self.scanner.drag_dest_add_text_targets()
+        self.scanner.drag_dest_add_uri_targets()
+        self.scanner.connect("drag-data-received", self.on_drag_data_received)
+
         self.discovery = AvahiKeysignDiscoveryWithMac()
         ib = builder.get_object('infobar_discovery')
         fix_infobar(ib)
@@ -125,6 +134,24 @@ class ReceiveApp:
         # We call this in async because it can take several seconds to complete and we don't want
         # to stall the UI boot. Also we don't care about having this information immediately.
         threads.deferToThread(self.check_bt_availability)
+
+    def on_drag_data_received(self, widget, drag_context, x, y, data, info, time):
+        log.info("recv: Drag data rcvd: %s (%s) %s", data, data.get_text(), info)
+        drag_data = data.get_text()
+        dragged_data = unquote(drag_data)
+        if dragged_data.startswith("file://"):
+            filename = dragged_data[7:].strip('\r\n\x00')  # remove file://, \r\n and NULL
+            keydata = open(filename, 'br').read()
+
+        elif dragged_data.startswith("-----BEGIN PGP PUBLIC KEY BLOCK-----"):
+            # We assume a raw (well, armored) key to be passed
+            keydata = dragged_data
+
+        else:
+            log.warning("We got a drag with neither file:// nor ----: %s", drag_data)
+            keydata = dragged_data
+
+        self.on_keydata_downloaded(keydata)
 
     def on_redo_button_clicked(self, button):
         log.info("redo pressed")
@@ -151,6 +178,7 @@ class ReceiveApp:
             log.debug("Bluetooth adapter is turned off: %s", e)
 
     def on_keydata_downloaded(self, keydata, pixbuf=None):
+        log.debug("Downloaded keydata of length %d: %s", len(keydata), keydata[:50])
         key = openpgpkey_from_data(keydata)
         psw = PreSignWidget(key, pixbuf)
         psw.connect('sign-key-confirmed',
