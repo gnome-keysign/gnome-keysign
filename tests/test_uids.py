@@ -3,7 +3,6 @@
 strings, rather than raw bytes, for the raw UID, email, name,
 and comment component.
 """
-from __future__ import unicode_literals
 
 from keysign import gpgkey
 

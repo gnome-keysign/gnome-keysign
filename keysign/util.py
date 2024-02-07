@@ -15,7 +15,6 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
-from __future__ import unicode_literals
 
 import hashlib
 import hmac
@@ -29,14 +28,9 @@ from string import Template
 from tempfile import NamedTemporaryFile
 from xml.etree import ElementTree
 
-try:
-    from urllib.parse import urlparse, parse_qs
-    from urllib.parse import ParseResult
-    from urllib.parse import quote
-except ImportError:
-    from urlparse import urlparse, parse_qs
-    from urlparse import ParseResult
-    from urllib2 import quote
+from urllib.parse import urlparse, parse_qs
+from urllib.parse import ParseResult
+from urllib.parse import quote
 
 import requests
 import dbus

@@ -17,17 +17,13 @@
 # - fix lockup with dialog.run(), return to mainloop instead
 # see also http://faq.pygtk.org/index.py?req=show&file=faq20.010.htp
 # (The license is still whatever you want.)
-from __future__ import print_function
 
 import inspect
 import linecache
 import pydoc
 import sys
 import traceback
-if sys.version_info.major < 3:
-    from io import BytesIO as StringIO
-else:
-    from io import StringIO as StringIO
+from io import StringIO as StringIO
 from gettext import gettext as _
 import os
 
