@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the gnome-keysign package.
 # Damned <damnedlies@163.com>, 2020.
 # Dingzhong Chen <wsxy162@gmail.com>, 2020.
-# lumingzh <lumingzh@qq.com>, 2022.
+# lumingzh <lumingzh@qq.com>, 2022-2023.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2021-05-31 10:45+0000\n"
-"PO-Revision-Date: 2022-02-07 18:17+0800\n"
+"POT-Creation-Date: 2023-02-05 13:50+0000\n"
+"PO-Revision-Date: 2023-09-02 10:59+0800\n"
 "Last-Translator: lumingzh <lumingzh@qq.com>\n"
 "Language-Team: Chinese - China <i18n-zh@googlegroups.com>\n"
 "Language: zh_CN\n"
@@ -18,10 +18,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
-"X-Generator: Gtranslator 41.0\n"
+"X-Generator: Gtranslator 42.0\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
-#: data/org.gnome.Keysign.raw.appdata.xml:11
+#: data/org.gnome.Keysign.raw.appdata.xml:14
 msgid ""
 "\n"
 "      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
@@ -32,7 +32,7 @@ msgstr ""
 "      GNOME Keysign 让您通过本地网络或蓝牙轻松、安全地签署 OpenPGP 密钥。\n"
 "    "
 
-#: data/org.gnome.Keysign.raw.appdata.xml:15
+#: data/org.gnome.Keysign.raw.appdata.xml:21
 msgid ""
 "\n"
 "      It can scan another key's barcode and transfer the key securely,\n"
@@ -79,7 +79,7 @@ msgstr "发送"
 msgid "Receive"
 msgstr "接收"
 
-#: keysign/app.ui:62 keysign/send.ui:55
+#: keysign/app.ui:62 keysign/send.ui:1003
 msgid "Internet"
 msgstr "互联网"
 
@@ -135,7 +135,7 @@ msgstr ""
 msgid "Press Enter to exit"
 msgstr "按 Enter 键退出"
 
-#: keysign/bluetoothreceive.py:134
+#: keysign/bluetoothreceive.py:135
 msgid "Trying to download the key, please wait"
 msgstr "正在尝试下载密钥，请稍候"
 
@@ -254,7 +254,7 @@ msgstr "签署密钥"
 msgid "Select file for saving"
 msgstr "选择要保存的文件"
 
-#: keysign/receive.ui:53
+#: keysign/receive.ui:56
 msgid ""
 "No GNOME Keysign servers around :-(\n"
 "Find a friend to use GNOME Keysign with.\n"
@@ -281,7 +281,7 @@ msgstr "<b>摄像头</b>"
 msgid "Integrated Web Cam"
 msgstr "集成网络摄像头"
 
-#: keysign/receive.ui:179 keysign/send.ui:673
+#: keysign/receive.ui:179 keysign/send.ui:609
 msgid "<b>Security Code</b>"
 msgstr "<b>安全代码</b>"
 
@@ -298,11 +298,10 @@ msgid "Key download was interrupted!"
 msgstr "密钥下载已中断！"
 
 #: keysign/receive.ui:346
-#| msgid "Display more details for the error."
 msgid "Show details about the error"
 msgstr "显示该错误详情"
 
-#: keysign/receive.ui:379
+#: keysign/receive.ui:381
 msgid ""
 "Error producing certifications ☹\n"
 "Something went wrong. Sometime, the passphrase was not correctly entered.\n"
@@ -323,7 +322,7 @@ msgid ""
 "keyring"
 msgstr "将生成的证书的临时版本导入到本地密钥环中"
 
-#: keysign/receive.ui:485
+#: keysign/receive.ui:487
 msgid ""
 "Successfully produced certifications.\n"
 "You can import a temporary signature to start using the key as if it had "
@@ -340,11 +339,11 @@ msgstr ""
 msgid "Key"
 msgstr "密钥"
 
-#: keysign/receive.ui:574 keysign/send.ui:598
+#: keysign/receive.ui:574 keysign/send.ui:534
 msgid "UIDs"
 msgstr "UID"
 
-#: keysign/receive.ui:651
+#: keysign/receive.ui:652
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
@@ -361,34 +360,17 @@ msgstr "确认(_O)"
 msgid "Signing the following UIDs:"
 msgstr "正在签署下列 UID："
 
-#: keysign/send.py:218
+#: keysign/send.py:251
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
 msgstr "仍在尝试获取互联网连接。连接似乎很慢或不可用。"
 
-#: keysign/send.py:224
+#: keysign/send.py:257
 msgid "There isn't an Internet connection!"
 msgstr "没有互联网连接！"
 
-#: keysign/send.py:280 keysign/send.ui:783
-msgid ""
-"Key successfully sent.\n"
-"You should receive soon an email with the signature."
-msgstr ""
-"密钥发送成功。\n"
-"您不久后会收到带有签名的电子邮件。"
-
-#: keysign/send.py:285
-msgid ""
-"Could not establish a secure connection.\n"
-"Either your partner has entered a wrong code or someone tried to intercept "
-"your connection"
-msgstr ""
-"无法建立安全连接。\n"
-"您的伙伴可能输入了错误的代码，或者某个人试图拦截您的连接"
-
-#: keysign/send.py:289
+#: keysign/send.py:348
 #, python-format
 msgid ""
 "An unexpected error occurred:\n"
@@ -401,15 +383,7 @@ msgstr ""
 msgid "Select and send key"
 msgstr "选择并发送密钥"
 
-#: keysign/send.ui:13
-msgid "Select and Send key"
-msgstr "选择并发送密钥"
-
-#: keysign/send.ui:53
-msgid "Also use the Internet to transfer the certificate"
-msgstr "并使用互联网传输该证书"
-
-#: keysign/send.ui:122
+#: keysign/send.ui:59
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
@@ -417,59 +391,90 @@ msgstr ""
 "您没有任何密钥！\n"
 "请使用例如 Seahorse 等软件创建一个密钥。"
 
-#: keysign/send.ui:199
+#: keysign/send.ui:135
 msgid "Very slow or no Internet connection!"
 msgstr "非常慢或没有互联网连接！"
 
-#: keysign/send.ui:268
+#: keysign/send.ui:204 keysign/send.ui:751
 msgid "The signature has been successfully imported!"
 msgstr "已成功导入签名！"
 
-#: keysign/send.ui:294
+#: keysign/send.ui:230 keysign/send.ui:777
 msgid ""
 "Returns the received certification back to the sender, so that the sender "
 "can make use of your OpenPGP certificate"
 msgstr "将接收的证书返回给发件人，以便发件人可以使用您的 openPGP 证书"
 
-#: keysign/send.ui:341
+#: keysign/send.ui:277 keysign/send.ui:822
 msgid "Display more details for the error."
 msgstr "显示关于错误的更多信息。"
 
-#: keysign/send.ui:372
+#: keysign/send.ui:308 keysign/send.ui:853
 msgid "An error occurred while trying to import the signature."
 msgstr "尝试导入签名时出错。"
 
 #. This refers to the key being certified by someone rather than the key used for
 #. certifying someone
-#: keysign/send.ui:427
+#: keysign/send.ui:363
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>选择要签署的密钥</b>"
 
-#: keysign/send.ui:443
+#: keysign/send.ui:379
 msgid "<small>Times signed</small>"
 msgstr "<small>签署时间</small>"
 
-#: keysign/send.ui:510
+#: keysign/send.ui:446
 msgid "Keylist"
 msgstr "密钥列表"
 
-#: keysign/send.ui:530
+#: keysign/send.ui:466
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
 msgstr "<small>要签署密钥，另一个人必须输入安全代码，或扫描二维码</small>"
 
-#: keysign/send.ui:557
+#: keysign/send.ui:493
 msgid "<b>Key Details</b>"
 msgstr "<b>密钥详细信息</b>"
 
-#: keysign/send.ui:582
+#: keysign/send.ui:518
 msgid "Fingerprint"
 msgstr "指纹"
 
-#: keysign/send.ui:736
+#: keysign/send.ui:672
 msgid "<b>QR Code</b>"
 msgstr "<b>二维码</b>"
+
+#: keysign/send.ui:897
+msgid ""
+"Could not establish a secure connection.\n"
+"Either your partner has entered a wrong code or someone tried to intercept "
+"your connection."
+msgstr ""
+"无法建立安全连接。\n"
+"可能您的伙伴输入了错误的代码或有人试图拦截您的连接。"
+
+#: keysign/send.ui:915
+msgid ""
+"Key successfully sent.\n"
+"You should receive an email with the signature soon.\n"
+"You can drag and drop the email here to import your certification."
+msgstr ""
+"密钥发送成功。\n"
+"您应该很快会收到带有签名的电子邮件。\n"
+"您可以将邮件拖拽到这里来导入您的证书。"
+
+#: keysign/send.ui:932
+msgid "An unexpected error occurred."
+msgstr "发生了意外错误。"
+
+#: keysign/send.ui:961
+msgid "Select and Send key"
+msgstr "选择并发送密钥"
+
+#: keysign/send.ui:1001
+msgid "Also use the Internet to transfer the certificate"
+msgstr "并使用互联网传输该证书"
 
 #: keysign/util.py:231
 msgid ""
