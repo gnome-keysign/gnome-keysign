@@ -31,6 +31,10 @@ from .util import mac_verify
 log = logging.getLogger(__name__)
 
 
+class BluetoothError(OSError):
+    pass
+
+
 class BluetoothReceive:
     def __init__(self, port=3, size=1024):
         self.port = port
