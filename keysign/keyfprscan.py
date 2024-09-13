@@ -22,7 +22,7 @@ import logging
 import os
 
 import gi
-gi.require_version('Gtk', '3.0')
+gi.require_version('Gtk', '4.0')
 gi.require_version('Gst', '1.0')
 
 from gi.repository import Gtk, Gst, GdkPixbuf
@@ -46,7 +46,7 @@ log = logging.getLogger(__name__)
 
 
 
-class KeyFprScanWidget(Gtk.VBox):
+class KeyFprScanWidget(Gtk.Box):
     """A widget for obtaining a key fingerprint.
 
     The fingerprint can be obtain by inserting it into
@@ -71,22 +71,22 @@ class KeyFprScanWidget(Gtk.VBox):
     def __init__(self, builder=None):
         log.debug("Init KFSW %r %r", self, builder)
         if issubclass(self.__class__, object):
-            super(KeyFprScanWidget, self).__init__()
+            super(KeyFprScanWidget, self).__init__(orientation=Gtk.Orientation.VERTICAL)
         else:
-            Gtk.VBox.__init__(self)
+            Gtk.Box.__init__(self, orientation=Gtk.Orientation.VERTICAL)
         log.debug("Inited parent KFSW %r", self)
 
         widget_name = 'scanner_widget'
         if not builder:
             thisdir = os.path.dirname(os.path.abspath(__file__))
             builder = Gtk.Builder()
-            builder.add_objects_from_file(os.path.join(thisdir, 'receive.ui'),
+            builder.add_objects_from_file(os.path.join(thisdir, 'receive4.ui'),
                 [widget_name])
         widget = builder.get_object(widget_name)
         parent = widget.get_parent()
         if parent:
             parent.remove(widget)
-        self.add(widget)
+        self.append(widget)
         
 
         self.scanner = builder.get_object("scanner")
@@ -98,7 +98,7 @@ class KeyFprScanWidget(Gtk.VBox):
         reader = BarcodeReaderGTK()
         reader.set_size_request(150,150)
         reader.connect('barcode', self.on_barcode)
-        self.scanner.add(reader)
+        self.scanner.append(reader)
         # We keep a reference here to not "lose" the object.
         # If we don't, Gtk crashes. With a segfault. Probably
         # because the object is freed but still used.
@@ -142,9 +142,8 @@ class KeyScanApp(Gtk.Application):
             self.scanwidget = KeyFprScanWidget()
         self.scanwidget.connect('changed', self.on_text_changed)
         self.scanwidget.connect('barcode', self.on_barcode)
-        window.add(self.scanwidget)
-
-        window.show_all()
+        window.set_child(self.scanwidget)
+        window.present()
         self.add_window(window)
 
     def on_text_changed(self, keyFprScanWidget, entryObject, *args):

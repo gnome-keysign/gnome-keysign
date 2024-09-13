@@ -1,0 +1,469 @@
+<?xml version='1.0' encoding='utf-8'?>
+<interface>
+  <requires lib="gtk" version="4.0" />
+  <object class="GtkImage" id="confirm-button-image">
+    </object>
+  <object class="GtkStack" id="receive_stack">
+    <property name="transition-type">slide-left-right</property>
+    <child>
+      <object class="GtkStackPage">
+        <property name="name">scanner</property>
+        <property name="title" translatable="1">Scan Barcode</property>
+        <property name="child">
+          <object class="GtkBox" id="box20">
+            <property name="name">scanner</property>
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkInfoBar" id="infobar_discovery">
+                <property name="visible">0</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="spacing">6</property>
+                    <child>
+                      <placeholder />
+                    </child>
+                    <child>
+                      <placeholder />
+                    </child>
+                    <child>
+                      <placeholder />
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">0</property>
+                    <property name="spacing">16</property>
+                    <child>
+                      <object class="GtkLabel" id="infobar_discover">
+                        <property name="label" translatable="1">No GNOME Keysign servers around :-(
+Find a friend to use GNOME Keysign with.
+You may also suffer from connectivity problems.
+For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/NoServers/1"&gt;the documentation&lt;/a&gt;.</property>
+                        <property name="use-markup">1</property>
+                      </object>
+                    </child>
+                    <child>
+                      <placeholder />
+                    </child>
+                    <child>
+                      <placeholder />
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <placeholder />
+                </child>
+              </object>
+            </child>
+            <child>
+              <placeholder />
+            </child>
+            <child>
+              <object class="GtkBox" id="scanner_widget">
+                <property name="vexpand">1</property>
+                <property name="margin-start">100</property>
+                <property name="margin-end">100</property>
+                <property name="margin-top">10</property>
+                <property name="margin-bottom">5</property>
+                <property name="orientation">vertical</property>
+                <property name="spacing">6</property>
+                <child>
+                  <placeholder />
+                </child>
+                <child>
+                  <object class="GtkLabel" id="label30">
+                    <property name="label" translatable="1">&lt;small&gt;To sign someone's key, scan their QR or enter security code&lt;/small&gt;</property>
+                    <property name="use-markup">1</property>
+                    <property name="xalign">0</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox" id="box40">
+                    <property name="spacing">20</property>
+                    <child>
+                      <object class="GtkLabel" id="label40">
+                        <property name="label" translatable="1">&lt;b&gt;Camera&lt;/b&gt;</property>
+                        <property name="use-markup">1</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkComboBoxText" id="comboboxtext1">
+                        <property name="hexpand">1</property>
+                        <property name="active">0</property>
+                        <items>
+                          <item id="0" translatable="yes">Integrated Web Cam</item>
+                        </items>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox" id="scanner">
+                    <property name="vexpand">1</property>
+                    <property name="orientation">vertical</property>
+                    <child>
+                      <placeholder />
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="label50">
+                    <property name="halign">start</property>
+                    <property name="label" translatable="1">&lt;b&gt;Security Code&lt;/b&gt;</property>
+                    <property name="use-markup">1</property>
+                    <property name="xalign">0</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="fingerprint_entry">
+                    <property name="name">fingerprint_entry</property>
+                    <property name="focusable">1</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkStackPage">
+        <property name="name">page1</property>
+        <property name="title">page1</property>
+        <property name="child">
+          <object class="GtkBox" id="box50">
+            <property name="margin-start">20</property>
+            <property name="margin-end">20</property>
+            <property name="margin-top">10</property>
+            <property name="margin-bottom">10</property>
+            <property name="orientation">vertical</property>
+            <property name="spacing">6</property>
+            <child>
+              <object class="GtkLabel" id="label10">
+                <property name="label" translatable="1">Downloading key-data. Please wait...</property>
+                <attributes>
+                  <attribute name="weight" value="heavy" />
+                </attributes>
+              </object>
+            </child>
+            <child>
+              <object class="GtkSpinner" id="spinner1">
+                <property name="vexpand">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="error_download_label">
+                <property name="visible">0</property>
+                <property name="label" translatable="1">Key download was interrupted!</property>
+                <property name="wrap">1</property>
+                <property name="wrap-mode">char</property>
+                <attributes>
+                  <attribute name="weight" value="heavy" />
+                  <attribute name="foreground" value="#000000000000" />
+                </attributes>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox" id="box60">
+                <child>
+                  <object class="GtkButton" id="cancel_download_button">
+                    <property name="label">gtk-cancel</property>
+                    <property name="focusable">1</property>
+                    <property name="receives-default">1</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton" id="redo_download_button">
+                    <property name="label">gtk-redo</property>
+                    <property name="focusable">1</property>
+                    <property name="receives-default">1</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkStackPage">
+        <property name="name">page2</property>
+        <property name="title">page2</property>
+        <property name="child">
+          <object class="GtkBox" id="keyconfirmbox">
+            <property name="name">Confirm Signing Key</property>
+            <property name="margin-start">20</property>
+            <property name="margin-end">20</property>
+            <property name="margin-top">10</property>
+            <property name="margin-bottom">10</property>
+            <property name="orientation">vertical</property>
+            <property name="spacing">6</property>
+            <child>
+              <object class="GtkInfoBar" id="infobar_certifications_errors">
+                <property name="visible">0</property>
+                <property name="message-type">error</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="spacing">6</property>
+                    <child>
+                      <object class="GtkButton" id="btn_show_error_details">
+                        <property name="label">gtk-help</property>
+                        <property name="focusable">1</property>
+                        <property name="receives-default">1</property>
+                        <property name="tooltip-text" translatable="1">Show details about the error</property>
+                      </object>
+                    </child>
+                    <child>
+                      <placeholder />
+                    </child>
+                    <child>
+                      <placeholder />
+                    </child>
+                    <child>
+                      <placeholder />
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">0</property>
+                    <property name="spacing">16</property>
+                    <child>
+                      <object class="GtkLabel" id="infobar_discover2">
+                        <property name="focusable">1</property>
+                        <property name="label" translatable="1">Error producing certifications ☹
+Something went wrong. Sometime, the passphrase was not correctly entered.
+You may try again by clicking the "confirm" button.</property>
+                        <property name="use-markup">1</property>
+                      </object>
+                    </child>
+                    <child>
+                      <placeholder />
+                    </child>
+                    <child>
+                      <placeholder />
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <placeholder />
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkInfoBar" id="infobar_certifications_produced">
+                <property name="visible">0</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="spacing">6</property>
+                    <child>
+                      <object class="GtkButton" id="btn_local_import_save_as">
+                        <property name="label">gtk-save-as</property>
+                        <property name="focusable">1</property>
+                        <property name="receives-default">1</property>
+                        <property name="tooltip-text" translatable="1">Saves the produced certifications as separate files in a custom directory</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="btn_local_import">
+                        <property name="label">gtk-jump-to</property>
+                        <property name="focusable">1</property>
+                        <property name="receives-default">1</property>
+                        <property name="tooltip-text" translatable="1">Imports a temporary version of the produced certifications into the local keyring</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="btn_upload">
+                        <property name="visible">0</property>
+                        <property name="label">gtk-go-up</property>
+                        <property name="focusable">1</property>
+                        <property name="receives-default">1</property>
+                      </object>
+                    </child>
+                    <child>
+                      <placeholder />
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">0</property>
+                    <property name="spacing">16</property>
+                    <child>
+                      <object class="GtkLabel" id="infobar_discover1">
+                        <property name="label" translatable="1">Successfully produced certifications.
+You can import a temporary signature to start using the key as if it had already been properly verified.
+For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/ProducedSignatures/1"&gt;the documentation&lt;/a&gt;.</property>
+                        <property name="use-markup">1</property>
+                      </object>
+                    </child>
+                    <child>
+                      <placeholder />
+                    </child>
+                    <child>
+                      <placeholder />
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <placeholder />
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="vexpand">1</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="vexpand">1</property>
+                    <property name="margin-top">15</property>
+                    <property name="margin-bottom">2</property>
+                    <property name="spacing">3</property>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkLabel" id="label80">
+                            <property name="halign">start</property>
+                            <property name="label" translatable="1">Key</property>
+                            <property name="xalign">0</property>
+                            <attributes>
+                              <attribute name="weight" value="bold" />
+                            </attributes>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="key_ids_label">
+                            <property name="width-request">200</property>
+                            <property name="label">23FD 347A 4194 29BA CCD5 E72D 6BC4 7780 54AC D246</property>
+                            <property name="selectable">1</property>
+                            <property name="xalign">0</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="label90">
+                            <property name="halign">start</property>
+                            <property name="margin-top">5</property>
+                            <property name="label" translatable="1">UIDs</property>
+                            <property name="xalign">0</property>
+                            <attributes>
+                              <attribute name="weight" value="bold" />
+                            </attributes>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="uids_label">
+                            <property name="label">Zulu Test &lt;foo@example.com&gt;
+Alpha Bar &lt;example@example.com&gt;</property>
+                            <property name="selectable">1</property>
+                            <property name="xalign">0</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkBox" id="imagebox">
+                        <property name="hexpand">1</property>
+                        <property name="width-request">200</property>
+                        <property name="height-request">200</property>
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkImage" id="image">
+                            <property name="width-request">200</property>
+                            <property name="height-request">200</property>
+                            <property name="valign">end</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="label70">
+                    <property name="label" translatable="1">To sign the key, confirm that you want to sign the following key.
+This will generate an email that must be sent in order to complete the signing process.</property>
+                    <property name="wrap">1</property>
+                    <property name="xalign">0</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox" id="box30">
+                <property name="spacing">6</property>
+                <child>
+                  <object class="GtkButton" id="confirm_sign_button">
+                    <property name="label" translatable="1">C_onfirm</property>
+                    <property name="name">confirm_button</property>
+                    <property name="focusable">1</property>
+                    <property name="receives-default">1</property>
+                    <property name="use-underline">1</property>
+                    <accessibility>
+                      </accessibility>
+                    <style>
+                      <class name="suggested-action" />
+                    </style>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkStackPage">
+        <property name="name">page3</property>
+        <property name="title">page3</property>
+        <property name="child">
+          <object class="GtkBox" id="box70">
+            <property name="margin-start">20</property>
+            <property name="margin-end">20</property>
+            <property name="margin-top">10</property>
+            <property name="margin-bottom">10</property>
+            <property name="orientation">vertical</property>
+            <property name="spacing">6</property>
+            <child>
+              <placeholder />
+            </child>
+            <child>
+              <object class="GtkLabel" id="uids_signed_label" />
+            </child>
+            <child>
+              <object class="GtkSpinner" id="spinner2">
+                <property name="vexpand">1</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="succes_fail_signing_label">
+                <property name="visible">0</property>
+                <attributes>
+                  <attribute name="weight" value="heavy" />
+                  <attribute name="foreground" value="#000000000000" />
+                </attributes>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox" id="box90">
+                <child>
+                  <object class="GtkButton" id="cancel_signing_button">
+                    <property name="label">gtk-cancel</property>
+                    <property name="focusable">1</property>
+                    <property name="receives-default">1</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkLabel" id="label20">
+                <property name="label" translatable="1">Signing the following UIDs:</property>
+              </object>
+            </child>
+          </object>
+        </property>
+      </object>
+    </child>
+  </object>
+</interface>

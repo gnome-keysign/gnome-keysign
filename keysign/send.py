@@ -11,7 +11,7 @@ except ImportError:
     from urllib import unquote
 
 import gi
-gi.require_version('Gtk', '3.0')
+gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk
 from gi.repository import GLib
 from gi.repository import Gdk
@@ -72,7 +72,7 @@ class SendApp:
 
         ui_file_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "send.ui")
+            "send4.ui")
         if not builder:
             builder = Gtk.Builder()
             builder.add_objects_from_file(ui_file_path, ["send_stack"])
@@ -82,7 +82,10 @@ class SendApp:
         self.klw = klw
 
         stack = builder.get_object("send_stack")
-        stack.add(klw)
+        if hasattr(stack, 'add_child'):
+            stack.add_child(klw)
+        else:
+            stack.add(klw)
         self.stack = stack
 
         # This is a dirty hack :-/
@@ -106,21 +109,9 @@ class SendApp:
         self.notify = None
         self.internet_option = False
 
-        # Add drag and drop to the keys list widget
-        builder.connect_signals(self)
         self.label = builder.get_object("keys_listbox")
-        self.label.drag_dest_set(Gtk.DestDefaults.ALL, [], DRAG_ACTION)
-        self.label.drag_dest_set_target_list(None)
-        self.label.drag_dest_add_text_targets()
-        self.label.drag_dest_add_uri_targets()
 
-        self.rb.connect('drag-data-received', self.on_rb_drag_data_received)
-        # We should probably only accept drag data when we have successfully sent the key.
-        # Now we're unconditionally accepting drags.
-        self.rb.drag_dest_set(Gtk.DestDefaults.ALL, [], DRAG_ACTION)
-        self.rb.drag_dest_set_target_list(None)
-        self.rb.drag_dest_add_text_targets()
-        self.rb.drag_dest_add_uri_targets()
+        self.rb.connect('unmap', self.on_resultbox_unmapped)
         self.rb_import_okay = builder.get_object('rb_infobar_import_okay')
         self.rb_button_ib_return_signature = builder.get_object('rb_return_signature')
         self.rb_import_error = builder.get_object('rb_infobar_import_error')
@@ -412,6 +403,10 @@ class SendApp:
             self.offer.stop()
             self.offer = None
             log.debug("Stopped network services")
+
+
+    def on_resultbox_unmapped(self, rb):
+        log.debug("Resultbox disappears %r", rb)
 
 
 

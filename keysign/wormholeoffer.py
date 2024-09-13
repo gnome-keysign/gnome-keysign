@@ -26,9 +26,7 @@ from builtins import input
 from wormhole.cli.public_relay import RENDEZVOUS_RELAY
 from wormhole.errors import TransferError, ServerConnectionError, WrongPasswordError, LonelyError
 import wormhole
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+
 if __name__ == "__main__":
     from twisted.internet import gtk3reactor
     gtk3reactor.install()

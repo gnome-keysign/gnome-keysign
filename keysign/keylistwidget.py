@@ -4,7 +4,8 @@ import logging
 import os
 
 import gi
-gi.require_version('Gtk', '3.0')
+gi.require_version('Gtk', '4.0')
+#gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GObject  # for __gsignals__
 from gi.repository import GLib  # for markup_escape_text
@@ -36,7 +37,7 @@ class ListBoxRowWithKey(Gtk.ListBoxRow):
 
         s = self.format(key)
         label = Gtk.Label(label=s, use_markup=True, xalign=0)
-        self.add(label)
+        self.set_child(label)
 
     @staticmethod
     def glib_markup_escape_text_to_text(s):
@@ -90,7 +91,7 @@ class ListBoxRowWithKey(Gtk.ListBoxRow):
         return s
 
 
-class KeyListWidget(Gtk.HBox):
+class KeyListWidget(Gtk.Box):
     """A Gtk Widget representing a list of OpenPGP Keys
     
     It shows the keys you provide in a ListBox and emits a
@@ -126,13 +127,13 @@ class KeyListWidget(Gtk.HBox):
         if not builder:
             builder = Gtk.Builder()
             builder.add_objects_from_file(
-                os.path.join(thisdir, 'send.ui'),
+                os.path.join(thisdir, 'send4.ui'),
                 [widget_name])
         widget = builder.get_object(widget_name)
         old_parent = widget.get_parent()
         if old_parent:
             old_parent.remove(widget)
-        self.add(widget)
+        self.append(widget)
 
         self.listbox = builder.get_object("keys_listbox")
         self.code_spinner = builder.get_object("code_spinner")
@@ -159,13 +160,13 @@ class KeyListWidget(Gtk.HBox):
             infobar = builder.get_object("infobar")
             infobar.show()
             l = Gtk.Label("You don't have any OpenPGP keys")
-            self.listbox.add(l)
+            self.listbox.append(l)
         else:
             for key in keys:
                 self.log.debug("Adding key: %r", key)
                 lbr = ListBoxRowWithKey(key)
                 lbr.props.margin_bottom = 5
-                self.listbox.add(lbr)
+                self.listbox.append(lbr)
             self.listbox.connect('row-activated', self.on_row_activated)
             self.listbox.connect('row-selected', self.on_row_selected)
 
@@ -186,20 +187,20 @@ class App(Gtk.Application):
         self.kpw = None
 
     def on_activate(self, app):
-        window = Gtk.ApplicationWindow()
+        window = Gtk.ApplicationWindow(application=app)
         window.set_title("Key List")
 
         if not self.kpw:
             self.kpw = KeyListWidget(get_usable_keys())
         self.kpw.connect('key-activated', self.on_key_activated)
         self.kpw.connect('key-selected', self.on_key_selected)
-        window.add(self.kpw)
+        window.set_child(self.kpw)
 
-        window.show_all()
+        window.present()
         self.add_window(window)
 
     def on_key_activated(self, keylistwidget, row):
-        self.get_windows()[0].get_window().beep()
+        self.get_windows()[0].get_display().beep()
         print ("Row activated! %r" % (row,))
 
     def on_key_selected(self, keylistwidget, row):

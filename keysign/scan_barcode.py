@@ -24,7 +24,8 @@ import sys
 import gi
 gi.require_version('Gst', '1.0')
 gi.require_version('GstVideo', '1.0')
-gi.require_version('Gtk', '3.0')
+gi.require_version('Gtk', '4.0')
+gi.require_version('Gdk', '4.0')
 from gi.repository import GObject
 from gi.repository import Gst
 from gi.repository import Gtk, GLib
@@ -301,8 +302,12 @@ class ScalingImage(Gtk.DrawingArea):
         #self.set_property("width_request", 400)
         #self.set_property("height_request", 400)
         #self.set_property("margin", 10)
-        self.set_property("expand", True)
+        self.set_hexpand(True)
+        self.set_vexpand(True)
+        self.set_draw_func(self.draw_func, None)
     
+    def draw_func(self, drawing_area, cr, width, height, user_data):
+        self.do_draw(cr, widget_width=width, widget_height=height)
     
     def set_from_pixbuf(self, pixbuf):
         self.pixbuf = pixbuf
@@ -314,7 +319,7 @@ class ScalingImage(Gtk.DrawingArea):
 #        log.debug("w: %r  h: %r",  allocation.width, allocation.height)
 #        self.queue_draw()
 
-    def do_draw(self, cr, pixbuf=None):
+    def do_draw(self, cr, pixbuf=None, widget_width=None, widget_height=None):
         log.debug('Drawing ScalingImage! %r', self)
         pixbuf = pixbuf or self.pixbuf
         if not pixbuf:
@@ -328,9 +333,10 @@ class ScalingImage(Gtk.DrawingArea):
     
     
             # Scale the pixbuf down to whatever space we have
-            allocation = self.get_allocation()
-            widget_width = allocation.width
-            widget_height = allocation.height
+            if widget_width is None or widget_height is None:
+                allocation = self.get_allocation()
+                widget_width = allocation.width
+                widget_height = allocation.height
             
             
             # I think we might not need this calculation

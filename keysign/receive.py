@@ -24,7 +24,7 @@ import sys
 from textwrap import dedent
 
 import gi
-gi.require_version('Gtk', '3.0')
+gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk, GLib
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
@@ -75,7 +75,7 @@ class ReceiveApp:
         if not builder:
             ui_file = os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
-                "receive.ui")
+                "receive4.ui")
             builder = Gtk.Builder()
             builder.add_objects_from_file(ui_file,
                 [widget_name, 'confirm-button-image'])
@@ -93,7 +93,7 @@ class ReceiveApp:
             old_scanner_parent.remove(old_scanner)
             # Hm. If we don't have an old parent, we never get to see
             # the newly created scanner. Weird.
-            old_scanner_parent.add(scanner)
+            old_scanner_parent.append(scanner)
 
         receive_stack = builder.get_object(widget_name)
         # It needs to be show()n so that it can be made visible
