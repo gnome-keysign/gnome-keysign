@@ -4,9 +4,7 @@
 # Main configuration is in pyproject.toml
 
 from setuptools import setup
-from setuptools.command.build_py import build_py
 from distutils.command.build import build
-import os
 
 
 class BuildWithCompile(build):
