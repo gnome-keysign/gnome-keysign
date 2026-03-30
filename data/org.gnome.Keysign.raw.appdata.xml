@@ -6,7 +6,9 @@
   <project_license>GPL-3.0+</project_license>
   <name>Keysign</name>
   <summary>OpenPGP Keysigning helper</summary>
-  
+  <developer id="online.tobias-mueller">
+    <name>Tobias Mueller</name>
+  </developer>
   <description>
     <p translatable="yes">
       GNOME Keysign allows signing OpenPGP keys comfortably and securely
