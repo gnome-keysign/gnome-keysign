@@ -1,5 +1,4 @@
 import logging
-from bluetooth import BluetoothSocket, RFCOMM, PORT_ANY
 import dbus
 import select
 import socket
@@ -80,8 +79,10 @@ class BluetoothOffer:
         """Acquires and returns a string suitable for finding the key via Bluetooth.
         Returns None if no powered on adapter could be found."""
         bt_data = None
+        log.debug("BT: Allocating code for %s", self.key)
         try:
             code = yield threads.deferToThread(get_local_bt_address)
+            log.debug("local addr: %s", code)
             code = code.upper()
         except NoBluezDbus as e:
             log.debug("Bluetooth service seems to be unavailable: %s", e)
@@ -90,9 +91,12 @@ class BluetoothOffer:
         except UnpoweredAdapter as e:
             log.debug("Bluetooth adapter is turned off: %s", e)
         else:
+            log.info("yo")
             if self.server_socket is None:
-                self.server_socket = BluetoothSocket(RFCOMM)
+                log.info("yo")
+                self.server_socket = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
                 # We create a bind with the Bluetooth address we have in the system
+                PORT_ANY = 0
                 self.server_socket.bind((code, PORT_ANY))
                 # Number of unaccepted connections that the system will allow before refusing new connections
                 backlog = 1
@@ -101,6 +105,8 @@ class BluetoothOffer:
             port = self.server_socket.getsockname()[1]
             log.info("BT Code: %s %s", code, port)
             bt_data = "BT={0};PT={1}".format(code, port)
+
+        log.info("BT return code: %s", bt_data)
         returnValue(bt_data)
 
     def stop(self):
@@ -114,6 +120,10 @@ class BluetoothOffer:
 
 def main(args):
     if not args:
+        log.info("Usable keys: %s", get_usable_keys())
+        print ("Usable keys:")
+        for k in get_usable_keys()[:50]:
+            print ("%s" % k.fingerprint)
         raise ValueError(_("You must provide an argument to identify the key"))
 
     def code_generated(data):
@@ -152,6 +162,7 @@ def main(args):
     hmac = mac_generate(key.fingerprint.encode('ascii'), file_key_data)
     offer = BluetoothOffer(key)
 
+    log.info("Running...")
     offer.allocate_code().addCallback(code_generated)
     reactor.run()
 

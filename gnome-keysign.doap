@@ -11,9 +11,7 @@ It exchanges a key directly between two instances of the app and
 follows best practices when producing and sending the signatures.
 </description>
   <homepage rdf:resource="https://wiki.gnome.org/Apps/Keysign" />
-  <!-- 
-       mailing-list rdf:resource="https://mail.gnome.org/mailman/listinfo/YOUR_MAILINGLIST"
-  / -->
+  <support-forum rdf:resource="https://discourse.gnome.org/c/applications/7" />
   <download-page rdf:resource="https://gitlab.gnome.org/GNOME/gnome-keysign/tags" />
   <bug-database rdf:resource="https://gitlab.gnome.org/GNOME/gnome-keysign/issues" />
   <!-- <category rdf:resource="http://api.gnome.org/doap-extensions#deprecated" /> -->

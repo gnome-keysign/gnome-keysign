@@ -7,20 +7,21 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2021-04-15 09:07+0000\n"
-"PO-Revision-Date: 2021-05-05 13:59+0200\n"
-"Last-Translator: Florentina Mușat <florentina.musat.28@gmail.com>\n"
+"POT-Creation-Date: 2023-02-05 13:50+0000\n"
+"PO-Revision-Date: 2023-10-21 14:48+0300\n"
+"Last-Translator: Florentina Mușat <florentina [dot] musat [dot] 28 [at] "
+"gmail [dot] com>\n"
 "Language-Team: Romanian <gnomero-list@lists.sourceforge.net>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.6.0\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2);;\n"
-"X-Generator: Poedit 2.4.2\n"
+"Generated-By: Babel 2.6.0\n"
+"X-Generator: Poedit 3.4\n"
 
-#: data/org.gnome.Keysign.raw.appdata.xml:11
+#: data/org.gnome.Keysign.raw.appdata.xml:14
 msgid ""
 "\n"
 "      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
@@ -33,7 +34,7 @@ msgstr ""
 "      via rețelei locale sau Bluetooth.\n"
 "    "
 
-#: data/org.gnome.Keysign.raw.appdata.xml:15
+#: data/org.gnome.Keysign.raw.appdata.xml:21
 msgid ""
 "\n"
 "      It can scan another key's barcode and transfer the key securely,\n"
@@ -86,7 +87,7 @@ msgstr "Trimite"
 msgid "Receive"
 msgstr "Primește"
 
-#: keysign/app.ui:62 keysign/send.ui:55
+#: keysign/app.ui:62 keysign/send.ui:1003
 msgid "Internet"
 msgstr "Internet"
 
@@ -142,7 +143,7 @@ msgstr ""
 msgid "Press Enter to exit"
 msgstr "Apăsați Enter pentru a ieși"
 
-#: keysign/bluetoothreceive.py:134
+#: keysign/bluetoothreceive.py:135
 msgid "Trying to download the key, please wait"
 msgstr "Se încearcă să se descarce cheia, așteptați"
 
@@ -238,7 +239,7 @@ msgstr ""
 "\n"
 "            Dați acestui raport un scurt titlu descriptiv.\n"
 "            Utilizați ceva precum\n"
-"            „{funcționalitate-care-s-a-defectat}: {ce-a-mers-greșit}”\n"
+"            „{feature-that-broke}: {what-went-wrong}”\n"
 "            pentru titlu, dacă puteți.\n"
 "            Apoi înlocuiți acest text\n"
 "            cu o descriere mai lungă a defecțiunii.\n"
@@ -267,7 +268,7 @@ msgstr "Semnează cheia"
 msgid "Select file for saving"
 msgstr "Selectează fișierul pentru salvare"
 
-#: keysign/receive.ui:53
+#: keysign/receive.ui:56
 msgid ""
 "No GNOME Keysign servers around :-(\n"
 "Find a friend to use GNOME Keysign with.\n"
@@ -296,7 +297,7 @@ msgstr "<b>Camera</b>"
 msgid "Integrated Web Cam"
 msgstr "Cameră web integrată"
 
-#: keysign/receive.ui:179 keysign/send.ui:673
+#: keysign/receive.ui:179 keysign/send.ui:609
 msgid "<b>Security Code</b>"
 msgstr "<b>Cod de securitate</b>"
 
@@ -316,7 +317,7 @@ msgstr "Descărcarea cheii a fost întreruptă!"
 msgid "Show details about the error"
 msgstr "Afișează detalii pentru eroare"
 
-#: keysign/receive.ui:379
+#: keysign/receive.ui:381
 msgid ""
 "Error producing certifications ☹\n"
 "Something went wrong. Sometime, the passphrase was not correctly entered.\n"
@@ -340,7 +341,7 @@ msgid ""
 msgstr ""
 "Importă o versiune temporară a certificărilor produce în inelul de chei local"
 
-#: keysign/receive.ui:485
+#: keysign/receive.ui:487
 msgid ""
 "Successfully produced certifications.\n"
 "You can import a temporary signature to start using the key as if it had "
@@ -358,11 +359,11 @@ msgstr ""
 msgid "Key"
 msgstr "Tastă"
 
-#: keysign/receive.ui:574 keysign/send.ui:598
+#: keysign/receive.ui:574 keysign/send.ui:534
 msgid "UIDs"
 msgstr "UID-uri"
 
-#: keysign/receive.ui:651
+#: keysign/receive.ui:652
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
@@ -380,7 +381,7 @@ msgstr "C_onfirmă"
 msgid "Signing the following UIDs:"
 msgstr "Se semnează următoarele UID-uri:"
 
-#: keysign/send.py:218
+#: keysign/send.py:251
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
@@ -388,29 +389,11 @@ msgstr ""
 "Se încearcă încă să se obțină o conexiune la Internet. Se pare că este lentă "
 "sau nedisponibilă."
 
-#: keysign/send.py:224
+#: keysign/send.py:257
 msgid "There isn't an Internet connection!"
 msgstr "Nu există o conexiune la Internet!"
 
-#: keysign/send.py:280 keysign/send.ui:783
-msgid ""
-"Key successfully sent.\n"
-"You should receive soon an email with the signature."
-msgstr ""
-"Cheie trimisă cu succes.\n"
-"Ar trebui să primiți în curând un email cu semnătura."
-
-#: keysign/send.py:285
-msgid ""
-"Could not establish a secure connection.\n"
-"Either your partner has entered a wrong code or someone tried to intercept "
-"your connection"
-msgstr ""
-"Nu s-a putut stabili o conexiune sigură.\n"
-"Ori partenerul dumneavoastră a introdus un cod greșit ori cineva a încercat "
-"să vă intercepteze conexiunea"
-
-#: keysign/send.py:289
+#: keysign/send.py:348
 #, python-format
 msgid ""
 "An unexpected error occurred:\n"
@@ -423,15 +406,7 @@ msgstr ""
 msgid "Select and send key"
 msgstr "Selectați și trimiteți cheia"
 
-#: keysign/send.ui:13
-msgid "Select and Send key"
-msgstr "Selectați și trimiteți cheia"
-
-#: keysign/send.ui:53
-msgid "Also use the Internet to transfer the certificate"
-msgstr "Utilizează de asemenea internetul pentru a transfera certificatul"
-
-#: keysign/send.ui:122
+#: keysign/send.ui:59
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
@@ -439,15 +414,15 @@ msgstr ""
 "Nu aveți nicio cheie!\n"
 "Utilizați, de ex. Seahorse pentru a crea una."
 
-#: keysign/send.ui:199
+#: keysign/send.ui:135
 msgid "Very slow or no Internet connection!"
 msgstr "Conexiune la Internet foarte înceată sau inexistentă!"
 
-#: keysign/send.ui:268
+#: keysign/send.ui:204 keysign/send.ui:751
 msgid "The signature has been successfully imported!"
 msgstr "Semnătura a fost importată cu succes!"
 
-#: keysign/send.ui:294
+#: keysign/send.ui:230 keysign/send.ui:777
 msgid ""
 "Returns the received certification back to the sender, so that the sender "
 "can make use of your OpenPGP certificate"
@@ -455,29 +430,29 @@ msgstr ""
 "Întoarce certificarea primită înapoi la expeditor, pentru ca expeditorul să "
 "vă poată utiliza certificatul OpenPGP"
 
-#: keysign/send.ui:341
+#: keysign/send.ui:277 keysign/send.ui:822
 msgid "Display more details for the error."
 msgstr "Afișează mai multe detalii pentru eroare."
 
-#: keysign/send.ui:372
+#: keysign/send.ui:308 keysign/send.ui:853
 msgid "An error occurred while trying to import the signature."
 msgstr "A apărut o eroare în timpul încercării de importare a semnăturii."
 
 #. This refers to the key being certified by someone rather than the key used for
 #. certifying someone
-#: keysign/send.ui:427
+#: keysign/send.ui:363
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>Selectați o cheie pentru semnare</b>"
 
-#: keysign/send.ui:443
+#: keysign/send.ui:379
 msgid "<small>Times signed</small>"
 msgstr "<small>De câte ori a fost semnată</small>"
 
-#: keysign/send.ui:510
+#: keysign/send.ui:446
 msgid "Keylist"
 msgstr "Listă de chei"
 
-#: keysign/send.ui:530
+#: keysign/send.ui:466
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
@@ -485,17 +460,50 @@ msgstr ""
 "<small>Pentru a avea cheia semnată, cealaltă persoană trebuie să introducă "
 "codul de securitate, sau să scaneze codul QR</small>"
 
-#: keysign/send.ui:557
+#: keysign/send.ui:493
 msgid "<b>Key Details</b>"
 msgstr "<b>Detalii cheie</b>"
 
-#: keysign/send.ui:582
+#: keysign/send.ui:518
 msgid "Fingerprint"
 msgstr "Amprentă"
 
-#: keysign/send.ui:736
+#: keysign/send.ui:672
 msgid "<b>QR Code</b>"
 msgstr "<b>Cod QR</b>"
+
+#: keysign/send.ui:897
+msgid ""
+"Could not establish a secure connection.\n"
+"Either your partner has entered a wrong code or someone tried to intercept "
+"your connection."
+msgstr ""
+"Nu s-a putut stabili o conexiune sigură.\n"
+"Ori partenerul dumneavoastră a introdus un cod greșit ori cineva a încercat "
+"să vă intercepteze conexiunea."
+
+#: keysign/send.ui:915
+msgid ""
+"Key successfully sent.\n"
+"You should receive an email with the signature soon.\n"
+"You can drag and drop the email here to import your certification."
+msgstr ""
+"Cheie trimisă cu succes.\n"
+"Ar trebui să primiți în curând un email cu semnătura.\n"
+"Puteți să trageți și să plasați emailul aici pentru a vă importa "
+"certificarea."
+
+#: keysign/send.ui:932
+msgid "An unexpected error occurred."
+msgstr "A apărut o eroare neașteptată."
+
+#: keysign/send.ui:961
+msgid "Select and Send key"
+msgstr "Selectați și trimiteți cheia"
+
+#: keysign/send.ui:1001
+msgid "Also use the Internet to transfer the certificate"
+msgstr "Utilizează de asemenea internetul pentru a transfera certificatul"
 
 #: keysign/util.py:231
 msgid ""

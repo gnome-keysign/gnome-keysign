@@ -15,8 +15,6 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
-from __future__ import unicode_literals
-
 import base64
 import logging
 import os  # The SigningKeyring uses os.symlink for the agent

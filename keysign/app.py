@@ -65,7 +65,7 @@ from . import gtkexcepthook
 log = logging.getLogger(__name__)
 
 def remove_whitespace(s):
-    cleaned = re.sub('[\s+]', '', s)
+    cleaned = re.sub(r'[\s+]', '', s)
     return cleaned
 
 

@@ -377,7 +377,7 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="label" translatable="yes">Error producing certifications ☹
-Something went wrong. Sometime, the passphrase was not correctly entered.
+Something went wrong. Sometimes, the passphrase was not correctly entered.
 You may try again by clicking the "confirm" button.</property>
                     <property name="use-markup">True</property>
                   </object>

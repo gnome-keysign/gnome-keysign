@@ -1,15 +1,15 @@
 # Polish translation for gnome-keysign.
-# Copyright © 2018-2021 the gnome-keysign authors.
+# Copyright © 2018-2023 the gnome-keysign authors.
 # This file is distributed under the same license as the gnome-keysign package.
-# Piotr Drąg <piotrdrag@gmail.com>, 2018-2021.
-# Aviary.pl <community-poland@mozilla.org>, 2018-2021.
+# Piotr Drąg <piotrdrag@gmail.com>, 2018-2023.
+# Aviary.pl <community-poland@mozilla.org>, 2018-2023.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2021-04-15 09:07+0000\n"
-"PO-Revision-Date: 2021-04-18 12:25+0200\n"
+"POT-Creation-Date: 2023-02-05 13:50+0000\n"
+"PO-Revision-Date: 2023-02-05 14:55+0100\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2);\n"
 
-#: data/org.gnome.Keysign.raw.appdata.xml:11
+#: data/org.gnome.Keysign.raw.appdata.xml:14
 msgid ""
 "\n"
 "      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
@@ -32,7 +32,7 @@ msgstr ""
 "      OpenPGP przez sieć lokalną lub Bluetooth.\n"
 "    "
 
-#: data/org.gnome.Keysign.raw.appdata.xml:15
+#: data/org.gnome.Keysign.raw.appdata.xml:21
 msgid ""
 "\n"
 "      It can scan another key's barcode and transfer the key securely,\n"
@@ -83,7 +83,7 @@ msgstr "Wyślij"
 msgid "Receive"
 msgstr "Odbierz"
 
-#: keysign/app.ui:62 keysign/send.ui:55
+#: keysign/app.ui:62 keysign/send.ui:1003
 msgid "Internet"
 msgstr "Internet"
 
@@ -139,7 +139,7 @@ msgstr ""
 msgid "Press Enter to exit"
 msgstr "Naciśnięcie klawisza Enter zakończy"
 
-#: keysign/bluetoothreceive.py:134
+#: keysign/bluetoothreceive.py:135
 msgid "Trying to download the key, please wait"
 msgstr "Próba pobrania klucza, proszę czekać"
 
@@ -264,7 +264,7 @@ msgstr "Podpisz klucz"
 msgid "Select file for saving"
 msgstr "Wybór pliku do zapisania"
 
-#: keysign/receive.ui:53
+#: keysign/receive.ui:56
 msgid ""
 "No GNOME Keysign servers around :-(\n"
 "Find a friend to use GNOME Keysign with.\n"
@@ -293,7 +293,7 @@ msgstr "<b>Aparat</b>"
 msgid "Integrated Web Cam"
 msgstr "Zintegrowana kamerka internetowa"
 
-#: keysign/receive.ui:179 keysign/send.ui:673
+#: keysign/receive.ui:179 keysign/send.ui:609
 msgid "<b>Security Code</b>"
 msgstr "<b>Kod zabezpieczeń</b>"
 
@@ -313,13 +313,13 @@ msgstr "Pobieranie klucza zostało przerwane."
 msgid "Show details about the error"
 msgstr "Wyświetla informacje o błędzie"
 
-#: keysign/receive.ui:379
+#: keysign/receive.ui:381
 msgid ""
 "Error producing certifications ☹\n"
 "Something went wrong. Sometime, the passphrase was not correctly entered.\n"
 "You may try again by clicking the \"confirm\" button."
 msgstr ""
-"Błąd podczas tworzenia certyfikacji. ☹\n"
+"Błąd podczas tworzenia certyfikatów. ☹\n"
 "Coś się nie powiodło. Czasami okazuje się, że hasło zostało błędnie podane.\n"
 "Można spróbować ponownie klikając przycisk „Potwierdź”."
 
@@ -337,7 +337,7 @@ msgid ""
 msgstr ""
 "Importuje tymczasową wersję utworzonych certyfikatów do lokalnej bazy kluczy"
 
-#: keysign/receive.ui:485
+#: keysign/receive.ui:487
 msgid ""
 "Successfully produced certifications.\n"
 "You can import a temporary signature to start using the key as if it had "
@@ -355,11 +355,11 @@ msgstr ""
 msgid "Key"
 msgstr "Klucz"
 
-#: keysign/receive.ui:574 keysign/send.ui:598
+#: keysign/receive.ui:574 keysign/send.ui:534
 msgid "UIDs"
 msgstr "UID"
 
-#: keysign/receive.ui:651
+#: keysign/receive.ui:652
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
@@ -378,7 +378,7 @@ msgstr "P_otwierdź"
 msgid "Signing the following UIDs:"
 msgstr "Podpisywanie tych UID:"
 
-#: keysign/send.py:218
+#: keysign/send.py:251
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
@@ -386,28 +386,11 @@ msgstr ""
 "Nadal trwa próba uzyskania połączenia z Internetem. Jest ono wolne lub "
 "niedostępne."
 
-#: keysign/send.py:224
+#: keysign/send.py:257
 msgid "There isn't an Internet connection!"
 msgstr "Nie ma połączenia z Internetem."
 
-#: keysign/send.py:280 keysign/send.ui:783
-msgid ""
-"Key successfully sent.\n"
-"You should receive soon an email with the signature."
-msgstr ""
-"Pomyślnie wysłano klucz.\n"
-"Wkrótce powinna przyjść wiadomość e-mail z podpisem."
-
-#: keysign/send.py:285
-msgid ""
-"Could not establish a secure connection.\n"
-"Either your partner has entered a wrong code or someone tried to intercept "
-"your connection"
-msgstr ""
-"Nie można nawiązać bezpiecznego połączenia.\n"
-"Partner wpisał błędny kod lub ktoś próbuje przechwycić połączenie"
-
-#: keysign/send.py:289
+#: keysign/send.py:348
 #, python-format
 msgid ""
 "An unexpected error occurred:\n"
@@ -420,15 +403,7 @@ msgstr ""
 msgid "Select and send key"
 msgstr "Wybierz i wyślij klucz"
 
-#: keysign/send.ui:13
-msgid "Select and Send key"
-msgstr "Wybierz i wyślij klucz"
-
-#: keysign/send.ui:53
-msgid "Also use the Internet to transfer the certificate"
-msgstr "Używa także Internetu do przesłania certyfikatu"
-
-#: keysign/send.ui:122
+#: keysign/send.ui:59
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
@@ -436,15 +411,15 @@ msgstr ""
 "Nie ma żadnych kluczy.\n"
 "Proszę użyć np. programu Seahorse i utworzyć jakiś."
 
-#: keysign/send.ui:199
+#: keysign/send.ui:135
 msgid "Very slow or no Internet connection!"
 msgstr "Bardzo wolne lub niedziałające połączenie z Internetem."
 
-#: keysign/send.ui:268
+#: keysign/send.ui:204 keysign/send.ui:751
 msgid "The signature has been successfully imported!"
 msgstr "Pomyślnie zaimportowano podpis."
 
-#: keysign/send.ui:294
+#: keysign/send.ui:230 keysign/send.ui:777
 msgid ""
 "Returns the received certification back to the sender, so that the sender "
 "can make use of your OpenPGP certificate"
@@ -452,29 +427,29 @@ msgstr ""
 "Zwraca otrzymany certyfikat z powrotem do nadawcy, aby nadawca mógł używać "
 "certyfikatu OpenPGP użytkownika"
 
-#: keysign/send.ui:341
+#: keysign/send.ui:277 keysign/send.ui:822
 msgid "Display more details for the error."
 msgstr "Wyświetla więcej informacji o błędzie"
 
-#: keysign/send.ui:372
+#: keysign/send.ui:308 keysign/send.ui:853
 msgid "An error occurred while trying to import the signature."
 msgstr "Wystąpił błąd podczas importowania podpisu."
 
 #. This refers to the key being certified by someone rather than the key used for
 #. certifying someone
-#: keysign/send.ui:427
+#: keysign/send.ui:363
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>Wybór klucza do podpisania</b>"
 
-#: keysign/send.ui:443
+#: keysign/send.ui:379
 msgid "<small>Times signed</small>"
 msgstr "<small>Ile razy podpisano</small>"
 
-#: keysign/send.ui:510
+#: keysign/send.ui:446
 msgid "Keylist"
 msgstr "Lista kluczy"
 
-#: keysign/send.ui:530
+#: keysign/send.ui:466
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
@@ -482,17 +457,48 @@ msgstr ""
 "<small>Aby klucz został podpisany, druga osoba musi wpisać kod zabezpieczeń "
 "lub zeskanować kod QR</small>"
 
-#: keysign/send.ui:557
+#: keysign/send.ui:493
 msgid "<b>Key Details</b>"
 msgstr "<b>Informacje o kluczu</b>"
 
-#: keysign/send.ui:582
+#: keysign/send.ui:518
 msgid "Fingerprint"
 msgstr "Odcisk"
 
-#: keysign/send.ui:736
+#: keysign/send.ui:672
 msgid "<b>QR Code</b>"
 msgstr "<b>Kod QR</b>"
+
+#: keysign/send.ui:897
+msgid ""
+"Could not establish a secure connection.\n"
+"Either your partner has entered a wrong code or someone tried to intercept "
+"your connection."
+msgstr ""
+"Nie można nawiązać bezpiecznego połączenia.\n"
+"Partner wpisał błędny kod lub ktoś próbuje przechwycić połączenie."
+
+#: keysign/send.ui:915
+msgid ""
+"Key successfully sent.\n"
+"You should receive an email with the signature soon.\n"
+"You can drag and drop the email here to import your certification."
+msgstr ""
+"Pomyślnie wysłano klucz.\n"
+"Wkrótce powinna przyjść wiadomość e-mail z podpisem.\n"
+"Można przeciągnąć tutaj tę wiadomość, aby zaimportować certyfikat."
+
+#: keysign/send.ui:932
+msgid "An unexpected error occurred."
+msgstr "Wystąpił nieoczekiwany błąd."
+
+#: keysign/send.ui:961
+msgid "Select and Send key"
+msgstr "Wybierz i wyślij klucz"
+
+#: keysign/send.ui:1001
+msgid "Also use the Internet to transfer the certificate"
+msgstr "Używa także Internetu do przesłania certyfikatu"
 
 #: keysign/util.py:231
 msgid ""

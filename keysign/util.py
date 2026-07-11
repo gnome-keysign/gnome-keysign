@@ -15,7 +15,6 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
-from __future__ import unicode_literals
 
 import hashlib
 import hmac
@@ -29,14 +28,9 @@ from string import Template
 from tempfile import NamedTemporaryFile
 from xml.etree import ElementTree
 
-try:
-    from urllib.parse import urlparse, parse_qs
-    from urllib.parse import ParseResult
-    from urllib.parse import quote
-except ImportError:
-    from urlparse import urlparse, parse_qs
-    from urlparse import ParseResult
-    from urllib2 import quote
+from urllib.parse import urlparse, parse_qs
+from urllib.parse import ParseResult
+from urllib.parse import quote
 
 import requests
 import dbus
@@ -51,6 +45,7 @@ from .errors import NoBluezDbus, UnpoweredAdapter, NoAdapter
 from .gpgmeh import fingerprint_from_keydata
 from .gpgmeh import sign_keydata_and_encrypt
 from .i18n import _
+from .bluetoothutil import get_local_bt_address
 
 log = logging.getLogger(__name__)
 
@@ -411,62 +406,6 @@ def fix_infobar(infobar):
             return
         widget.set_transition_type(Gtk.RevealerTransitionType.NONE)
     infobar.forall(make_sure_revealer_does_nothing)
-
-
-def get_local_bt_address():
-    """Check if there is a powered on Bluetooth device and return his address.
-       This is a blocking method"""
-    available = False
-    bus_name = "org.bluez"
-    timeout = 2  # 2 seconds seems to be enough to start a bus service
-    bus = dbus.SystemBus()
-
-    try:
-        _start_bus(bus_name, timeout)
-    except dbus.exceptions.DBusException as e:
-        raise NoBluezDbus(e)
-    else:
-        available_bt = _get_available_bt()
-        for bt in available_bt:
-            adapter = dbus.Interface(bus.get_object("org.bluez", bt), "org.freedesktop.DBus.Properties")
-            power = adapter.Get("org.bluez.Adapter1", "Powered")
-            if power:
-                available = adapter.Get("org.bluez.Adapter1", "Address")
-                break
-
-        if len(available_bt) == 0:
-            # Not a single BT adapter available in the system
-            raise NoAdapter
-        elif not available:
-            # Every BT adapters are powered off
-            raise UnpoweredAdapter
-
-        return available
-
-
-def _start_bus(bus_name, timeout, flags=0):
-    """Manually start the bus, so we can set a custom timeout"""
-    bus = dbus.SystemBus()
-    bus.call_blocking(BUS_DAEMON_NAME, BUS_DAEMON_PATH,
-                      BUS_DAEMON_IFACE,
-                      'StartServiceByName',
-                      'su', (bus_name, flags), timeout=timeout)
-
-
-def _get_available_bt():
-    """Returns the list of available Bluetooth"""
-    available_bt = []
-    bus_name = "org.bluez"
-    object_path = "/org/bluez"
-    bus = dbus.SystemBus()
-    obj = bus.get_object(bus_name, object_path)
-    iface = dbus.Interface(obj, 'org.freedesktop.DBus.Introspectable')
-    xml_string = iface.Introspect()
-    for child in ElementTree.fromstring(xml_string):
-        if child.tag == 'node':
-            bt = '/'.join((object_path, child.attrib['name']))
-            available_bt.append(bt)
-    return available_bt
 
 
 def get_attachments(filename):
