@@ -55,7 +55,8 @@ class BarcodeReaderGTK(Gtk.Box):
         super(BarcodeReaderGTK, self).__init__(*args, **kwargs)
         self.connect('unmap', self.on_unmap)
         self.connect('map', self.on_map)
-
+        self.scaling_image = ScalingImage()
+        self.append(self.scaling_image)
 
 
     def on_message(self, bus, message):
@@ -95,18 +96,18 @@ class BarcodeReaderGTK(Gtk.Box):
 
     def run(self):
         p = "autovideosrc  \n"
-        #p = "uridecodebin uri=file:///tmp/qr.png "
-        #p = "uridecodebin uri=file:///tmp/v.webm "
         p += " ! tee name=t \n"
         p += "       t. ! queue ! videoconvert \n"
         p += "                  ! zbar cache=true attach_frame=true \n"
         p += "                  ! fakesink \n"
         p += "       t. ! queue ! videoconvert \n"
-        p += ("                 ! gtksink "
+        p += ("                 ! appsink "
             "sync=false "
             "name=imagesink "
-            #"max-lateness=2000000000000  "
-            "enable-last-sample=false "
+            "emit-signals=true "
+            "max-buffers=1 "
+            "drop=true "
+            "caps=\"video/x-raw,format=RGBA\" "
             "\n"
             )
 
@@ -115,16 +116,7 @@ class BarcodeReaderGTK(Gtk.Box):
         pipeline = Gst.parse_launch(pipeline)
 
         self.imagesink = pipeline.get_by_name('imagesink')
-        self.gtksink_widget = self.imagesink.get_property("widget")
-        log.info("About to remove children from %r", self)
-        for child in self.get_children():
-            log.info("About to remove child: %r", child)
-            self.remove(child)
-        # self.gtksink_widget.set_property("expand", False)
-        log.info("Adding sink widget: %r", self.gtksink_widget)
-        #self.add(self.gtksink_widget)
-        self.pack_start(self.gtksink_widget, True, True, 0)
-        self.gtksink_widget.show()
+        self.imagesink.connect("new-sample", self.on_new_sample)
 
         self.pipeline = pipeline
 
@@ -133,6 +125,34 @@ class BarcodeReaderGTK(Gtk.Box):
         bus.add_signal_watch()
 
         pipeline.set_state(Gst.State.PLAYING)
+
+
+    def on_new_sample(self, appsink):
+        sample = appsink.emit("pull-sample")
+        if not sample:
+            return Gst.FlowReturn.ERROR
+
+        buf = sample.get_buffer()
+        caps = sample.get_caps()
+        struct = caps.get_structure(0)
+        width = struct.get_value("width")
+        height = struct.get_value("height")
+
+        data = buf.extract_dup(0, buf.get_size())
+        gbytes = GLib.Bytes.new_take(data)
+
+        pixbuf = GdkPixbuf.Pixbuf.new_from_bytes(
+            gbytes,
+            GdkPixbuf.Colorspace.RGB,
+            True,
+            8,
+            width,
+            height,
+            width * 4
+        )
+
+        GLib.idle_add(self.scaling_image.set_from_pixbuf, pixbuf)
+        return Gst.FlowReturn.OK
 
 
     def pause(self):
@@ -176,14 +196,13 @@ class ReaderApp(Gtk.Application):
 
     
     def on_activate(self, data=None):
-        window = Gtk.ApplicationWindow()
+        window = Gtk.ApplicationWindow(application=self)
         window.set_title("Gtk Gst Barcode Reader")
         reader = BarcodeReaderGTK()
         reader.connect('barcode', self.on_barcode)
-        window.add(reader)
+        window.set_child(reader)
 
-        window.show_all()
-        self.add_window(window)
+        window.present()
 
 
     def on_barcode(self, reader, barcode, message, image):
@@ -195,38 +214,33 @@ class ReaderApp(Gtk.Application):
 class SimpleInterface(ReaderApp):
     '''We tweak the UI of the demo ReaderApp a little'''
     def on_activate(self, *args, **kwargs):
-        window = Gtk.ApplicationWindow()
+        window = Gtk.ApplicationWindow(application=self)
         window.set_title("Simple Barcode Reader")
         window.set_default_size(400, 300)
 
-        vbox = Gtk.Box(Gtk.Orientation.HORIZONTAL, 0)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
         vbox.set_margin_top(3)
         vbox.set_margin_bottom(3)
-        window.add(vbox)
+        window.set_child(vbox)
 
         reader = BarcodeReaderGTK()
         reader.connect('barcode', self.on_barcode)
-        vbox.pack_start(reader, True, True, 0)
+        vbox.append(reader)
         self.reader = reader
 
         #self.image = Gtk.Image()
         # FIXME: We could show a default image like "no barcode scanned just yet"
         self.image = ScalingImage()
         self.imagebox = Gtk.Box() #expand=True)
-        self.imagebox.add(self.image)
-        self.imagebox.show()
-        vbox.pack_end(self.imagebox, True, True, 0)
+        self.imagebox.append(self.image)
+        vbox.append(self.imagebox)
 
 
-        self.playButtonImage = Gtk.Image()
-        self.playButtonImage.set_from_stock("gtk-media-play", Gtk.IconSize.BUTTON)
-        self.playButton = Gtk.Button.new()
-        self.playButton.add(self.playButtonImage)
+        self.playButton = Gtk.Button.new_from_icon_name("media-play")
         self.playButton.connect("clicked", self.playToggled)
-        vbox.pack_end(self.playButton, False, False, 0)
+        vbox.append(self.playButton)
 
-        window.show_all()
-        self.add_window(window)
+        window.present()
 
 
     def playToggled(self, w):
@@ -248,8 +262,8 @@ class SimpleInterface(ReaderApp):
 
         # So we just show a window instead...
         w = Gtk.Window()
-        w.add(ScalingImage(pixbuf))
-        w.show_all()
+        w.set_child(ScalingImage(pixbuf))
+        w.present()
         return False
 
 
