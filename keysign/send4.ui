@@ -39,7 +39,6 @@
                     </child>
                     <child>
                       <object class="GtkBox">
-                        <property name="visible">0</property>
                         <property name="spacing">16</property>
                         <child>
                           <object class="GtkLabel">
@@ -84,7 +83,6 @@ Please use, e.g. Seahorse to create one.</property>
                     </child>
                     <child>
                       <object class="GtkBox">
-                        <property name="visible">0</property>
                         <property name="spacing">16</property>
                         <child>
                           <object class="GtkLabel" id="label_internet">
@@ -119,7 +117,6 @@ Please use, e.g. Seahorse to create one.</property>
                     </child>
                     <child>
                       <object class="GtkBox">
-                        <property name="visible">0</property>
                         <property name="spacing">16</property>
                         <child>
                           <object class="GtkLabel" id="label_import_okay">
@@ -133,7 +130,7 @@ Please use, e.g. Seahorse to create one.</property>
                         </child>
                         <child>
                           <object class="GtkButton" id="return_signature">
-                            <property name="label">gtk-undo</property>
+                            <property name="label" translatable="yes">Undo</property>
                             <property name="focusable">1</property>
                             <property name="receives-default">1</property>
                             <property name="tooltip-text" translatable="1">Returns the received certification back to the sender, so that the sender can make use of your OpenPGP certificate</property>
@@ -157,7 +154,7 @@ Please use, e.g. Seahorse to create one.</property>
                         <property name="spacing">6</property>
                         <child>
                           <object class="GtkButton" id="import_error_details_button">
-                            <property name="label">gtk-info</property>
+                            <property name="label" translatable="yes">Info</property>
                             <property name="focusable">1</property>
                             <property name="receives-default">1</property>
                             <property name="tooltip-text" translatable="1">Display more details for the error.</property>
@@ -173,7 +170,6 @@ Please use, e.g. Seahorse to create one.</property>
                     </child>
                     <child>
                       <object class="GtkBox">
-                        <property name="visible">0</property>
                         <property name="spacing">16</property>
                         <child>
                           <object class="GtkLabel" id="label_import_error">
@@ -217,7 +213,6 @@ Please use, e.g. Seahorse to create one.</property>
                     </child>
                     <child>
                       <object class="GtkBox">
-                        <property name="visible">0</property>
                         <property name="spacing">16</property>
                         <child>
                           <object class="GtkLabel" id="label_import_error_no_new_signatures">
@@ -466,7 +461,6 @@ FDFB F70A 0290 6C30 1813</property>
                     </child>
                     <child>
                       <object class="GtkBox">
-                        <property name="visible">0</property>
                         <property name="spacing">16</property>
                         <child>
                           <object class="GtkLabel" id="rb_label_import_okay">
@@ -480,7 +474,7 @@ FDFB F70A 0290 6C30 1813</property>
                         </child>
                         <child>
                           <object class="GtkButton" id="rb_return_signature">
-                            <property name="label">gtk-undo</property>
+                            <property name="label" translatable="yes">Undo</property>
                             <property name="focusable">1</property>
                             <property name="receives-default">1</property>
                             <property name="tooltip-text" translatable="1">Returns the received certification back to the sender, so that the sender can make use of your OpenPGP certificate</property>
@@ -504,7 +498,7 @@ FDFB F70A 0290 6C30 1813</property>
                         <property name="spacing">6</property>
                         <child>
                           <object class="GtkButton" id="rb_import_error_details_button">
-                            <property name="label">gtk-info</property>
+                            <property name="label" translatable="yes">Info</property>
                             <property name="focusable">1</property>
                             <property name="receives-default">1</property>
                             <property name="tooltip-text" translatable="1">Display more details for the error.</property>
@@ -520,7 +514,6 @@ FDFB F70A 0290 6C30 1813</property>
                     </child>
                     <child>
                       <object class="GtkBox">
-                        <property name="visible">0</property>
                         <property name="spacing">16</property>
                         <child>
                           <object class="GtkLabel" id="rb_label_import_error">
@@ -589,7 +582,7 @@ You can drag and drop the email here to import your certification.</property>
         <property name="title" translatable="1">Select and Send key</property>
         <child>
           <object class="GtkButton" id="headerbutton">
-            <property name="label">gtk-go-back</property>
+            <property name="label" translatable="yes">Back</property>
             <property name="sensitive">0</property>
             <property name="focusable">1</property>
             <property name="receives-default">1</property>
