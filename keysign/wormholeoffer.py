@@ -28,8 +28,8 @@ from wormhole.errors import TransferError, ServerConnectionError, WrongPasswordE
 import wormhole
 
 if __name__ == "__main__":
-    from twisted.internet import gtk3reactor
-    gtk3reactor.install()
+    from twisted.internet import gireactor
+    gireactor.install()
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, returnValue
 

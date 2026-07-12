@@ -25,8 +25,8 @@ from wormhole.errors import WrongPasswordError, LonelyError, TransferError
 import wormhole
 
 if __name__ == "__main__":
-    from twisted.internet import gtk3reactor
-    gtk3reactor.install()
+    from twisted.internet import gireactor
+    gireactor.install()
 from twisted.internet import reactor
 
 from .gpgmeh import fingerprint_from_keydata

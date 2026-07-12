@@ -18,8 +18,8 @@ from gi.repository import Gdk
 from gpg import errors
 from wormhole.errors import ServerConnectionError, LonelyError, WrongPasswordError
 if __name__ == "__main__":
-    from twisted.internet import gtk3reactor
-    gtk3reactor.install()
+    from twisted.internet import gireactor
+    gireactor.install()
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks
 

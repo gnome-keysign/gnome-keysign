@@ -7,9 +7,9 @@ import sys
 
 if __name__ == "__main__":
     import gi
-    gi.require_version('Gtk', '3.0')
-    from twisted.internet import gtk3reactor
-    gtk3reactor.install()
+    gi.require_version('Gtk', '4.0')
+    from twisted.internet import gireactor
+    gireactor.install()
     from twisted.internet import reactor
 from twisted.internet import threads
 from twisted.internet.defer import inlineCallbacks, returnValue

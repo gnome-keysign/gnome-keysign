@@ -29,8 +29,8 @@ from gi.repository import Gtk, GLib
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 if __name__ == "__main__":
-    from twisted.internet import gtk3reactor
-    gtk3reactor.install()
+    from twisted.internet import gireactor
+    gireactor.install()
 from twisted.internet import reactor, threads
 from twisted.internet.defer import inlineCallbacks
 from wormhole.errors import WrongPasswordError, LonelyError
