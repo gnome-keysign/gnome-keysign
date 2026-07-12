@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel", "babel", "BabelGladeExtractor"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gnome-keysign"
+dynamic = ["version"]
+description = "OpenPGP key signing helper"
+readme = "README.rst"
+authors = [
+    { name = "Tobias Mueller", email = "tobiasmue@gnome.org" }
+]
+urls = { Homepage = "https://wiki.gnome.org/Apps/Keysign" }
+license = { text = "GPL-3.0-or-later" }
+classifiers = [
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: Legal Industry",
+    "Intended Audience :: Telecommunications Industry",
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License (GPL)",
+    "Operating System :: POSIX :: Linux",
+    "Environment :: X11 Applications :: GTK",
+    "Topic :: Desktop Environment",
+    "Natural Language :: English",
+    "Topic :: Communications :: Email",
+    "Topic :: Multimedia :: Video :: Capture",
+    "Topic :: Security :: Cryptography",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+dependencies = [
+    "requests>=2.6",
+    "qrcode",
+    "twisted[tls]>=17.5.0",
+    "magic-wormhole>=0.10.2"
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest_twisted",
+    "tox",
+    "pycodestyle",
+    "pylint"
+]
+
+[project.entry-points.console_scripts]
+gnome-keysign-sign-key = "keysign.SignKey:main"
+gnome-keysign-split-uids = "keysign.export_uids:main"
+
+[project.entry-points.gui_scripts]
+gnome-keysign = "keysign:main"
+
+[tool.setuptools]
+packages = ["keysign", "keysign.compat", "keysign.network"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+keysign = ["*.ui", "locale/*/*/*.mo"]
+
+[tool.setuptools.dynamic]
+version = {attr = "keysign._version.__version__"}
+
+[tool.setuptools.data-files]
+"share/applications" = ["data/org.gnome.Keysign.desktop"]
+"share/metainfo" = ["data/org.gnome.Keysign.appdata.xml"]
+"share/icons/hicolor/scalable/apps" = ["data/org.gnome.Keysign.svg"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
