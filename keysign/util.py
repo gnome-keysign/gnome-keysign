@@ -38,7 +38,8 @@ from wormhole._wordlist import PGPWordList
 from _dbus_bindings import BUS_DAEMON_NAME, BUS_DAEMON_PATH, BUS_DAEMON_IFACE
 import gi
 
-gi.require_version('Gtk', '3.0')
+gi.require_version('Gtk', '4.0')
+#gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
 
 from .errors import NoBluezDbus, UnpoweredAdapter, NoAdapter
@@ -119,7 +120,7 @@ def _email_mailto(to, subject=None, body=None, files=None):
         else:
             url += "?attach={0}".format(file)
     try:
-        Gtk.show_uri(None, url, Gdk.CURRENT_TIME)
+        Gtk.show_uri(None, url, None)
         return True
     except GLib.GError as e:
         log.debug("mailto URI is probably not available: %s", e.message)
@@ -405,7 +406,15 @@ def fix_infobar(infobar):
         if not isinstance(widget, Gtk.Revealer):
             return
         widget.set_transition_type(Gtk.RevealerTransitionType.NONE)
-    infobar.forall(make_sure_revealer_does_nothing)
+
+    child = infobar.get_first_child()
+    while child:
+        make_sure_revealer_does_nothing(child)
+        c = child.get_first_child()
+        while c:
+            make_sure_revealer_does_nothing(c)
+            c = c.get_next_sibling()
+        child = child.get_next_sibling()
 
 
 def get_attachments(filename):

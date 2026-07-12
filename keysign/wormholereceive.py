@@ -22,12 +22,10 @@ from twisted.internet.defer import inlineCallbacks, returnValue
 from wormhole.cli.public_relay import RENDEZVOUS_RELAY
 from wormhole.errors import WrongPasswordError, LonelyError, TransferError
 import wormhole
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+
 if __name__ == "__main__":
-    from twisted.internet import gtk3reactor
-    gtk3reactor.install()
+    from twisted.internet import gireactor
+    gireactor.install()
 from twisted.internet import reactor
 
 from .gpgmeh import fingerprint_from_keydata

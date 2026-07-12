@@ -1,0 +1,55 @@
+<?xml version='1.0' encoding='utf-8'?>
+<interface>
+  <requires lib="gtk" version="4.0" />
+  <object class="GtkApplicationWindow" id="applicationwindow1">
+    <property name="default_width">600</property>
+    <property name="default_height">400</property>
+    <child type="titlebar">
+      <object class="GtkHeaderBar" id="headerbar1">
+        <child>
+          <object class="GtkButton" id="back_refresh_button">
+            <property name="focusable">1</property>
+            <property name="receives_default">1</property>
+            <child>
+              <object class="GtkImage" id="refresh-button-image">
+                </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkToggleButton" id="internet_toggle">
+            <property name="focusable">1</property>
+            <property name="receives_default">1</property>
+            <child>
+              <object class="GtkBox">
+                <child>
+                  <object class="GtkImage">
+                    </object>
+                </child>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="margin-start">5</property>
+                    <property name="label" translatable="1">Internet</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child type="title">
+          <object class="GtkStackSwitcher" id="stackswitcher1">
+            <property name="stack">send_receive_stack</property>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkStack" id="send_receive_stack">
+        <property name="transition_type">crossfade</property>
+        <child>
+          <placeholder />
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

@@ -19,8 +19,8 @@
 import logging
 
 import gi
-gi.require_version('Gtk', '3.0')
-gi.require_version('Gdk', '3.0')
+gi.require_version('Gtk', '4.0')
+gi.require_version('Gdk', '4.0')
 from gi.repository import Gdk, Gtk, GObject
 import qrcode
 
@@ -66,34 +66,27 @@ class QRImage(Gtk.DrawingArea):
         # The data to be rendered
         self._surface = None
         self.data = data
-        self.set_app_paintable(True)
+        self.set_draw_func(self.draw_func, None)
 
         self.handle_events = handle_events
         if handle_events:
-            self.connect('button-release-event', self.on_button_released)
-            self.add_events(
-                Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.BUTTON_PRESS_MASK)
+            gesture = Gtk.GestureClick()
+            gesture.connect('released', self.on_gesture_released)
+            self.add_controller(gesture)
 
+    def draw_func(self, drawing_area, cr, width, height, user_data):
+        self.do_draw(cr, widget_width=width, widget_height=height)
 
-    def on_button_released(self, widget, event):
-        self.log.info('Event %s', dir(event))
-        if event.button == 1:
+    def on_gesture_released(self, gesture, n_press, x, y):
+        button = gesture.get_current_button()
+        if button == 1:
             w = FullscreenQRImageWindow(data=self.data)
-            top_level_window = self.get_toplevel()
-            if top_level_window.is_toplevel():
-                w.set_transient_for(top_level_window)
+            root = self.get_root()
+            if root:
+                w.set_transient_for(root)
 
 
-    def do_size_allocate(self, event):
-        """This is the event handler for the resizing event, i.e.
-        when window is resized. We then want to regenerate the QR code.
-        """
-        allocation = self.get_allocation()
-        if allocation != event:
-            self.queue_draw()
-        Gtk.DrawingArea.do_size_allocate(self, event)
-
-    def do_draw(self, cr):
+    def do_draw(self, cr, widget_width, widget_height):
         """This scales the QR Code up to the widget's
         size. You may define your own size, but you must
         be careful not to cause too many resizing events.
@@ -101,9 +94,10 @@ class QRImage(Gtk.DrawingArea):
         trying to fit the image.
         """
         data = self.data
-        box = self.get_allocation()
-        width, height = box.width, box.height
-        size = min(width, height)
+        if widget_width is None or widget_height is None:
+            box = self.get_allocation()
+            widget_width, widget_height = box.width, box.height
+        size = min(widget_width, widget_height)
 
         qrcode = self.qrcode
         img_size = qrcode.get_width()
@@ -125,7 +119,7 @@ class QRImage(Gtk.DrawingArea):
         # All of the rest I do not really understand,
         # but it seems to work reasonably well, without
         # weird PIL to Pixbuf hacks.
-        cr.translate(width / 2, height / 2)
+        cr.translate(widget_width / 2, widget_height / 2)
         scale = max(1, size / img_size)
         cr.scale(scale, scale)
         cr.translate(-img_size / 2, -img_size / 2)
@@ -204,15 +198,15 @@ def fullscreen_at_monitor(window, n):
     be buggy.
     http://stackoverflow.com/a/39386341/2015768
     """
-    screen = Gdk.Screen.get_default()
-
-    monitor_n_geo = screen.get_monitor_geometry(n)
-    x = monitor_n_geo.x
-    y = monitor_n_geo.y
-
-    window.move(x,y)
-
-    window.fullscreen()
+    if hasattr(Gdk, 'Screen') and hasattr(Gdk.Screen, 'get_default'):
+        screen = Gdk.Screen.get_default()
+        monitor_n_geo = screen.get_monitor_geometry(n)
+        x = monitor_n_geo.x
+        y = monitor_n_geo.y
+        window.move(x,y)
+        window.fullscreen()
+    else:
+        window.fullscreen()
 
 
 class FullscreenQRImageWindow(Gtk.Window):
@@ -224,70 +218,36 @@ class FullscreenQRImageWindow(Gtk.Window):
     def __init__(self, data, *args, **kwargs):
         '''The data will be passed to the QRImage'''
         self.log = logging.getLogger(__name__)
-        if issubclass(self.__class__, object):
-            super(FullscreenQRImageWindow, self).__init__(*args, **kwargs)
-        else:
-            Gtk.Window.__init__(*args, **kwargs)
+        super(FullscreenQRImageWindow, self).__init__(*args, **kwargs)
 
         self.fullscreen()
         
         self.qrimage = QRImage(data=data, handle_events=False)
         self.qrimage.set_has_tooltip(False)
-        self.add(self.qrimage)
+        self.set_child(self.qrimage)
         
-        self.connect('button-release-event', self.on_button_released)
-        self.connect('key-release-event', self.on_key_released)
-        self.add_events(
-            Gdk.EventMask.KEY_PRESS_MASK | Gdk.EventMask.KEY_RELEASE_MASK |
-            Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.BUTTON_PRESS_MASK
-            )
+        gesture = Gtk.GestureClick()
+        gesture.connect('released', self.on_fullscreen_gesture_released)
+        self.add_controller(gesture)
+        key_controller = Gtk.EventControllerKey()
+        key_controller.connect('key-released', self.on_fullscreen_key_released)
+        self.add_controller(key_controller)
 
-        self.show_all()
+        self.present()
 
-
-    def on_button_released(self, widget, event):
-        '''Connected to the button-release-event and closes this
-        window''' # It's unclear whether all resources are free()d
-        self.log.info('Event on fullscreen: %s', event)
-        if event.button == 1:
+    def on_fullscreen_gesture_released(self, gesture, n_press, x, y):
+        button = gesture.get_current_button()
+        if button == 1:
             self.unfullscreen()
             self.hide()
             self.close()
 
-    def on_key_released(self, widget, event):
-        self.log.info('Event on fullscreen: %s', dir(event))
-        self.log.info('keycode: %s', event.get_keycode())
-        self.log.info('keyval: %s', event.get_keyval())
-        self.log.info('keyval: %s', Gdk.keyval_name(event.keyval))
-        keyname = Gdk.keyval_name(event.keyval).lower()
+    def on_fullscreen_key_released(self, controller, keyval, keycode, state):
+        keyname = Gdk.keyval_name(keyval).lower()
         if keyname == 'escape' or keyname == 'f' or keyname == 'q':
             self.unfullscreen()
             self.hide()
             self.close()
-        elif keyname == 'left' or keyname == 'right':
-            # We're trying to switch monitors
-            screen = self.get_screen()
-            # Determines the monitor the window is currently most visible in
-            n = screen.get_monitor_at_window(screen.get_active_window())
-            n_monitors = screen.get_n_monitors()
-
-            if keyname == 'left':
-                delta = -1
-            elif keyname == 'right':
-                delta = 1
-            else:
-                raise ValueError()
-
-            new_n = (n+delta) % n_monitors
-            log.info("Moving from %d to %d/%d", n, new_n, n_monitors)
-            if n != new_n:
-                # This call would make it animate a little,
-                # but it looks weird for me, so we don't unfullscreen.
-                # self.unfullscreen()
-                fullscreen_at_monitor(self, new_n)
-                # The following call is broken, unfortunately.
-                # https://bugzilla.gnome.org/show_bug.cgi?id=752677
-                # self.fullscreen_on_monitor(self.get_screen(), new_n)
 
 
 def main(data):
@@ -311,9 +271,11 @@ def main(data):
         
     #qr.connect('button-release-event', on_released)
     #qr.add_events(Gdk.EventMask.BUTTON_RELEASE_MASK | Gdk.EventMask.BUTTON_PRESS_MASK)
-    w.add(qr)
-    w.show_all()
-    Gtk.main()
+    w.set_child(qr)
+    w.present()
+    app = Gtk.Application()
+    app.connect('activate', lambda app: (w.set_application(app), w.present()))
+    app.run(None)
 
 if __name__ == '__main__':
     import sys

@@ -13,15 +13,16 @@ except ImportError:
     from urllib import unquote
 
 import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+gi.require_version('Gtk', '4.0')
+gi.require_version('Adw', '1')
+from gi.repository import Gtk, Adw
 from gi.repository import GLib
 from gi.repository import Gdk
 from gpg import errors
 from wormhole.errors import ServerConnectionError, LonelyError, WrongPasswordError
 if __name__ == "__main__":
-    from twisted.internet import gtk3reactor
-    gtk3reactor.install()
+    from twisted.internet import gireactor
+    gireactor.install()
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks
 
@@ -89,7 +90,7 @@ class SendApp:
 
         ui_file_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "send.ui")
+            "send4.ui")
         if not builder:
             builder = Gtk.Builder()
             builder.add_objects_from_file(ui_file_path, ["send_stack"])
@@ -99,7 +100,10 @@ class SendApp:
         self.klw = klw
 
         stack = builder.get_object("send_stack")
-        stack.add(klw)
+        if hasattr(stack, 'add_child'):
+            stack.add_child(klw)
+        else:
+            stack.add(klw)
         self.stack = stack
 
         # This is a dirty hack :-/
@@ -123,21 +127,9 @@ class SendApp:
         self.notify = None
         self.internet_option = False
 
-        # Add drag and drop to the keys list widget
-        builder.connect_signals(self)
         self.label = builder.get_object("keys_listbox")
-        self.label.drag_dest_set(Gtk.DestDefaults.ALL, [], DRAG_ACTION)
-        self.label.drag_dest_set_target_list(None)
-        self.label.drag_dest_add_text_targets()
-        self.label.drag_dest_add_uri_targets()
 
-        self.rb.connect('drag-data-received', self.on_rb_drag_data_received)
-        # We should probably only accept drag data when we have successfully sent the key.
-        # Now we're unconditionally accepting drags.
-        self.rb.drag_dest_set(Gtk.DestDefaults.ALL, [], DRAG_ACTION)
-        self.rb.drag_dest_set_target_list(None)
-        self.rb.drag_dest_add_text_targets()
-        self.rb.drag_dest_add_uri_targets()
+        self.rb.connect('unmap', self.on_resultbox_unmapped)
         self.rb_import_okay = builder.get_object('rb_infobar_import_okay')
         self.rb_button_ib_return_signature = builder.get_object('rb_return_signature')
         self.rb_import_error = builder.get_object('rb_infobar_import_error')
@@ -382,7 +374,7 @@ class SendApp:
 
         ####
         # Show widget for key
-        self.stack.add(self.kpw)
+        self.stack.add_child(self.kpw)
         self.stack_saved_visible_child = self.stack.get_visible_child()
         self.stack.set_visible_child(self.kpw)
         log.debug('Setting kpw: %r', self.kpw)
@@ -392,7 +384,7 @@ class SendApp:
     def show_result(self, success, message):
         self._deactivate_offer()
 
-        self.stack.add(self.rb)
+        self.stack.add_child(self.rb)
         self.stack.remove(self.kpw)
         self.kpw = None
 
@@ -448,22 +440,25 @@ class SendApp:
             log.debug("Stopped network services")
 
 
+    def on_resultbox_unmapped(self, rb):
+        log.debug("Resultbox disappears %r", rb)
 
-class App(Gtk.Application):
+
+
+class App(Adw.Application):
     def __init__(self, *args, **kwargs):
         super(App, self).__init__(*args, **kwargs)
         self.connect('activate', self.on_activate)
         self.send_app = None
-        #self.builder = Gtk.Builder.new_from_file('send.ui')
 
     def on_activate(self, data=None):
         ui_file_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "send.ui")
+            "send4.ui")
         self.builder = Gtk.Builder.new_from_file(ui_file_path)
         window = self.builder.get_object("appwindow")
         assert window
-        window.connect("delete-event", self.on_delete_window)
+        window.connect("close-request", self.on_delete_window)
         self.headerbar = self.builder.get_object("headerbar")
         hb = self.builder.get_object("headerbutton")
         hb.connect("clicked", self.on_header_button_clicked)
@@ -477,7 +472,7 @@ class App(Gtk.Application):
         ss.connect('map', self.on_send_stack_mapped)
         self.send_stack = ss
 
-        window.show_all()
+        window.present()
         self.add_window(window)
 
     @staticmethod
@@ -557,7 +552,7 @@ class App(Gtk.Application):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    app = App()
+    app = App(application_id="org.gnome.Keysign.Send")
     try:
         GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
                                   lambda *args: reactor.callFromThread(reactor.stop), None)

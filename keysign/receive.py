@@ -25,14 +25,14 @@ from textwrap import dedent
 from urllib.parse import unquote
 
 import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GLib
-from gi.repository import Gdk
+gi.require_version('Gtk', '4.0')
+gi.require_version('Adw', '1')
+from gi.repository import Gtk, GLib, Adw
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 if __name__ == "__main__":
-    from twisted.internet import gtk3reactor
-    gtk3reactor.install()
+    from twisted.internet import gireactor
+    gireactor.install()
 from twisted.internet import reactor, threads
 from twisted.internet.defer import inlineCallbacks
 from wormhole.errors import WrongPasswordError, LonelyError
@@ -77,7 +77,7 @@ class ReceiveApp:
         if not builder:
             ui_file = os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
-                "receive.ui")
+                "receive4.ui")
             builder = Gtk.Builder()
             builder.add_objects_from_file(ui_file,
                 [widget_name, 'confirm-button-image'])
@@ -95,7 +95,7 @@ class ReceiveApp:
             old_scanner_parent.remove(old_scanner)
             # Hm. If we don't have an old parent, we never get to see
             # the newly created scanner. Weird.
-            old_scanner_parent.add(scanner)
+            old_scanner_parent.append(scanner)
 
         receive_stack = builder.get_object(widget_name)
         # It needs to be show()n so that it can be made visible
@@ -197,7 +197,7 @@ class ReceiveApp:
             except ValueError as ve:
                 log.error(ve.args[0])
         else:
-            self.stack.add(self.rb)
+            self.stack.add_child(self.rb)
             self.result_label.set_label(dedent(message.__doc__))
             self.stack.set_visible_child(self.rb)
 
@@ -290,7 +290,7 @@ class ReceiveApp:
             ib.hide()
 
 
-class App(Gtk.Application):
+class App(Adw.Application):
     def __init__(self, *args, **kwargs):
         super(App, self).__init__(*args, **kwargs)
         self.connect('activate', self.on_activate)
@@ -299,11 +299,11 @@ class App(Gtk.Application):
     def on_activate(self, app):
         ui_file = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "receive.ui")
+            "receive4.ui")
         builder = Gtk.Builder.new_from_file(ui_file)
 
-        window = Gtk.ApplicationWindow()
-        window.connect("delete-event", self.on_delete_window)
+        window = Adw.ApplicationWindow(application=app)
+        window.connect("close-request", self.on_delete_window)
         window.set_title(_("Receive"))
         # window.set_size_request(600, 400)
         #window = self.builder.get_object("appwindow")
@@ -311,8 +311,8 @@ class App(Gtk.Application):
         self.receive = ReceiveApp(builder)
         receive_stack = self.receive.stack
 
-        window.add(receive_stack)
-        window.show_all()
+        window.set_child(receive_stack)
+        window.present()
         self.add_window(window)
 
     @staticmethod
@@ -327,7 +327,7 @@ def main(args=[]):
         args = []
     Gst.init(None)
 
-    app = App()
+    app = App(application_id="org.gnome.Keysign.Receive")
     try:
         GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
                                   lambda *args: reactor.callFromThread(reactor.stop), None)

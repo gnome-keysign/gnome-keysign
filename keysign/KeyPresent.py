@@ -23,6 +23,8 @@ import argparse
 import logging
 import os
 
+import gi
+gi.require_version('Gtk', '4.0')
 from gi.repository import Gtk, GLib
 
 if  __name__ == "__main__" and __package__ is None:
@@ -66,7 +68,7 @@ class KeyPresentWidget(Gtk.Widget):
         if not builder:
             builder = Gtk.Builder()
             builder.add_objects_from_file(
-                os.path.join(thisdir, 'send.ui'),
+                os.path.join(thisdir, 'send4.ui'),
                 ['box3']
                 )
         log.debug("Our builder is: %r", builder)
@@ -114,11 +116,7 @@ class KeyPresentWidget(Gtk.Widget):
 
         if not qrcodedata:
             qrcodedata = "OPENPGP4FPR:" + self.key_fingerprint
-        qr = self.qrcode_frame.get_child()
-        if qr:
-            self.qrcode_frame.remove(self.qrcode_frame.get_child())
-        self.qrcode_frame.add(QRImage(qrcodedata))
-        self.qrcode_frame.show_all()
+        self.qrcode_frame.set_child(QRImage(qrcodedata))
 
 
 class KeyPresent(Gtk.Application):
@@ -149,14 +147,13 @@ class KeyPresent(Gtk.Application):
         self.log.info("Startup")
         self.window = Gtk.ApplicationWindow(application=app)
         self.window.set_title ("Keysign - Key")
-        self.window.add(self.key_present_page)
+        self.window.set_child(self.key_present_page)
 
 
     def on_activate(self, app):
         self.log.info("Activate!")
         #self.window = Gtk.ApplicationWindow(application=app)
 
-        self.window.show_all()
         # In case the user runs the application a second time,
         # we raise the existing window.
         self.window.present()
