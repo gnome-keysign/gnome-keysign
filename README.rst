@@ -225,3 +225,45 @@ signed.  If you are happy with what you see, i.e. because you have
 checked the names on the key to be correct, you can click next.  This 
 will cause the program to sign the key and open your mail program with 
 the encrypted signature preloaded as attachment.
+
+
+Translation and Localization
+============================
+
+GNOME Keysign uses Babel for translation extraction and catalog management.
+
+Using the pybabel CLI (Recommended)
+----------------------------------
+
+You can use the `pybabel` CLI directly, which reads the configuration from `setup.cfg`:
+
+* **Extract messages to POT file**:
+
+  .. code::
+
+      pybabel extract -F setup.cfg -o keysign/locale/keysign.pot .
+
+* **Update translation catalogs**:
+
+  .. code::
+
+      pybabel update -D keysign -i keysign/locale/keysign.pot -d keysign/locale
+
+* **Compile translation catalogs**:
+
+  .. code::
+
+      pybabel compile -D keysign -d keysign/locale
+
+
+Using legacy setup.py commands
+-----------------------------
+
+You can also run these operations via the setup.py interface:
+
+.. code::
+
+    python3 setup.py extract_messages
+    python3 setup.py update_catalog
+    python3 setup.py compile_catalog
+
