@@ -25,7 +25,8 @@ from textwrap import dedent
 
 import gi
 gi.require_version('Gtk', '4.0')
-from gi.repository import Gtk, GLib
+gi.require_version('Adw', '1')
+from gi.repository import Gtk, GLib, Adw
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 if __name__ == "__main__":
@@ -262,7 +263,7 @@ class ReceiveApp:
             ib.hide()
 
 
-class App(Gtk.Application):
+class App(Adw.Application):
     def __init__(self, *args, **kwargs):
         super(App, self).__init__(*args, **kwargs)
         self.connect('activate', self.on_activate)
@@ -274,7 +275,7 @@ class App(Gtk.Application):
             "receive4.ui")
         builder = Gtk.Builder.new_from_file(ui_file)
 
-        window = Gtk.ApplicationWindow(application=app)
+        window = Adw.ApplicationWindow(application=app)
         window.connect("close-request", self.on_delete_window)
         window.set_title(_("Receive"))
         # window.set_size_request(600, 400)
@@ -299,7 +300,7 @@ def main(args=[]):
         args = []
     Gst.init(None)
 
-    app = App()
+    app = App(application_id="org.gnome.Keysign.Receive")
     try:
         GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
                                   lambda *args: reactor.callFromThread(reactor.stop), None)

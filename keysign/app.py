@@ -24,7 +24,8 @@ import sys
 
 import gi
 gi.require_version('Gtk', '4.0')
-from gi.repository import Gtk, GLib
+gi.require_version('Adw', '1')
+from gi.repository import Gtk, GLib, Adw
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 from gi.repository import Gdk
@@ -99,7 +100,7 @@ class PswMappingReceiveApp(ReceiveApp):
         return self.psw.get_toplevel()
 
 
-class KeysignApp(Gtk.Application):
+class KeysignApp(Adw.Application):
     def __init__(self, *args, **kwargs):
         super(KeysignApp, self).__init__(*args, **kwargs)
         self.connect('activate', self.on_activate)
@@ -313,7 +314,8 @@ def main(args=[]):
         args = []
     Gst.init(None)
 
-    app = KeysignApp()
+    Adw.init()
+    app = KeysignApp(application_id="org.gnome.Keysign")
     try:
         GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
                                   lambda *args: reactor.callFromThread(reactor.stop), None)

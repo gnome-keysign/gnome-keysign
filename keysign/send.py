@@ -12,7 +12,8 @@ except ImportError:
 
 import gi
 gi.require_version('Gtk', '4.0')
-from gi.repository import Gtk
+gi.require_version('Adw', '1')
+from gi.repository import Gtk, Adw
 from gi.repository import GLib
 from gi.repository import Gdk
 from gpg import errors
@@ -410,21 +411,20 @@ class SendApp:
 
 
 
-class App(Gtk.Application):
+class App(Adw.Application):
     def __init__(self, *args, **kwargs):
         super(App, self).__init__(*args, **kwargs)
         self.connect('activate', self.on_activate)
         self.send_app = None
-        #self.builder = Gtk.Builder.new_from_file('send.ui')
 
     def on_activate(self, data=None):
         ui_file_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "send.ui")
+            "send4.ui")
         self.builder = Gtk.Builder.new_from_file(ui_file_path)
         window = self.builder.get_object("appwindow")
         assert window
-        window.connect("delete-event", self.on_delete_window)
+        window.connect("close-request", self.on_delete_window)
         self.headerbar = self.builder.get_object("headerbar")
         hb = self.builder.get_object("headerbutton")
         hb.connect("clicked", self.on_header_button_clicked)
@@ -438,7 +438,7 @@ class App(Gtk.Application):
         ss.connect('map', self.on_send_stack_mapped)
         self.send_stack = ss
 
-        window.show_all()
+        window.present()
         self.add_window(window)
 
     @staticmethod
@@ -518,7 +518,7 @@ class App(Gtk.Application):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    app = App()
+    app = App(application_id="org.gnome.Keysign.Send")
     try:
         GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
                                   lambda *args: reactor.callFromThread(reactor.stop), None)
