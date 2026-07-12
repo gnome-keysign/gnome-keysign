@@ -169,7 +169,7 @@ class ReceiveApp:
             except ValueError as ve:
                 log.error(ve.args[0])
         else:
-            self.stack.add(self.rb)
+            self.stack.add_child(self.rb)
             self.result_label.set_label(dedent(message.__doc__))
             self.stack.set_visible_child(self.rb)
 
@@ -271,11 +271,11 @@ class App(Gtk.Application):
     def on_activate(self, app):
         ui_file = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "receive.ui")
+            "receive4.ui")
         builder = Gtk.Builder.new_from_file(ui_file)
 
-        window = Gtk.ApplicationWindow()
-        window.connect("delete-event", self.on_delete_window)
+        window = Gtk.ApplicationWindow(application=app)
+        window.connect("close-request", self.on_delete_window)
         window.set_title(_("Receive"))
         # window.set_size_request(600, 400)
         #window = self.builder.get_object("appwindow")
@@ -283,8 +283,8 @@ class App(Gtk.Application):
         self.receive = ReceiveApp(builder)
         receive_stack = self.receive.stack
 
-        window.add(receive_stack)
-        window.show_all()
+        window.set_child(receive_stack)
+        window.present()
         self.add_window(window)
 
     @staticmethod

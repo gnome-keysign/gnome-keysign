@@ -339,7 +339,7 @@ class SendApp:
 
         ####
         # Show widget for key
-        self.stack.add(self.kpw)
+        self.stack.add_child(self.kpw)
         self.stack_saved_visible_child = self.stack.get_visible_child()
         self.stack.set_visible_child(self.kpw)
         log.debug('Setting kpw: %r', self.kpw)
@@ -349,7 +349,7 @@ class SendApp:
     def show_result(self, success, message):
         self._deactivate_offer()
 
-        self.stack.add(self.rb)
+        self.stack.add_child(self.rb)
         self.stack.remove(self.kpw)
         self.kpw = None
 
