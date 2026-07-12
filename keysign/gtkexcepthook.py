@@ -164,9 +164,6 @@ def _info(exctyp, value, tb):
     if exception_dialog_active:
         return
 
-    Gdk.pointer_ungrab(Gdk.CURRENT_TIME)
-    Gdk.keyboard_ungrab(Gdk.CURRENT_TIME)
-
     exception_dialog_active = True
     # Create the dialog
     dialog = Gtk.MessageDialog(type=Gtk.MessageType.WARNING)
@@ -203,23 +200,19 @@ def _info(exctyp, value, tb):
     details_expander.connect("notify::expanded", expander_cb)
 
     textview = Gtk.TextView()
-    textview.show()
     textview.set_editable(False)
-    textview.modify_font(Pango.FontDescription("Monospace normal"))
 
     sw = Gtk.ScrolledWindow()
-    sw.show()
     sw.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-    sw.add(textview)
+    sw.set_child(textview)
 
     # Set window sizing so that it's always at least 600 pixels wide, and
     # increases by 300 pixels in height once the details panel is open
     sw.set_size_request(0, 300)
     dialog.set_size_request(600, 0)
 
-    details_expander.add(sw)
-    details_expander.show_all()
-    dialog.get_content_area().pack_start(details_expander, True, True, 0)
+    details_expander.set_child(sw)
+    dialog.get_content_area().append(details_expander)
 
     # Get the traceback and set contents of the details
     try:
@@ -244,7 +237,7 @@ def _info(exctyp, value, tb):
     # Connect callback and present the dialog
     dialog.connect('response', _dialog_response_cb, trace, exctyp, value)
     #dialog.set_modal(True) # this might actually be contra-productive...
-    dialog.show()
+    dialog.present()
     # calling dialog.run() here locks everything up in some cases, so
     # we just return to the main loop instead
 
@@ -271,7 +264,7 @@ def _dialog_response_cb(dialog, resp, trace, exctyp, value):
             quote_plus(exctyp.__name__, "/"),
             quote_plus(str(value), "/")
         )
-        Gtk.show_uri(None, search_url, Gdk.CURRENT_TIME)
+        Gtk.show_uri(None, search_url, None)
         if "-" in VERSION:
             dialog.set_response_sensitive(RESPONSE_REPORT, True)
     elif resp == RESPONSE_REPORT:
@@ -311,7 +304,7 @@ def _dialog_response_cb(dialog, resp, trace, exctyp, value):
             title="",
             body=quote_plus(body.encode("utf-8"), "/"),
         )
-        Gtk.show_uri(None, report_url, Gdk.CURRENT_TIME)
+        Gtk.show_uri(None, report_url, None)
     else:
         dialog.destroy()
         exception_dialog_active = False
@@ -334,9 +327,9 @@ if __name__ == '__main__':
     win = Gtk.Window()
     win.set_size_request(200, 150)
     win.set_title(os.path.basename(sys.argv[0]))
-    btn = Gtk.Button("Break it")
+    btn = Gtk.Button(label="Break it")
     btn.connect("clicked", _test_button_clicked_cb)
-    win.add(btn)
+    win.set_child(btn)
     win.connect("destroy", lambda *a: Gtk.main_quit())
-    win.show_all()
+    win.present()
     Gtk.main()
