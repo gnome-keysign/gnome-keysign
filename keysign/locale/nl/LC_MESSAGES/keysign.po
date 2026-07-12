@@ -1,25 +1,26 @@
 # Dutch translation for gnome-keysign.
 # Copyright (C) 2019 gnome-keysign's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-keysign package.
-# Nathan Follens <nfollens@gnome.org>, 2019-2021.
+# Nathan Follens <nfollens@gnome.org>, 2019-2021, 2025.
+# Dick Groskamp <dikgro@yahoo.co.uk>, 2025.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2021-05-31 10:45+0000\n"
-"PO-Revision-Date: 2021-09-07 20:58+0200\n"
+"POT-Creation-Date: 2025-05-10 16:12+0000\n"
+"PO-Revision-Date: 2025-09-14 15:35+0200\n"
 "Last-Translator: Nathan Follens <nfollens@gnome.org>\n"
-"Language-Team: Dutch <gnome-nl-list@gnome.org>\n"
+"Language-Team: GNOME-NL https://matrix.to/#/#nl:gnome.org\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.6.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.0\n"
+"Generated-By: Babel 2.6.0\n"
+"X-Generator: Poedit 3.6\n"
 
-#: data/org.gnome.Keysign.raw.appdata.xml:11
+#: data/org.gnome.Keysign.raw.appdata.xml:14
 msgid ""
 "\n"
 "      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
@@ -27,12 +28,11 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"      Gnome Keysign laat u eenvoudig en veilig OpenPGP-sleutels "
-"ondertekenen\n"
+"      GNOME Keysign laat u eenvoudig en veilig OpenPGP-sleutels ondertekenen\n"
 "      via het lokale netwerk of Bluetooth.\n"
 "    "
 
-#: data/org.gnome.Keysign.raw.appdata.xml:15
+#: data/org.gnome.Keysign.raw.appdata.xml:21
 msgid ""
 "\n"
 "      It can scan another key's barcode and transfer the key securely,\n"
@@ -43,12 +43,11 @@ msgid ""
 "    "
 msgstr ""
 "\n"
-"      Het kan de barcode van een andere sleutel scannen en de sleutel veilig "
+"      Het kan de streepjescode van een andere sleutel scannen en de sleutel veilig "
 "overdragen,\n"
-"      wat informele sleutelondertekeningssessies tussen twee partijen "
-"mogelijk maakt.\n"
-"      Het verzendt de versleutelde ondertekeningen naar de UID’s van een "
-"sleutel\n"
+"      wat informele sleutelondertekeningssessies tussen twee partijen mogelijk "
+"maakt.\n"
+"      Het verzendt de versleutelde ondertekeningen naar de UID’s van een sleutel\n"
 "      met de door de gebruiker ingestelde e-mailcliënt.\n"
 "    "
 
@@ -60,11 +59,10 @@ msgstr "Keysign"
 #. Comment
 #: data/org.gnome.Keysign.raw.desktop:3
 msgid ""
-"A keysigning helper to enable you to comfortably exchange OpenPGP keys with "
-"a friend"
+"A keysigning helper to enable you to comfortably exchange OpenPGP keys with a "
+"friend"
 msgstr ""
-"Een hulpprogramma dat u eenvoudig OpenPGP-sleutels laat uitwisselen met een "
-"vriend"
+"Een hulpprogramma dat u eenvoudig OpenPGP-sleutels laat uitwisselen met een vriend"
 
 #. Keywords
 #: data/org.gnome.Keysign.raw.desktop:4
@@ -80,11 +78,11 @@ msgstr "org.gnome.Keysign"
 msgid "Send"
 msgstr "Verzenden"
 
-#: keysign/app.py:188 keysign/receive.py:279
+#: keysign/app.py:188 keysign/receive.py:307
 msgid "Receive"
 msgstr "Ontvangen"
 
-#: keysign/app.ui:62 keysign/send.ui:55
+#: keysign/app.ui:62 keysign/send.ui:1081
 msgid "Internet"
 msgstr "Internet"
 
@@ -140,7 +138,7 @@ msgstr ""
 msgid "Press Enter to exit"
 msgstr "Druk op Enter om af te sluiten"
 
-#: keysign/bluetoothreceive.py:134
+#: keysign/bluetoothreceive.py:135
 msgid "Trying to download the key, please wait"
 msgstr "Poging tot downloaden van sleutel, even geduld"
 
@@ -150,66 +148,66 @@ msgstr "Kan Avahi niet starten"
 
 #: keysign/dialog_avahi.ui:9
 msgid ""
-"Keysign is unable to automatically start Avahi. You can try to execute "
-"`systemctl start avahi-daemon` for solving this problem."
+"Keysign is unable to automatically start Avahi. You can try to execute `systemctl "
+"start avahi-daemon` for solving this problem."
 msgstr ""
-"Keysign kan Avahi niet automatisch starten. U kunt `systemctl start avahi-"
-"daemon` proberen uitvoeren om dit probleem op te lossen."
+"Keysign kan Avahi niet automatisch starten. U kunt `systemctl start avahi-daemon` "
+"proberen uitvoeren om dit probleem op te lossen."
 
 #: keysign/dialog_avahi.ui:23
 msgid "OK"
 msgstr "Oké"
 
-#: keysign/gtkexcepthook.py:173
+#: keysign/gtkexcepthook.py:169
 msgid "Bug Detected"
 msgstr "Fout gedetecteerd"
 
-#: keysign/gtkexcepthook.py:175
+#: keysign/gtkexcepthook.py:171
 msgid "<big><b>A programming error has been detected.</b></big>"
 msgstr "<big><b>Er is een programmeerfout gedetecteerd.</b></big>"
 
-#: keysign/gtkexcepthook.py:178
+#: keysign/gtkexcepthook.py:174
 msgid ""
 "You may be able to ignore this error and carry on working, but you may get "
 "unexpected results.\n"
 "\n"
-"Please tell the developers about this using the issue tracker if no-one else "
-"has reported it yet."
+"Please tell the developers about this using the issue tracker if no-one else has "
+"reported it yet."
 msgstr ""
-"U kunt deze fout negeren en verderwerken, maar dit kan tot onverwachte "
-"resultate leiden.\n"
+"U kunt deze fout negeren en verderwerken, maar dit kan tot onverwachte resultate "
+"leiden.\n"
 "\n"
-"Gelieve de ontwikkelaars over deze fout te informeren indien niemand anders "
-"dit al heeft gedaan."
+"Gelieve de ontwikkelaars over deze fout te informeren indien niemand anders dit al "
+"heeft gedaan."
 
-#: keysign/gtkexcepthook.py:187
+#: keysign/gtkexcepthook.py:183
 msgid "Search Tracker..."
 msgstr "Tracker doorzoeken…"
 
-#: keysign/gtkexcepthook.py:189
+#: keysign/gtkexcepthook.py:185
 msgid "Report..."
 msgstr "Melden…"
 
-#: keysign/gtkexcepthook.py:191
+#: keysign/gtkexcepthook.py:187
 msgid "Ignore Error"
 msgstr "Fout negeren"
 
-#: keysign/gtkexcepthook.py:192
+#: keysign/gtkexcepthook.py:188
 msgid "Quit GNOME Keysign"
-msgstr "Gnome Keysign afsluiten"
+msgstr "GNOME Keysign afsluiten"
 
-#: keysign/gtkexcepthook.py:202
+#: keysign/gtkexcepthook.py:198
 msgid "Details..."
 msgstr "Details…"
 
-#: keysign/gtkexcepthook.py:229 keysign/gtkexcepthook.py:232
+#: keysign/gtkexcepthook.py:225 keysign/gtkexcepthook.py:228
 msgid "Exception while analyzing the exception."
 msgstr "Uitzondering bij analyseren van uitzondering."
 
 #. TRANSLATORS: Crash report template for github, preceding a traceback.
 #. TRANSLATORS: Please ask users kindly to supply at least an English
 #. TRANSLATORS: title if they are able.
-#: keysign/gtkexcepthook.py:281
+#: keysign/gtkexcepthook.py:277
 msgid ""
 "            #### Description\n"
 "\n"
@@ -253,19 +251,19 @@ msgstr ""
 "            #### Traceback\n"
 "        "
 
-#: keysign/keylistwidget.py:83
+#: keysign/keylistwidget.py:82
 msgid "Expires: "
 msgstr "Verloopt: "
 
-#: keysign/receive.py:158
+#: keysign/receive.py:186
 msgid "Sign Key"
 msgstr "Sleutel ondertekenen"
 
-#: keysign/receive.py:225
+#: keysign/receive.py:253
 msgid "Select file for saving"
 msgstr "Kies een bestand om op te slaan"
 
-#: keysign/receive.ui:53
+#: keysign/receive.ui:56
 msgid ""
 "No GNOME Keysign servers around :-(\n"
 "Find a friend to use GNOME Keysign with.\n"
@@ -273,15 +271,14 @@ msgid ""
 "For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "NoServers/1\">the documentation</a>."
 msgstr ""
-"Geen Gnome Keysign-servers in de buurt :-(\n"
-"Probeer Gnome Keysign uit met een vriend.\n"
+"Geen GNOME Keysign-servers in de buurt :-(\n"
+"Probeer GNOME Keysign uit met een vriend.\n"
 "U kunt mogelijk last ondervinden van verbindingsproblemen.\n"
 "Bekijk <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/NoServers/1\">de "
 "documentatie</a> voor meer informatie."
 
 #: keysign/receive.ui:108
-msgid ""
-"<small>To sign someone's key, scan their QR or enter security code</small>"
+msgid "<small>To sign someone's key, scan their QR or enter security code</small>"
 msgstr ""
 "<small>Om iemands sleutel te ondertekenen, scant u hun QR-code of voert u de "
 "beveiligingscode in</small>"
@@ -294,13 +291,13 @@ msgstr "<b>Camera</b>"
 msgid "Integrated Web Cam"
 msgstr "Geïntegreerde webcam"
 
-#: keysign/receive.ui:179 keysign/send.ui:673
+#: keysign/receive.ui:179 keysign/send.ui:687
 msgid "<b>Security Code</b>"
 msgstr "<b>Beveiligingscode</b>"
 
 #: keysign/receive.ui:212
 msgid "Scan Barcode"
-msgstr "Barcode scannen"
+msgstr "Streepjescode scannen"
 
 #: keysign/receive.ui:229
 msgid "Downloading key-data. Please wait..."
@@ -314,10 +311,10 @@ msgstr "Downloaden van sleutel onderbroken!"
 msgid "Show details about the error"
 msgstr "Informatie over de fout weergeven"
 
-#: keysign/receive.ui:379
+#: keysign/receive.ui:381
 msgid ""
 "Error producing certifications ☹\n"
-"Something went wrong. Sometime, the passphrase was not correctly entered.\n"
+"Something went wrong. Sometimes, the passphrase was not correctly entered.\n"
 "You may try again by clicking the \"confirm\" button."
 msgstr ""
 "Fout bij produceren van certificaten ☹\n"
@@ -325,52 +322,49 @@ msgstr ""
 "U kunt het opnieuw proberen door op de knop ‘Bevestigen’ te drukken."
 
 #: keysign/receive.ui:427
-msgid ""
-"Saves the produced certifications as separate files in a custom directory"
+msgid "Saves the produced certifications as separate files in a custom directory"
 msgstr ""
-"Slaat de geproduceerde certificaten op als aparte bestanden in een map naar "
-"keuze"
+"Slaat de geproduceerde certificaten op als aparte bestanden in een map naar keuze"
 
 #: keysign/receive.ui:442
 msgid ""
-"Imports a temporary version of the produced certifications into the local "
-"keyring"
+"Imports a temporary version of the produced certifications into the local keyring"
 msgstr ""
 "Leest een tijdelijke versie van de geproduceerde certificaten in de lokale "
 "sleutelbos in"
 
-#: keysign/receive.ui:485
+#: keysign/receive.ui:487
 msgid ""
 "Successfully produced certifications.\n"
-"You can import a temporary signature to start using the key as if it had "
-"already been properly verified.\n"
+"You can import a temporary signature to start using the key as if it had already "
+"been properly verified.\n"
 "For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "ProducedSignatures/1\">the documentation</a>."
 msgstr ""
 "Certificaten geproduceerd.\n"
-"U kunt een tijdelijke ondertekening inlezen om de sleutel al te gebruiken "
-"alsof hij reeds volledig geverifieerd is.\n"
-"Bekijk <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
-"ProducedSignatures/1\">de documentatie</a> voor meer informatie."
+"U kunt een tijdelijke ondertekening inlezen om de sleutel al te gebruiken alsof "
+"hij reeds volledig geverifieerd is.\n"
+"Bekijk <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/ProducedSignatures/1\">de "
+"documentatie</a> voor meer informatie."
 
 #: keysign/receive.ui:541
 msgid "Key"
 msgstr "Sleutel"
 
-#: keysign/receive.ui:574 keysign/send.ui:598
+#: keysign/receive.ui:574 keysign/send.ui:612
 msgid "UIDs"
 msgstr "UID’s"
 
-#: keysign/receive.ui:651
+#: keysign/receive.ui:652
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
-"This will generate an email that must be sent in order to complete the "
-"signing process."
+"This will generate an email that must be sent in order to complete the signing "
+"process."
 msgstr ""
 "Om de sleutel te onderteken, bevestigt u dat u volgende sleutel wilt "
 "ondertekenen.\n"
-"Dit zal een e-mail genereren die verzonden meot worden om het "
-"ondertekeningsproces te voltooien."
+"Dit zal een e-mail genereren die verzonden meot worden om het ondertekeningsproces "
+"te voltooien."
 
 #: keysign/receive.ui:676
 msgid "C_onfirm"
@@ -380,37 +374,19 @@ msgstr "B_evestigen"
 msgid "Signing the following UIDs:"
 msgstr "Volgende UID’s worden ondertekend:"
 
-#: keysign/send.py:218
+#: keysign/send.py:292
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
 msgstr ""
-"Nog steeds geen toegang tot het internet. Het lijkt traag of niet "
-"beschikbaar te zijn."
+"Nog steeds geen toegang tot het internet. Het lijkt traag of niet beschikbaar te "
+"zijn."
 
-#: keysign/send.py:224
+#: keysign/send.py:298
 msgid "There isn't an Internet connection!"
 msgstr "Er is geen internetverbinding!"
 
-#: keysign/send.py:280 keysign/send.ui:783
-msgid ""
-"Key successfully sent.\n"
-"You should receive soon an email with the signature."
-msgstr ""
-"Sleutel verzonden.\n"
-"U ontvangt normaal gezien binnenkort een e-mail met de ondertekening."
-
-#: keysign/send.py:285
-msgid ""
-"Could not establish a secure connection.\n"
-"Either your partner has entered a wrong code or someone tried to intercept "
-"your connection"
-msgstr ""
-"Kon geen beveiligde verbinding instellen.\n"
-"Uw partner heeft een verkeerde code ingevoerd, of iemand heeft uw verbinding "
-"proberen onderscheppen"
-
-#: keysign/send.py:289
+#: keysign/send.py:413
 #, python-format
 msgid ""
 "An unexpected error occurred:\n"
@@ -423,81 +399,109 @@ msgstr ""
 msgid "Select and send key"
 msgstr "Sleutel kiezen en verzenden"
 
-#: keysign/send.ui:13
-msgid "Select and Send key"
-msgstr "Sleutel kiezen en verzenden"
-
-#: keysign/send.ui:53
-msgid "Also use the Internet to transfer the certificate"
-msgstr "Gebruik ook het internet om het certificaat over te dragen"
-
-#: keysign/send.ui:122
+#: keysign/send.ui:59
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
 msgstr ""
-"U heeft geen sleutels!\n"
+"U hebt geen sleutels!\n"
 "Gebruik bv. Seahorse om er een aan te maken."
 
-#: keysign/send.ui:199
+#: keysign/send.ui:135
 msgid "Very slow or no Internet connection!"
 msgstr "Zeer trage of geen internetverbinding!"
 
-#: keysign/send.ui:268
+#: keysign/send.ui:204 keysign/send.ui:829
 msgid "The signature has been successfully imported!"
 msgstr "De ondertekening is ingelezen!"
 
-#: keysign/send.ui:294
+#: keysign/send.ui:230 keysign/send.ui:855
 msgid ""
-"Returns the received certification back to the sender, so that the sender "
-"can make use of your OpenPGP certificate"
+"Returns the received certification back to the sender, so that the sender can make "
+"use of your OpenPGP certificate"
 msgstr ""
-"Stuurt het ontvangen certificaat terug naar de afzender, zodat de afzender "
-"gebruik kan maken van uw OpenPGP-certificaat"
+"Stuurt het ontvangen certificaat terug naar de afzender, zodat de afzender gebruik "
+"kan maken van uw OpenPGP-certificaat"
 
-#: keysign/send.ui:341
+#: keysign/send.ui:277 keysign/send.ui:900
 msgid "Display more details for the error."
 msgstr "Meer informatie over de fout weergeven."
 
-#: keysign/send.ui:372
+#: keysign/send.ui:308 keysign/send.ui:931
 msgid "An error occurred while trying to import the signature."
 msgstr "Er is een fout opgetreden bij het inlezen van de ondertekening."
 
+#: keysign/send.ui:386
+msgid "Not imported this certification because it is already known."
+msgstr "Dit certificaat is niet geïmporteerd omdat het al bekend is."
+
 #. This refers to the key being certified by someone rather than the key used for
 #. certifying someone
-#: keysign/send.ui:427
+#: keysign/send.ui:441
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>Selecteer een sleutel voor ondertekenen</b>"
 
-#: keysign/send.ui:443
+#: keysign/send.ui:457
 msgid "<small>Times signed</small>"
 msgstr "<small>Aantal keer ondertekend</small>"
 
-#: keysign/send.ui:510
+#: keysign/send.ui:524
 msgid "Keylist"
 msgstr "Sleutellijst"
 
-#: keysign/send.ui:530
+#: keysign/send.ui:544
 msgid ""
-"<small>To have the key signed, the other person must enter the security "
-"code, or scan the QR code</small>"
+"<small>To have the key signed, the other person must enter the security code, or "
+"scan the QR code</small>"
 msgstr ""
 "<small>Om de sleutel te laten ondertekenen, moet de andere persoon de "
 "beveiligingscode invoeren of de QR-code scannen</small>"
 
-#: keysign/send.ui:557
+#: keysign/send.ui:571
 msgid "<b>Key Details</b>"
 msgstr "<b>Sleuteldetails</b>"
 
-#: keysign/send.ui:582
+#: keysign/send.ui:596
 msgid "Fingerprint"
 msgstr "Vingerafdruk"
 
-#: keysign/send.ui:736
+#: keysign/send.ui:750
 msgid "<b>QR Code</b>"
 msgstr "<b>QR-code</b>"
 
-#: keysign/util.py:231
+#: keysign/send.ui:975
+msgid ""
+"Could not establish a secure connection.\n"
+"Either your partner has entered a wrong code or someone tried to intercept your "
+"connection."
+msgstr ""
+"Kon geen beveiligde verbinding instellen.\n"
+"Uw partner heeft een verkeerde code ingevoerd, of iemand heeft uw verbinding "
+"proberen te onderscheppen."
+
+#: keysign/send.ui:993
+msgid ""
+"Key successfully sent.\n"
+"You should receive an email with the signature soon.\n"
+"You can drag and drop the email here to import your certification."
+msgstr ""
+"Sleutel verzonden.\n"
+"U ontvangt normaal gezien binnenkort een e-mail met de ondertekening.\n"
+"U kunt de e-mail naar hier verslepen om uw certificaat te importeren."
+
+#: keysign/send.ui:1010
+msgid "An unexpected error occurred."
+msgstr "Er is een onverwachte fout opgetreden."
+
+#: keysign/send.ui:1039
+msgid "Select and Send key"
+msgstr "Sleutel kiezen en verzenden"
+
+#: keysign/send.ui:1079
+msgid "Also use the Internet to transfer the certificate"
+msgstr "Gebruik ook het internet om het certificaat over te dragen"
+
+#: keysign/util.py:225
 msgid ""
 "Hi $uid,\n"
 "\n"
@@ -523,9 +527,9 @@ msgstr ""
 "Bedankt dat ik uw sleutel mocht ondertekenen!\n"
 "\n"
 "--\n"
-"Gnome Keysign\n"
+"GNOME Keysign\n"
 
-#: keysign/wormholereceive.py:86
+#: keysign/wormholereceive.py:85
 msgid "Wrong message authentication code"
 msgstr "Verkeerde berichtauthenticatiecode"
 
@@ -533,8 +537,8 @@ msgstr "Verkeerde berichtauthenticatiecode"
 #~ "Uses the Internet to transport the key rather than the local network and "
 #~ "Bluetooth (if available)"
 #~ msgstr ""
-#~ "Gebruikt het internet om de sleutel te transporteren in plaats van het "
-#~ "lokale netwerk en Bluetooth (indien beschikbaar)"
+#~ "Gebruikt het internet om de sleutel te transporteren in plaats van het lokale "
+#~ "netwerk en Bluetooth (indien beschikbaar)"
 
 #~ msgid "Translated for gettext (C)"
 #~ msgstr "Vertaald voor gettext (C)"

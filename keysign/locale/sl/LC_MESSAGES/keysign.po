@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2020-04-03 12:02+0000\n"
-"PO-Revision-Date: 2020-06-16 21:25+0200\n"
-"Last-Translator: Matej Urbančič <mateju@svn.gnome.org>\n"
+"POT-Creation-Date: 2024-08-12 15:26+0000\n"
+"PO-Revision-Date: 2024-08-13 07:52+0200\n"
+"Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian GNOME Translation Team <gnome-si@googlegroups.com>\n"
 "Language: sl_SI\n"
 "MIME-Version: 1.0\n"
@@ -19,17 +19,21 @@ msgstr ""
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n"
 "%100==4 ? 3 : 0);\n"
 "X-Poedit-SourceCharset: utf-8\n"
-"X-Generator: Poedit 2.3\n"
+"X-Generator: Poedit 2.2.1\n"
 
-#: data/org.gnome.Keysign.raw.appdata.xml:11
+#: data/org.gnome.Keysign.raw.appdata.xml:14
 msgid ""
 "\n"
 "      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
 "      via the local network or Bluetooth.\n"
 "    "
 msgstr ""
+"\n"
+"GNOME Keysign omogoča udobno in varno podpisovanje ključev OpenPGP\n"
+"      prek krajevnega omrežja ali Bluetootha.\n"
+"    "
 
-#: data/org.gnome.Keysign.raw.appdata.xml:15
+#: data/org.gnome.Keysign.raw.appdata.xml:21
 msgid ""
 "\n"
 "      It can scan another key's barcode and transfer the key securely,\n"
@@ -39,11 +43,18 @@ msgid ""
 "      to use.\n"
 "    "
 msgstr ""
+"\n"
+"Lahko optično prebere črtno kodo drugega ključa in varno prenese ključ,\n"
+"      kar omogoča priložnostne seje podpisovanja ključev z dvema stranema.\n"
+"      Sledi najboljšim praksam pošiljanja šifriranih podpisov\n"
+"      na UID-je ključa z e-poštnim odjemalcem, ki ga je uporabnik nastavil\n"
+"      za uporabo.\n"
+"    "
 
 #. Name
 #: data/org.gnome.Keysign.raw.desktop:2
 msgid "Keysign"
-msgstr ""
+msgstr "Keysign"
 
 #. Comment
 #: data/org.gnome.Keysign.raw.desktop:3
@@ -51,44 +62,46 @@ msgid ""
 "A keysigning helper to enable you to comfortably exchange OpenPGP keys with "
 "a friend"
 msgstr ""
+"Pomočnik za podpisovanje ključev, ki vam omogoča udobno izmenjavo ključev "
+"OpenPGP s prijatelji"
 
 #. Keywords
 #: data/org.gnome.Keysign.raw.desktop:4
 msgid "python;gpg;gnupg;key;openpgp;"
-msgstr ""
+msgstr "python;gpg;gnupg;ključ;openpgp;"
 
 #. Icon
 #: data/org.gnome.Keysign.raw.desktop:7
 msgid "org.gnome.Keysign"
-msgstr ""
+msgstr "org.gnome.Keysign"
 
-#: keysign/app.py:187
+#: keysign/app.py:186
 msgid "Send"
 msgstr "Pošlji"
 
-#: keysign/app.py:189 keysign/receive.py:272
+#: keysign/app.py:188 keysign/receive.py:307
 msgid "Receive"
-msgstr "Sprejmi"
+msgstr "Prejmi"
 
-#: keysign/app.ui:62 keysign/send.ui:54
+#: keysign/app.ui:62 keysign/send.ui:1081
 msgid "Internet"
 msgstr "Splet"
 
 #: keysign/avahioffer.py:83 keysign/bluetoothoffer.py:126
 msgid "Offering key: {}"
-msgstr ""
+msgstr "Ponujeni ključ: {}"
 
 #: keysign/avahioffer.py:84 keysign/bluetoothoffer.py:127
 msgid "Discovery info: {}"
-msgstr ""
+msgstr "Razkrite informacije: {}"
 
 #: keysign/avahioffer.py:86
 msgid "Press Enter to stop"
-msgstr ""
+msgstr "Pritisnite vnašalko, da ustavite"
 
 #: keysign/bluetoothoffer.py:117
 msgid "You must provide an argument to identify the key"
-msgstr ""
+msgstr "Če želite identificirati ključ, morate navesti argument"
 
 #: keysign/bluetoothoffer.py:128
 msgid "HMAC: {}"
@@ -100,55 +113,61 @@ msgstr "Vrata: {}"
 
 #: keysign/bluetoothoffer.py:132
 msgid "Bluetooth not available"
-msgstr ""
+msgstr "Bluetooth ni na voljo"
 
 #: keysign/bluetoothoffer.py:137
 msgid "Press Enter to cancel"
-msgstr ""
+msgstr "Pritisnite vnašalko, da prekličete"
 
 #: keysign/bluetoothoffer.py:144
 msgid ""
 "\n"
 "Key successfully sent"
 msgstr ""
+"\n"
+"Ključ uspešno poslan"
 
 #: keysign/bluetoothoffer.py:146
 msgid ""
 "\n"
 "An error occurred: {}"
 msgstr ""
+"\n"
+"Prišlo je do napake: {}"
 
 #: keysign/bluetoothoffer.py:148
 msgid "Press Enter to exit"
-msgstr ""
+msgstr "Pritisnite vnašalko za izhod"
 
-#: keysign/bluetoothreceive.py:134
+#: keysign/bluetoothreceive.py:135
 msgid "Trying to download the key, please wait"
-msgstr ""
+msgstr "Poteka poskus prenosa ključa, počakajte"
 
 #: keysign/dialog_avahi.ui:8
 msgid "Unable to Start Avahi"
-msgstr ""
+msgstr "Avahi ni mogoče zagnati"
 
 #: keysign/dialog_avahi.ui:9
 msgid ""
 "Keysign is unable to automatically start Avahi. You can try to execute "
 "`systemctl start avahi-daemon` for solving this problem."
 msgstr ""
+"Keysign ne more samodejno zagnati programa Avahi. Za rešitev tega problema "
+"lahko poskusite izvesti ukaz `systemctl start avahi-daemon`."
 
 #: keysign/dialog_avahi.ui:23
 msgid "OK"
 msgstr "V redu"
 
-#: keysign/gtkexcepthook.py:173
+#: keysign/gtkexcepthook.py:169
 msgid "Bug Detected"
-msgstr ""
+msgstr "Zaznana napaka"
 
-#: keysign/gtkexcepthook.py:175
+#: keysign/gtkexcepthook.py:171
 msgid "<big><b>A programming error has been detected.</b></big>"
-msgstr ""
+msgstr "<big><b>Zaznana je bila programska napaka.</b></big>"
 
-#: keysign/gtkexcepthook.py:178
+#: keysign/gtkexcepthook.py:174
 msgid ""
 "You may be able to ignore this error and carry on working, but you may get "
 "unexpected results.\n"
@@ -156,35 +175,39 @@ msgid ""
 "Please tell the developers about this using the issue tracker if no-one else "
 "has reported it yet."
 msgstr ""
+"Morda boste lahko prezrli to napako in nadaljevali z delom, vendar boste "
+"morda dobili nepričakovane rezultate.\n"
+"\n"
+"O tem obvestite razvijalce s sledilnikom težav, če tega še nihče ni prijavil."
 
-#: keysign/gtkexcepthook.py:187
+#: keysign/gtkexcepthook.py:183
 msgid "Search Tracker..."
-msgstr ""
+msgstr "Sledilnik iskanja ..."
 
-#: keysign/gtkexcepthook.py:189
+#: keysign/gtkexcepthook.py:185
 msgid "Report..."
 msgstr "Poročilo ..."
 
-#: keysign/gtkexcepthook.py:191
+#: keysign/gtkexcepthook.py:187
 msgid "Ignore Error"
 msgstr "Prezri napako"
 
-#: keysign/gtkexcepthook.py:192
+#: keysign/gtkexcepthook.py:188
 msgid "Quit GNOME Keysign"
-msgstr ""
+msgstr "Zapri Keysign GNOME"
 
-#: keysign/gtkexcepthook.py:202
+#: keysign/gtkexcepthook.py:198
 msgid "Details..."
 msgstr "Podrobnosti ..."
 
-#: keysign/gtkexcepthook.py:229 keysign/gtkexcepthook.py:232
+#: keysign/gtkexcepthook.py:225 keysign/gtkexcepthook.py:228
 msgid "Exception while analyzing the exception."
-msgstr ""
+msgstr "Izjema pri analizi izjeme."
 
 #. TRANSLATORS: Crash report template for github, preceding a traceback.
 #. TRANSLATORS: Please ask users kindly to supply at least an English
 #. TRANSLATORS: title if they are able.
-#: keysign/gtkexcepthook.py:281
+#: keysign/gtkexcepthook.py:277
 msgid ""
 "            #### Description\n"
 "\n"
@@ -207,20 +230,40 @@ msgid ""
 "            #### Traceback\n"
 "        "
 msgstr ""
+"            #### Opis\n"
+"\n"
+"            Dajte temu poročilu kratek opisni naslov\n"
+"            v angleščini. Uporabite nekaj takega:\n"
+"            \"{funkcija-ki-ne-dela}: {kaj-je-slo-narobe}\"\n"
+"            za naslov, če lahko.\n"
+"            Nato zamenjajte to besedilo\n"
+"            z daljšim angleškim opisom hrošča.\n"
+"            Tudi posnetki zaslona ali videoposnetki so odlični!\n"
+"\n"
+"#### Koraki za ponovitev\n"
+"\n"
+"            Prosimo, povejte nam, kaj ste počeli,\n"
+"            ko se je prikazalo sporočilo o napaki.\n"
+"            Če lahko navedete navodila po korakih\n"
+"            o tem, kako reproducirati napako,\n"
+"            je to še toliko bolje.\n"
+"\n"
+"#### Sledi napake iz terminala\n"
+"        "
 
-#: keysign/keylistwidget.py:83
+#: keysign/keylistwidget.py:82
 msgid "Expires: "
-msgstr ""
+msgstr "Poteče: "
 
-#: keysign/receive.py:158
+#: keysign/receive.py:186
 msgid "Sign Key"
-msgstr "Podpis ključa"
+msgstr "Podpiši ključ"
 
-#: keysign/receive.py:218
+#: keysign/receive.py:253
 msgid "Select file for saving"
-msgstr ""
+msgstr "Izberite datoteko za shranjevanje"
 
-#: keysign/receive.ui:53
+#: keysign/receive.ui:56
 msgid ""
 "No GNOME Keysign servers around :-(\n"
 "Find a friend to use GNOME Keysign with.\n"
@@ -228,23 +271,30 @@ msgid ""
 "For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "NoServers/1\">the documentation</a>."
 msgstr ""
+"V okolici ni strežnikov Keysign GNOME :-(\n"
+"Poiščite prijatelja, s katerim boste lahko uporabljali Keysign GNOME.\n"
+"Morda boste imeli tudi težave s povezljivostjo.\n"
+"Za več informacij obiščite <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"NoServers/1\">dokumentacijo</a>."
 
 #: keysign/receive.ui:108
 msgid ""
 "<small>To sign someone's key, scan their QR or enter security code</small>"
 msgstr ""
+"<small>Če želite podpisati ključ neke osebe, optično preberite njihovo kodo "
+"QR ali vnesite varnostno kodo</small>"
 
 #: keysign/receive.ui:127
 msgid "<b>Camera</b>"
-msgstr ""
+msgstr "<b>Kamera</b>"
 
 #: keysign/receive.ui:142
 msgid "Integrated Web Cam"
-msgstr ""
+msgstr "Integrirana spletna kamera"
 
-#: keysign/receive.ui:179 keysign/send.ui:568
+#: keysign/receive.ui:179 keysign/send.ui:687
 msgid "<b>Security Code</b>"
-msgstr ""
+msgstr "<b>Varnostna koda</b>"
 
 #: keysign/receive.ui:212
 msgid "Scan Barcode"
@@ -252,24 +302,38 @@ msgstr "Preberi črtno kodo"
 
 #: keysign/receive.ui:229
 msgid "Downloading key-data. Please wait..."
-msgstr ""
+msgstr "Prenašanje podatkov ključa. Počakajte ..."
 
 #: keysign/receive.ui:254
 msgid "Key download was interrupted!"
-msgstr ""
+msgstr "Prenos ključev je bil prekinjen!"
 
-#: keysign/receive.ui:345
+#: keysign/receive.ui:346
+msgid "Show details about the error"
+msgstr "Pokaži podrobnosti o napaki"
+
+#: keysign/receive.ui:381
+msgid ""
+"Error producing certifications ☹\n"
+"Something went wrong. Sometimes, the passphrase was not correctly entered.\n"
+"You may try again by clicking the \"confirm\" button."
+msgstr ""
+"Napaka pri izdelavi potrdil ☹\n"
+"Nekaj je šlo narobe. Včasih geslo ni pravilno vneseno.\n"
+"Poskusite znova s klikom gumba »potrdi«."
+
+#: keysign/receive.ui:427
 msgid ""
 "Saves the produced certifications as separate files in a custom directory"
-msgstr ""
+msgstr "Proizvedena potrdila shrani kot ločene datoteke v mapo po meri"
 
-#: keysign/receive.ui:360
+#: keysign/receive.ui:442
 msgid ""
 "Imports a temporary version of the produced certifications into the local "
 "keyring"
-msgstr ""
+msgstr "Uvozi začasne različice izdelanih potrdil v krajevno zbirko ključev"
 
-#: keysign/receive.ui:403
+#: keysign/receive.ui:487
 msgid ""
 "Successfully produced certifications.\n"
 "You can import a temporary signature to start using the key as if it had "
@@ -277,121 +341,166 @@ msgid ""
 "For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
 "ProducedSignatures/1\">the documentation</a>."
 msgstr ""
+"Uspešno izdelani certifikati.\n"
+"Začasni podpis lahko uvozite, da začnete uporabljati ključ, kot da je že bil "
+"pravilno preverjen.\n"
+"Za več informacij obiščite <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"ProducedSignatures/1\">dokumentacijo</a>."
 
-#: keysign/receive.ui:446
+#: keysign/receive.ui:541
+msgid "Key"
+msgstr "Ključ"
+
+#: keysign/receive.ui:574 keysign/send.ui:612
+msgid "UIDs"
+msgstr "UID-ji"
+
+#: keysign/receive.ui:652
 msgid ""
 "To sign the key, confirm that you want to sign the following key.\n"
 "This will generate an email that must be sent in order to complete the "
 "signing process."
 msgstr ""
+"Če želite podpisati ključ, potrdite, da želite podpisati naslednji ključ.\n"
+"To bo ustvarilo e-poštno sporočilo, ki ga je treba poslati, da dokončate "
+"postopek podpisovanja."
 
-#: keysign/receive.ui:474
-msgid "Key"
-msgstr "Ključ"
-
-#: keysign/receive.ui:507 keysign/send.ui:493
-msgid "UIDs"
-msgstr ""
-
-#: keysign/receive.ui:594
+#: keysign/receive.ui:676
 msgid "C_onfirm"
 msgstr "P_otrdi"
 
-#: keysign/receive.ui:716
+#: keysign/receive.ui:798
 msgid "Signing the following UIDs:"
-msgstr ""
+msgstr "Podpisovanje naslednjih identifikatorjev up. vmesnika (UID):"
 
-#: keysign/send.py:207
+#: keysign/send.py:292
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
 msgstr ""
+"Še vedno poskušate vzpostaviti povezavo z internetom. Zdi se, da je počasen "
+"ali ni na voljo."
 
-#: keysign/send.py:213
+#: keysign/send.py:298
 msgid "There isn't an Internet connection!"
-msgstr ""
+msgstr "Ni internetne povezave!"
 
-#: keysign/send.py:219 keysign/send.ui:267
-msgid "The signature has been successfully imported!"
-msgstr ""
-
-#: keysign/send.py:225
-msgid ""
-"An error occurred while trying to import the signature.\n"
-"Please double check the correctness of the chosen signature."
-msgstr ""
-
-#: keysign/send.py:254 keysign/send.ui:678
-msgid ""
-"Key successfully sent.\n"
-"You should receive soon an email with the signature."
-msgstr ""
-
-#: keysign/send.py:259
-msgid ""
-"Could not establish a secure connection.\n"
-"Either your partner has entered a wrong code or someone tried to intercept "
-"your connection"
-msgstr ""
-
-#: keysign/send.py:263
+#: keysign/send.py:413
 #, python-format
 msgid ""
 "An unexpected error occurred:\n"
 "%s"
 msgstr ""
+"Prišlo je do nepričakovane napake:\n"
+"%s"
 
 #: keysign/send.ui:7
 msgid "Select and send key"
-msgstr ""
+msgstr "Izberi in pošlji ključ"
 
-#: keysign/send.ui:13
-msgid "Select and Send key"
-msgstr ""
-
-#: keysign/send.ui:121
+#: keysign/send.ui:59
 msgid ""
 "You don't have any keys!\n"
 "Please use, e.g. Seahorse to create one."
 msgstr ""
+"Nimate nobenega ključa!\n"
+"Prosimo, uporabite npr. Seahorse, da ga ustvarite."
 
-#: keysign/send.ui:198
+#: keysign/send.ui:135
 msgid "Very slow or no Internet connection!"
+msgstr "Zelo počasi ali brez internetne povezave!"
+
+#: keysign/send.ui:204 keysign/send.ui:829
+msgid "The signature has been successfully imported!"
+msgstr "Podpis je bil uspešno uvožen!"
+
+#: keysign/send.ui:230 keysign/send.ui:855
+msgid ""
+"Returns the received certification back to the sender, so that the sender "
+"can make use of your OpenPGP certificate"
 msgstr ""
+"Vrne prejeto potrdilo nazaj pošiljatelju, tako da lahko pošiljatelj uporabi "
+"vaše potrdilo OpenPGP"
+
+#: keysign/send.ui:277 keysign/send.ui:900
+msgid "Display more details for the error."
+msgstr "Prikažite več podrobnosti o napaki."
+
+#: keysign/send.ui:308 keysign/send.ui:931
+msgid "An error occurred while trying to import the signature."
+msgstr "Pri poskusu uvoza podpisa je prišlo do napake."
+
+#: keysign/send.ui:386
+msgid "Not imported this certification because it is already known."
+msgstr "To potrdilo ni bilo uvoženo, ker je že znano."
 
 #. This refers to the key being certified by someone rather than the key used for
 #. certifying someone
-#: keysign/send.ui:322
+#: keysign/send.ui:441
 msgid "<b>Select a key for signing</b>"
-msgstr "<b>Izbor ključa za pospisovanje</b>"
+msgstr "<b>Izberite ključ za podpisovanje</b>"
 
-#: keysign/send.ui:338
+#: keysign/send.ui:457
 msgid "<small>Times signed</small>"
-msgstr ""
+msgstr "<small>Časi podpisov</small>"
 
-#: keysign/send.ui:405
+#: keysign/send.ui:524
 msgid "Keylist"
 msgstr "Seznam ključev"
 
-#: keysign/send.ui:425
+#: keysign/send.ui:544
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
 msgstr ""
+"<small>Za podpis ključa mora druga oseba vnesti varnostno kodo ali optično "
+"prebrati kodo QR</small>"
 
-#: keysign/send.ui:452
+#: keysign/send.ui:571
 msgid "<b>Key Details</b>"
 msgstr "<b>Podrobnosti ključa</b>"
 
-#: keysign/send.ui:477
+#: keysign/send.ui:596
 msgid "Fingerprint"
 msgstr "Prstni odtis"
 
-#: keysign/send.ui:631
+#: keysign/send.ui:750
 msgid "<b>QR Code</b>"
 msgstr "<b>Koda QR</b>"
 
-#: keysign/util.py:231
+#: keysign/send.ui:975
+msgid ""
+"Could not establish a secure connection.\n"
+"Either your partner has entered a wrong code or someone tried to intercept "
+"your connection."
+msgstr ""
+"Ni bilo mogoče vzpostaviti varne povezave.\n"
+"Vaš partner je vnesel napačno kodo ali pa je nekdo poskušal prestreči vašo "
+"povezavo."
+
+#: keysign/send.ui:993
+msgid ""
+"Key successfully sent.\n"
+"You should receive an email with the signature soon.\n"
+"You can drag and drop the email here to import your certification."
+msgstr ""
+"Ključ uspešno poslan.\n"
+"Kmalu bi morali prejeti e-poštno sporočilo s podpisom.\n"
+"E-poštno sporočilo lahko povlečete in spustite sem, da uvozite potrdilo."
+
+#: keysign/send.ui:1010
+msgid "An unexpected error occurred."
+msgstr "Prišlo je do nepričakovane napake."
+
+#: keysign/send.ui:1039
+msgid "Select and Send key"
+msgstr "Izbiranje in pošiljanje ključa"
+
+#: keysign/send.ui:1079
+msgid "Also use the Internet to transfer the certificate"
+msgstr "Za prenos potrdila uporabi tudi internet"
+
+#: keysign/util.py:225
 msgid ""
 "Hi $uid,\n"
 "\n"
@@ -406,7 +515,18 @@ msgid ""
 "--\n"
 "GNOME Keysign\n"
 msgstr ""
+"Pozdravljeni, $uid,\n"
+"\n"
+"\n"
+"pravkar sem podpisal vaš ključ\n"
+"\n"
+"      $fingerprint\n"
+"\n"
+"Hvala, ker ste mi dovolili, da podpišem vaš ključ!\n"
+"\n"
+"--\n"
+"Keysign GNOME\n"
 
-#: keysign/wormholereceive.py:86
+#: keysign/wormholereceive.py:85
 msgid "Wrong message authentication code"
-msgstr ""
+msgstr "Napačna koda za preverjanje pristnosti sporočila"

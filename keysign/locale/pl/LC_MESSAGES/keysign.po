@@ -1,15 +1,15 @@
 # Polish translation for gnome-keysign.
-# Copyright © 2018-2023 the gnome-keysign authors.
+# Copyright © 2018-2024 the gnome-keysign authors.
 # This file is distributed under the same license as the gnome-keysign package.
-# Piotr Drąg <piotrdrag@gmail.com>, 2018-2023.
-# Aviary.pl <community-poland@mozilla.org>, 2018-2023.
+# Piotr Drąg <piotrdrag@gmail.com>, 2018-2024.
+# Aviary.pl <community-poland@mozilla.org>, 2018-2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2023-02-05 13:50+0000\n"
-"PO-Revision-Date: 2023-02-05 14:55+0100\n"
+"POT-Creation-Date: 2024-08-12 15:26+0000\n"
+"PO-Revision-Date: 2024-09-15 19:24+0200\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
 "Language-Team: Polish <community-poland@mozilla.org>\n"
 "Language: pl\n"
@@ -79,11 +79,11 @@ msgstr "org.gnome.Keysign"
 msgid "Send"
 msgstr "Wyślij"
 
-#: keysign/app.py:188 keysign/receive.py:279
+#: keysign/app.py:188 keysign/receive.py:307
 msgid "Receive"
 msgstr "Odbierz"
 
-#: keysign/app.ui:62 keysign/send.ui:1003
+#: keysign/app.ui:62 keysign/send.ui:1081
 msgid "Internet"
 msgstr "Internet"
 
@@ -159,15 +159,15 @@ msgstr ""
 msgid "OK"
 msgstr "OK"
 
-#: keysign/gtkexcepthook.py:173
+#: keysign/gtkexcepthook.py:169
 msgid "Bug Detected"
 msgstr "Wykryto błąd"
 
-#: keysign/gtkexcepthook.py:175
+#: keysign/gtkexcepthook.py:171
 msgid "<big><b>A programming error has been detected.</b></big>"
 msgstr "<big><b>Wykryto błąd programu.</b></big>"
 
-#: keysign/gtkexcepthook.py:178
+#: keysign/gtkexcepthook.py:174
 msgid ""
 "You may be able to ignore this error and carry on working, but you may get "
 "unexpected results.\n"
@@ -181,34 +181,34 @@ msgstr ""
 "Proszę poinformować o tym programistów za pomocą systemu śledzenia błędów "
 "(w języku angielskim), jeśli nikt jeszcze tego nie zrobił."
 
-#: keysign/gtkexcepthook.py:187
+#: keysign/gtkexcepthook.py:183
 msgid "Search Tracker..."
 msgstr "Przeszukaj system śledzenia błędów…"
 
-#: keysign/gtkexcepthook.py:189
+#: keysign/gtkexcepthook.py:185
 msgid "Report..."
 msgstr "Zgłoś…"
 
-#: keysign/gtkexcepthook.py:191
+#: keysign/gtkexcepthook.py:187
 msgid "Ignore Error"
 msgstr "Zignoruj błąd"
 
-#: keysign/gtkexcepthook.py:192
+#: keysign/gtkexcepthook.py:188
 msgid "Quit GNOME Keysign"
 msgstr "Zakończ program"
 
-#: keysign/gtkexcepthook.py:202
+#: keysign/gtkexcepthook.py:198
 msgid "Details..."
 msgstr "Szczegóły…"
 
-#: keysign/gtkexcepthook.py:229 keysign/gtkexcepthook.py:232
+#: keysign/gtkexcepthook.py:225 keysign/gtkexcepthook.py:228
 msgid "Exception while analyzing the exception."
 msgstr "Wyjątek podczas analizowania wyjątku."
 
 #. TRANSLATORS: Crash report template for github, preceding a traceback.
 #. TRANSLATORS: Please ask users kindly to supply at least an English
 #. TRANSLATORS: title if they are able.
-#: keysign/gtkexcepthook.py:281
+#: keysign/gtkexcepthook.py:277
 msgid ""
 "            #### Description\n"
 "\n"
@@ -252,15 +252,15 @@ msgstr ""
 "            #### Wyjątek\n"
 "        "
 
-#: keysign/keylistwidget.py:83
+#: keysign/keylistwidget.py:82
 msgid "Expires: "
 msgstr "Wygasa: "
 
-#: keysign/receive.py:158
+#: keysign/receive.py:186
 msgid "Sign Key"
 msgstr "Podpisz klucz"
 
-#: keysign/receive.py:225
+#: keysign/receive.py:253
 msgid "Select file for saving"
 msgstr "Wybór pliku do zapisania"
 
@@ -293,7 +293,7 @@ msgstr "<b>Aparat</b>"
 msgid "Integrated Web Cam"
 msgstr "Zintegrowana kamerka internetowa"
 
-#: keysign/receive.ui:179 keysign/send.ui:609
+#: keysign/receive.ui:179 keysign/send.ui:687
 msgid "<b>Security Code</b>"
 msgstr "<b>Kod zabezpieczeń</b>"
 
@@ -316,7 +316,7 @@ msgstr "Wyświetla informacje o błędzie"
 #: keysign/receive.ui:381
 msgid ""
 "Error producing certifications ☹\n"
-"Something went wrong. Sometime, the passphrase was not correctly entered.\n"
+"Something went wrong. Sometimes, the passphrase was not correctly entered.\n"
 "You may try again by clicking the \"confirm\" button."
 msgstr ""
 "Błąd podczas tworzenia certyfikatów. ☹\n"
@@ -355,7 +355,7 @@ msgstr ""
 msgid "Key"
 msgstr "Klucz"
 
-#: keysign/receive.ui:574 keysign/send.ui:534
+#: keysign/receive.ui:574 keysign/send.ui:612
 msgid "UIDs"
 msgstr "UID"
 
@@ -378,7 +378,7 @@ msgstr "P_otwierdź"
 msgid "Signing the following UIDs:"
 msgstr "Podpisywanie tych UID:"
 
-#: keysign/send.py:251
+#: keysign/send.py:292
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
@@ -386,11 +386,11 @@ msgstr ""
 "Nadal trwa próba uzyskania połączenia z Internetem. Jest ono wolne lub "
 "niedostępne."
 
-#: keysign/send.py:257
+#: keysign/send.py:298
 msgid "There isn't an Internet connection!"
 msgstr "Nie ma połączenia z Internetem."
 
-#: keysign/send.py:348
+#: keysign/send.py:413
 #, python-format
 msgid ""
 "An unexpected error occurred:\n"
@@ -415,11 +415,11 @@ msgstr ""
 msgid "Very slow or no Internet connection!"
 msgstr "Bardzo wolne lub niedziałające połączenie z Internetem."
 
-#: keysign/send.ui:204 keysign/send.ui:751
+#: keysign/send.ui:204 keysign/send.ui:829
 msgid "The signature has been successfully imported!"
 msgstr "Pomyślnie zaimportowano podpis."
 
-#: keysign/send.ui:230 keysign/send.ui:777
+#: keysign/send.ui:230 keysign/send.ui:855
 msgid ""
 "Returns the received certification back to the sender, so that the sender "
 "can make use of your OpenPGP certificate"
@@ -427,29 +427,33 @@ msgstr ""
 "Zwraca otrzymany certyfikat z powrotem do nadawcy, aby nadawca mógł używać "
 "certyfikatu OpenPGP użytkownika"
 
-#: keysign/send.ui:277 keysign/send.ui:822
+#: keysign/send.ui:277 keysign/send.ui:900
 msgid "Display more details for the error."
 msgstr "Wyświetla więcej informacji o błędzie"
 
-#: keysign/send.ui:308 keysign/send.ui:853
+#: keysign/send.ui:308 keysign/send.ui:931
 msgid "An error occurred while trying to import the signature."
 msgstr "Wystąpił błąd podczas importowania podpisu."
 
+#: keysign/send.ui:386
+msgid "Not imported this certification because it is already known."
+msgstr "Ten certyfikat nie zostanie zaimportowany, ponieważ jest już znany."
+
 #. This refers to the key being certified by someone rather than the key used for
 #. certifying someone
-#: keysign/send.ui:363
+#: keysign/send.ui:441
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>Wybór klucza do podpisania</b>"
 
-#: keysign/send.ui:379
+#: keysign/send.ui:457
 msgid "<small>Times signed</small>"
 msgstr "<small>Ile razy podpisano</small>"
 
-#: keysign/send.ui:446
+#: keysign/send.ui:524
 msgid "Keylist"
 msgstr "Lista kluczy"
 
-#: keysign/send.ui:466
+#: keysign/send.ui:544
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
@@ -457,19 +461,19 @@ msgstr ""
 "<small>Aby klucz został podpisany, druga osoba musi wpisać kod zabezpieczeń "
 "lub zeskanować kod QR</small>"
 
-#: keysign/send.ui:493
+#: keysign/send.ui:571
 msgid "<b>Key Details</b>"
 msgstr "<b>Informacje o kluczu</b>"
 
-#: keysign/send.ui:518
+#: keysign/send.ui:596
 msgid "Fingerprint"
 msgstr "Odcisk"
 
-#: keysign/send.ui:672
+#: keysign/send.ui:750
 msgid "<b>QR Code</b>"
 msgstr "<b>Kod QR</b>"
 
-#: keysign/send.ui:897
+#: keysign/send.ui:975
 msgid ""
 "Could not establish a secure connection.\n"
 "Either your partner has entered a wrong code or someone tried to intercept "
@@ -478,7 +482,7 @@ msgstr ""
 "Nie można nawiązać bezpiecznego połączenia.\n"
 "Partner wpisał błędny kod lub ktoś próbuje przechwycić połączenie."
 
-#: keysign/send.ui:915
+#: keysign/send.ui:993
 msgid ""
 "Key successfully sent.\n"
 "You should receive an email with the signature soon.\n"
@@ -488,19 +492,19 @@ msgstr ""
 "Wkrótce powinna przyjść wiadomość e-mail z podpisem.\n"
 "Można przeciągnąć tutaj tę wiadomość, aby zaimportować certyfikat."
 
-#: keysign/send.ui:932
+#: keysign/send.ui:1010
 msgid "An unexpected error occurred."
 msgstr "Wystąpił nieoczekiwany błąd."
 
-#: keysign/send.ui:961
+#: keysign/send.ui:1039
 msgid "Select and Send key"
 msgstr "Wybierz i wyślij klucz"
 
-#: keysign/send.ui:1001
+#: keysign/send.ui:1079
 msgid "Also use the Internet to transfer the certificate"
 msgstr "Używa także Internetu do przesłania certyfikatu"
 
-#: keysign/util.py:231
+#: keysign/util.py:225
 msgid ""
 "Hi $uid,\n"
 "\n"
@@ -528,6 +532,6 @@ msgstr ""
 "--\n"
 "GNOME Keysign\n"
 
-#: keysign/wormholereceive.py:86
+#: keysign/wormholereceive.py:85
 msgid "Wrong message authentication code"
 msgstr "Błędny kod uwierzytelnienia wiadomości"

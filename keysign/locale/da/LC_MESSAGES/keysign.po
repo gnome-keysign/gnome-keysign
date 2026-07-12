@@ -2,14 +2,14 @@
 # Copyright (C) 2019 gnome-keysign's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-keysign package.
 # scootergrisen, 2019, 2021.
-# Alan Mortensen <alanmortensen.am@gmail.com>, 2023.
+# Alan Mortensen <alanmortensen.am@gmail.com>, 2023-24.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2023-02-05 13:50+0000\n"
-"PO-Revision-Date: 2023-10-12 17:56+0200\n"
+"POT-Creation-Date: 2024-08-12 15:26+0000\n"
+"PO-Revision-Date: 2024-09-24 18:55+0200\n"
 "Last-Translator: Alan Mortensen <alanmortensen.am@gmail.com>\n"
 "Language-Team: Danish <dansk@dansk-gruppen.dk>\n"
 "Language: da\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #: data/org.gnome.Keysign.raw.appdata.xml:14
 msgid ""
@@ -78,11 +78,11 @@ msgstr "org.gnome.Keysign"
 msgid "Send"
 msgstr "Send"
 
-#: keysign/app.py:188 keysign/receive.py:279
+#: keysign/app.py:188 keysign/receive.py:307
 msgid "Receive"
 msgstr "Modtag"
 
-#: keysign/app.ui:62 keysign/send.ui:1003
+#: keysign/app.ui:62 keysign/send.ui:1081
 msgid "Internet"
 msgstr "Internet"
 
@@ -158,15 +158,15 @@ msgstr ""
 msgid "OK"
 msgstr "OK"
 
-#: keysign/gtkexcepthook.py:173
+#: keysign/gtkexcepthook.py:169
 msgid "Bug Detected"
 msgstr "Fejl registreret"
 
-#: keysign/gtkexcepthook.py:175
+#: keysign/gtkexcepthook.py:171
 msgid "<big><b>A programming error has been detected.</b></big>"
 msgstr "<big><b>En programmeringsfejl blev registreret.</b></big>"
 
-#: keysign/gtkexcepthook.py:178
+#: keysign/gtkexcepthook.py:174
 msgid ""
 "You may be able to ignore this error and carry on working, but you may get "
 "unexpected results.\n"
@@ -180,34 +180,34 @@ msgstr ""
 "Fortæl venligst udviklerne om det med issue trackeren, hvis ikke der er "
 "andre som har rapporteret det endnu."
 
-#: keysign/gtkexcepthook.py:187
+#: keysign/gtkexcepthook.py:183
 msgid "Search Tracker..."
 msgstr "Søg i tracker …"
 
-#: keysign/gtkexcepthook.py:189
+#: keysign/gtkexcepthook.py:185
 msgid "Report..."
 msgstr "Rapportér …"
 
-#: keysign/gtkexcepthook.py:191
+#: keysign/gtkexcepthook.py:187
 msgid "Ignore Error"
 msgstr "Ignorer fejl"
 
-#: keysign/gtkexcepthook.py:192
+#: keysign/gtkexcepthook.py:188
 msgid "Quit GNOME Keysign"
 msgstr "Afslut GNOME Nøgleunderskriver"
 
-#: keysign/gtkexcepthook.py:202
+#: keysign/gtkexcepthook.py:198
 msgid "Details..."
 msgstr "Detaljer …"
 
-#: keysign/gtkexcepthook.py:229 keysign/gtkexcepthook.py:232
+#: keysign/gtkexcepthook.py:225 keysign/gtkexcepthook.py:228
 msgid "Exception while analyzing the exception."
 msgstr "Undtagelse ved analysering af undtagelsen."
 
 #. TRANSLATORS: Crash report template for github, preceding a traceback.
 #. TRANSLATORS: Please ask users kindly to supply at least an English
 #. TRANSLATORS: title if they are able.
-#: keysign/gtkexcepthook.py:281
+#: keysign/gtkexcepthook.py:277
 msgid ""
 "            #### Description\n"
 "\n"
@@ -252,15 +252,15 @@ msgstr ""
 "            #### Traceback (tilbagesporing)\n"
 "        "
 
-#: keysign/keylistwidget.py:83
+#: keysign/keylistwidget.py:82
 msgid "Expires: "
 msgstr "Udløber: "
 
-#: keysign/receive.py:158
+#: keysign/receive.py:186
 msgid "Sign Key"
 msgstr "Underskriv nøgle"
 
-#: keysign/receive.py:225
+#: keysign/receive.py:253
 msgid "Select file for saving"
 msgstr "Vælg fil som skal gemmes"
 
@@ -293,7 +293,7 @@ msgstr "<b>Kamera</b>"
 msgid "Integrated Web Cam"
 msgstr "Integreret webcam"
 
-#: keysign/receive.ui:179 keysign/send.ui:609
+#: keysign/receive.ui:179 keysign/send.ui:687
 msgid "<b>Security Code</b>"
 msgstr "<b>Sikkerhedskode</b>"
 
@@ -316,7 +316,7 @@ msgstr "Vis detaljer om fejlen"
 #: keysign/receive.ui:381
 msgid ""
 "Error producing certifications ☹\n"
-"Something went wrong. Sometime, the passphrase was not correctly entered.\n"
+"Something went wrong. Sometimes, the passphrase was not correctly entered.\n"
 "You may try again by clicking the \"confirm\" button."
 msgstr ""
 "Fejl ved generering af certificeringer ☹\n"
@@ -356,7 +356,7 @@ msgstr ""
 msgid "Key"
 msgstr "Nøgle"
 
-#: keysign/receive.ui:574 keysign/send.ui:534
+#: keysign/receive.ui:574 keysign/send.ui:612
 msgid "UIDs"
 msgstr "UID'er"
 
@@ -378,7 +378,7 @@ msgstr "_Bekræft"
 msgid "Signing the following UIDs:"
 msgstr "Underskriver følgende UID'er:"
 
-#: keysign/send.py:251
+#: keysign/send.py:292
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
@@ -386,11 +386,11 @@ msgstr ""
 "Prøver stadigvæk på at få forbindelse til internettet. Det ser ud til at "
 "være langsomt eller utilgængeligt."
 
-#: keysign/send.py:257
+#: keysign/send.py:298
 msgid "There isn't an Internet connection!"
 msgstr "Der er ikke forbindelse til internettet!"
 
-#: keysign/send.py:348
+#: keysign/send.py:413
 #, python-format
 msgid ""
 "An unexpected error occurred:\n"
@@ -415,11 +415,11 @@ msgstr ""
 msgid "Very slow or no Internet connection!"
 msgstr "Meget langsom eller ingen internetforbindelse!"
 
-#: keysign/send.ui:204 keysign/send.ui:751
+#: keysign/send.ui:204 keysign/send.ui:829
 msgid "The signature has been successfully imported!"
 msgstr "Underskriften blev importeret!"
 
-#: keysign/send.ui:230 keysign/send.ui:777
+#: keysign/send.ui:230 keysign/send.ui:855
 msgid ""
 "Returns the received certification back to the sender, so that the sender "
 "can make use of your OpenPGP certificate"
@@ -427,29 +427,33 @@ msgstr ""
 "Returnerer den modtagne certificering til afsenderen, så afsenderen kan "
 "bruge dit OpenPGP-certifikat"
 
-#: keysign/send.ui:277 keysign/send.ui:822
+#: keysign/send.ui:277 keysign/send.ui:900
 msgid "Display more details for the error."
 msgstr "Vis flere detaljer om fejlen."
 
-#: keysign/send.ui:308 keysign/send.ui:853
+#: keysign/send.ui:308 keysign/send.ui:931
 msgid "An error occurred while trying to import the signature."
 msgstr "Der opstod en fejl da underskriften blev forsøgt importeret."
 
+#: keysign/send.ui:386
+msgid "Not imported this certification because it is already known."
+msgstr "Certificeringen blev ikke importeret, da den allerede er kendt."
+
 #. This refers to the key being certified by someone rather than the key used for
 #. certifying someone
-#: keysign/send.ui:363
+#: keysign/send.ui:441
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>Vælg en nøgle som skal underskrives</b>"
 
-#: keysign/send.ui:379
+#: keysign/send.ui:457
 msgid "<small>Times signed</small>"
 msgstr "<small>Antal underskrifter</small>"
 
-#: keysign/send.ui:446
+#: keysign/send.ui:524
 msgid "Keylist"
 msgstr "Nøgleliste"
 
-#: keysign/send.ui:466
+#: keysign/send.ui:544
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
@@ -457,19 +461,19 @@ msgstr ""
 "<small>For at underskrive nøglen, skal den anden person indtaste "
 "sikkerhedskoden eller skanne QR-koden</small>"
 
-#: keysign/send.ui:493
+#: keysign/send.ui:571
 msgid "<b>Key Details</b>"
 msgstr "<b>Nøgledetaljer</b>"
 
-#: keysign/send.ui:518
+#: keysign/send.ui:596
 msgid "Fingerprint"
 msgstr "Fingeraftryk"
 
-#: keysign/send.ui:672
+#: keysign/send.ui:750
 msgid "<b>QR Code</b>"
 msgstr "<b>QR-kode</b>"
 
-#: keysign/send.ui:897
+#: keysign/send.ui:975
 msgid ""
 "Could not establish a secure connection.\n"
 "Either your partner has entered a wrong code or someone tried to intercept "
@@ -479,7 +483,7 @@ msgstr ""
 "Enten har din partner indtastet en forkert kode eller nogen prøvede på at "
 "opsnappe din forbindelse."
 
-#: keysign/send.ui:915
+#: keysign/send.ui:993
 msgid ""
 "Key successfully sent.\n"
 "You should receive an email with the signature soon.\n"
@@ -489,19 +493,19 @@ msgstr ""
 "Du bør snart modtage en e-mail med underskriften.\n"
 "Du kan trække og slippe din e-mail hertil for at importere dit certifikat."
 
-#: keysign/send.ui:932
+#: keysign/send.ui:1010
 msgid "An unexpected error occurred."
 msgstr "Der opstod en uventet fejl."
 
-#: keysign/send.ui:961
+#: keysign/send.ui:1039
 msgid "Select and Send key"
 msgstr "Vælg og send nøgle"
 
-#: keysign/send.ui:1001
+#: keysign/send.ui:1079
 msgid "Also use the Internet to transfer the certificate"
 msgstr "Du kan også bruger internettet til at overføre certifikatet"
 
-#: keysign/util.py:231
+#: keysign/util.py:225
 msgid ""
 "Hi $uid,\n"
 "\n"
@@ -529,6 +533,6 @@ msgstr ""
 "--\n"
 "GNOME Nøgleunderskriver\n"
 
-#: keysign/wormholereceive.py:86
+#: keysign/wormholereceive.py:85
 msgid "Wrong message authentication code"
 msgstr "Forkert autentifikationskode for meddelelse"
