@@ -4,7 +4,7 @@ import logging
 import sys, os
 
 import gi
-gi.require_version('Gtk', "3.0")
+gi.require_version('Gtk', "4.0")
 from gi.repository import Gtk, GLib
 
 
@@ -48,9 +48,9 @@ def load_latin1_key():
 
 
 def _gui_test(widget):
-    widget.show_all()
-    GLib.timeout_add_seconds(2,  Gtk.main_quit)
-    Gtk.main()
+    loop = GLib.MainLoop()
+    GLib.timeout_add_seconds(2, loop.quit)
+    loop.run()
 
 
 def test_kpw():

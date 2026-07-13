@@ -21,7 +21,7 @@ import logging
 from subprocess import check_call
 import tempfile
 import gi
-gi.require_version('Gtk', '3.0')
+gi.require_version('Gtk', '4.0')
 
 from wormhole.errors import WrongPasswordError, LonelyError
 from pytest_twisted import inlineCallbacks

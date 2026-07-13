@@ -6,7 +6,7 @@ from subprocess import check_call
 import tempfile
 import unittest
 import gi
-gi.require_version('Gtk', '3.0')
+gi.require_version('Gtk', '4.0')
 
 from twisted.internet import threads
 from pytest_twisted import inlineCallbacks
