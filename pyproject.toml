@@ -43,7 +43,8 @@ test = [
     "pytest_twisted",
     "tox",
     "pycodestyle",
-    "pylint"
+    "pylint",
+    "pillow"
 ]
 
 [project.entry-points.console_scripts]
