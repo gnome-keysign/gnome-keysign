@@ -14,6 +14,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Clean leftover virtual environment
+      run: |
+        rm -rf venv
+
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
