@@ -105,6 +105,11 @@ class KeyFprScanWidget(Gtk.Box):
         # Somebody should look at that...
         self.reader = reader
 
+        self.camera_selector = builder.get_object("comboboxtext1")
+        self.camera_devices = {}
+        if self.camera_selector:
+            self.populate_cameras()
+
         self.fpr_entry = builder.get_object("fingerprint_entry")
         self.fpr_entry.connect('changed', self.on_text_changed)
         
@@ -113,6 +118,63 @@ class KeyFprScanWidget(Gtk.Box):
 
         # Temporary measure...
         self.barcode_scanner = self
+
+    def populate_cameras(self):
+        self.camera_selector.remove_all()
+        
+        monitor = Gst.DeviceMonitor.new()
+        monitor.add_filter("Video/Source", None)
+        monitor.start()
+        devices = monitor.get_devices()
+        monitor.stop()
+        
+        self.camera_devices = {}
+        suitable_index = -1
+        
+        for idx, device in enumerate(devices):
+            display_name = device.get_display_name()
+            props = device.get_properties()
+            device_path = None
+            if props:
+                for key in ["api.v4l2.path", "device.path", "object.path"]:
+                    val = props.get_string(key)
+                    if val:
+                        if val.startswith("v4l2:"):
+                            val = val[5:]
+                        device_path = val
+                        break
+            
+            if not device_path:
+                continue
+                
+            name_lower = display_name.lower()
+            is_unsuitable = "ir" in name_lower or "infrared" in name_lower or "infra-red" in name_lower
+            
+            if is_unsuitable:
+                label = f"⚠️ {display_name} ({device_path}) [IR / Unsuitable]"
+            else:
+                label = f"{display_name} ({device_path})"
+                if suitable_index == -1:
+                    suitable_index = len(self.camera_devices)
+            
+            item_id = str(len(self.camera_devices))
+            self.camera_devices[item_id] = device_path
+            self.camera_selector.append(item_id, label)
+            
+        if self.camera_devices:
+            self.camera_selector.connect("changed", self.on_camera_changed)
+            default_index = suitable_index if suitable_index != -1 else 0
+            self.camera_selector.set_active(default_index)
+            default_path = self.camera_devices.get(str(default_index))
+            if default_path:
+                self.reader.set_device(default_path)
+
+    def on_camera_changed(self, combo):
+        active_id = combo.get_active_id()
+        if active_id and active_id in self.camera_devices:
+            device_path = self.camera_devices[active_id]
+            log.info("Camera changed in dropdown to ID %s: %s", active_id, device_path)
+            self.reader.set_device(device_path)
 
     def on_text_changed(self, entryObject, *args):
         self.emit('changed', entryObject, *args)
