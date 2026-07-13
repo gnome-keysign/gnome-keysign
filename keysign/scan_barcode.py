@@ -95,25 +95,15 @@ class BarcodeReaderGTK(Gtk.Box):
 
 
     def run(self):
-        p = "autovideosrc  \n"
-        p += " ! tee name=t \n"
-        p += "       t. ! queue ! videoconvert \n"
-        p += "                  ! zbar cache=true attach_frame=true \n"
-        p += "                  ! fakesink \n"
-        p += "       t. ! queue ! videoconvert \n"
-        p += ("                 ! appsink "
-            "sync=false "
-            "name=imagesink "
-            "emit-signals=true "
-            "max-buffers=1 "
-            "drop=true "
-            "caps=\"video/x-raw,format=RGBA\" "
-            "\n"
-            )
-
-        pipeline = p
-        log.info("Launching pipeline %s", pipeline)
-        pipeline = Gst.parse_launch(pipeline)
+        pipeline_str = (
+            "autovideosrc "
+            " ! videoconvert "
+            " ! zbar cache=true attach_frame=true "
+            " ! videoconvert "
+            " ! appsink sync=false name=imagesink emit-signals=true max-buffers=1 drop=true caps=\"video/x-raw,format=RGBA\""
+        )
+        log.info("Launching pipeline: %s", pipeline_str)
+        pipeline = Gst.parse_launch(pipeline_str)
 
         self.imagesink = pipeline.get_by_name('imagesink')
         self.imagesink.connect("new-sample", self.on_new_sample)
