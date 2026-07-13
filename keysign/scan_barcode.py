@@ -51,8 +51,9 @@ class BarcodeReaderGTK(Gtk.Box):
     }
 
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, device=None, **kwargs):
         super(BarcodeReaderGTK, self).__init__(*args, **kwargs)
+        self.device = device
         self.connect('unmap', self.on_unmap)
         self.connect('map', self.on_map)
         self.scaling_image = ScalingImage()
@@ -95,8 +96,11 @@ class BarcodeReaderGTK(Gtk.Box):
 
 
     def run(self):
+        src = "autovideosrc"
+        if self.device:
+            src = f"v4l2src device={self.device}"
         pipeline_str = (
-            "autovideosrc "
+            f"{src} "
             " ! videoconvert "
             " ! zbar cache=true attach_frame=true "
             " ! videoconvert "
