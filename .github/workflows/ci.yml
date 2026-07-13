@@ -42,7 +42,7 @@ jobs:
 
     - name: Install Python dependencies
       run: |
-        pip install --upgrade pip setuptools wheel
+        pip install --upgrade pip setuptools wheel zope.interface
         pip install -r requirements.txt
         pip install babel BabelGladeExtractor
         pip install .[test]
