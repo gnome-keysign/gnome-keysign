@@ -81,17 +81,17 @@ class WormholeReceive:
                 else:
                     log.warning("The received key has a different MAC")
                     self._reply_error(_("Wrong message authentication code"))
-                    self._handle_failure(WrongPasswordError())
+                    return self._handle_failure(WrongPasswordError())
             else:
                 log.info("Unrecognized message: %s", m)
                 self._reply_error("Unrecognized message")
-                self._handle_failure(TransferError())
+                return self._handle_failure(TransferError())
         except WrongPasswordError as wpe:
             log.info("A wrong password has been used")
-            self._handle_failure(wpe)
+            return self._handle_failure(wpe)
         except LonelyError as le:
             log.info("Closed the connection before we found anyone")
-            self._handle_failure(le)
+            return self._handle_failure(le)
 
     def _is_verified(self, key_data):
         if self.mac is None:
