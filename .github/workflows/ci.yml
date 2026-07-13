@@ -14,11 +14,6 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.12'
-
     - name: Install system dependencies
       run: |
         sudo apt-get update
@@ -34,17 +29,23 @@ jobs:
           gpg \
           xvfb \
           libcairo2-dev \
-          pkg-config
+          pkg-config \
+          python3-gi \
+          python3-gi-cairo \
+          python3-gpg \
+          python3-venv
+
+    - name: Set up Virtual Environment with System Packages
+      run: |
+        python3 -m venv --system-site-packages venv
+        echo "PATH=$GITHUB_WORKSPACE/venv/bin:$PATH" >> $GITHUB_ENV
 
     - name: Install Python dependencies
       run: |
-        python -m pip install --upgrade pip setuptools wheel
+        pip install --upgrade pip setuptools wheel
         pip install -r requirements.txt
-        PKG_CONFIG_PATH="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig:$PKG_CONFIG_PATH" pip install pygobject gpg
         pip install babel BabelGladeExtractor
         pip install .[test]
-
-
 
     - name: Compile translation catalogs
       run: |
