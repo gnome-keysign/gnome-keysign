@@ -25,16 +25,25 @@ gi.require_version('Gtk', '4.0')
 import pytest
 import socket
 
+import threading
+
 def check_internet():
-    try:
-        socket.setdefaulttimeout(2.0)
-        socket.gethostbyname("relay.magic-wormhole.io")
-        return True
-    except Exception:
-        return False
+    res = [False]
+    def target():
+        try:
+            socket.gethostbyname("relay.magic-wormhole.io")
+            res[0] = True
+        except Exception:
+            pass
+    t = threading.Thread(target=target)
+    t.daemon = True
+    t.start()
+    t.join(timeout=1.0)
+    return res[0]
 
 HAVE_INTERNET = check_internet()
 pytestmark = pytest.mark.skipif(not HAVE_INTERNET, reason="No internet or wormhole relay unreachable")
+
 
 
 from wormhole.errors import WrongPasswordError, LonelyError
