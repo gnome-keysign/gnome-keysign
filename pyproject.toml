@@ -20,7 +20,6 @@ classifiers = [
     "Intended Audience :: Legal Industry",
     "Intended Audience :: Telecommunications Industry",
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: GNU General Public License (GPL)",
     "Operating System :: POSIX :: Linux",
     "Environment :: X11 Applications :: GTK",
     "Topic :: Desktop Environment",
