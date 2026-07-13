@@ -236,15 +236,21 @@ class SimpleInterface(ReaderApp):
         vbox.append(self.imagebox)
 
 
-        self.playButton = Gtk.Button.new_from_icon_name("media-play")
-        self.playButton.connect("clicked", self.playToggled)
+        self.playButton = Gtk.ToggleButton()
+        self.playButton.set_icon_name("media-playback-pause-symbolic")
+        self.playButton.connect("toggled", self.playToggled)
         vbox.append(self.playButton)
 
         window.present()
 
 
-    def playToggled(self, w):
-        self.reader.pause()
+    def playToggled(self, button):
+        if button.get_active():
+            self.reader.pause()
+            button.set_icon_name("media-playback-start-symbolic")
+        else:
+            self.reader.pipeline.set_state(Gst.State.PLAYING)
+            button.set_icon_name("media-playback-pause-symbolic")
 
 
     def on_barcode(self, reader, barcode, message, pixbuf):
