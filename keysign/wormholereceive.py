@@ -18,7 +18,7 @@
 
 import logging
 
-from twisted.internet.defer import inlineCallbacks, returnValue
+from twisted.internet.defer import inlineCallbacks
 from wormhole.cli.public_relay import RENDEZVOUS_RELAY
 from wormhole.errors import WrongPasswordError, LonelyError, TransferError
 import wormhole
@@ -77,7 +77,7 @@ class WormholeReceive:
                     reply = {"answer": {"message_ack": "ok"}}
                     reply_encoded = encode_message(reply)
                     self.w.send_message(reply_encoded)
-                    returnValue((key_data.encode("utf-8"), success, message))
+                    return key_data.encode("utf-8"), success, message
                 else:
                     log.warning("The received key has a different MAC")
                     self._reply_error(_("Wrong message authentication code"))
@@ -119,7 +119,7 @@ class WormholeReceive:
     def _handle_failure(error):
         success = False
         key_data = None
-        returnValue((key_data, success, type(error)))
+        return key_data, success, type(error)
 
 
 def main(args):

@@ -9,7 +9,7 @@ if __name__ == "__main__":
     gireactor.install()
     from twisted.internet import reactor
 from twisted.internet import threads
-from twisted.internet.defer import inlineCallbacks, returnValue
+from twisted.internet.defer import inlineCallbacks
 
 if __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -109,16 +109,16 @@ class BluetoothReceive:
 
             key_data = None
             success = False
-            returnValue((key_data, success, be))
+            return key_data, success, be
         except Exception as e:
             log.error("An error occurred connecting or receiving: %s" % e)
             key_data = None
             success = False
-            returnValue((key_data, success, e))
+            return key_data, success, e
 
         if self.client_socket:
             self.client_socket.close()
-        returnValue((message.decode("utf-8"), success, None))
+        return message.decode("utf-8"), success, None
 
     def stop(self):
         self.stopped = True
