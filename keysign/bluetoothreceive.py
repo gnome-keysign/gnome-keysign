@@ -49,6 +49,8 @@ class BluetoothReceive:
                 socket.SOCK_STREAM,
                 socket.BTPROTO_RFCOMM)
         message = b""
+        success = False
+        ret_val = None
         try:
             self.client_socket.setblocking(False)
             try:
@@ -60,8 +62,6 @@ class BluetoothReceive:
                 else:
                     log.exception("BT connection (%d)", be.errno)
                     raise be
-
-            success = False
             while not self.stopped and not success:
                 r, w, e = yield threads.deferToThread(select.select, [self.client_socket], [], [], 0.5)
                 if r:
