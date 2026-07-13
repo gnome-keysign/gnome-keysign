@@ -24,7 +24,8 @@ import sys
 import gi
 gi.require_version('Gst', '1.0')
 gi.require_version('GstVideo', '1.0')
-gi.require_version('Gtk', '3.0')
+gi.require_version('Gtk', '4.0')
+gi.require_version('Gdk', '4.0')
 from gi.repository import GObject
 from gi.repository import Gst
 from gi.repository import Gtk, GLib
@@ -50,11 +51,13 @@ class BarcodeReaderGTK(Gtk.Box):
     }
 
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, device=None, **kwargs):
         super(BarcodeReaderGTK, self).__init__(*args, **kwargs)
+        self.device = device
         self.connect('unmap', self.on_unmap)
         self.connect('map', self.on_map)
-
+        self.scaling_image = ScalingImage()
+        self.append(self.scaling_image)
 
 
     def on_message(self, bus, message):
@@ -93,37 +96,21 @@ class BarcodeReaderGTK(Gtk.Box):
 
 
     def run(self):
-        p = "autovideosrc  \n"
-        #p = "uridecodebin uri=file:///tmp/qr.png "
-        #p = "uridecodebin uri=file:///tmp/v.webm "
-        p += " ! tee name=t \n"
-        p += "       t. ! queue ! videoconvert \n"
-        p += "                  ! zbar cache=true attach_frame=true \n"
-        p += "                  ! fakesink \n"
-        p += "       t. ! queue ! videoconvert \n"
-        p += ("                 ! gtksink "
-            "sync=false "
-            "name=imagesink "
-            #"max-lateness=2000000000000  "
-            "enable-last-sample=false "
-            "\n"
-            )
-
-        pipeline = p
-        log.info("Launching pipeline %s", pipeline)
-        pipeline = Gst.parse_launch(pipeline)
+        src = "autovideosrc"
+        if self.device:
+            src = f"v4l2src device={self.device}"
+        pipeline_str = (
+            f"{src} "
+            " ! videoconvert "
+            " ! zbar cache=true attach_frame=true "
+            " ! videoconvert "
+            " ! appsink sync=false name=imagesink emit-signals=true max-buffers=1 drop=true caps=\"video/x-raw,format=RGBA\""
+        )
+        log.info("Launching pipeline: %s", pipeline_str)
+        pipeline = Gst.parse_launch(pipeline_str)
 
         self.imagesink = pipeline.get_by_name('imagesink')
-        self.gtksink_widget = self.imagesink.get_property("widget")
-        log.info("About to remove children from %r", self)
-        for child in self.get_children():
-            log.info("About to remove child: %r", child)
-            self.remove(child)
-        # self.gtksink_widget.set_property("expand", False)
-        log.info("Adding sink widget: %r", self.gtksink_widget)
-        #self.add(self.gtksink_widget)
-        self.pack_start(self.gtksink_widget, True, True, 0)
-        self.gtksink_widget.show()
+        self.imagesink.connect("new-sample", self.on_new_sample)
 
         self.pipeline = pipeline
 
@@ -132,6 +119,53 @@ class BarcodeReaderGTK(Gtk.Box):
         bus.add_signal_watch()
 
         pipeline.set_state(Gst.State.PLAYING)
+
+
+    def set_device(self, device):
+        log.info("Setting device to: %s", device)
+        if self.device == device:
+            return
+        
+        is_playing = False
+        if hasattr(self, 'pipeline') and self.pipeline:
+            state = self.pipeline.get_state(0)[1]
+            if state in (Gst.State.PLAYING, Gst.State.PAUSED):
+                is_playing = True
+            self.pipeline.set_state(Gst.State.NULL)
+            self.pipeline = None
+            
+        self.device = device
+        
+        if is_playing:
+            self.run()
+
+
+    def on_new_sample(self, appsink):
+        sample = appsink.emit("pull-sample")
+        if not sample:
+            return Gst.FlowReturn.ERROR
+
+        buf = sample.get_buffer()
+        caps = sample.get_caps()
+        struct = caps.get_structure(0)
+        width = struct.get_value("width")
+        height = struct.get_value("height")
+
+        data = buf.extract_dup(0, buf.get_size())
+        gbytes = GLib.Bytes.new_take(data)
+
+        pixbuf = GdkPixbuf.Pixbuf.new_from_bytes(
+            gbytes,
+            GdkPixbuf.Colorspace.RGB,
+            True,
+            8,
+            width,
+            height,
+            width * 4
+        )
+
+        GLib.idle_add(self.scaling_image.set_from_pixbuf, pixbuf)
+        return Gst.FlowReturn.OK
 
 
     def pause(self):
@@ -175,14 +209,13 @@ class ReaderApp(Gtk.Application):
 
     
     def on_activate(self, data=None):
-        window = Gtk.ApplicationWindow()
+        window = Gtk.ApplicationWindow(application=self)
         window.set_title("Gtk Gst Barcode Reader")
         reader = BarcodeReaderGTK()
         reader.connect('barcode', self.on_barcode)
-        window.add(reader)
+        window.set_child(reader)
 
-        window.show_all()
-        self.add_window(window)
+        window.present()
 
 
     def on_barcode(self, reader, barcode, message, image):
@@ -194,42 +227,43 @@ class ReaderApp(Gtk.Application):
 class SimpleInterface(ReaderApp):
     '''We tweak the UI of the demo ReaderApp a little'''
     def on_activate(self, *args, **kwargs):
-        window = Gtk.ApplicationWindow()
+        window = Gtk.ApplicationWindow(application=self)
         window.set_title("Simple Barcode Reader")
         window.set_default_size(400, 300)
 
-        vbox = Gtk.Box(Gtk.Orientation.HORIZONTAL, 0)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
         vbox.set_margin_top(3)
         vbox.set_margin_bottom(3)
-        window.add(vbox)
+        window.set_child(vbox)
 
         reader = BarcodeReaderGTK()
         reader.connect('barcode', self.on_barcode)
-        vbox.pack_start(reader, True, True, 0)
+        vbox.append(reader)
         self.reader = reader
 
         #self.image = Gtk.Image()
         # FIXME: We could show a default image like "no barcode scanned just yet"
         self.image = ScalingImage()
         self.imagebox = Gtk.Box() #expand=True)
-        self.imagebox.add(self.image)
-        self.imagebox.show()
-        vbox.pack_end(self.imagebox, True, True, 0)
+        self.imagebox.append(self.image)
+        vbox.append(self.imagebox)
 
 
-        self.playButtonImage = Gtk.Image()
-        self.playButtonImage.set_from_stock("gtk-media-play", Gtk.IconSize.BUTTON)
-        self.playButton = Gtk.Button.new()
-        self.playButton.add(self.playButtonImage)
-        self.playButton.connect("clicked", self.playToggled)
-        vbox.pack_end(self.playButton, False, False, 0)
+        self.playButton = Gtk.ToggleButton()
+        self.playButton.set_icon_name("media-playback-pause-symbolic")
+        self.playButton.connect("toggled", self.playToggled)
+        vbox.append(self.playButton)
 
-        window.show_all()
-        self.add_window(window)
+        window.present()
 
 
-    def playToggled(self, w):
-        self.reader.pause()
+    def playToggled(self, button):
+        if button.get_active():
+            self.reader.pause()
+            button.set_icon_name("media-playback-start-symbolic")
+        else:
+            self.reader.pipeline.set_state(Gst.State.PLAYING)
+            button.set_icon_name("media-playback-pause-symbolic")
 
 
     def on_barcode(self, reader, barcode, message, pixbuf):
@@ -247,8 +281,8 @@ class SimpleInterface(ReaderApp):
 
         # So we just show a window instead...
         w = Gtk.Window()
-        w.add(ScalingImage(pixbuf))
-        w.show_all()
+        w.set_child(ScalingImage(pixbuf))
+        w.present()
         return False
 
 
@@ -301,8 +335,12 @@ class ScalingImage(Gtk.DrawingArea):
         #self.set_property("width_request", 400)
         #self.set_property("height_request", 400)
         #self.set_property("margin", 10)
-        self.set_property("expand", True)
+        self.set_hexpand(True)
+        self.set_vexpand(True)
+        self.set_draw_func(self.draw_func, None)
     
+    def draw_func(self, drawing_area, cr, width, height, user_data):
+        self.do_draw(cr, widget_width=width, widget_height=height)
     
     def set_from_pixbuf(self, pixbuf):
         self.pixbuf = pixbuf
@@ -314,7 +352,7 @@ class ScalingImage(Gtk.DrawingArea):
 #        log.debug("w: %r  h: %r",  allocation.width, allocation.height)
 #        self.queue_draw()
 
-    def do_draw(self, cr, pixbuf=None):
+    def do_draw(self, cr, pixbuf=None, widget_width=None, widget_height=None):
         log.debug('Drawing ScalingImage! %r', self)
         pixbuf = pixbuf or self.pixbuf
         if not pixbuf:
@@ -328,9 +366,10 @@ class ScalingImage(Gtk.DrawingArea):
     
     
             # Scale the pixbuf down to whatever space we have
-            allocation = self.get_allocation()
-            widget_width = allocation.width
-            widget_height = allocation.height
+            if widget_width is None or widget_height is None:
+                allocation = self.get_allocation()
+                widget_width = allocation.width
+                widget_height = allocation.height
             
             
             # I think we might not need this calculation

@@ -240,7 +240,7 @@ def test_fingerprint_from_data():
 
 
 class TestKey1:
-    def setup(self):
+    def setup_method(self):
         data = read_fixture_file("pubkey-1.asc")
         self.key = openpgpkey_from_data(data)
 
@@ -263,7 +263,7 @@ def test_get_public_key_no_data():
 
 
 class TestGetPublicKeyData:
-    def setup(self):
+    def setup_method(self):
         self.fname = get_fixture_file("pubkey-1.asc")
         original = open(self.fname, 'rb').read()
         # This should be a new, empty directory
@@ -276,7 +276,7 @@ class TestGetPublicKeyData:
     
         self.originalkey = openpgpkey_from_data(original)
 
-    def teardown(self):
+    def teardown_method(self):
         # shutil.rmtree(self.homedir)
         pass
 
@@ -309,7 +309,7 @@ def test_get_empty_usable_keys():
 
 
 class TestGetUsableKeys:
-    def setup(self):
+    def setup_method(self):
         self.fname = get_fixture_file("pubkey-1.asc")
         original = open(self.fname, 'rb').read()
         # This should be a new, empty directory
@@ -322,7 +322,7 @@ class TestGetUsableKeys:
     
         self.originalkey = openpgpkey_from_data(original)
 
-    def teardown(self):
+    def teardown_method(self):
         # shutil.rmtree(self.homedir)
         pass
 
@@ -341,7 +341,7 @@ class TestGetUsableKeys:
 
 
 class TestGetUsableSecretKeys:
-    def setup(self):
+    def setup_method(self):
         self.fname = get_fixture_file("seckey-no-pw-1.asc")
         original = open(self.fname, 'rb').read()
         # This should be a new, empty directory
@@ -354,7 +354,7 @@ class TestGetUsableSecretKeys:
     
         self.originalkey = openpgpkey_from_data(original)
 
-    def teardown(self):
+    def teardown_method(self):
         # shutil.rmtree(self.homedir)
         pass
 
@@ -391,7 +391,7 @@ class TestSignAndEncrypt:
     SENDER_KEY = "seckey-no-pw-1.asc"
     RECEIVER_KEY = "seckey-no-pw-2.asc"
 
-    def setup(self):
+    def setup_method(self):
         # The "sender" sends its certificate to have it certified by the receiver
         self.key_sender_key = get_fixture_file(self.SENDER_KEY)
         # The "receiver" will receive the certificate, certify it, and send it back to the "sender"
@@ -404,7 +404,7 @@ class TestSignAndEncrypt:
         check_call(sender_gpgcmd + ["--import", self.key_sender_key])
         check_call(receiver_gpgcmd + ["--import", self.key_receiver_key])
 
-    def teardown(self):
+    def teardown_method(self):
         # shutil.rmtree(self.sender_homedir)
         # shutil.rmtree(self.receiver_homedir)
         pass

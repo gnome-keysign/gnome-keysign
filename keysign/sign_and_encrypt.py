@@ -21,6 +21,7 @@ import argparse
 import logging
 import sys
 
+
 from .gpgmeh import sign_keydata_and_encrypt, fingerprint_from_keydata
 
 def main():

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel", "babel", "BabelGladeExtractor"]
+requires = ["setuptools>=61.0.0", "wheel", "babel", "BabelGladeExtractor"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,11 +7,11 @@ name = "gnome-keysign"
 dynamic = ["version"]
 description = "OpenPGP key signing helper"
 readme = "README.rst"
-license = {text = "GPLv3+"}
 authors = [
-    {name = "Tobias Mueller", email = "tobiasmue@gnome.org"}
+    { name = "Tobias Mueller", email = "tobiasmue@gnome.org" }
 ]
-requires-python = ">=3.5"
+urls = { Homepage = "https://wiki.gnome.org/Apps/Keysign" }
+license = { text = "GPL-3.0-or-later" }
 classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: System Administrators",
@@ -29,47 +29,40 @@ classifiers = [
     "Topic :: Communications :: Email",
     "Topic :: Multimedia :: Video :: Capture",
     "Topic :: Security :: Cryptography",
-    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Libraries :: Python Modules"
 ]
 dependencies = [
     "requests>=2.6",
     "qrcode",
     "twisted[tls]>=17.5.0",
-    "magic-wormhole>=0.10.2",
+    "magic-wormhole>=0.10.2"
 ]
 
 [project.optional-dependencies]
-bluetooth = ["pybluez>=0.22"]
 test = [
     "pytest",
     "pytest_twisted",
     "tox",
     "pycodestyle",
-    "pylint",
+    "pylint"
 ]
 
-[project.urls]
-Homepage = "https://wiki.gnome.org/Apps/Keysign"
-
-[project.scripts]
+[project.entry-points.console_scripts]
 gnome-keysign-sign-key = "keysign.SignKey:main"
 gnome-keysign-split-uids = "keysign.export_uids:main"
 
-[project.gui-scripts]
+[project.entry-points.gui_scripts]
 gnome-keysign = "keysign:main"
 
 [tool.setuptools]
 packages = ["keysign", "keysign.compat", "keysign.network"]
 include-package-data = true
 
+[tool.setuptools.package-data]
+keysign = ["*.ui", "locale/*/*/*.mo"]
+
 [tool.setuptools.dynamic]
 version = {attr = "keysign._version.__version__"}
-
-[tool.setuptools.package-data]
-keysign = [
-    "*.ui",
-    "locale/*/*/*.mo",
-]
 
 [tool.setuptools.data-files]
 "share/applications" = ["data/org.gnome.Keysign.desktop"]
@@ -81,3 +74,4 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+pythonpath = ["."]

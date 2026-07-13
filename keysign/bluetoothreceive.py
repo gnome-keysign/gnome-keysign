@@ -1,13 +1,12 @@
 import logging
 import select
-from bluetooth import BluetoothSocket, BluetoothError, RFCOMM
 import socket
 
 if __name__ == "__main__":
     import gi
-    gi.require_version('Gtk', '3.0')
-    from twisted.internet import gtk3reactor
-    gtk3reactor.install()
+    gi.require_version('Gtk', '4.0')
+    from twisted.internet import gireactor
+    gireactor.install()
     from twisted.internet import reactor
 from twisted.internet import threads
 from twisted.internet.defer import inlineCallbacks, returnValue
@@ -32,6 +31,10 @@ from .util import mac_verify
 log = logging.getLogger(__name__)
 
 
+class BluetoothError(OSError):
+    pass
+
+
 class BluetoothReceive:
     def __init__(self, port=3, size=1024):
         self.port = port
@@ -41,18 +44,23 @@ class BluetoothReceive:
 
     @inlineCallbacks
     def find_key(self, bt_mac, mac):
-        self.client_socket = BluetoothSocket(RFCOMM)
+        self.client_socket = socket.socket(
+                socket.AF_BLUETOOTH,
+                socket.SOCK_STREAM,
+                socket.BTPROTO_RFCOMM)
         message = b""
         try:
             self.client_socket.setblocking(False)
             try:
                 log.info("Trying to connect to %s port %s", bt_mac, self.port)
                 self.client_socket.connect((bt_mac, self.port))
-            except BluetoothError as be:
-                if be.args[0] == "(115, 'Operation now in progress')":
+            except OSError as be:
+                if be.errno == 115: #"(115, 'Operation now in progress')":
                     pass
                 else:
+                    log.exception("BT connection (%d)", be.errno)
                     raise be
+
             success = False
             while not self.stopped and not success:
                 r, w, e = yield threads.deferToThread(select.select, [self.client_socket], [], [], 0.5)
@@ -66,8 +74,11 @@ class BluetoothReceive:
                             part_message = self.client_socket.recv(self.size)
                             log.debug("Read %d bytes: %r", len(part_message), part_message)
                             message += part_message
-                    except BluetoothError as be:
-                        if be.args[0] == "(104, 'Connection reset by peer')":
+                    except ConnectionRefusedError as be:
+                        log.exception("Connection Refused!")
+                    except OSError as be:
+                        log.exception("BT recv (%d)", be.errno)
+                        if be.errno == 104: # "(104, 'Connection reset by peer')":
                             log.info("Bluetooth connection closed, let's check if we downloaded the key")
                         else:
                             raise be
@@ -81,17 +92,21 @@ class BluetoothReceive:
                 log.info("MAC validation failed: %r", verified)
                 success = False
                 message = b""
-        except BluetoothError as be:
-            if be.args[0] == "(16, 'Device or resource busy')":
+        except ConnectionRefusedError as be:
+            log.info("CR")
+        except OSError as be:
+            log.exception("BT conn (%d)", be.errno)
+            if be.errno == 16: # "(16, 'Device or resource busy')":
                 log.info("Probably has been provided a partial bt mac")
-            elif be.args[0] == "(111, 'Connection refused')":
+            elif be.errno == 111: # "(111, 'Connection refused')":
                 log.info("The sender refused our connection attempt")
-            elif be.args[0] == "(112, 'Host is down')":
+            elif be.errno == 112: #  "(112, 'Host is down')":
                 log.info("The sender's Bluetooth is not available")
-            elif be.args[0] == "(113, 'No route to host')":
+            elif be.errno == 113: # "(113, 'No route to host')":
                 log.info("An error occurred with Bluetooth, if present probably the device is not powered")
             else:
-                log.info("An unknown bt error occurred: %s" % be.args[0])
+                log.info("An unknown bt error occurred: %s" % be.errno)
+
             key_data = None
             success = False
             returnValue((key_data, success, be))
@@ -111,8 +126,8 @@ class BluetoothReceive:
             try:
                 self.client_socket.shutdown(socket.SHUT_RDWR)
                 self.client_socket.close()
-            except BluetoothError as be:
-                if be.args[0] == "(9, 'Bad file descriptor')":
+            except OSError as be:
+                if be.errno == 9: #"(9, 'Bad file descriptor')":
                     log.info("The old Bluetooth connection was already closed")
                 else:
                     log.exception("An unknown bt error occurred")

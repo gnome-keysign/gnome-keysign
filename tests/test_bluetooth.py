@@ -6,7 +6,7 @@ from subprocess import check_call
 import tempfile
 import unittest
 import gi
-gi.require_version('Gtk', '3.0')
+gi.require_version('Gtk', '4.0')
 
 from twisted.internet import threads
 from pytest_twisted import inlineCallbacks
@@ -17,6 +17,15 @@ try:
     HAVE_BT = True
 except ImportError:
     HAVE_BT = False
+
+HAVE_2_BT = False
+if HAVE_BT:
+    try:
+        from keysign.bluetoothutil import _get_available_bt
+        HAVE_2_BT = len(_get_available_bt()) >= 2
+    except Exception:
+        pass
+
 from keysign.gpgmeh import get_public_key_data, openpgpkey_from_data
 from keysign.util import mac_generate
 
@@ -50,7 +59,7 @@ def import_key_from_file(fixture, homedir):
 
 
 @inlineCallbacks
-@unittest.skipUnless(HAVE_BT, "requires bluetooth module")
+@unittest.skipUnless(HAVE_2_BT, "requires two working bluetooth devices")
 def test_bt():
     """This test requires two working Bluetooth devices"""
     # This should be a new, empty directory
@@ -74,13 +83,13 @@ def test_bt():
     msg_tuple = yield receive.find_key(code, hmac)
     log.debug("Receiving yielded: %r", msg_tuple)
     downloaded_key_data, success, _ = msg_tuple
-    assert success, "No success :( %r" % msg_tuple
+    assert success, "No success :( %r" % (msg_tuple,)
     log.info("Checking with key: %r", downloaded_key_data)
     assert downloaded_key_data.encode("utf-8") == file_key_data
 
 
 @inlineCallbacks
-@unittest.skipUnless(HAVE_BT, "requires bluetooth module")
+@unittest.skipUnless(HAVE_2_BT, "requires two working bluetooth devices")
 def test_bt_wrong_hmac():
     """This test requires two working Bluetooth devices"""
     # This should be a new, empty directory
@@ -113,11 +122,11 @@ def test_bt_wrong_mac():
     downloaded_key_data, success, error = msg_tuple
     assert downloaded_key_data is None
     assert not success
-    assert error.args[0] == "(112, 'Host is down')"
+    assert error.args[0] in (112, 113, "(112, 'Host is down')")
 
 
 @inlineCallbacks
-@unittest.skipUnless(HAVE_BT, "requires bluetooth module")
+@unittest.skipUnless(HAVE_2_BT, "requires two working bluetooth devices")
 def test_bt_corrupted_key():
     """This test requires two working Bluetooth devices"""
 

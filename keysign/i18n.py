@@ -39,4 +39,4 @@ from locale import gettext as _
 try:
     _ = lang.ugettext
 except AttributeError:
-    log.info("Cannot get ugettext from lang: %r", lang, exc_info=True)
+    _ = lang.gettext

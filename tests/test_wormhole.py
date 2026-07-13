@@ -21,7 +21,7 @@ import logging
 from subprocess import check_call
 import tempfile
 import gi
-gi.require_version('Gtk', '3.0')
+gi.require_version('Gtk', '4.0')
 
 from wormhole.errors import WrongPasswordError, LonelyError
 from pytest_twisted import inlineCallbacks
@@ -167,23 +167,24 @@ def test_wrmhl_with_hmac():
 
 @inlineCallbacks
 def test_offer_cancel():
+    from unittest.mock import patch
+    with patch('keysign.Keyserver.AvahiPublisher') as MockAvahiPublisher:
+        def _received(start_data):
+            success, message = start_data
+            assert message is not None
+            assert isinstance(message, LonelyError)
 
-    def _received(start_data):
-        success, message = start_data
-        assert message is not None
-        assert isinstance(message, LonelyError)
+        # This should be a new, empty directory
+        homedir = tempfile.mkdtemp()
+        os.environ["GNUPGHOME"] = homedir
+        key = import_key_from_file("seckey-no-pw-1.asc", homedir)
+        log.info("Running with key %r", key)
+        # Start offering the key
+        offer = Offer(key)
+        _ = yield offer.allocate_code(worm=True)
 
-    # This should be a new, empty directory
-    homedir = tempfile.mkdtemp()
-    os.environ["GNUPGHOME"] = homedir
-    key = import_key_from_file("seckey-no-pw-1.asc", homedir)
-    log.info("Running with key %r", key)
-    # Start offering the key
-    offer = Offer(key)
-    _ = yield offer.allocate_code(worm=True)
+        defers = offer.start()
+        for de in defers:
+            de.addCallback(_received)
 
-    defers = offer.start()
-    for de in defers:
-        de.addCallback(_received)
-
-    offer.stop()
+        offer.stop()

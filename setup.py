@@ -1,11 +1,13 @@
 #!/usr/bin/env python
-#
-# Minimal setup.py for custom build commands
-# Main configuration is in pyproject.toml
 
+import os
 from setuptools import setup
 from distutils.command.build import build
 
+os.chdir(os.path.dirname(os.path.realpath(__file__)))
+
+with open(os.path.join('keysign', '_version.py')) as f:
+    exec(f.read())
 
 class BuildWithCompile(build):
     """Custom build command that translates desktop and appdata files"""
@@ -21,11 +23,19 @@ class BuildWithCompile(build):
                               'keysign/locale')
         build.run(self)
 
-
-# All configuration is in pyproject.toml
-# This setup.py only provides custom build commands
 setup(
+    version=__version__,
     cmdclass={
         'build': BuildWithCompile,
+    },
+    message_extractors={
+        '': [
+           ('**.raw.desktop', 'babelglade:extract_desktop', None),
+           ('**.raw.appdata.xml', 'babelglade:extract_glade', None),
+        ],
+        'keysign': [
+            ('**.py', 'python', None),
+            ('**.ui', 'babelglade:extract_glade', None),
+        ],
     },
 )

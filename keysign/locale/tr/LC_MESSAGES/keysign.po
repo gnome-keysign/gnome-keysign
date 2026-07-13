@@ -1,25 +1,25 @@
 # Turkish translation for gnome-keysign.
-# Copyright (C) 2019-2022 gnome-keysign's COPYRIGHT HOLDER
+# Copyright (C) 2019-2024 gnome-keysign's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-keysign package.
 #
-# Emin Tufan Çetin <etcetin@gmail.com>, 2021, 2022, 2023.
-# Sabri Ünal <libreajans@gmail.com>, 2019, 2022, 2023.
+# Sabri Ünal <yakushabb@gmail.com>, 2019, 2022-2024.
+# Emin Tufan Çetin <etcetin@gmail.com>, 2021-2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2022-12-12 13:18+0000\n"
-"PO-Revision-Date: 2023-01-27 23:54+0300\n"
-"Last-Translator: Sabri Ünal <libreajans@gmail.com>\n"
-"Language-Team: Türkçe <gnome-turk@gnome.org>\n"
+"POT-Creation-Date: 2024-08-12 15:26+0000\n"
+"PO-Revision-Date: 2024-09-11 14:54+0300\n"
+"Last-Translator: Sabri Ünal <yakushabb@gmail.com>\n"
+"Language-Team: Türkçe <takim@gnome.org.tr>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "Generated-By: Babel 2.6.0\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.5\n"
 
 #: data/org.gnome.Keysign.raw.appdata.xml:14
 msgid ""
@@ -80,11 +80,11 @@ msgstr "org.gnome.Keysign"
 msgid "Send"
 msgstr "Gönder"
 
-#: keysign/app.py:188 keysign/receive.py:279
+#: keysign/app.py:188 keysign/receive.py:307
 msgid "Receive"
 msgstr "Al"
 
-#: keysign/app.ui:62 keysign/send.ui:1003
+#: keysign/app.ui:62 keysign/send.ui:1081
 msgid "Internet"
 msgstr "İnternet"
 
@@ -161,15 +161,15 @@ msgstr ""
 msgid "OK"
 msgstr "Tamam"
 
-#: keysign/gtkexcepthook.py:173
+#: keysign/gtkexcepthook.py:169
 msgid "Bug Detected"
 msgstr "Hata Algılandı"
 
-#: keysign/gtkexcepthook.py:175
+#: keysign/gtkexcepthook.py:171
 msgid "<big><b>A programming error has been detected.</b></big>"
 msgstr "<big><b>Bir programlama hatası algılandı.</b></big>"
 
-#: keysign/gtkexcepthook.py:178
+#: keysign/gtkexcepthook.py:174
 msgid ""
 "You may be able to ignore this error and carry on working, but you may get "
 "unexpected results.\n"
@@ -183,27 +183,27 @@ msgstr ""
 "Henüz bir başkası bildirmediyse, lütfen hata takipçisi kullanarak "
 "geliştiricileri bu konuda bilgilendirin."
 
-#: keysign/gtkexcepthook.py:187
+#: keysign/gtkexcepthook.py:183
 msgid "Search Tracker..."
 msgstr "İzleyici Tara..."
 
-#: keysign/gtkexcepthook.py:189
+#: keysign/gtkexcepthook.py:185
 msgid "Report..."
 msgstr "Bildir..."
 
-#: keysign/gtkexcepthook.py:191
+#: keysign/gtkexcepthook.py:187
 msgid "Ignore Error"
 msgstr "Hataları Görmezden Gel"
 
-#: keysign/gtkexcepthook.py:192
+#: keysign/gtkexcepthook.py:188
 msgid "Quit GNOME Keysign"
 msgstr "GNOME Keysign uygulamasından çık"
 
-#: keysign/gtkexcepthook.py:202
+#: keysign/gtkexcepthook.py:198
 msgid "Details..."
 msgstr "Ayrıntılar..."
 
-#: keysign/gtkexcepthook.py:229 keysign/gtkexcepthook.py:232
+#: keysign/gtkexcepthook.py:225 keysign/gtkexcepthook.py:228
 msgid "Exception while analyzing the exception."
 msgstr "İstisna incelenirken istisna oluştu."
 
@@ -211,7 +211,7 @@ msgstr "İstisna incelenirken istisna oluştu."
 #. TRANSLATORS: Crash report template for github, preceding a traceback.
 #. TRANSLATORS: Please ask users kindly to supply at least an English
 #. TRANSLATORS: title if they are able.
-#: keysign/gtkexcepthook.py:281
+#: keysign/gtkexcepthook.py:277
 msgid ""
 "            #### Description\n"
 "\n"
@@ -255,15 +255,15 @@ msgstr ""
 "            #### Traceback\n"
 "        "
 
-#: keysign/keylistwidget.py:83
+#: keysign/keylistwidget.py:82
 msgid "Expires: "
 msgstr "Geçerlilik süresi: "
 
-#: keysign/receive.py:158
+#: keysign/receive.py:186
 msgid "Sign Key"
 msgstr "Anahtar İmzala"
 
-#: keysign/receive.py:225
+#: keysign/receive.py:253
 msgid "Select file for saving"
 msgstr "Kaydetmek için dosya seç"
 
@@ -296,7 +296,7 @@ msgstr "<b>Kamera</b>"
 msgid "Integrated Web Cam"
 msgstr "Tümleşik Kamera"
 
-#: keysign/receive.ui:179 keysign/send.ui:609
+#: keysign/receive.ui:179 keysign/send.ui:687
 msgid "<b>Security Code</b>"
 msgstr "<b>Güvenlik Kodu</b>"
 
@@ -319,11 +319,11 @@ msgstr "Hatayla ilgili ayrıntıları göster"
 #: keysign/receive.ui:381
 msgid ""
 "Error producing certifications ☹\n"
-"Something went wrong. Sometime, the passphrase was not correctly entered.\n"
+"Something went wrong. Sometimes, the passphrase was not correctly entered.\n"
 "You may try again by clicking the \"confirm\" button."
 msgstr ""
 "Sertifikalar oluşturulurken hata ☹\n"
-"Bir şeyler yanlış gitti. Parola metni doğru girilmedi.\n"
+"Bir şeyler yanlış gitti. Bazen parola metni doğru girilmemiş olabilir.\n"
 "\"Onayla\" düğmesine tıklayarak yeniden deneyebilirsiniz."
 
 #: keysign/receive.ui:427
@@ -355,7 +355,7 @@ msgstr ""
 msgid "Key"
 msgstr "Anahtar"
 
-#: keysign/receive.ui:574 keysign/send.ui:534
+#: keysign/receive.ui:574 keysign/send.ui:612
 msgid "UIDs"
 msgstr "UID’ler"
 
@@ -377,17 +377,17 @@ msgstr "_Onayla"
 msgid "Signing the following UIDs:"
 msgstr "Şu UIDʼler imzalanıyor:"
 
-#: keysign/send.py:251
+#: keysign/send.py:292
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
 msgstr "Hala internete bağlanmaya çalışılıyor. Yavaş veya erişilemez olabilir."
 
-#: keysign/send.py:257
+#: keysign/send.py:298
 msgid "There isn't an Internet connection!"
 msgstr "İnternet bağlantısı yok!"
 
-#: keysign/send.py:348
+#: keysign/send.py:413
 #, python-format
 msgid ""
 "An unexpected error occurred:\n"
@@ -412,11 +412,11 @@ msgstr ""
 msgid "Very slow or no Internet connection!"
 msgstr "İnternet bağlantınız çok yavaş veya bağlantı yok!"
 
-#: keysign/send.ui:204 keysign/send.ui:751
+#: keysign/send.ui:204 keysign/send.ui:829
 msgid "The signature has been successfully imported!"
 msgstr "İmza başarıyla içe aktarıldı!"
 
-#: keysign/send.ui:230 keysign/send.ui:777
+#: keysign/send.ui:230 keysign/send.ui:855
 msgid ""
 "Returns the received certification back to the sender, so that the sender "
 "can make use of your OpenPGP certificate"
@@ -424,29 +424,33 @@ msgstr ""
 "Alınan sertifikasyonu göndericiye geri döndürür, böylece gönderici OpenPGP "
 "sertifikanızdan yararlanabilir"
 
-#: keysign/send.ui:277 keysign/send.ui:822
+#: keysign/send.ui:277 keysign/send.ui:900
 msgid "Display more details for the error."
 msgstr "Hata için daha çok ayrıntı göster."
 
-#: keysign/send.ui:308 keysign/send.ui:853
+#: keysign/send.ui:308 keysign/send.ui:931
 msgid "An error occurred while trying to import the signature."
 msgstr "İmzayı içe aktarmaya çalışırken hata oluştu."
 
+#: keysign/send.ui:386
+msgid "Not imported this certification because it is already known."
+msgstr "Bu sertifika zaten bilindiğinden içe aktarılmadı."
+
 #. This refers to the key being certified by someone rather than the key used for
 #. certifying someone
-#: keysign/send.ui:363
+#: keysign/send.ui:441
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>İmzalamak için anahtar seç</b>"
 
-#: keysign/send.ui:379
+#: keysign/send.ui:457
 msgid "<small>Times signed</small>"
 msgstr "<small>İmzalanma zamanı</small>"
 
-#: keysign/send.ui:446
+#: keysign/send.ui:524
 msgid "Keylist"
 msgstr "Anahtar Listesi"
 
-#: keysign/send.ui:466
+#: keysign/send.ui:544
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
@@ -454,19 +458,19 @@ msgstr ""
 "<small>Anahtarın imzalanması için, diğer kişi güvenlik kodunu girmeli veya "
 "QR kodunu taramalıdır.</small>"
 
-#: keysign/send.ui:493
+#: keysign/send.ui:571
 msgid "<b>Key Details</b>"
 msgstr "<b>Anahtar Ayrıntıları</b>"
 
-#: keysign/send.ui:518
+#: keysign/send.ui:596
 msgid "Fingerprint"
 msgstr "Parmak İzi"
 
-#: keysign/send.ui:672
+#: keysign/send.ui:750
 msgid "<b>QR Code</b>"
 msgstr "<b>QR Kodu</b>"
 
-#: keysign/send.ui:897
+#: keysign/send.ui:975
 msgid ""
 "Could not establish a secure connection.\n"
 "Either your partner has entered a wrong code or someone tried to intercept "
@@ -475,7 +479,7 @@ msgstr ""
 "Güvenli bağlantı oluşturulamadı.\n"
 "Eşiniz yanlış kod girmiş olabilir veya birisi bağlantınızı kesmiş olabilir."
 
-#: keysign/send.ui:915
+#: keysign/send.ui:993
 msgid ""
 "Key successfully sent.\n"
 "You should receive an email with the signature soon.\n"
@@ -485,19 +489,19 @@ msgstr ""
 "Yakında imzalı bir e-posta almalısınız.\n"
 "Sertifikanızı içe aktarmak için e-postayı buraya sürükleyip bırakabilirsiniz."
 
-#: keysign/send.ui:932
+#: keysign/send.ui:1010
 msgid "An unexpected error occurred."
 msgstr "Beklenmedik hata oluştu."
 
-#: keysign/send.ui:961
+#: keysign/send.ui:1039
 msgid "Select and Send key"
 msgstr "Anahtar Seç ve Gönder"
 
-#: keysign/send.ui:1001
+#: keysign/send.ui:1079
 msgid "Also use the Internet to transfer the certificate"
 msgstr "Ayrıca, sertifikayı aktarmak için İnternetʼi kullan"
 
-#: keysign/util.py:231
+#: keysign/util.py:225
 msgid ""
 "Hi $uid,\n"
 "\n"
@@ -525,6 +529,6 @@ msgstr ""
 "--\n"
 "GNOME Keysign\n"
 
-#: keysign/wormholereceive.py:86
+#: keysign/wormholereceive.py:85
 msgid "Wrong message authentication code"
 msgstr "Hatalı ileti kimlik doğrulama kodu"

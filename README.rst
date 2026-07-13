@@ -22,8 +22,8 @@ and gives the user a well known interface.
 
 
 The list of features includes:
-
-    * Modern GTK3 GUI
+ 
+    * Modern GTK4 & Libadwaita GUI
     * Avahi-based discovery of peers in the local network
     * alternatively: Key transfer via Bluetooth
     * Cryptographically authenticated key exchange
@@ -47,7 +47,7 @@ The list of dependencies includes:
     * avahi with python bindings
     * dbus with python bindings
     * GStreamer with the good and bad plugins
-    * GTK and Cairo
+    * GTK4, Libadwaita, and Cairo
     * gobject introspection for those libraries
     * Magic Wormhole
     * PyBluez (optional)
@@ -80,7 +80,7 @@ so it should be easy for you to install it.
 If your version is older than that,
 this list of packages seems to make it work:
 
-    python  python-babelgladeextractor avahi-daemon  python-gi  gir1.2-glib-2.0   gir1.2-gtk-3.0 python-dbus    gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad gstreamer1.0-plugins-good gstreamer1.0-gtk3  python-gi-cairo python-gpg  python-twisted python-future
+    python3 python3-babelgladeextractor avahi-daemon python3-gi gir1.2-glib-2.0 gir1.2-gtk-4.0 gir1.2-adw-1 python3-dbus gir1.2-gstreamer-1.0 gir1.2-gst-plugins-base-1.0 gstreamer1.0-plugins-bad gstreamer1.0-plugins-good python3-gi-cairo python3-gpg python3-twisted
 
 Magic Wormhole can be installed with pip:
 
@@ -88,16 +88,13 @@ Magic Wormhole can be installed with pip:
 
     pip install magic-wormhole
 
-In Ubuntu, the package
-gstreamer1.0-plugins-bad provides the zbar element and in versions older
-than 18.04 the gtksink element.
-In newer versions of Ubuntu, the gtksink element is provided by the
-gstreamer1.0-gtk3 packages.
-gstreamer1.0-plugins-good provides the autovideosrc element.
+In Ubuntu, the package gstreamer1.0-plugins-bad provides the zbar element,
+and gstreamer1.0-plugins-good provides the autovideosrc element.
+GStreamer's appsink is used for rendering the video stream.
 
 These packages should be optional:
 
-    python-requests python-qrcode python-bluez
+    python3-requests python3-qrcode python3-bluez
 
 
 Fedora dependencies
@@ -113,14 +110,14 @@ assuming that pip and git are already installed:
 
 .. code::
 
-    sudo dnf install -y python-babel-BabelGladeExtractor python-gobject dbus-python gstreamer1-plugins-bad-free-gtk gstreamer1-plugins-good  gnupg python-gnupg  python-twisted
+    sudo dnf install -y python3-babel-BabelGladeExtractor python3-gobject dbus-python gstreamer1-plugins-bad-free gstreamer1-plugins-good gnupg python3-gpg python3-twisted libadwaita
     pip install magic-wormhole
 
 As optional:
 
 .. code::
 
-    sudo dnf install -y pybluez
+    sudo dnf install -y python3-bluez
 
 
 Installation with pip
@@ -228,3 +225,45 @@ signed.  If you are happy with what you see, i.e. because you have
 checked the names on the key to be correct, you can click next.  This 
 will cause the program to sign the key and open your mail program with 
 the encrypted signature preloaded as attachment.
+
+
+Translation and Localization
+============================
+
+GNOME Keysign uses Babel for translation extraction and catalog management.
+
+Using the pybabel CLI (Recommended)
+----------------------------------
+
+You can use the `pybabel` CLI directly, which reads the configuration from `setup.cfg`:
+
+* **Extract messages to POT file**:
+
+  .. code::
+
+      pybabel extract -F setup.cfg -o keysign/locale/keysign.pot .
+
+* **Update translation catalogs**:
+
+  .. code::
+
+      pybabel update -D keysign -i keysign/locale/keysign.pot -d keysign/locale
+
+* **Compile translation catalogs**:
+
+  .. code::
+
+      pybabel compile -D keysign -d keysign/locale
+
+
+Using legacy setup.py commands
+-----------------------------
+
+You can also run these operations via the setup.py interface:
+
+.. code::
+
+    python3 setup.py extract_messages
+    python3 setup.py update_catalog
+    python3 setup.py compile_catalog
+
