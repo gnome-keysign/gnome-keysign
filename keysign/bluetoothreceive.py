@@ -92,8 +92,10 @@ class BluetoothReceive:
                 log.info("MAC validation failed: %r", verified)
                 success = False
                 message = b""
+            ret_val = message.decode("utf-8"), success, None
         except ConnectionRefusedError as be:
             log.info("CR")
+            ret_val = message.decode("utf-8"), success, None
         except OSError as be:
             log.exception("BT conn (%d)", be.errno)
             if be.errno == 16: # "(16, 'Device or resource busy')":
@@ -109,16 +111,16 @@ class BluetoothReceive:
 
             key_data = None
             success = False
-            return key_data, success, be
+            ret_val = key_data, success, be
         except Exception as e:
             log.error("An error occurred connecting or receiving: %s" % e)
             key_data = None
             success = False
-            return key_data, success, e
+            ret_val = key_data, success, e
 
         if self.client_socket:
             self.client_socket.close()
-        return message.decode("utf-8"), success, None
+        return ret_val
 
     def stop(self):
         self.stopped = True
