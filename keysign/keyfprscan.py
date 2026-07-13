@@ -129,7 +129,18 @@ class KeyFprScanWidget(Gtk.Box):
         monitor.stop()
         
         self.camera_devices = {}
-        suitable_index = -1
+        best_suitable_idx = -1
+        best_suitable_v4l2 = -1
+        
+        best_unsuitable_idx = -1
+        best_unsuitable_v4l2 = -1
+        
+        import re
+        def get_v4l2_index(path):
+            if not path:
+                return -1
+            m = re.search(r'\d+$', path)
+            return int(m.group(0)) if m else -1
         
         for idx, device in enumerate(devices):
             display_name = device.get_display_name()
@@ -150,20 +161,32 @@ class KeyFprScanWidget(Gtk.Box):
             name_lower = display_name.lower()
             is_unsuitable = "ir" in name_lower or "infrared" in name_lower or "infra-red" in name_lower
             
+            v4l2_num = get_v4l2_index(device_path)
+            current_idx = len(self.camera_devices)
+            item_id = str(current_idx)
+            self.camera_devices[item_id] = device_path
+            
             if is_unsuitable:
                 label = f"⚠️ {display_name} ({device_path}) [IR / Unsuitable]"
+                if v4l2_num > best_unsuitable_v4l2:
+                    best_unsuitable_v4l2 = v4l2_num
+                    best_unsuitable_idx = current_idx
             else:
                 label = f"{display_name} ({device_path})"
-                if suitable_index == -1:
-                    suitable_index = len(self.camera_devices)
+                if v4l2_num > best_suitable_v4l2:
+                    best_suitable_v4l2 = v4l2_num
+                    best_suitable_idx = current_idx
             
-            item_id = str(len(self.camera_devices))
-            self.camera_devices[item_id] = device_path
             self.camera_selector.append(item_id, label)
             
         if self.camera_devices:
             self.camera_selector.connect("changed", self.on_camera_changed)
-            default_index = suitable_index if suitable_index != -1 else 0
+            if best_suitable_idx != -1:
+                default_index = best_suitable_idx
+            elif best_unsuitable_idx != -1:
+                default_index = best_unsuitable_idx
+            else:
+                default_index = 0
             self.camera_selector.set_active(default_index)
             default_path = self.camera_devices.get(str(default_index))
             if default_path:
