@@ -1,7 +1,16 @@
 import os
 import logging
 import pytest
-import qrcode
+HAVE_CAMERA_DEPS = False
+try:
+    import qrcode
+    from PIL import Image
+    HAVE_CAMERA_DEPS = True
+except ImportError:
+    qrcode = None
+
+pytestmark = pytest.mark.skipif(not HAVE_CAMERA_DEPS, reason="Missing camera test dependencies (qrcode or PIL)")
+
 import gi
 gi.require_version('Gst', '1.0')
 gi.require_version('Gtk', '4.0')
