@@ -14,11 +14,17 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
     - name: Install system dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y \
           libgirepository1.0-dev \
+          libgirepository-2.0-dev \
           libgtk-4-dev \
           libgstreamer1.0-dev \
           libgstreamer-plugins-base1.0-dev \
@@ -29,20 +35,12 @@ jobs:
           gpg \
           xvfb \
           libcairo2-dev \
-          pkg-config \
-          python3-gi \
-          python3-gi-cairo \
-          python3-gpg \
-          python3-venv
-
-    - name: Set up Virtual Environment with System Packages
-      run: |
-        /usr/bin/python3 -m venv --system-site-packages venv
-        echo "PATH=$GITHUB_WORKSPACE/venv/bin:$PATH" >> $GITHUB_ENV
+          pkg-config
 
     - name: Install Python dependencies
       run: |
-        pip install --upgrade pip setuptools wheel zope.interface
+        python -m pip install --upgrade pip setuptools wheel
+        PKG_CONFIG_PATH="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig" pip install pygobject gpg
         pip install -r requirements.txt
         pip install babel BabelGladeExtractor
         pip install .[test]
