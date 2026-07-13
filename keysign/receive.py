@@ -27,7 +27,7 @@ from urllib.parse import unquote
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from gi.repository import Gtk, GLib, Adw
+from gi.repository import Gtk, GLib, Adw, Gdk
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 if __name__ == "__main__":

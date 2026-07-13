@@ -151,10 +151,10 @@ class PreSignWidget(Gtk.Box):
                     text="Error certifying key"
                 )
                 dialog.format_secondary_text(
-                    str(exception) + "\n"
+                    str(exception) + "\n" +
                     "We don't know any more, sorry :(")
-                dialog.run()
-                dialog.destroy()
+                dialog.connect("response", lambda d, r: d.destroy())
+                dialog.present()
             self.infobar_show_error_button.connect("clicked", show_error)
         self.infobar_errors.show = show
 

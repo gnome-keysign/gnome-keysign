@@ -162,7 +162,7 @@ def _info(exctyp, value, tb):
 
     exception_dialog_active = True
     # Create the dialog
-    dialog = Gtk.MessageDialog(type=Gtk.MessageType.WARNING)
+    dialog = Gtk.MessageDialog(message_type=Gtk.MessageType.WARNING)
     dialog.set_title(_("Bug Detected"))
 
     primary = _(
