@@ -40,15 +40,17 @@ jobs:
           gpg \
           xvfb \
           libcairo2-dev \
-          pkg-config
+          pkg-config \
+          libdbus-1-dev
 
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
-        PKG_CONFIG_PATH="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig" pip install pygobject gpg
+        PKG_CONFIG_PATH="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig" pip install pygobject gpg dbus-python
         pip install -r requirements.txt
         pip install babel BabelGladeExtractor
         pip install .[test]
+
 
     - name: Compile translation catalogs
       run: |
