@@ -31,15 +31,17 @@ def check_internet():
     res = [False]
     def target():
         try:
-            socket.gethostbyname("relay.magic-wormhole.io")
+            conn = socket.create_connection(("relay.magic-wormhole.io", 443), timeout=1.0)
+            conn.close()
             res[0] = True
         except Exception:
             pass
     t = threading.Thread(target=target)
     t.daemon = True
     t.start()
-    t.join(timeout=1.0)
+    t.join(timeout=1.5)
     return res[0]
+
 
 HAVE_INTERNET = check_internet()
 pytestmark = pytest.mark.skipif(not HAVE_INTERNET, reason="No internet or wormhole relay unreachable")
