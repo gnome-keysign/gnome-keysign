@@ -37,7 +37,7 @@ jobs:
 
     - name: Set up Virtual Environment with System Packages
       run: |
-        python3 -m venv --system-site-packages venv
+        /usr/bin/python3 -m venv --system-site-packages venv
         echo "PATH=$GITHUB_WORKSPACE/venv/bin:$PATH" >> $GITHUB_ENV
 
     - name: Install Python dependencies
