@@ -121,6 +121,25 @@ class BarcodeReaderGTK(Gtk.Box):
         pipeline.set_state(Gst.State.PLAYING)
 
 
+    def set_device(self, device):
+        log.info("Setting device to: %s", device)
+        if self.device == device:
+            return
+        
+        is_playing = False
+        if hasattr(self, 'pipeline') and self.pipeline:
+            state = self.pipeline.get_state(0)[1]
+            if state in (Gst.State.PLAYING, Gst.State.PAUSED):
+                is_playing = True
+            self.pipeline.set_state(Gst.State.NULL)
+            self.pipeline = None
+            
+        self.device = device
+        
+        if is_playing:
+            self.run()
+
+
     def on_new_sample(self, appsink):
         sample = appsink.emit("pull-sample")
         if not sample:
