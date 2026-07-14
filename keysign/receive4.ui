@@ -1,6 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
 <interface>
   <requires lib="gtk" version="4.0" />
+  <object class="GtkMessageDialog" id="error_dialog">
+    <property name="message-type">error</property>
+    <property name="buttons">close</property>
+    <property name="text" translatable="yes">Error certifying key</property>
+    <property name="secondary-text" translatable="yes">%s
+We don't know any more, sorry :(</property>
+  </object>
   <object class="GtkImage" id="confirm-button-image">
     </object>
   <object class="GtkStack" id="receive_stack">
