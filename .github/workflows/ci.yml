@@ -58,6 +58,11 @@ jobs:
       run: |
         python setup.py compile_catalog
 
+    - name: Test translation round-trip
+      run: |
+        python setup.py extract_messages
+        python setup.py update_catalog
+
     - name: Run test suite
       run: |
         xvfb-run pytest

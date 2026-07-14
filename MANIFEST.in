@@ -8,3 +8,5 @@ include data/org.gnome.Keysign.desktop data/org.gnome.Keysign.svg data/org.gnome
 include keysign/*.ui
 include COPYING
 include README.rst
+include pyproject.toml
+include babel.cfg
