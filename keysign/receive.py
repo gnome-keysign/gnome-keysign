@@ -174,6 +174,10 @@ class ReceiveApp:
         except UnpoweredAdapter as e:
             log.debug("Bluetooth adapter is turned off: %s", e)
 
+    def get_toplevel(self):
+        if self.psw:
+            return self.psw.get_root()
+        return self.stack.get_root()
     def on_keydata_downloaded(self, keydata, pixbuf=None):
         log.debug("Downloaded keydata of length %d: %s", len(keydata), keydata[:50])
         key = openpgpkey_from_data(keydata)
@@ -227,7 +231,7 @@ class ReceiveApp:
         # We need to prevent tmpfiles from going out of
         # scope too early so that they don't get deleted
         try:
-            tmpfiles_plaintext = list(sign_keydata_and_send(keydata))
+            tmpfiles_plaintext = list(sign_keydata_and_send(keydata, parent_window=self.get_toplevel()))
         except GPGRuntimeError as e:
             self.log.exception("Something went wrong with signing the key")
             keyPreSignWidget.infobar_success.hide()
@@ -309,6 +313,19 @@ class App(Adw.Application):
         receive_stack = self.receive.stack
 
         window.set_child(receive_stack)
+
+        def on_realize(win):
+            surface = win.get_surface()
+            try:
+                from gi.repository import GdkWayland
+                if isinstance(surface, GdkWayland.WaylandToplevel):
+                    def on_handle_exported(toplevel, handle, *args):
+                        win.portal_handle = f"wayland:{handle}"
+                    surface.export_handle(on_handle_exported)
+            except Exception:
+                pass
+        window.connect("realize", on_realize)
+
         window.present()
         self.add_window(window)
 
