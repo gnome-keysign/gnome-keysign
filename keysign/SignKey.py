@@ -37,6 +37,8 @@ def main():
         help="Increase detail of logging")
     parser.add_argument("file", nargs='+', type=argparse.FileType('rb'),
         help="File containing OpenPGP keys")
+    parser.add_argument('--sign-and-send-all-uids', action='store_true',
+        help="Attach certifications for email-less UIDs to the emails dispatched for UIDs with emails.")
     args = parser.parse_args()
 
     log_levels = [logging.WARNING, logging.INFO, logging.DEBUG]
@@ -48,7 +50,7 @@ def main():
     for fhandle in args.file:
         data = fhandle.read()
         log.info("Calling %r to sign %s", sign_keydata_and_send, fhandle.name)
-        tmpfiles = list(sign_keydata_and_send(keydata=data))
+        tmpfiles = list(sign_keydata_and_send(keydata=data, send_all_uids=args.sign_and_send_all_uids))
     print("Finished signing. " +
              "We're only waiting for the signature " +
              "files to be picked up. " +

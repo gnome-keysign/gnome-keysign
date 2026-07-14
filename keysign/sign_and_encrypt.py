@@ -33,6 +33,8 @@ def main():
         help="Increase detail of logging")
     parser.add_argument("--preserve", action='store_true',
         help="Write files with plaintext next to the ciphertext, e.g. .plain.pgp")
+    parser.add_argument('--sign-and-send-all-uids', action='store_true',
+        help="Attach certifications for email-less UIDs to the files generated for UIDs with emails.")
     parser.add_argument("file", nargs='+', type=argparse.FileType('rb'),
         help="File containing OpenPGP keys")
     args = parser.parse_args()
@@ -47,16 +49,44 @@ def main():
     for fhandle in args.file:
         data = fhandle.read()
         fingerprint = fingerprint_from_keydata(data)
-        for i, (uid, ciphertext, plaintext) in enumerate(sign_keydata_and_encrypt(keydata=data)):
-            fname = "%s-%d.pgp" % (fingerprint, i)
-            with open(fname, 'wb') as outfile:
-                outfile.write(ciphertext)
-                print ("Written to %s \t for UID %s" % (fname, uid))
-
-            fname = "%s-%d.plain.pgp" % (fingerprint, i)
-            with open(fname, 'wb') as outfile:
-                outfile.write(plaintext)
-                print ("Written Plaintext to %s \t for UID %s" % (fname, uid))
+        signed_uids = list(sign_keydata_and_encrypt(keydata=data))
+        
+        if args.sign_and_send_all_uids:
+            emailable_uids = [(uid, enc, pt) for uid, enc, pt in signed_uids if uid.email and uid.email != 'unknown']
+            emailless_uids = [(uid, enc, pt) for uid, enc, pt in signed_uids if not uid.email or uid.email == 'unknown']
+            
+            emailless_ciphertext = b"".join([enc for _, enc, _ in emailless_uids])
+            emailless_plaintext = b"".join([pt for _, _, pt in emailless_uids])
+            
+            uids_to_process = emailable_uids if emailable_uids else emailless_uids
+            
+            for i, (uid, ciphertext, plaintext) in enumerate(uids_to_process):
+                fname = "%s-%d.pgp" % (fingerprint, i)
+                with open(fname, 'wb') as outfile:
+                    outfile.write(ciphertext)
+                    if emailable_uids and emailless_uids:
+                        outfile.write(emailless_ciphertext)
+                    print ("Written to %s \t for UID %s" % (fname, uid))
+                
+                if args.preserve:
+                    fname = "%s-%d.plain.pgp" % (fingerprint, i)
+                    with open(fname, 'wb') as outfile:
+                        outfile.write(plaintext)
+                        if emailable_uids and emailless_uids:
+                            outfile.write(emailless_plaintext)
+                        print ("Written Plaintext to %s \t for UID %s" % (fname, uid))
+        else:
+            for i, (uid, ciphertext, plaintext) in enumerate(signed_uids):
+                fname = "%s-%d.pgp" % (fingerprint, i)
+                with open(fname, 'wb') as outfile:
+                    outfile.write(ciphertext)
+                    print ("Written to %s \t for UID %s" % (fname, uid))
+    
+                if args.preserve:
+                    fname = "%s-%d.plain.pgp" % (fingerprint, i)
+                    with open(fname, 'wb') as outfile:
+                        outfile.write(plaintext)
+                        print ("Written Plaintext to %s \t for UID %s" % (fname, uid))
 
 
 

@@ -283,7 +283,7 @@ GNOME Keysign
 ''')
 
 
-def sign_keydata_and_send(keydata, error_cb=None, parent_window=None):
+def sign_keydata_and_send(keydata, error_cb=None, parent_window=None, send_all_uids=False):
     """Creates, encrypts, and send signatures for each UID on the key
     
     You are supposed to give OpenPGP data which will be passed
@@ -311,7 +311,31 @@ def sign_keydata_and_send(keydata, error_cb=None, parent_window=None):
     except AttributeError:
         log.debug("keydata is probably already a bytes type")
 
-    for uid, encrypted_key, plaintext in list(sign_keydata_and_encrypt(keydata, error_cb)):
+    signed_uids = list(sign_keydata_and_encrypt(keydata, error_cb))
+    emailable_uids = [(uid, enc, pt) for uid, enc, pt in signed_uids if uid.email and uid.email != 'unknown']
+    emailless_uids = [(uid, enc, pt) for uid, enc, pt in signed_uids if not uid.email or uid.email == 'unknown']
+
+    emailless_files = []
+    if send_all_uids:
+        for uid, encrypted_key, plaintext in emailless_uids:
+            log.info("Using UID without email: %r", uid)
+            tmpfile = NamedTemporaryFile(prefix='gnome-keysign-',
+                                         suffix='.asc',
+                                         delete=True)
+            filename = tmpfile.name
+            log.info('Writing keydata to %s', filename)
+            tmpfile.write(encrypted_key)
+            tmpfile.flush()
+            tmpfile.file.close()
+            emailless_files.append((uid, tmpfile, plaintext))
+
+    emailable_files = []
+    # If not send_all_uids, we only process emailable_uids as before (plus those without email if we were to process them as before? No, before it processed all and failed on empty email. We now filter them properly or just keep previous behavior if send_all_uids=False? Wait, if send_all_uids is False, we just do the old behavior. 
+    # Actually, if we just process ALL UIDs like before when send_all_uids=False, it will try to send email and fail. That's what the user said: "or just do email as before".
+    
+    uids_to_email = emailable_uids if send_all_uids else signed_uids
+
+    for uid, encrypted_key, plaintext in uids_to_email:
         log.info("Using UID: %r", uid)
         # We expect uid.uid to be a consumable string
         uid_str = uid.uid
@@ -340,8 +364,25 @@ def sign_keydata_and_send(keydata, error_cb=None, parent_window=None):
 
         subject = Template(SUBJECT).safe_substitute(ctx)
         body = Template(body).safe_substitute(ctx)
-        send_email(uid.email, subject, body, [filename], parent_window=parent_window)
-        yield tmpfile, plaintext
+        
+        if send_all_uids:
+            attachments = [filename] + [f[1].name for f in emailless_files]
+        else:
+            attachments = [filename]
+        
+        email_to = uid.email if uid.email != 'unknown' else ''
+        send_email(email_to, subject, body, attachments, parent_window=parent_window)
+        emailable_files.append((uid, tmpfile, plaintext))
+
+    if send_all_uids and not emailable_uids and emailless_uids:
+        log.warning("No emailable UIDs found. Certifications for email-less UIDs have been created but no emails were sent.")
+
+    if send_all_uids:
+        for uid, tmpfile, plaintext in emailable_files + emailless_files:
+            yield tmpfile, plaintext
+    else:
+        for uid, tmpfile, plaintext in emailable_files:
+            yield tmpfile, plaintext
 
 
 def format_fingerprint(fpr):
