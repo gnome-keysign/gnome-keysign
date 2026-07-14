@@ -57,7 +57,7 @@ gnome-keysign = "keysign:main"
 where = ["."]
 include = ["keysign*"]
 exclude = ["keysign.locale*"]
-namespaces = true
+namespaces = false
 
 [tool.setuptools]
 include-package-data = true
