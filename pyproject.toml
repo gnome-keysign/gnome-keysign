@@ -53,8 +53,13 @@ gnome-keysign-split-uids = "keysign.export_uids:main"
 [project.entry-points.gui_scripts]
 gnome-keysign = "keysign:main"
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["keysign*"]
+exclude = ["keysign.locale*"]
+namespaces = true
+
 [tool.setuptools]
-packages = ["keysign", "keysign.compat", "keysign.network"]
 include-package-data = true
 
 [tool.setuptools.package-data]
