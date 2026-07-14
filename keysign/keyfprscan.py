@@ -41,6 +41,7 @@ if  __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 from .scan_barcode import BarcodeReaderGTK
+from . import camera_portal
 
 log = logging.getLogger(__name__)
 
@@ -106,7 +107,39 @@ class KeyFprScanWidget(Gtk.Box):
         self.reader = reader
 
         self.camera_selector = builder.get_object("comboboxtext1")
+        self.camera_box = builder.get_object("box40")
         self.camera_devices = {}
+        
+        self._using_portal = False
+        if camera_portal._using_flatpak() and camera_portal.is_camera_portal_available():
+            log.info("Running in Flatpak and Camera Portal is available, requesting access")
+            self._using_portal = True
+            # Hide the camera selector dropdown — portal handles camera access
+            if self.camera_box:
+                self.camera_box.set_visible(False)
+            camera_portal.request_camera_access(self._on_camera_portal_response)
+        else:
+            # Legacy path: enumerate devices with Gst.DeviceMonitor
+            if self.camera_selector:
+                self.populate_cameras()
+
+    def _on_camera_portal_response(self, success, pipewire_fd):
+        """Called when the Camera Portal responds to our access request."""
+        if success and pipewire_fd is not None:
+            log.info("Camera Portal granted access, fd=%d", pipewire_fd)
+            from gi.repository import GLib
+            GLib.idle_add(self.reader.set_pipewire_fd, pipewire_fd)
+        else:
+            log.warning("Camera Portal denied or failed, falling back to "
+                        "direct device access.")
+            self._using_portal = False
+            from gi.repository import GLib
+            GLib.idle_add(self._fallback_to_device_monitor)
+
+    def _fallback_to_device_monitor(self):
+        """Fall back to legacy Gst.DeviceMonitor enumeration."""
+        if self.camera_box:
+            self.camera_box.set_visible(True)
         if self.camera_selector:
             self.populate_cameras()
 
