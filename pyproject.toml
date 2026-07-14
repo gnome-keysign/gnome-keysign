@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0.0", "wheel", "babel", "BabelGladeExtractor"]
+requires = ["setuptools>=77.0.0", "wheel", "babel", "BabelGladeExtractor"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -11,7 +11,7 @@ authors = [
     { name = "Tobias Mueller", email = "tobiasmue@gnome.org" }
 ]
 urls = { Homepage = "https://wiki.gnome.org/Apps/Keysign" }
-license = { text = "GPL-3.0-or-later" }
+license = "GPL-3.0-or-later"
 classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: System Administrators",
