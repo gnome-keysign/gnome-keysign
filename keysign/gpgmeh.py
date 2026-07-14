@@ -43,6 +43,19 @@ log = logging.getLogger(__name__)
 class GPGRuntimeError(RuntimeError):
     pass
 
+class NoSecretKeysError(GPGRuntimeError):
+    def __init__(self, message, homedir=None, all_keys=None):
+        super(NoSecretKeysError, self).__init__(message)
+        self.homedir = homedir
+        self.all_keys = all_keys or []
+        
+    def __str__(self):
+        return "{msg} (Homedir: {homedir}, Keys found: {keys})".format(
+            msg=super(NoSecretKeysError, self).__str__(),
+            homedir=self.homedir,
+            keys=len(self.all_keys)
+        )
+
 class GenEdit:
     _ignored_status = (gpg.constants.STATUS_EOF,
                        gpg.constants.STATUS_GOT_IT,
@@ -521,10 +534,17 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
     oldctx = DirectoryContext(homedir)
     ctx = TempContextWithAgent(oldctx)
     # We're trying to sign with all available secret keys
-    available_secret_keys = [key for key in ctx.keylist(secret=True)
+    all_secret_keys = list(ctx.keylist(secret=True))
+    available_secret_keys = [key for key in all_secret_keys
         if not (key.disabled or key.revoked or key.invalid or key.expired)]
     log.debug('Setting available sec keys to (%d): %r',
         len(available_secret_keys), available_secret_keys)
+    if not available_secret_keys:
+        raise NoSecretKeysError(
+            "No secret keys available to sign with.",
+            homedir=homedir,
+            all_keys=all_secret_keys
+        )
     ctx.signers = available_secret_keys
 
     ctx.op_import(minimise_key(keydata))
