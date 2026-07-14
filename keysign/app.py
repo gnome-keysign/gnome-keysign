@@ -25,7 +25,7 @@ import sys
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from gi.repository import Gtk, GLib, Adw
+from gi.repository import Gtk, GLib, Adw, Gio
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 from gi.repository import Gdk
@@ -185,6 +185,18 @@ class KeysignApp(Adw.Application):
                 "send_stack", _("Send"))
             self.send_receive_stack.add_titled(rs,
                 "receive_stack", _("Receive"))
+
+            # Actions and accelerators to switch between Send and Receive tabs using Alt+S and Alt+R
+            send_action = Gio.SimpleAction.new("switch-to-send", None)
+            send_action.connect("activate", lambda action, parameter: self.send_receive_stack.set_visible_child_name("send_stack"))
+            self.add_action(send_action)
+
+            receive_action = Gio.SimpleAction.new("switch-to-receive", None)
+            receive_action.connect("activate", lambda action, parameter: self.send_receive_stack.set_visible_child_name("receive_stack"))
+            self.add_action(receive_action)
+
+            self.set_accels_for_action("app.switch-to-send", ["<Alt>s"])
+            self.set_accels_for_action("app.switch-to-receive", ["<Alt>r"])
 
         window.present()
         self.add_window(window)
