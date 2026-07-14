@@ -175,7 +175,7 @@ def _info(exctyp, value, tb):
         "if no-one else has reported it yet."
     )
     dialog.set_markup(primary)
-    dialog.format_secondary_text(secondary)
+    dialog.set_property('secondary-text', secondary)
 
     dialog.add_button(_("Search Tracker..."), RESPONSE_SEARCH)
     if "-" in VERSION:  # only development and prereleases

@@ -150,7 +150,7 @@ class PreSignWidget(Gtk.Box):
                     buttons=Gtk.ButtonsType.CLOSE,
                     text="Error certifying key"
                 )
-                dialog.format_secondary_text(
+                dialog.set_property('secondary-text',
                     str(exception) + "\n" +
                     "We don't know any more, sorry :(")
                 dialog.connect("response", lambda d, r: d.destroy())

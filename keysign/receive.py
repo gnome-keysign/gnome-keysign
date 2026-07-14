@@ -27,7 +27,7 @@ from urllib.parse import unquote
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from gi.repository import Gtk, GLib, Adw, Gdk
+from gi.repository import Gtk, GLib, Adw, Gdk, GObject
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 if __name__ == "__main__":
@@ -107,12 +107,9 @@ class ReceiveApp:
         self.scanner = scanner
         self.stack = receive_stack
 
-        DRAG_ACTION = Gdk.DragAction.COPY
-        self.scanner.drag_dest_set(Gtk.DestDefaults.ALL, [], DRAG_ACTION)
-        self.scanner.drag_dest_set_target_list(None)
-        self.scanner.drag_dest_add_text_targets()
-        self.scanner.drag_dest_add_uri_targets()
-        self.scanner.connect("drag-data-received", self.on_drag_data_received)
+        drop_target = Gtk.DropTarget.new(GObject.TYPE_STRING, Gdk.DragAction.COPY)
+        drop_target.connect("drop", self.on_drop_data_received)
+        self.scanner.add_controller(drop_target)
 
         self.discovery = AvahiKeysignDiscoveryWithMac()
         ib = builder.get_object('infobar_discovery')
@@ -135,10 +132,9 @@ class ReceiveApp:
         # to stall the UI boot. Also we don't care about having this information immediately.
         threads.deferToThread(self.check_bt_availability)
 
-    def on_drag_data_received(self, widget, drag_context, x, y, data, info, time):
-        log.info("recv: Drag data rcvd: %s (%s) %s", data, data.get_text(), info)
-        drag_data = data.get_text()
-        dragged_data = unquote(drag_data)
+    def on_drop_data_received(self, target, value, x, y):
+        log.info("recv: Drag data rcvd: %s", value)
+        dragged_data = unquote(value)
         if dragged_data.startswith("file://"):
             filename = dragged_data[7:].strip('\r\n\x00')  # remove file://, \r\n and NULL
             keydata = open(filename, 'br').read()
@@ -148,10 +144,11 @@ class ReceiveApp:
             keydata = dragged_data
 
         else:
-            log.warning("We got a drag with neither file:// nor ----: %s", drag_data)
+            log.warning("We got a drag with neither file:// nor ----: %s", value)
             keydata = dragged_data
 
         self.on_keydata_downloaded(keydata)
+        return True
 
     def on_redo_button_clicked(self, button):
         log.info("redo pressed")
