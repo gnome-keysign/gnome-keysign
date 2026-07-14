@@ -66,7 +66,53 @@ def mac_verify(key, data, mac):
     return result
 
 
-def _email_portal(to, subject=None, body=None, files=None):
+
+def get_window_handle(window):
+    if not window:
+        return ""
+    if isinstance(window, str):
+        return window
+
+    try:
+        import gi
+        gi.require_version('Gtk', '4.0')
+        from gi.repository import Gtk
+
+        # If it has a custom portal_handle attribute (e.g. exported asynchronously on Wayland)
+        if hasattr(window, "portal_handle"):
+            return window.portal_handle
+
+        surface = window.get_surface()
+        if not surface:
+            return ""
+
+        # Try X11
+        try:
+            from gi.repository import GdkX11
+            if isinstance(surface, GdkX11.X11Toplevel):
+                return f"x11:{surface.get_xid()}"
+        except Exception:
+            pass
+
+        # Try Wayland (if it wasn't exported yet or we want to try synchronously)
+        try:
+            from gi.repository import GdkWayland
+            if isinstance(surface, GdkWayland.WaylandToplevel):
+                if not hasattr(window, "_portal_handle_export_started"):
+                    window._portal_handle_export_started = True
+                    def on_handle_exported(toplevel, handle, *args):
+                        window.portal_handle = f"wayland:{handle}"
+                    surface.export_handle(on_handle_exported)
+        except Exception:
+            pass
+    except Exception as e:
+        log = logging.getLogger(__name__)
+        log.debug("Could not get window handle: %s", e)
+
+    return ""
+
+
+def _email_portal(to, subject=None, body=None, files=None, parent_window=None):
     # The following checks are to ensure Python 2 compatibility
     if not hasattr(os, 'O_PATH'):
         os.O_PATH = 2097152
@@ -82,9 +128,7 @@ def _email_portal(to, subject=None, body=None, files=None):
         return None
     iface = "org.freedesktop.portal.Email"
     email = dbus.Interface(proxy, iface)
-    # Apparently we are unable to get the parent window XID from the receive class.
-    # Until this is sorted out, we leave the parent window empty.
-    parent_window = ""
+    parent_window_str = get_window_handle(parent_window)
     attrs = []
     # Even if we don't close the file descriptor it should not be a problem because
     # eventually at runtime it will be automatically closed.
@@ -96,7 +140,7 @@ def _email_portal(to, subject=None, body=None, files=None):
             attrs.append(dbus.types.UnixFd(fd))
     opts = {"subject": subject, "address": to, "body": body, "attachment_fds": attrs}
     try:
-        ret = email.ComposeEmail(parent_window, opts)
+        ret = email.ComposeEmail(parent_window_str, opts)
         return ret
     except TypeError:
         log.debug("Email portal is not available")
@@ -180,13 +224,13 @@ def _fix_path_flatpak(files):
     return fixed_files
 
 
-def send_email(to, subject=None, body=None, files=None):
+def send_email(to, subject=None, body=None, files=None, parent_window=None):
     """Tries to send the email using firstly the portal, then the xdg-email
     and as a last attempt the mailto uri"""
     if _using_flatpak():
         files = _fix_path_flatpak(files)
 
-    if _email_portal(to, subject, body, files):
+    if _email_portal(to, subject, body, files, parent_window=parent_window):
         return
 
     try:
@@ -239,7 +283,7 @@ GNOME Keysign
 ''')
 
 
-def sign_keydata_and_send(keydata, error_cb=None):
+def sign_keydata_and_send(keydata, error_cb=None, parent_window=None):
     """Creates, encrypts, and send signatures for each UID on the key
     
     You are supposed to give OpenPGP data which will be passed
@@ -296,7 +340,7 @@ def sign_keydata_and_send(keydata, error_cb=None):
 
         subject = Template(SUBJECT).safe_substitute(ctx)
         body = Template(body).safe_substitute(ctx)
-        send_email(uid.email, subject, body, [filename])
+        send_email(uid.email, subject, body, [filename], parent_window=parent_window)
         yield tmpfile, plaintext
 
 

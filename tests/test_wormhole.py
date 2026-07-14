@@ -22,6 +22,31 @@ from subprocess import check_call
 import tempfile
 import gi
 gi.require_version('Gtk', '4.0')
+import pytest
+import socket
+
+import threading
+
+def check_internet():
+    res = [False]
+    def target():
+        try:
+            conn = socket.create_connection(("relay.magic-wormhole.io", 443), timeout=1.0)
+            conn.close()
+            res[0] = True
+        except Exception:
+            pass
+    t = threading.Thread(target=target)
+    t.daemon = True
+    t.start()
+    t.join(timeout=1.5)
+    return res[0]
+
+
+HAVE_INTERNET = check_internet()
+pytestmark = pytest.mark.skipif(not HAVE_INTERNET, reason="No internet or wormhole relay unreachable")
+
+
 
 from wormhole.errors import WrongPasswordError, LonelyError
 from pytest_twisted import inlineCallbacks

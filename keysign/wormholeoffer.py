@@ -30,7 +30,7 @@ if __name__ == "__main__":
     from twisted.internet import gireactor
     gireactor.install()
 from twisted.internet import reactor
-from twisted.internet.defer import inlineCallbacks, returnValue
+from twisted.internet.defer import inlineCallbacks
 
 if __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -66,7 +66,7 @@ class WormholeOffer:
             code = yield self.w.get_code()
         log.info("Invitation Code: %s", code)
         wormhole_data = "WORM={0}".format(code)
-        returnValue((code, wormhole_data))
+        return code, wormhole_data
 
     @inlineCallbacks
     def start(self):
@@ -93,22 +93,24 @@ class WormholeOffer:
             log.info("Got data, %d bytes" % len(msg))
             success, error_msg = self._check_received(msg)
             self.stop()
-            returnValue((success, error_msg))
+            ret_val = success, error_msg
 
         except (ServerConnectionError, WrongPasswordError) as e:
             error = dedent(e.__doc__)
             log.error("Error: %s" % error)
             success = False
-            returnValue((success, e))
+            ret_val = success, e
         except LonelyError as le:
             log.info("Lonely, close() was called before the peer connection could be established")
             success = False
-            returnValue((success, le))
+            ret_val = success, le
         except Exception as e:
             error = dedent(e.__doc__)
             log.error("An unknown error occurred: %s" % error)
             success = False
-            returnValue((success, e))
+            ret_val = success, e
+
+        return ret_val
 
     def _check_received(self, msg):
         """If the received message has a field 'answer' that means that the transfer

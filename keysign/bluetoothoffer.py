@@ -11,7 +11,7 @@ if __name__ == "__main__":
     gireactor.install()
     from twisted.internet import reactor
 from twisted.internet import threads
-from twisted.internet.defer import inlineCallbacks, returnValue
+from twisted.internet.defer import inlineCallbacks
 
 if sys.version < '3':
     input = raw_input
@@ -72,7 +72,7 @@ class BluetoothOffer:
             success = False
             message = e
 
-        returnValue((success, message))
+        return success, message
 
     @inlineCallbacks
     def allocate_code(self):
@@ -107,7 +107,7 @@ class BluetoothOffer:
             bt_data = "BT={0};PT={1}".format(code, port)
 
         log.info("BT return code: %s", bt_data)
-        returnValue(bt_data)
+        return bt_data
 
     def stop(self):
         log.debug("Stopping bt receive")

@@ -235,13 +235,13 @@ GNOME Keysign uses Babel for translation extraction and catalog management.
 Using the pybabel CLI (Recommended)
 ----------------------------------
 
-You can use the `pybabel` CLI directly, which reads the configuration from `setup.cfg`:
+You can use the `pybabel` CLI directly, which reads the mapping configuration from `babel.cfg`:
 
 * **Extract messages to POT file**:
 
   .. code::
 
-      pybabel extract -F setup.cfg -o keysign/locale/keysign.pot .
+      pybabel extract -F babel.cfg -o keysign/locale/keysign.pot .
 
 * **Update translation catalogs**:
 

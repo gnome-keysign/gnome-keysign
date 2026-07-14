@@ -20,8 +20,6 @@ classifiers = [
     "Intended Audience :: Legal Industry",
     "Intended Audience :: Telecommunications Industry",
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: GNU General Public License (GPL)",
-    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Operating System :: POSIX :: Linux",
     "Environment :: X11 Applications :: GTK",
     "Topic :: Desktop Environment",
@@ -44,7 +42,8 @@ test = [
     "pytest_twisted",
     "tox",
     "pycodestyle",
-    "pylint"
+    "pylint",
+    "pillow"
 ]
 
 [project.entry-points.console_scripts]
@@ -54,8 +53,13 @@ gnome-keysign-split-uids = "keysign.export_uids:main"
 [project.entry-points.gui_scripts]
 gnome-keysign = "keysign:main"
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["keysign*"]
+exclude = ["keysign.locale*"]
+namespaces = true
+
 [tool.setuptools]
-packages = ["keysign", "keysign.compat", "keysign.network"]
 include-package-data = true
 
 [tool.setuptools.package-data]
@@ -75,3 +79,7 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 pythonpath = ["."]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

@@ -1,6 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
 <interface>
   <requires lib="gtk" version="4.0" />
+  <object class="GtkMessageDialog" id="error_dialog">
+    <property name="message-type">error</property>
+    <property name="buttons">close</property>
+    <property name="text" translatable="yes">Error certifying key</property>
+    <property name="secondary-text" translatable="yes">%s
+We don't know any more, sorry :(</property>
+  </object>
   <object class="GtkImage" id="confirm-button-image">
     </object>
   <object class="GtkStack" id="receive_stack">
@@ -265,7 +272,9 @@ You may try again by clicking the "confirm" button.</property>
                     </child>
                     <child>
                       <object class="GtkButton" id="btn_local_import">
-                        <property name="label" translatable="yes">Import</property>
+                        <property name="label" translatable="yes">_Import</property>
+                        <property name="use-underline">1</property>
+                        <property name="icon-name">document-import-symbolic</property>
                         <property name="focusable">1</property>
                         <property name="receives-default">1</property>
                         <property name="tooltip-text" translatable="1">Imports a temporary version of the produced certifications into the local keyring</property>

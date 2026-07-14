@@ -25,12 +25,15 @@ import sys
 import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from gi.repository import Gtk, GLib, Adw
+from gi.repository import Gtk, GLib, Adw, Gio
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 from gi.repository import Gdk
-from twisted.internet import gireactor
-gireactor.install()
+try:
+    from twisted.internet import gireactor
+    gireactor.install()
+except Exception:
+    pass
 
 from twisted.internet import reactor
 
@@ -121,6 +124,18 @@ class KeysignApp(Adw.Application):
         window = builder.get_object(appwindow)
         window.set_title("GNOME Keysign")
         window.connect("close-request", self.on_delete_window)
+
+        def on_realize(win):
+            surface = win.get_surface()
+            try:
+                from gi.repository import GdkWayland
+                if isinstance(surface, GdkWayland.WaylandToplevel):
+                    def on_handle_exported(toplevel, handle, *args):
+                        win.portal_handle = f"wayland:{handle}"
+                    surface.export_handle(on_handle_exported)
+            except Exception:
+                pass
+        window.connect("realize", on_realize)
         self.headerbar = window.get_titlebar()
         self.header_button = builder.get_object("back_refresh_button")
         self.header_button.connect('clicked', self.on_header_button_clicked)
@@ -185,6 +200,18 @@ class KeysignApp(Adw.Application):
                 "send_stack", _("Send"))
             self.send_receive_stack.add_titled(rs,
                 "receive_stack", _("Receive"))
+
+            # Actions and accelerators to switch between Send and Receive tabs using Alt+S and Alt+R
+            send_action = Gio.SimpleAction.new("switch-to-send", None)
+            send_action.connect("activate", lambda action, parameter: self.send_receive_stack.set_visible_child_name("send_stack"))
+            self.add_action(send_action)
+
+            receive_action = Gio.SimpleAction.new("switch-to-receive", None)
+            receive_action.connect("activate", lambda action, parameter: self.send_receive_stack.set_visible_child_name("receive_stack"))
+            self.add_action(receive_action)
+
+            self.set_accels_for_action("app.switch-to-send", ["<Alt>s"])
+            self.set_accels_for_action("app.switch-to-receive", ["<Alt>r"])
 
         window.present()
         self.add_window(window)

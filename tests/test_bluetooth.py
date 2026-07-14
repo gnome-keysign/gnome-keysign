@@ -11,12 +11,15 @@ gi.require_version('Gtk', '4.0')
 from twisted.internet import threads
 from pytest_twisted import inlineCallbacks
 
-try:
-    from keysign.bluetoothoffer import BluetoothOffer
-    from keysign.bluetoothreceive import BluetoothReceive, BluetoothError
-    HAVE_BT = True
-except ImportError:
-    HAVE_BT = False
+HAVE_BT = False
+if hasattr(socket, 'AF_BLUETOOTH'):
+    try:
+        from keysign.bluetoothoffer import BluetoothOffer
+        from keysign.bluetoothreceive import BluetoothReceive, BluetoothError
+        HAVE_BT = True
+    except ImportError:
+        pass
+
 
 HAVE_2_BT = False
 if HAVE_BT:
