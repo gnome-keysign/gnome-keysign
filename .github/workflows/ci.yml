@@ -36,6 +36,7 @@ jobs:
           gstreamer1.0-plugins-good \
           gstreamer1.0-plugins-bad \
           gir1.2-gtk-4.0 \
+          gir1.2-adw-1 \
           gir1.2-gst-plugins-base-1.0 \
           libgpgme-dev \
           gpg \
