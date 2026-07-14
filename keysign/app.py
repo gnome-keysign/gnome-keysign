@@ -29,8 +29,11 @@ from gi.repository import Gtk, GLib, Adw, Gio
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 from gi.repository import Gdk
-from twisted.internet import gireactor
-gireactor.install()
+try:
+    from twisted.internet import gireactor
+    gireactor.install()
+except Exception:
+    pass
 
 from twisted.internet import reactor
 
