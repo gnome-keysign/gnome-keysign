@@ -24,6 +24,7 @@
               <object class="GtkBox">
                 <child>
                   <object class="GtkImage">
+                    <property name="icon-name">network-idle</property>
                     </object>
                 </child>
                 <child>
