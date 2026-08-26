@@ -27,7 +27,7 @@ def to_valid_utf8_string(s, errors='replace', replacement='?'):
     """Takes a string and returns a valid utf8 encodable string
 
     Not every Python string is utf-8 encodable.
-    Take 'fo\udcf6e\udce9ba <foo@bma.d>' for example.
+    Take 'fo\\udcf6e\\udce9ba <foo@bma.d>' for example.
     This function replaces undecodable characters with a '?'
     """
     try:
