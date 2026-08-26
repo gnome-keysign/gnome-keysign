@@ -16,8 +16,14 @@ if hasattr(socket, 'AF_BLUETOOTH'):
     try:
         from keysign.bluetoothoffer import BluetoothOffer
         from keysign.bluetoothreceive import BluetoothReceive, BluetoothError
+        
+        # Probe the kernel for actual Bluetooth support to avoid crashes
+        # on systems that lack BT in the kernel (e.g. build containers)
+        s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+        s.close()
+        
         HAVE_BT = True
-    except ImportError:
+    except (ImportError, OSError):
         pass
 
 
