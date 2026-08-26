@@ -162,6 +162,31 @@ Note that this installs the application in the virtual environment,
 so you run the program from there, e.g. /tmp/keysign/bin/gnome-keysign.
 
 
+Using uv
+--------
+
+If you prefer using `uv <https://github.com/astral-sh/uv>`_ for fast dependency management, it is fully compatible.
+
+To run the application, create an environment that inherits system site-packages (for PyGObject and dbus) and then run the app:
+
+.. code::
+
+    uv venv --system-site-packages
+    uv run gnome-keysign
+
+To run tests:
+
+.. code::
+
+    uv run --extra test pytest
+
+To extract translations without installing build dependencies permanently:
+
+.. code::
+
+    uv run --with "setuptools>=77" --with "babel" --with "BabelGladeExtractor" python setup.py extract_messages
+
+
 Starting
 =========
 
