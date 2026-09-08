@@ -250,27 +250,7 @@ class ReceiveApp:
 
             def save_as_clicked(button):
                 self.log.info("Save as clicked")
-                dialog = Gtk.FileChooserDialog(_("Select file for saving"),
-                    self.get_toplevel(),
-                    Gtk.FileChooserAction.SAVE,
-                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                     Gtk.STOCK_SAVE, Gtk.ResponseType.OK)
-                )
-                response = dialog.run()
-                if response == Gtk.ResponseType.OK:
-                    filename = dialog.get_filename()
-                    self.log.info("Saving file to: %r", filename)
-                    with open(filename, 'wb') as f:
-                        for p in plaintexts:
-                            f.write(p)
-                        for sigfile in self.tmpfiles:
-                            pass
-                            # Hrm. Those are the encrypted files, I think.
-                            # We probably want to offer the plaintext versions, though
-                            #f.write(open(sigfile, 'r').read())
-                else:
-                    self.log.info("Not saving file: %r", response)
-                dialog.destroy()
+                self.save_certifications(plaintexts)
 
             keyPreSignWidget.infobar_save_as_button.connect("clicked", save_as_clicked)
 
@@ -279,6 +259,36 @@ class ReceiveApp:
             # key confirmation page.
             log.debug ("Signed the key: %r", self.tmpfiles)
             # self.stack.set_visible_child_name("scanner")
+
+    def save_certifications(self, plaintexts):
+        """Asks the user for a file name and writes the certifications there
+
+        Gtk.FileDialog is asynchronous, so the writing happens from the
+        callback once the user has picked a file.
+        """
+        dialog = Gtk.FileDialog()
+        dialog.set_title(_("Select file for saving"))
+        dialog.set_initial_name("certifications.asc")
+
+        def on_file_selected(dialog, result):
+            try:
+                gfile = dialog.save_finish(result)
+            except GLib.Error as e:
+                # The user dismissed the dialog, or we could not have the file
+                self.log.info("Not saving the certifications: %s", e)
+                return
+            filename = gfile.get_path()
+            self.log.info("Saving file to: %r", filename)
+            self.write_certifications(filename, plaintexts)
+
+        dialog.save(self.get_toplevel(), None, on_file_selected)
+
+    @staticmethod
+    def write_certifications(filename, plaintexts):
+        """Writes the plaintext certifications to the given file"""
+        with open(filename, 'wb') as f:
+            for plaintext in plaintexts:
+                f.write(plaintext)
 
     def on_list_changed(self, discovery, number, userdata):
         """We show an infobar if we can only receive with Avahi and
