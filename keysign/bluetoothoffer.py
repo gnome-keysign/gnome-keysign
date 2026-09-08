@@ -60,8 +60,7 @@ class BluetoothOffer:
                     # accept() without deferring it to a thread
                     client_socket, address = self.server_socket.accept()
                     key_data = get_public_key_data(self.key.fingerprint)
-                    kd_decoded = key_data.decode('utf-8')
-                    yield threads.deferToThread(client_socket.sendall, kd_decoded)
+                    yield threads.deferToThread(client_socket.sendall, key_data)
                     log.info("Key has been sent")
                     client_socket.shutdown(socket.SHUT_RDWR)
                     client_socket.close()
