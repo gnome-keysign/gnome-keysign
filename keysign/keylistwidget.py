@@ -4,7 +4,6 @@ import os
 
 import gi
 gi.require_version('Gtk', '4.0')
-#gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GObject  # for __gsignals__
 from gi.repository import GLib  # for markup_escape_text
@@ -158,7 +157,7 @@ class KeyListWidget(Gtk.Box):
         if len(list(keys)) <= 0:
             infobar = builder.get_object("infobar")
             infobar.show()
-            l = Gtk.Label("You don't have any OpenPGP keys")
+            l = Gtk.Label(label="You don't have any OpenPGP keys")
             self.listbox.append(l)
         else:
             for key in keys:
