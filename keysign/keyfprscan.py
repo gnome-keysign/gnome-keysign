@@ -123,6 +123,15 @@ class KeyFprScanWidget(Gtk.Box):
             if self.camera_selector:
                 self.populate_cameras()
 
+        self.fpr_entry = builder.get_object("fingerprint_entry")
+        self.fpr_entry.connect('changed', self.on_text_changed)
+
+        self.set_hexpand(True)
+        self.set_vexpand(True)
+
+        # Temporary measure...
+        self.barcode_scanner = self
+
     def _on_camera_portal_response(self, success, pipewire_fd):
         """Called when the Camera Portal responds to our access request."""
         if success and pipewire_fd is not None:
@@ -142,15 +151,6 @@ class KeyFprScanWidget(Gtk.Box):
             self.camera_box.set_visible(True)
         if self.camera_selector:
             self.populate_cameras()
-
-        self.fpr_entry = builder.get_object("fingerprint_entry")
-        self.fpr_entry.connect('changed', self.on_text_changed)
-        
-        self.set_hexpand(True)
-        self.set_vexpand(True)
-
-        # Temporary measure...
-        self.barcode_scanner = self
 
     def populate_cameras(self):
         self.camera_selector.remove_all()
