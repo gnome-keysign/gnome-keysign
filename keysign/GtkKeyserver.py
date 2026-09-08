@@ -27,6 +27,9 @@ import os
 import sys
 
 from threading import Thread
+
+import gi
+gi.require_version('Gtk', '4.0')
 from gi.repository import GLib
 from gi.repository import Gtk
 from dbus.mainloop.glib import DBusGMainLoop
@@ -49,14 +52,16 @@ class ServerWindow(Gtk.Window):
         self.log = logging.getLogger(__name__)
 
         Gtk.Window.__init__(self, title="Gtk and Python threads")
-        self.set_border_width(10)
+        self.keyserver = None
 
-        self.connect("delete-event", Gtk.main_quit)
-
-        hBox = Gtk.HBox()
-        self.button = Gtk.ToggleButton('Start')
-        hBox.pack_start(self.button, False, False, 0)
-        self.add(hBox)
+        hBox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        hBox.set_margin_top(10)
+        hBox.set_margin_bottom(10)
+        hBox.set_margin_start(10)
+        hBox.set_margin_end(10)
+        self.button = Gtk.ToggleButton(label='Start')
+        hBox.append(self.button)
+        self.set_child(hBox)
 
         self.button.connect('toggled', self.on_button_toggled)
 
@@ -87,12 +92,21 @@ class ServerWindow(Gtk.Window):
 def main(args):
     log = logging.getLogger(__name__)
     log.debug('Running main with args: %s', args)
-    w = ServerWindow()
-    w.show_all()
-    log.debug('Starting main')
 
-    DBusGMainLoop(set_as_default = True)
-    Gtk.main()
+    DBusGMainLoop(set_as_default=True)
+
+    app = Gtk.Application(application_id='org.gnome.keysign.gtkkeyserver')
+
+    def on_activate(app):
+        w = ServerWindow()
+        w.set_application(app)
+        w.present()
+
+    app.connect('activate', on_activate)
+    log.debug('Starting main')
+    # Closing the last window quits the application, which is what the
+    # delete-event handler used to do for us.
+    return app.run(None)
 
 if __name__ == '__main__':
     logging.basicConfig(stream=sys.stderr, level=logging.DEBUG,
