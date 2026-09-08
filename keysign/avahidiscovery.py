@@ -119,6 +119,10 @@ class AvahiKeysignDiscovery(GObject.GObject):
                 try:
                     downloaded_key = download_key_http(address, port)
                     if fingerprint_from_keydata(downloaded_key) != cleaned:
+                        self.log.warning("Downloaded a key from %r:%r which "
+                                         "is not the key we asked for",
+                                         address, port)
+                        downloaded_key = None
                         continue
                 except ConnectionError:
                     self.log.exception("Error downloading from %r:%r",
