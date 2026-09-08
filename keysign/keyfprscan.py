@@ -70,10 +70,7 @@ class KeyFprScanWidget(Gtk.Box):
 
     def __init__(self, builder=None):
         log.debug("Init KFSW %r %r", self, builder)
-        if issubclass(self.__class__, object):
-            super(KeyFprScanWidget, self).__init__(orientation=Gtk.Orientation.VERTICAL)
-        else:
-            Gtk.Box.__init__(self, orientation=Gtk.Orientation.VERTICAL)
+        super(KeyFprScanWidget, self).__init__(orientation=Gtk.Orientation.VERTICAL)
         log.debug("Inited parent KFSW %r", self)
 
         widget_name = 'scanner_widget'

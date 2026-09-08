@@ -38,23 +38,6 @@ class ListBoxRowWithKey(Gtk.ListBoxRow):
         label = Gtk.Label(label=s, use_markup=True, xalign=0)
         self.set_child(label)
 
-    @staticmethod
-    def glib_markup_escape_text_to_text(s):
-        """A helper function to return the text type
-        markup_escape_text returns a "str" which is
-        a binary type in python2.
-        This function tries to decode the returned
-        str object.  It will fail in Python3.
-        """
-        m = GLib.markup_escape_text(s)
-        try:
-            ret = m.decode('utf-8')
-        except AttributeError:
-            # We are in Python3 land. All is fine.
-            ret = m
-        return ret
-        
-
     @classmethod
     def format_uid(cls, uid):
         "Returns a pango string for a gpgmeh.UID"
@@ -65,8 +48,7 @@ class ListBoxRowWithKey(Gtk.ListBoxRow):
                           for k in items}
         log.info("format dicT: %r", format_dict)
         d = {k: (log.debug("handling kv: %r %r", k, v),
-                  cls.glib_markup_escape_text_to_text(
-                    "{}".format(v)))[1]
+                  GLib.markup_escape_text("{}".format(v)))[1]
              for k, v in format_dict.items()}
         log.info("Formatting UID %r", d)
         s = fmt.format(**d)

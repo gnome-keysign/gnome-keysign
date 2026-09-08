@@ -30,12 +30,7 @@ def to_valid_utf8_string(s, errors='replace', replacement='?'):
     Take 'fo\udcf6e\udce9ba <foo@bma.d>' for example.
     This function replaces undecodable characters with a '?'
     """
-    try:
-        safe = s.encode('utf-8', errors=errors).decode('utf-8', errors=errors)
-    except UnicodeDecodeError:
-        # This is the Python 2 way...
-        safe = s.decode('utf-8', errors=errors).replace(u"\uFFFD", replacement)
-    return safe
+    return s.encode('utf-8', errors=errors).decode('utf-8', errors=errors)
 
 
 def parse_uid(uid, errors='replace'):

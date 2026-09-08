@@ -57,8 +57,7 @@ class WormholeReceive:
 
         self.stop()
         self.w = wormhole.create(self.app_id, RENDEZVOUS_RELAY, reactor)
-        # The following mod is required for Python 2 support
-        self.w.set_code("%s" % str(self.code))
+        self.w.set_code(self.code)
 
         try:
             message = yield self.w.get_message()

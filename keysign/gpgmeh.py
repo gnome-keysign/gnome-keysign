@@ -19,7 +19,6 @@ import base64
 import logging
 import os  # The SigningKeyring uses os.symlink for the agent
 from subprocess import check_output
-import sys
 from tempfile import mkdtemp
 import platform
 
@@ -30,8 +29,6 @@ from gpg.errors import GPGMEError
 
 
 from .gpgkey import Key, UID
-
-texttype = unicode if sys.version_info.major < 3 else str
 
 log = logging.getLogger(__name__)
 
@@ -83,7 +80,7 @@ class GenEdit:
         log.info("edit_cb: %r %r '%s'", status, args, sinkdata)
         data = self.generator.send((status, args)) #, sinkdata))
         log.info("edit_cb data: %r", data)
-        return texttype(data)
+        return str(data)
 
 def del_uids(uids):
     status, arg = yield None

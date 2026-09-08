@@ -20,7 +20,6 @@ from binascii import hexlify
 from textwrap import dedent
 import logging
 import os
-from builtins import input
 
 from wormhole.cli.public_relay import RENDEZVOUS_RELAY
 from wormhole.errors import TransferError, ServerConnectionError, WrongPasswordError, LonelyError

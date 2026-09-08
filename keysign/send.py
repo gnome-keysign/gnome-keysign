@@ -7,10 +7,7 @@ import signal
 from string import Template
 from tempfile import NamedTemporaryFile
 
-try:
-    from urllib.parse import unquote
-except ImportError:
-    from urllib import unquote
+from urllib.parse import unquote
 
 import gi
 gi.require_version('Gtk', '4.0')
