@@ -100,10 +100,7 @@ class SendApp:
         self.klw = klw
 
         stack = builder.get_object("send_stack")
-        if hasattr(stack, 'add_child'):
-            stack.add_child(klw)
-        else:
-            stack.add(klw)
+        stack.add_child(klw)
         self.stack = stack
 
         # This is a dirty hack :-/
@@ -501,16 +498,12 @@ class App(Adw.Application):
     def on_resultbox_mapped(self, rb):
         log.debug("Resultbox becomes visible!")
         self.header_button.set_sensitive(True)
-        self.header_button.set_image(
-            Gtk.Image.new_from_icon_name("go-previous",
-                                         Gtk.IconSize.BUTTON))
+        self.header_button.set_icon_name("go-previous")
         self.internet_toggle.hide()
 
     def on_keylist_mapped(self, keylistwidget):
         log.debug("Keylist becomes visible!")
-        self.header_button.set_image(
-            Gtk.Image.new_from_icon_name("view-refresh",
-            Gtk.IconSize.BUTTON))
+        self.header_button.set_icon_name("view-refresh")
         # We don't support refreshing for now.
         self.header_button.set_sensitive(False)
         self.internet_toggle.show()
@@ -523,9 +516,7 @@ class App(Adw.Application):
     def on_keypresent_mapped(self, kpw):
         log.debug("keypresent becomes visible!")
         self.header_button.set_sensitive(True)
-        self.header_button.set_image(
-            Gtk.Image.new_from_icon_name("go-previous",
-            Gtk.IconSize.BUTTON))
+        self.header_button.set_icon_name("go-previous")
         self.internet_toggle.hide()
 
     def on_send_header_button_clicked(self, button, *args):
