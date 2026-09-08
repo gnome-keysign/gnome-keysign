@@ -65,6 +65,25 @@ def remove_whitespace(s):
     return cleaned
 
 
+def format_error(message):
+    """Turns what a transport reports as an error into user facing text
+
+    Depending on which transport failed, and how, we get handed an
+    exception class, an exception instance, a sentence meant for the
+    user, or nothing at all.
+    """
+    if message is None:
+        return _("An unexpected error occurred")
+    if isinstance(message, str):
+        return message
+    if isinstance(message, type) and issubclass(message, BaseException):
+        # Wormhole tells us which error occurred by handing us the class
+        return dedent(message.__doc__ or "").strip() or message.__name__
+    if isinstance(message, BaseException):
+        return str(message) or format_error(type(message))
+    return str(message)
+
+
 class ReceiveApp:
     def __init__(self, builder=None):
         self.psw = None
@@ -170,7 +189,7 @@ class ReceiveApp:
                 log.error(ve.args[0])
         else:
             self.stack.add(self.rb)
-            self.result_label.set_label(dedent(message.__doc__))
+            self.result_label.set_label(format_error(message))
             self.stack.set_visible_child(self.rb)
 
     def on_code_changed(self, scanner, entry):
