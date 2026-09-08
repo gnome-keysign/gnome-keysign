@@ -39,7 +39,6 @@ from _dbus_bindings import BUS_DAEMON_NAME, BUS_DAEMON_PATH, BUS_DAEMON_IFACE
 import gi
 
 gi.require_version('Gtk', '4.0')
-#gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
 
 from .errors import NoBluezDbus, UnpoweredAdapter, NoAdapter
