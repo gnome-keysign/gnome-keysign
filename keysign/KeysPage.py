@@ -118,7 +118,6 @@ class KeysPage(Gtk.Box):
             self.scrolled_window.set_child(self.treeView)
             self.scrolled_window.set_min_content_height(200)
 
-            #self.pack_start(self.scrolled_window, True, True, 0)
 
             self.hpane = Gtk.Paned(orientation=Gtk.Orientation.HORIZONTAL)
             self.hpane.set_start_child(self.scrolled_window)
