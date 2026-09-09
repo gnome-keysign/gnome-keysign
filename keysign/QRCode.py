@@ -191,24 +191,6 @@ class QRImage(Gtk.DrawingArea):
     data = GObject.Property(getter=get_data, setter=set_data)
 
 
-def fullscreen_at_monitor(window, n):
-    """Fullscreens a given window on the n-th monitor
-
-    This is because Gtk's fullscreen_on_monitor seems to
-    be buggy.
-    http://stackoverflow.com/a/39386341/2015768
-    """
-    if hasattr(Gdk, 'Screen') and hasattr(Gdk.Screen, 'get_default'):
-        screen = Gdk.Screen.get_default()
-        monitor_n_geo = screen.get_monitor_geometry(n)
-        x = monitor_n_geo.x
-        y = monitor_n_geo.y
-        window.move(x,y)
-        window.fullscreen()
-    else:
-        window.fullscreen()
-
-
 class FullscreenQRImageWindow(Gtk.Window):
     '''Displays a QRImage in a fullscreen window
     

@@ -25,7 +25,7 @@ import logging
 
 import gi
 gi.require_version('Gtk', '4.0')
-from gi.repository import Gtk, GLib
+from gi.repository import Gio, Gtk, GLib
 from gi.repository import GObject
 
 from .gpgmeh import get_usable_secret_keys, get_usable_keys
@@ -34,6 +34,20 @@ from .gpgmeh import get_usable_secret_keys, get_usable_keys
 from .__init__ import __version__
 
 log = logging.getLogger(__name__)
+
+
+class KeyUID(GObject.Object):
+    """One UID of a key, as listed by the KeysPage
+
+    Gio.ListStore holds GObjects, so the columns read their text off
+    these rather than out of a Gtk.ListStore's columns.
+    """
+
+    def __init__(self, name, email, fingerprint):
+        super(KeyUID, self).__init__()
+        self.name = name or ""
+        self.email = email or ""
+        self.fingerprint = fingerprint
 
 
 class KeysPage(Gtk.Box):
@@ -67,12 +81,8 @@ class KeysPage(Gtk.Box):
         '''
         super(KeysPage, self).__init__(orientation=Gtk.Orientation.VERTICAL)
 
-        # set up the list store to be filled up with user's gpg keys
-        # Note that other functions expect a certain structure to
-        # this ListStore, e.g. when parsing the selection of the
-        # TreeView, i.e. in get_items_from_selection.
-        self.store = Gtk.ListStore(str, str, str)
-        #                       name, email, fingerprint
+        # set up the list model to be filled up with user's gpg keys
+        self.store = Gio.ListStore(item_type=KeyUID)
 
         keys = get_usable_secret_keys()
         keys += get_usable_keys() if show_public_keys else []
@@ -81,44 +91,37 @@ class KeysPage(Gtk.Box):
             fingerprint = key.fingerprint
 
             for uid in uidslist:
-                self.store.append((uid.name, uid.email, fingerprint))
+                self.store.append(KeyUID(uid.name, uid.email, fingerprint))
 
-        if len(self.store) == 0:
+        if self.store.get_n_items() == 0:
             lbl = Gtk.Label(label="You don't have a private key")
             lbl.set_hexpand(True)
             lbl.set_vexpand(True)
             self.append(lbl)
         else:
-            # create the tree view
-            self.treeView = Gtk.TreeView(model=self.store)
-            # setup 'Name' column
-            nameRenderer = Gtk.CellRendererText()
-            nameColumn = Gtk.TreeViewColumn("Name", nameRenderer, text=0)
+            # Nothing is selected until the user picks something, so
+            # turn autoselect off before handing the model over -- it
+            # would select the first row the moment it gets one.
+            self.selection = Gtk.SingleSelection()
+            self.selection.set_autoselect(False)
+            self.selection.set_can_unselect(True)
+            self.selection.set_model(self.store)
 
-            # setup 'Email' column
-            emailRenderer = Gtk.CellRendererText()
-            emailColumn = Gtk.TreeViewColumn("Email", emailRenderer, text=1)
+            self.columnView = Gtk.ColumnView(model=self.selection)
+            self.columnView.append_column(self._make_column("Name", "name"))
+            self.columnView.append_column(self._make_column("Email", "email"))
+            ## Should we ever want to show the fingerprint, too
+            # self.columnView.append_column(
+            #     self._make_column("Fingerprint", "fingerprint"))
 
-            ## setup 'Fingerprint' column
-            # keyRenderer = Gtk.CellRendererText()
-            # keyColumn = Gtk.TreeViewColumn("Fingerprint", keyRenderer, text=2)
+            self.columnView.connect('activate', self.on_row_activated)
 
-            self.treeView.append_column(nameColumn)
-            self.treeView.append_column(emailColumn)
-            # self.treeView.append_column(keyColumn)
-
-            self.treeView.connect('row-activated', self.on_row_activated)
-
-            # make the tree view resposive to single click selection
-            self.treeView.get_selection().connect('changed', self.on_selection_changed)
-
-            # make the tree view scrollable
+            # make the list scrollable
             self.scrolled_window = Gtk.ScrolledWindow()
             self.scrolled_window.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-            self.scrolled_window.set_child(self.treeView)
+            self.scrolled_window.set_child(self.columnView)
             self.scrolled_window.set_min_content_height(200)
 
-            #self.pack_start(self.scrolled_window, True, True, 0)
 
             self.hpane = Gtk.Paned(orientation=Gtk.Orientation.HORIZONTAL)
             self.hpane.set_start_child(self.scrolled_window)
@@ -131,29 +134,51 @@ class KeysPage(Gtk.Box):
             self.hpane.set_vexpand(True)
             self.append(self.hpane)
 
+            # Only now that the right pane exists is it safe to react to
+            # a selection, because that is what we fill in
+            self.selection.connect('selection-changed',
+                                   self.on_selection_changed)
 
-    # We could make it a @staticmethod, but the returned items
-    # are bound to the model, anyway.  So it probably doesn't
-    # make much sense to have a static function, anyway.
+    @staticmethod
+    def _make_column(title, attribute):
+        """Returns a column showing the given attribute of a KeyUID"""
+        factory = Gtk.SignalListItemFactory()
+
+        def on_setup(factory, list_item):
+            list_item.set_child(Gtk.Label(xalign=0.0))
+
+        def on_bind(factory, list_item):
+            label = list_item.get_child()
+            label.set_text(getattr(list_item.get_item(), attribute))
+
+        factory.connect('setup', on_setup)
+        factory.connect('bind', on_bind)
+        return Gtk.ColumnViewColumn(title=title, factory=factory, expand=True)
+
+
     def get_items_from_selection(self, selection=None):
-        '''Returns the elements in the ListStore for the given selection'''
-        s = selection or self.treeView.get_selection()
-        model, paths = s.get_selected_rows()
-        name = email = fingerprint = None
-        for path in paths:
-            iterator = model.get_iter(path)
-            (name, email, fingerprint) = model.get(iterator, 0, 1, 2)
-            break
+        '''Returns name, email, and fingerprint of the selected UID
 
-        return (name, email, fingerprint)
+        All three are None when nothing is selected.
+        '''
+        s = selection or self.selection
+        uid = s.get_selected_item()
+        if uid is None:
+            return (None, None, None)
+
+        return (uid.name, uid.email, uid.fingerprint)
 
 
     def on_selection_changed(self, selection, *args):
-        log.debug('Selected new TreeView item %s = %s', selection, args)
+        log.debug('Selected a new item %s = %s', selection, args)
         
         name, email, fingerprint = \
             self.get_items_from_selection(selection)[:3]
-        
+
+        if fingerprint is None:
+            # The selection was cleared, there is nothing to show
+            return
+
         self.emit('key-selection-changed', fingerprint)
         
         # FIXME: We'd rather want to get the key object
@@ -188,18 +213,14 @@ class KeysPage(Gtk.Box):
             pane.append(w)
 
 
-    def on_row_activated(self, treeview, tree_path, column):
+    def on_row_activated(self, columnview, position):
         '''A callback for when the user "activated" a row,
         e.g. by double-clicking an entry.
-        
+
         It emits the key-selected signal.
         '''
-        # We just hijack the existing function.
-        # I'm sure we could get the required information out of
-        # the tree_path and column, but I don't know how.
-        name, email, fingerprint = \
-            self.get_items_from_selection()[:3]
-        self.emit('key-selected', fingerprint)
+        uid = self.store.get_item(position)
+        self.emit('key-selected', uid.fingerprint)
 
 
     def on_publish_button_clicked(self, button, key, *args):
