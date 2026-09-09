@@ -38,6 +38,7 @@ from keysign.gpgmeh import get_public_key_data
 from keysign.gpgmeh import sign_keydata_and_encrypt
 from keysign.gpgmeh import ImportNewCertificationError
 from keysign.gpgmeh import get_signatures_for_uids_on_key
+from keysign.gpgmeh import NoSecretKeysError
 
 from keysign.gpgkey import to_valid_utf8_string
 
@@ -609,3 +610,38 @@ class TestUtf8(TestSignAndEncrypt):
 #class TestSubKeys(TestSignAndEncrypt):
 #    SENDER_KEY = "seckey-2.asc"
 #    RECEIVER_KEY = "seckey-subkeys.asc"
+
+
+class TestSignAndEncryptNoSecretKey:
+    SENDER_KEY = "seckey-no-pw-1.asc"
+
+    def setup_method(self):
+        self.key_sender_key = get_fixture_file(self.SENDER_KEY)
+        self.key_sender_homedir = tempfile.mkdtemp()
+        sender_gpgcmd = ["gpg", "--homedir={}".format(self.key_sender_homedir)]
+        check_call(sender_gpgcmd + ["--import", self.key_sender_key])
+
+        # The receiver has no keys!
+        self.key_receiver_homedir = tempfile.mkdtemp()
+
+    def teardown_method(self):
+        pass
+
+    def test_sign_and_encrypt_no_keys(self):
+        keydata = open(self.key_sender_key, "rb").read()
+        sender = TempContext()
+        sender.op_import(keydata)
+        result = sender.op_import_result()
+        fpr = result.imports[0].fpr
+        sink = gpg.Data()
+        sender.op_export(fpr, 0, sink)
+        sink.seek(0, 0)
+        public_sender_key = sink.read()
+
+        with pytest.raises(NoSecretKeysError) as exc_info:
+            uid_encrypted = list(sign_keydata_and_encrypt(public_sender_key,
+                                 error_cb=None, homedir=self.key_receiver_homedir))
+        
+        assert "No secret keys available" in str(exc_info.value)
+        assert exc_info.value.homedir == self.key_receiver_homedir
+

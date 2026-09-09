@@ -51,8 +51,10 @@ class BarcodeReaderGTK(Gtk.Box):
     }
 
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, device=None, pipewire_fd=None, **kwargs):
         super(BarcodeReaderGTK, self).__init__(*args, **kwargs)
+        self.device = device
+        self.pipewire_fd = pipewire_fd
         self.connect('unmap', self.on_unmap)
         self.connect('map', self.on_map)
         self.scaling_image = ScalingImage()
@@ -95,8 +97,14 @@ class BarcodeReaderGTK(Gtk.Box):
 
 
     def run(self):
+        if self.pipewire_fd is not None:
+            src = f"pipewiresrc fd={self.pipewire_fd}"
+        elif self.device:
+            src = f"v4l2src device={self.device}"
+        else:
+            src = "autovideosrc"
         pipeline_str = (
-            "autovideosrc "
+            f"{src} "
             " ! videoconvert "
             " ! zbar cache=true attach_frame=true "
             " ! videoconvert "
@@ -115,6 +123,40 @@ class BarcodeReaderGTK(Gtk.Box):
         bus.add_signal_watch()
 
         pipeline.set_state(Gst.State.PLAYING)
+
+
+    def set_pipewire_fd(self, fd):
+        """Set PipeWire fd for portal-based camera access."""
+        log.info("Setting PipeWire fd to: %s", fd)
+        was_playing = False
+        if hasattr(self, 'pipeline') and self.pipeline:
+            state = self.pipeline.get_state(0)[1]
+            if state in (Gst.State.PLAYING, Gst.State.PAUSED):
+                was_playing = True
+            self.pipeline.set_state(Gst.State.NULL)
+            self.pipeline = None
+        self.pipewire_fd = fd
+        self.device = None
+        if was_playing:
+            self.run()
+
+    def set_device(self, device):
+        log.info("Setting device to: %s", device)
+        if self.device == device:
+            return
+        
+        is_playing = False
+        if hasattr(self, 'pipeline') and self.pipeline:
+            state = self.pipeline.get_state(0)[1]
+            if state in (Gst.State.PLAYING, Gst.State.PAUSED):
+                is_playing = True
+            self.pipeline.set_state(Gst.State.NULL)
+            self.pipeline = None
+            
+        self.device = device
+        
+        if is_playing:
+            self.run()
 
 
     def on_new_sample(self, appsink):

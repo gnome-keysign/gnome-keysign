@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0.0", "wheel", "babel", "BabelGladeExtractor"]
+requires = ["setuptools>=77.0.0", "wheel", "babel", "BabelGladeExtractor"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -11,7 +11,7 @@ authors = [
     { name = "Tobias Mueller", email = "tobiasmue@gnome.org" }
 ]
 urls = { Homepage = "https://wiki.gnome.org/Apps/Keysign" }
-license = { text = "GPL-3.0-or-later" }
+license = "GPL-3.0-or-later"
 classifiers = [
     "Intended Audience :: Developers",
     "Intended Audience :: System Administrators",
@@ -20,7 +20,6 @@ classifiers = [
     "Intended Audience :: Legal Industry",
     "Intended Audience :: Telecommunications Industry",
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: GNU General Public License (GPL)",
     "Operating System :: POSIX :: Linux",
     "Environment :: X11 Applications :: GTK",
     "Topic :: Desktop Environment",
@@ -43,7 +42,8 @@ test = [
     "pytest_twisted",
     "tox",
     "pycodestyle",
-    "pylint"
+    "pylint",
+    "pillow"
 ]
 
 [project.entry-points.console_scripts]
@@ -53,8 +53,13 @@ gnome-keysign-split-uids = "keysign.export_uids:main"
 [project.entry-points.gui_scripts]
 gnome-keysign = "keysign:main"
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["keysign*"]
+exclude = ["keysign.locale*"]
+namespaces = false
+
 [tool.setuptools]
-packages = ["keysign", "keysign.compat", "keysign.network"]
 include-package-data = true
 
 [tool.setuptools.package-data]
@@ -67,6 +72,11 @@ version = {attr = "keysign._version.__version__"}
 "share/applications" = ["data/org.gnome.Keysign.desktop"]
 "share/metainfo" = ["data/org.gnome.Keysign.appdata.xml"]
 "share/icons/hicolor/scalable/apps" = ["data/org.gnome.Keysign.svg"]
+"share/icons/hicolor/symbolic/apps" = ["data/org.gnome.Keysign-symbolic.svg"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

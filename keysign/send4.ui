@@ -49,6 +49,7 @@ Please use, e.g. Seahorse to create one.</property>
                         </child>
                         <child>
                           <object class="GtkImage">
+                            <property name="icon-name">dialog-error</property>
                             </object>
                         </child>
                         <child>
@@ -596,6 +597,7 @@ You can drag and drop the email here to import your certification.</property>
               <object class="GtkBox">
                 <child>
                   <object class="GtkImage">
+                    <property name="icon-name">network-idle</property>
                     </object>
                 </child>
                 <child>

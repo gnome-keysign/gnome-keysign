@@ -97,7 +97,7 @@ class PreSignWidget(Gtk.Box):
             builder = Gtk.Builder()
             builder.add_objects_from_file(
                 os.path.join(thisdir, 'receive4.ui'),
-                [widget_name, 'confirm-button-image'])
+                [widget_name, 'confirm-button-image', 'error_dialog'])
         widget = builder.get_object(widget_name)
         parent = widget.get_parent()
         if parent:
@@ -139,23 +139,25 @@ class PreSignWidget(Gtk.Box):
         self.infobar_show_error_button = builder.get_object('btn_show_error_details')
 
         ib_error_show = self.infobar_errors.show
+        
+        self.error_dialog = builder.get_object('error_dialog')
+        self.error_dialog_base_text = self.error_dialog.get_property('secondary-text')
+        self.error_dialog.connect("response", lambda d, r: d.hide())
+
+        def show_error(btn):
+            if hasattr(self.infobar_errors, 'exception'):
+                exception = self.infobar_errors.exception
+                self.error_dialog.set_transient_for(self.get_root())
+                self.error_dialog.set_property('secondary-text',
+                    self.error_dialog_base_text % (str(exception),))
+                self.error_dialog.present()
+
+        self.infobar_show_error_button.connect("clicked", show_error)
+
         def show(exception):
             self.infobar_errors.exception = exception
             ib_error_show()
-            def show_error(btn):
-                dialog = Gtk.MessageDialog(
-                    transient_for=self.get_toplevel(),
-                    flags=0,
-                    message_type=Gtk.MessageType.ERROR,
-                    buttons=Gtk.ButtonsType.CLOSE,
-                    text="Error certifying key"
-                )
-                dialog.format_secondary_text(
-                    str(exception) + "\n" +
-                    "We don't know any more, sorry :(")
-                dialog.connect("response", lambda d, r: d.destroy())
-                dialog.present()
-            self.infobar_show_error_button.connect("clicked", show_error)
+            
         self.infobar_errors.show = show
 
     def on_confirm_button_clicked(self, buttonObject, *args):

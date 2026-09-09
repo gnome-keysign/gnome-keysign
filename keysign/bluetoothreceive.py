@@ -9,7 +9,7 @@ if __name__ == "__main__":
     gireactor.install()
     from twisted.internet import reactor
 from twisted.internet import threads
-from twisted.internet.defer import inlineCallbacks, returnValue
+from twisted.internet.defer import inlineCallbacks
 
 if __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -49,6 +49,8 @@ class BluetoothReceive:
                 socket.SOCK_STREAM,
                 socket.BTPROTO_RFCOMM)
         message = b""
+        success = False
+        ret_val = None
         try:
             self.client_socket.setblocking(False)
             try:
@@ -60,8 +62,6 @@ class BluetoothReceive:
                 else:
                     log.exception("BT connection (%d)", be.errno)
                     raise be
-
-            success = False
             while not self.stopped and not success:
                 r, w, e = yield threads.deferToThread(select.select, [self.client_socket], [], [], 0.5)
                 if r:
@@ -92,8 +92,10 @@ class BluetoothReceive:
                 log.info("MAC validation failed: %r", verified)
                 success = False
                 message = b""
+            ret_val = message.decode("utf-8"), success, None
         except ConnectionRefusedError as be:
             log.info("CR")
+            ret_val = message.decode("utf-8"), success, None
         except OSError as be:
             log.exception("BT conn (%d)", be.errno)
             if be.errno == 16: # "(16, 'Device or resource busy')":
@@ -109,16 +111,16 @@ class BluetoothReceive:
 
             key_data = None
             success = False
-            returnValue((key_data, success, be))
+            ret_val = key_data, success, be
         except Exception as e:
             log.error("An error occurred connecting or receiving: %s" % e)
             key_data = None
             success = False
-            returnValue((key_data, success, e))
+            ret_val = key_data, success, e
 
         if self.client_socket:
             self.client_socket.close()
-        returnValue((message.decode("utf-8"), success, None))
+        return ret_val
 
     def stop(self):
         self.stopped = True
