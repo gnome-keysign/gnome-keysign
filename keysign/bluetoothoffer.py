@@ -2,7 +2,6 @@ import logging
 import dbus
 import select
 import socket
-import sys
 
 if __name__ == "__main__":
     import gi
@@ -12,9 +11,6 @@ if __name__ == "__main__":
     from twisted.internet import reactor
 from twisted.internet import threads
 from twisted.internet.defer import inlineCallbacks
-
-if sys.version < '3':
-    input = raw_input
 
 if __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +

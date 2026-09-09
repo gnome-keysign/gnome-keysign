@@ -21,9 +21,6 @@ import sys
 
 from .util import sign_keydata_and_send
 
-if sys.version_info.major < 3:
-    input = raw_input
-
 
 def main():
     import argparse

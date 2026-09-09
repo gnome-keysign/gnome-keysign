@@ -16,13 +16,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys
-
 import dbus
-
-if sys.version_info[0] >= 3:
-    unicode = str
-
 
 class AvahiConstants:
     SERVER_RUNNING = 2
@@ -46,18 +40,14 @@ class AvahiConstants:
 
     @staticmethod
     def string_to_byte_array(s):
-        if isinstance(s, unicode):
+        if isinstance(s, str):
             s = s.encode('utf-8')
 
         r = []
 
+        # Iterating over bytes yields ints
         for c in s:
-            if isinstance(c, int):
-                # Python 3: iterating over bytes yields ints
-                r.append(dbus.Byte(c))
-            else:
-                # Python 2: iterating over str yields str
-                r.append(dbus.Byte(ord(c)))
+            r.append(dbus.Byte(c))
 
         return r
 
@@ -66,10 +56,10 @@ class AvahiConstants:
         l = []
 
         for k, v in txt_dict.items():
-            if isinstance(k, unicode):
+            if isinstance(k, str):
                 k = k.encode('utf-8')
 
-            if isinstance(v, unicode):
+            if isinstance(v, str):
                 v = v.encode('utf-8')
 
             l.append(AvahiConstants.string_to_byte_array(b"%s=%s" % (k, v)))

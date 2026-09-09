@@ -65,7 +65,6 @@ def mac_verify(key, data, mac):
     return result
 
 
-
 def get_window_handle(window):
     if not window:
         return ""
@@ -112,11 +111,6 @@ def get_window_handle(window):
 
 
 def _email_portal(to, subject=None, body=None, files=None, parent_window=None):
-    # The following checks are to ensure Python 2 compatibility
-    if not hasattr(os, 'O_PATH'):
-        os.O_PATH = 2097152
-    if not hasattr(os, 'O_CLOEXEC'):
-        os.O_CLOEXEC = 524288
     name = "org.freedesktop.portal.Desktop"
     path = "/org/freedesktop/portal/desktop"
     bus = dbus.SessionBus()

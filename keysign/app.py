@@ -84,8 +84,7 @@ class PswMappingReceiveApp(ReceiveApp):
     in time.
     """
     def __init__(self, mapped_func, builder=None):
-        # ReceiveApp, in Python 2, is an old style object
-        ReceiveApp.__init__(self, builder=builder)
+        super(PswMappingReceiveApp, self).__init__(builder=builder)
         self.func = mapped_func
         
     def on_keydata_downloaded(self, *args, **kwargs):
