@@ -1,5 +1,5 @@
 import logging
-from twisted.internet.defer import inlineCallbacks, returnValue
+from twisted.internet.defer import inlineCallbacks
 
 from .wormholeoffer import WormholeOffer
 from .avahioffer import AvahiHTTPOffer
@@ -40,7 +40,7 @@ class Offer:
         discovery_data = ";".join(discovery_data)
         # As design when we use both avahi and wormhole we only display
         # the wormhole code
-        returnValue((code, discovery_data))
+        return code, discovery_data
 
     def start(self):
         avahi_defers = self.a_offer.start()
@@ -51,7 +51,7 @@ class Offer:
         # If we have a Bluetooth code, so if the Bluetooth has been
         # correctly initialized
         if not self.b_data:
-            log.info("Bluetooth as been skipped")
+            log.info("Bluetooth has been skipped")
         else:
             bt_d = self.bt_offer.start()
             d.append(bt_d)

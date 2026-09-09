@@ -15,7 +15,6 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
-from __future__ import unicode_literals
 from collections import namedtuple
 from datetime import datetime
 import logging
@@ -28,7 +27,7 @@ def to_valid_utf8_string(s, errors='replace', replacement='?'):
     """Takes a string and returns a valid utf8 encodable string
 
     Not every Python string is utf-8 encodable.
-    Take 'fo\udcf6e\udce9ba <foo@bma.d>' for example.
+    Take 'fo\\udcf6e\\udce9ba <foo@bma.d>' for example.
     This function replaces undecodable characters with a '?'
     """
     try:
@@ -113,7 +112,11 @@ class Key(namedtuple("Key", ["expiry", "fingerprint", "uidslist"])):
 
     @property
     def fpr(self):
-        "Legacy compatibility, use fingerprint instead"
+        """Legacy compatibility, use fingerprint instead.
+        However, this is useful for compatibility with gpgme.
+        It returns keys with the "fpr" property and we may want
+        to be able to run gpgme functions with both their keys and our keys.
+        """
         warnings.warn("Legacy fpr, use the fingerprint property",
                       DeprecationWarning)
         return self.fingerprint

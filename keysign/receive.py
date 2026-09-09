@@ -22,15 +22,17 @@ import os
 import signal
 import sys
 from textwrap import dedent
+from urllib.parse import unquote
 
 import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GLib
+gi.require_version('Gtk', '4.0')
+gi.require_version('Adw', '1')
+from gi.repository import Gtk, GLib, Adw, Gdk, GObject
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 if __name__ == "__main__":
-    from twisted.internet import gtk3reactor
-    gtk3reactor.install()
+    from twisted.internet import gireactor
+    gireactor.install()
 from twisted.internet import reactor, threads
 from twisted.internet.defer import inlineCallbacks
 from wormhole.errors import WrongPasswordError, LonelyError
@@ -94,7 +96,7 @@ class ReceiveApp:
         if not builder:
             ui_file = os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
-                "receive.ui")
+                "receive4.ui")
             builder = Gtk.Builder()
             builder.add_objects_from_file(ui_file,
                 [widget_name, 'confirm-button-image'])
@@ -112,7 +114,7 @@ class ReceiveApp:
             old_scanner_parent.remove(old_scanner)
             # Hm. If we don't have an old parent, we never get to see
             # the newly created scanner. Weird.
-            old_scanner_parent.add(scanner)
+            old_scanner_parent.append(scanner)
 
         receive_stack = builder.get_object(widget_name)
         # It needs to be show()n so that it can be made visible
@@ -123,6 +125,10 @@ class ReceiveApp:
         # receive_stack.set_visible_child(old_scanner_parent)
         self.scanner = scanner
         self.stack = receive_stack
+
+        drop_target = Gtk.DropTarget.new(GObject.TYPE_STRING, Gdk.DragAction.COPY)
+        drop_target.connect("drop", self.on_drop_data_received)
+        self.scanner.add_controller(drop_target)
 
         self.discovery = AvahiKeysignDiscoveryWithMac()
         ib = builder.get_object('infobar_discovery')
@@ -144,6 +150,24 @@ class ReceiveApp:
         # We call this in async because it can take several seconds to complete and we don't want
         # to stall the UI boot. Also we don't care about having this information immediately.
         threads.deferToThread(self.check_bt_availability)
+
+    def on_drop_data_received(self, target, value, x, y):
+        log.info("recv: Drag data rcvd: %s", value)
+        dragged_data = unquote(value)
+        if dragged_data.startswith("file://"):
+            filename = dragged_data[7:].strip('\r\n\x00')  # remove file://, \r\n and NULL
+            keydata = open(filename, 'br').read()
+
+        elif dragged_data.startswith("-----BEGIN PGP PUBLIC KEY BLOCK-----"):
+            # We assume a raw (well, armored) key to be passed
+            keydata = dragged_data
+
+        else:
+            log.warning("We got a drag with neither file:// nor ----: %s", value)
+            keydata = dragged_data
+
+        self.on_keydata_downloaded(keydata)
+        return True
 
     def on_redo_button_clicked(self, button):
         log.info("redo pressed")
@@ -169,7 +193,12 @@ class ReceiveApp:
         except UnpoweredAdapter as e:
             log.debug("Bluetooth adapter is turned off: %s", e)
 
+    def get_toplevel(self):
+        if self.psw:
+            return self.psw.get_root()
+        return self.stack.get_root()
     def on_keydata_downloaded(self, keydata, pixbuf=None):
+        log.debug("Downloaded keydata of length %d: %s", len(keydata), keydata[:50])
         key = openpgpkey_from_data(keydata)
         psw = PreSignWidget(key, pixbuf)
         psw.connect('sign-key-confirmed',
@@ -188,7 +217,7 @@ class ReceiveApp:
             except ValueError as ve:
                 log.error(ve.args[0])
         else:
-            self.stack.add(self.rb)
+            self.stack.add_child(self.rb)
             self.result_label.set_label(format_error(message))
             self.stack.set_visible_child(self.rb)
 
@@ -221,7 +250,7 @@ class ReceiveApp:
         # We need to prevent tmpfiles from going out of
         # scope too early so that they don't get deleted
         try:
-            tmpfiles_plaintext = list(sign_keydata_and_send(keydata))
+            tmpfiles_plaintext = list(sign_keydata_and_send(keydata, parent_window=self.get_toplevel()))
         except GPGRuntimeError as e:
             self.log.exception("Something went wrong with signing the key")
             keyPreSignWidget.infobar_success.hide()
@@ -281,7 +310,7 @@ class ReceiveApp:
             ib.hide()
 
 
-class App(Gtk.Application):
+class App(Adw.Application):
     def __init__(self, *args, **kwargs):
         super(App, self).__init__(*args, **kwargs)
         self.connect('activate', self.on_activate)
@@ -290,11 +319,11 @@ class App(Gtk.Application):
     def on_activate(self, app):
         ui_file = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "receive.ui")
+            "receive4.ui")
         builder = Gtk.Builder.new_from_file(ui_file)
 
-        window = Gtk.ApplicationWindow()
-        window.connect("delete-event", self.on_delete_window)
+        window = Adw.ApplicationWindow(application=app)
+        window.connect("close-request", self.on_delete_window)
         window.set_title(_("Receive"))
         # window.set_size_request(600, 400)
         #window = self.builder.get_object("appwindow")
@@ -302,8 +331,21 @@ class App(Gtk.Application):
         self.receive = ReceiveApp(builder)
         receive_stack = self.receive.stack
 
-        window.add(receive_stack)
-        window.show_all()
+        window.set_child(receive_stack)
+
+        def on_realize(win):
+            surface = win.get_surface()
+            try:
+                from gi.repository import GdkWayland
+                if isinstance(surface, GdkWayland.WaylandToplevel):
+                    def on_handle_exported(toplevel, handle, *args):
+                        win.portal_handle = f"wayland:{handle}"
+                    surface.export_handle(on_handle_exported)
+            except Exception:
+                pass
+        window.connect("realize", on_realize)
+
+        window.present()
         self.add_window(window)
 
     @staticmethod
@@ -318,7 +360,7 @@ def main(args=[]):
         args = []
     Gst.init(None)
 
-    app = App()
+    app = App(application_id="org.gnome.Keysign.Receive")
     try:
         GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
                                   lambda *args: reactor.callFromThread(reactor.stop), None)

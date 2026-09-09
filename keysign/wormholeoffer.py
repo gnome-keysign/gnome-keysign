@@ -16,7 +16,6 @@
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
 from binascii import hexlify
 from textwrap import dedent
 import logging
@@ -26,14 +25,12 @@ from builtins import input
 from wormhole.cli.public_relay import RENDEZVOUS_RELAY
 from wormhole.errors import TransferError, ServerConnectionError, WrongPasswordError, LonelyError
 import wormhole
-import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+
 if __name__ == "__main__":
-    from twisted.internet import gtk3reactor
-    gtk3reactor.install()
+    from twisted.internet import gireactor
+    gireactor.install()
 from twisted.internet import reactor
-from twisted.internet.defer import inlineCallbacks, returnValue
+from twisted.internet.defer import inlineCallbacks
 
 if __name__ == "__main__" and __package__ is None:
     logging.getLogger().error("You seem to be trying to execute " +
@@ -69,7 +66,7 @@ class WormholeOffer:
             code = yield self.w.get_code()
         log.info("Invitation Code: %s", code)
         wormhole_data = "WORM={0}".format(code)
-        returnValue((code, wormhole_data))
+        return code, wormhole_data
 
     @inlineCallbacks
     def start(self):
@@ -96,22 +93,24 @@ class WormholeOffer:
             log.info("Got data, %d bytes" % len(msg))
             success, error_msg = self._check_received(msg)
             self.stop()
-            returnValue((success, error_msg))
+            ret_val = success, error_msg
 
         except (ServerConnectionError, WrongPasswordError) as e:
             error = dedent(e.__doc__)
             log.error("Error: %s" % error)
             success = False
-            returnValue((success, e))
+            ret_val = success, e
         except LonelyError as le:
             log.info("Lonely, close() was called before the peer connection could be established")
             success = False
-            returnValue((success, le))
+            ret_val = success, le
         except Exception as e:
             error = dedent(e.__doc__)
             log.error("An unknown error occurred: %s" % error)
             success = False
-            returnValue((success, e))
+            ret_val = success, e
+
+        return ret_val
 
     def _check_received(self, msg):
         """If the received message has a field 'answer' that means that the transfer

@@ -22,7 +22,7 @@ import logging
 import os
 
 import gi
-gi.require_version('Gtk', '3.0')
+gi.require_version('Gtk', '4.0')
 gi.require_version('Gst', '1.0')
 
 from gi.repository import Gtk, Gst, GdkPixbuf
@@ -41,12 +41,13 @@ if  __name__ == "__main__" and __package__ is None:
     __package__ = str('keysign')
 
 from .scan_barcode import BarcodeReaderGTK
+from . import camera_portal
 
 log = logging.getLogger(__name__)
 
 
 
-class KeyFprScanWidget(Gtk.VBox):
+class KeyFprScanWidget(Gtk.Box):
     """A widget for obtaining a key fingerprint.
 
     The fingerprint can be obtain by inserting it into
@@ -60,7 +61,7 @@ class KeyFprScanWidget(Gtk.VBox):
                         (GObject.TYPE_PYOBJECT,)),
         # It's probably not the best name for that signal.
         # While "barcode_scanned" might be better, it is probably
-        # unneccesarily specific.
+        # unnecessarily specific.
         str('barcode'): (GObject.SignalFlags.RUN_LAST, None,
                         (str, # The barcode string
                          Gst.Message.__gtype__, # The GStreamer message itself
@@ -71,22 +72,22 @@ class KeyFprScanWidget(Gtk.VBox):
     def __init__(self, builder=None):
         log.debug("Init KFSW %r %r", self, builder)
         if issubclass(self.__class__, object):
-            super(KeyFprScanWidget, self).__init__()
+            super(KeyFprScanWidget, self).__init__(orientation=Gtk.Orientation.VERTICAL)
         else:
-            Gtk.VBox.__init__(self)
+            Gtk.Box.__init__(self, orientation=Gtk.Orientation.VERTICAL)
         log.debug("Inited parent KFSW %r", self)
 
         widget_name = 'scanner_widget'
         if not builder:
             thisdir = os.path.dirname(os.path.abspath(__file__))
             builder = Gtk.Builder()
-            builder.add_objects_from_file(os.path.join(thisdir, 'receive.ui'),
+            builder.add_objects_from_file(os.path.join(thisdir, 'receive4.ui'),
                 [widget_name])
         widget = builder.get_object(widget_name)
         parent = widget.get_parent()
         if parent:
             parent.remove(widget)
-        self.add(widget)
+        self.append(widget)
         
 
         self.scanner = builder.get_object("scanner")
@@ -98,12 +99,49 @@ class KeyFprScanWidget(Gtk.VBox):
         reader = BarcodeReaderGTK()
         reader.set_size_request(150,150)
         reader.connect('barcode', self.on_barcode)
-        self.scanner.add(reader)
-        # We keep a referece here to not "lose" the object.
+        self.scanner.append(reader)
+        # We keep a reference here to not "lose" the object.
         # If we don't, Gtk crashes. With a segfault. Probably
         # because the object is freed but still used.
         # Somebody should look at that...
         self.reader = reader
+
+        self.camera_selector = builder.get_object("comboboxtext1")
+        self.camera_box = builder.get_object("box40")
+        self.camera_devices = {}
+        
+        self._using_portal = False
+        if camera_portal._using_flatpak() and camera_portal.is_camera_portal_available():
+            log.info("Running in Flatpak and Camera Portal is available, requesting access")
+            self._using_portal = True
+            # Hide the camera selector dropdown — portal handles camera access
+            if self.camera_box:
+                self.camera_box.set_visible(False)
+            camera_portal.request_camera_access(self._on_camera_portal_response)
+        else:
+            # Legacy path: enumerate devices with Gst.DeviceMonitor
+            if self.camera_selector:
+                self.populate_cameras()
+
+    def _on_camera_portal_response(self, success, pipewire_fd):
+        """Called when the Camera Portal responds to our access request."""
+        if success and pipewire_fd is not None:
+            log.info("Camera Portal granted access, fd=%d", pipewire_fd)
+            from gi.repository import GLib
+            GLib.idle_add(self.reader.set_pipewire_fd, pipewire_fd)
+        else:
+            log.warning("Camera Portal denied or failed, falling back to "
+                        "direct device access.")
+            self._using_portal = False
+            from gi.repository import GLib
+            GLib.idle_add(self._fallback_to_device_monitor)
+
+    def _fallback_to_device_monitor(self):
+        """Fall back to legacy Gst.DeviceMonitor enumeration."""
+        if self.camera_box:
+            self.camera_box.set_visible(True)
+        if self.camera_selector:
+            self.populate_cameras()
 
         self.fpr_entry = builder.get_object("fingerprint_entry")
         self.fpr_entry.connect('changed', self.on_text_changed)
@@ -113,6 +151,86 @@ class KeyFprScanWidget(Gtk.VBox):
 
         # Temporary measure...
         self.barcode_scanner = self
+
+    def populate_cameras(self):
+        self.camera_selector.remove_all()
+        
+        monitor = Gst.DeviceMonitor.new()
+        monitor.add_filter("Video/Source", None)
+        monitor.start()
+        devices = monitor.get_devices()
+        monitor.stop()
+        
+        self.camera_devices = {}
+        best_suitable_idx = -1
+        best_suitable_v4l2 = -1
+        
+        best_unsuitable_idx = -1
+        best_unsuitable_v4l2 = -1
+        
+        import re
+        def get_v4l2_index(path):
+            if not path:
+                return -1
+            m = re.search(r'\d+$', path)
+            return int(m.group(0)) if m else -1
+        
+        for idx, device in enumerate(devices):
+            display_name = device.get_display_name()
+            props = device.get_properties()
+            device_path = None
+            if props:
+                for key in ["api.v4l2.path", "device.path", "object.path"]:
+                    val = props.get_string(key)
+                    if val:
+                        if val.startswith("v4l2:"):
+                            val = val[5:]
+                        device_path = val
+                        break
+            
+            if not device_path:
+                continue
+                
+            name_lower = display_name.lower()
+            is_unsuitable = "ir" in name_lower or "infrared" in name_lower or "infra-red" in name_lower
+            
+            v4l2_num = get_v4l2_index(device_path)
+            current_idx = len(self.camera_devices)
+            item_id = str(current_idx)
+            self.camera_devices[item_id] = device_path
+            
+            if is_unsuitable:
+                label = f"⚠️ {display_name} ({device_path}) [IR / Unsuitable]"
+                if v4l2_num > best_unsuitable_v4l2:
+                    best_unsuitable_v4l2 = v4l2_num
+                    best_unsuitable_idx = current_idx
+            else:
+                label = f"{display_name} ({device_path})"
+                if v4l2_num > best_suitable_v4l2:
+                    best_suitable_v4l2 = v4l2_num
+                    best_suitable_idx = current_idx
+            
+            self.camera_selector.append(item_id, label)
+            
+        if self.camera_devices:
+            self.camera_selector.connect("changed", self.on_camera_changed)
+            if best_suitable_idx != -1:
+                default_index = best_suitable_idx
+            elif best_unsuitable_idx != -1:
+                default_index = best_unsuitable_idx
+            else:
+                default_index = 0
+            self.camera_selector.set_active(default_index)
+            default_path = self.camera_devices.get(str(default_index))
+            if default_path:
+                self.reader.set_device(default_path)
+
+    def on_camera_changed(self, combo):
+        active_id = combo.get_active_id()
+        if active_id and active_id in self.camera_devices:
+            device_path = self.camera_devices[active_id]
+            log.info("Camera changed in dropdown to ID %s: %s", active_id, device_path)
+            self.reader.set_device(device_path)
 
     def on_text_changed(self, entryObject, *args):
         self.emit('changed', entryObject, *args)
@@ -142,9 +260,8 @@ class KeyScanApp(Gtk.Application):
             self.scanwidget = KeyFprScanWidget()
         self.scanwidget.connect('changed', self.on_text_changed)
         self.scanwidget.connect('barcode', self.on_barcode)
-        window.add(self.scanwidget)
-
-        window.show_all()
+        window.set_child(self.scanwidget)
+        window.present()
         self.add_window(window)
 
     def on_text_changed(self, keyFprScanWidget, entryObject, *args):

@@ -23,13 +23,17 @@ import signal
 import sys
 
 import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GLib
+gi.require_version('Gtk', '4.0')
+gi.require_version('Adw', '1')
+from gi.repository import Gtk, GLib, Adw, Gio
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 from gi.repository import Gdk
-from twisted.internet import gtk3reactor
-gtk3reactor.install()
+try:
+    from twisted.internet import gireactor
+    gireactor.install()
+except Exception:
+    pass
 
 from twisted.internet import reactor
 
@@ -65,7 +69,7 @@ from . import gtkexcepthook
 log = logging.getLogger(__name__)
 
 def remove_whitespace(s):
-    cleaned = re.sub('[\s+]', '', s)
+    cleaned = re.sub(r'[\s+]', '', s)
     return cleaned
 
 
@@ -99,7 +103,7 @@ class PswMappingReceiveApp(ReceiveApp):
         return self.psw.get_toplevel()
 
 
-class KeysignApp(Gtk.Application):
+class KeysignApp(Adw.Application):
     def __init__(self, *args, **kwargs):
         super(KeysignApp, self).__init__(*args, **kwargs)
         self.connect('activate', self.on_activate)
@@ -113,14 +117,25 @@ class KeysignApp(Gtk.Application):
     def on_activate(self, app):
         ui_file_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "app.ui")
+            "app4.ui")
         appwindow = 'applicationwindow1'
         builder = Gtk.Builder()
         builder.add_objects_from_file(ui_file_path, [appwindow])
         window = builder.get_object(appwindow)
-        window.set_wmclass ("GNOME Keysign", "GNOME Keysign")
         window.set_title("GNOME Keysign")
-        window.connect("delete-event", self.on_delete_window)
+        window.connect("close-request", self.on_delete_window)
+
+        def on_realize(win):
+            surface = win.get_surface()
+            try:
+                from gi.repository import GdkWayland
+                if isinstance(surface, GdkWayland.WaylandToplevel):
+                    def on_handle_exported(toplevel, handle, *args):
+                        win.portal_handle = f"wayland:{handle}"
+                    surface.export_handle(on_handle_exported)
+            except Exception:
+                pass
+        window.connect("realize", on_realize)
         self.headerbar = window.get_titlebar()
         self.header_button = builder.get_object("back_refresh_button")
         self.header_button.connect('clicked', self.on_header_button_clicked)
@@ -160,11 +175,10 @@ class KeysignApp(Gtk.Application):
             log.info("Probably Avahi needs to be manually started: %s", de)
             ui_file_path = os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
-                "dialog_avahi.ui")
+                "dialog_avahi4.ui")
             appwindow = 'dialog_avahi'
             builder = Gtk.Builder()
             builder.add_objects_from_file(ui_file_path, [appwindow])
-            window.set_wmclass("GNOME Keysign", "GNOME Keysign")
             window.set_title("GNOME Keysign")
             ok_button = builder.get_object("avahi_ok")
             ok_button.connect('clicked', self.on_delete_window)
@@ -187,15 +201,19 @@ class KeysignApp(Gtk.Application):
             self.send_receive_stack.add_titled(rs,
                 "receive_stack", _("Receive"))
 
-            # These properties must be set after the stacks has been added to the window
-            # because they require a window element that "receive.ui" file doesn't provide.
-            accel_group = Gtk.AccelGroup()
-            window.add_accel_group(accel_group)
-            self.receive.accept_button.add_accelerator("clicked", accel_group, ord('o'), Gdk.ModifierType.MOD1_MASK,
-                                                       Gtk.AccelFlags.VISIBLE)
-            self.receive.accept_button.set_can_default(True)
+            # Actions and accelerators to switch between Send and Receive tabs using Alt+S and Alt+R
+            send_action = Gio.SimpleAction.new("switch-to-send", None)
+            send_action.connect("activate", lambda action, parameter: self.send_receive_stack.set_visible_child_name("send_stack"))
+            self.add_action(send_action)
 
-        window.show_all()
+            receive_action = Gio.SimpleAction.new("switch-to-receive", None)
+            receive_action.connect("activate", lambda action, parameter: self.send_receive_stack.set_visible_child_name("receive_stack"))
+            self.add_action(receive_action)
+
+            self.set_accels_for_action("app.switch-to-send", ["<Alt>s"])
+            self.set_accels_for_action("app.switch-to-receive", ["<Alt>r"])
+
+        window.present()
         self.add_window(window)
 
     def run(self, args=[]):
@@ -279,16 +297,12 @@ class KeysignApp(Gtk.Application):
     def on_resultbox_mapped(self, rb):
         log.debug("Resultbox becomes visible!")
         self.header_button.set_sensitive(True)
-        self.header_button.set_image(
-            Gtk.Image.new_from_icon_name("go-previous",
-                                         Gtk.IconSize.BUTTON))
+        self.header_button.set_icon_name("go-previous")
         self.internet_toggle.hide()
 
     def on_keylist_mapped(self, keylistwidget):
         log.debug("Keylist becomes visible!")
-        self.header_button.set_image(
-            Gtk.Image.new_from_icon_name("view-refresh",
-            Gtk.IconSize.BUTTON))
+        self.header_button.set_icon_name("view-refresh")
         # We don't support refreshing for now.
         self.header_button.set_sensitive(False)
         self.internet_toggle.show()
@@ -301,25 +315,19 @@ class KeysignApp(Gtk.Application):
     def on_keypresent_mapped(self, kpw):
         log.debug("keypresent becomes visible!")
         self.header_button.set_sensitive(True)
-        self.header_button.set_image(
-            Gtk.Image.new_from_icon_name("go-previous",
-            Gtk.IconSize.BUTTON))
+        self.header_button.set_icon_name("go-previous")
         self.internet_toggle.hide()
 
     def on_scanner_mapped(self, scanner):
         log.debug("scanner becomes visible!")
         self.header_button.set_sensitive(False)
-        self.header_button.set_image(
-            Gtk.Image.new_from_icon_name("go-previous",
-            Gtk.IconSize.BUTTON))
+        self.header_button.set_icon_name("go-previous")
         self.internet_toggle.hide()
 
     def on_presign_mapped(self, psw):
         log.debug("presign becomes visible!")
         self.header_button.set_sensitive(True)
-        self.header_button.set_image(
-            Gtk.Image.new_from_icon_name("go-previous",
-            Gtk.IconSize.BUTTON))
+        self.header_button.set_icon_name("go-previous")
         self.internet_toggle.hide()
 
 
@@ -333,7 +341,8 @@ def main(args=[]):
         args = []
     Gst.init(None)
 
-    app = KeysignApp()
+    Adw.init()
+    app = KeysignApp(application_id="org.gnome.Keysign")
     try:
         GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
                                   lambda *args: reactor.callFromThread(reactor.stop), None)

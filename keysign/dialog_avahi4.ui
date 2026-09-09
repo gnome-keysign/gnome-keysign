@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='utf-8'?>
+<interface>
+  <requires lib="gtk" version="4.0" />
+  <object class="GtkMessageDialog" id="dialog_avahi">
+    <property name="type_hint">dialog</property>
+    <property name="text" translatable="1">Unable to Start Avahi</property>
+    <property name="secondary_text" translatable="1">Keysign is unable to automatically start Avahi. You can try to execute `systemctl start avahi-daemon` for solving this problem.</property>
+    <child>
+      <object class="GtkBox">
+        <property name="visible">0</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child>
+          <object class="GtkBox">
+            <property name="vexpand">1</property>
+            <property name="hexpand">True</property>
+            <property name="homogeneous">True</property>
+            <child>
+              <object class="GtkButton" id="avahi_ok">
+                <property name="label" translatable="1">OK</property>
+                <property name="name">avahi_ok</property>
+                <property name="focusable">1</property>
+                <property name="receives_default">1</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>

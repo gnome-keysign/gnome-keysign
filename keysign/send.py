@@ -4,6 +4,8 @@ import logging
 import mailbox
 import os
 import signal
+from string import Template
+from tempfile import NamedTemporaryFile
 
 try:
     from urllib.parse import unquote
@@ -11,15 +13,16 @@ except ImportError:
     from urllib import unquote
 
 import gi
-gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+gi.require_version('Gtk', '4.0')
+gi.require_version('Adw', '1')
+from gi.repository import Gtk, Adw
 from gi.repository import GLib
 from gi.repository import Gdk
 from gpg import errors
 from wormhole.errors import ServerConnectionError, LonelyError, WrongPasswordError
 if __name__ == "__main__":
-    from twisted.internet import gtk3reactor
-    gtk3reactor.install()
+    from twisted.internet import gireactor
+    gireactor.install()
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks
 
@@ -38,7 +41,7 @@ if  __name__ == "__main__" and __package__ is None:
 from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
 from .offer import Offer
-from .util import get_attachments
+from .util import get_attachments, send_email
 from . import gpgmeh
 # We import i18n to have the locale set up for Glade
 from .i18n import _
@@ -52,6 +55,21 @@ except ImportError:
 
 
 DRAG_ACTION = Gdk.DragAction.COPY
+
+
+
+RETURN_SUBJECT = "Your OpenPGP certifications on my key"
+RETURN_BODY = """Hi $uid,
+
+thanks for having signed my key.
+Here are the certifications you produced.
+
+Please import them by, e.g., spawning a terminal and typing
+
+    gpg --import
+
+Then, drag and drop the attachment into your terminal and press Enter.
+"""
 
 
 class SendApp:
@@ -72,7 +90,7 @@ class SendApp:
 
         ui_file_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "send.ui")
+            "send4.ui")
         if not builder:
             builder = Gtk.Builder()
             builder.add_objects_from_file(ui_file_path, ["send_stack"])
@@ -82,7 +100,10 @@ class SendApp:
         self.klw = klw
 
         stack = builder.get_object("send_stack")
-        stack.add(klw)
+        if hasattr(stack, 'add_child'):
+            stack.add_child(klw)
+        else:
+            stack.add(klw)
         self.stack = stack
 
         # This is a dirty hack :-/
@@ -106,21 +127,9 @@ class SendApp:
         self.notify = None
         self.internet_option = False
 
-        # Add drag and drop to the keys list widget
-        builder.connect_signals(self)
         self.label = builder.get_object("keys_listbox")
-        self.label.drag_dest_set(Gtk.DestDefaults.ALL, [], DRAG_ACTION)
-        self.label.drag_dest_set_target_list(None)
-        self.label.drag_dest_add_text_targets()
-        self.label.drag_dest_add_uri_targets()
 
-        self.rb.connect('drag-data-received', self.on_rb_drag_data_received)
-        # We should probably only accept drag data when we have successfully sent the key.
-        # Now we're unconditionally accepting drags.
-        self.rb.drag_dest_set(Gtk.DestDefaults.ALL, [], DRAG_ACTION)
-        self.rb.drag_dest_set_target_list(None)
-        self.rb.drag_dest_add_text_targets()
-        self.rb.drag_dest_add_uri_targets()
+        self.rb.connect('unmap', self.on_resultbox_unmapped)
         self.rb_import_okay = builder.get_object('rb_infobar_import_okay')
         self.rb_button_ib_return_signature = builder.get_object('rb_return_signature')
         self.rb_import_error = builder.get_object('rb_infobar_import_error')
@@ -134,19 +143,21 @@ class SendApp:
             log.debug("We are trying to send a key, no imports at this stage")
             return
         try:
-            self.decrypt_and_import_certifications(data)
+            decrypted_certifications, attestors = self.decrypt_and_import_certifications(data)
+        except gpgmeh.NoNewSignatures as e:
+            self.no_new_signatures_import_error(e)
         except errors.GPGMEError as e:
             self.signature_import_error(e)
         else:
-            self.signature_imported(decrypted_certifications, sender)
+            self.signature_imported(decrypted_certifications, attestors)
 
     def on_rb_drag_data_received(self, widget, drag_context, x, y, data, info, time):
         try:
-            decrypted_certifications = self.decrypt_and_import_certifications(data)
+            decrypted_certifications, attestors = self.decrypt_and_import_certifications(data)
         except errors.GPGMEError as e:
             self.rb_signature_import_error(e)
         else:
-            self.rb_signature_imported(decrypted_certifications)
+            self.rb_signature_imported(decrypted_certifications, attestors)
 
 
     def decrypt_and_import_certifications(self, data):
@@ -164,6 +175,8 @@ class SendApp:
             with open(filename, "rb") as si:
                 signatures.append(si.read())
 
+        sigs_before = {key.fingerprint: gpgmeh.get_signatures_for_uids_on_key(key)
+                       for key in gpgmeh.get_usable_secret_keys()}
         # We currently do not know how to obtain the sender of the email.
         # We could parse the email for a From: header.
         # But if only the attachment is dropped, we don't have that information.
@@ -181,7 +194,27 @@ class SendApp:
             log.exception("Could not import signatures")
             raise
         else:
-            return decrypted_certifications
+            sigs_after = {key.fingerprint: gpgmeh.get_signatures_for_uids_on_key(key)
+                          for key in gpgmeh.get_usable_secret_keys()}
+            log.debug("Delta Sigs, before: %s", sigs_before)
+            attestors = set()
+            for fpr, uid_sigs in sigs_after.items():
+                for uid, sigs in uid_sigs.items():
+                    sig_delta = sigs - sigs_before[fpr][uid]
+                    log.info("These certifications are new: %s", sig_delta)
+                    for keyid in sig_delta:
+                        for key in gpgmeh.get_usable_keys(pattern=keyid):
+                            log.debug("Attestor key has UIDs: %s", key.uidslist)
+                            for uid in key.uidslist:
+                                email = uid.email
+                                log.debug("Attestor key %s has UID %s with Email %s", key, uid, email)
+                                if email:
+                                    log.debug("Adding %s to %s", email, attestors)
+                                    attestors.add(email)
+                                    log.debug("Now, attestors is %s", attestors)
+
+            log.debug("Found attestors: %s", attestors)
+            return decrypted_certifications, attestors
 
     @inlineCallbacks
     def on_key_activated(self, widget, key):
@@ -258,7 +291,7 @@ class SendApp:
         self.klw.ib_internet.show()
         log.info("No Internet connection")
 
-    def signature_imported(self, decrypted_certifications, sender=None):
+    def signature_imported(self, decrypted_certifications, attestors):
         """When we have received, decrypted, and imported a certification,
         this function will show the infobar and offer to return the certification
         to the sender.
@@ -266,36 +299,60 @@ class SendApp:
         simply because that information is currently not included in the certification
         the attestor sends.
         """
+        log.debug("s_i Attestors: %s", attestors)
         self.klw.ib_import_okay.show()
-        if not sender:
+        if not attestors:
             # We do not know where to return the certification to, so we hide the button
             self.klw.button_ib_import_okay.hide()
         else:
             def return_certification(button):
-                log.info("Return certification to %s (%d)",
-                    sender, len(decrypted_certifications))
-                
+                self._tempfiles = []
+                for sender in attestors:
+                    log.info("Return certification to %s (%d)",
+                        sender, len(decrypted_certifications))
+
+                    tempfiles = []
+                    for cert in decrypted_certifications:
+                        tempfile = NamedTemporaryFile(prefix='gnome-keysign-certifications',
+                                                     suffix='.asc',
+                                                     delete=True)
+                        tempfile.write(cert)
+                        tempfile.file.close()
+                        tempfiles.append(tempfile)
+
+                    ctx = {'uid': sender}
+                    subject = Template(RETURN_SUBJECT).safe_substitute(ctx)
+                    body = Template(RETURN_BODY).safe_substitute(ctx)
+                    send_email(sender, subject=subject, body=body, files=[f.name for f in tempfiles])
+                    # We just keep the object around so that the files do not get deleted before the email has been sent. Once the app quits, we are happy with the files being cleaned up.
+                    self._tempfiles.append(tempfiles)
+
             self.klw.button_ib_import_okay.connect('clicked', return_certification)
             self.klw.button_ib_import_okay.show()
 
         log.info("Signature imported")
 
+    def no_new_signatures_import_error(self, e):
+        self.klw.ib_import_error_no_new_sigs.show()
+        log.info("No new signatures: %r", e)
+
     def signature_import_error(self, e):
         self.klw.ib_import_error.show()
         # We hide the error details button, because we don't have that functionality just yet
         self.klw.button_ib_import_error.hide()
-        log.info("Signature import error")
+        log.info("Signature import error: %r", e)
 
-    def rb_signature_imported(self, decrypted_certifications):
+    def rb_signature_imported(self, decrypted_certifications, attestors):
         self.rb_import_okay.show()
-        sender = None
-        if not sender:
+        log.debug("rb_s_i Attestors: %s", attestors)
+        if not attestors:
             # We do not know where to return the certification to, so we hide the button
             self.rb_button_ib_return_signature.hide()
         else:
             def return_certification(button):
-                log.info("Return certification to %s (%d)",
-                    sender, len(decrypted_certifications))
+                for sender in attestors:
+                    log.info("Return certification to %s (%d)",
+                        sender, len(decrypted_certifications))
 
             self.rb_button_ib_return_signature.connect('clicked', return_certification)
             self.rb_button_ib_return_signature.show()
@@ -317,7 +374,7 @@ class SendApp:
 
         ####
         # Show widget for key
-        self.stack.add(self.kpw)
+        self.stack.add_child(self.kpw)
         self.stack_saved_visible_child = self.stack.get_visible_child()
         self.stack.set_visible_child(self.kpw)
         log.debug('Setting kpw: %r', self.kpw)
@@ -327,7 +384,7 @@ class SendApp:
     def show_result(self, success, message):
         self._deactivate_offer()
 
-        self.stack.add(self.rb)
+        self.stack.add_child(self.rb)
         self.stack.remove(self.kpw)
         self.kpw = None
 
@@ -383,22 +440,25 @@ class SendApp:
             log.debug("Stopped network services")
 
 
+    def on_resultbox_unmapped(self, rb):
+        log.debug("Resultbox disappears %r", rb)
 
-class App(Gtk.Application):
+
+
+class App(Adw.Application):
     def __init__(self, *args, **kwargs):
         super(App, self).__init__(*args, **kwargs)
         self.connect('activate', self.on_activate)
         self.send_app = None
-        #self.builder = Gtk.Builder.new_from_file('send.ui')
 
     def on_activate(self, data=None):
         ui_file_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "send.ui")
+            "send4.ui")
         self.builder = Gtk.Builder.new_from_file(ui_file_path)
         window = self.builder.get_object("appwindow")
         assert window
-        window.connect("delete-event", self.on_delete_window)
+        window.connect("close-request", self.on_delete_window)
         self.headerbar = self.builder.get_object("headerbar")
         hb = self.builder.get_object("headerbutton")
         hb.connect("clicked", self.on_header_button_clicked)
@@ -412,7 +472,7 @@ class App(Gtk.Application):
         ss.connect('map', self.on_send_stack_mapped)
         self.send_stack = ss
 
-        window.show_all()
+        window.present()
         self.add_window(window)
 
     @staticmethod
@@ -492,7 +552,7 @@ class App(Gtk.Application):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    app = App()
+    app = App(application_id="org.gnome.Keysign.Send")
     try:
         GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
                                   lambda *args: reactor.callFromThread(reactor.stop), None)

@@ -26,9 +26,9 @@ import logging
 import os
 
 import gi
-gi.require_version('Gtk', '3.0')
+gi.require_version('Gtk', '4.0')
 
-from gi.repository import Gtk, GLib
+from gi.repository import Gtk, GLib, GdkPixbuf
 from gi.repository import GObject
 
 
@@ -76,7 +76,7 @@ def format_uidslist(uidslist):
 
 
 
-class PreSignWidget(Gtk.VBox):
+class PreSignWidget(Gtk.Box):
     """A widget for obtaining a key fingerprint.
 
     The fingerprint can be obtain by inserting it into
@@ -96,13 +96,13 @@ class PreSignWidget(Gtk.VBox):
         if not builder:
             builder = Gtk.Builder()
             builder.add_objects_from_file(
-                os.path.join(thisdir, 'receive.ui'),
-                [widget_name, 'confirm-button-image'])
+                os.path.join(thisdir, 'receive4.ui'),
+                [widget_name, 'confirm-button-image', 'error_dialog'])
         widget = builder.get_object(widget_name)
         parent = widget.get_parent()
         if parent:
             parent.remove(widget)
-        self.add(widget)
+        self.append(widget)
 
         confirm_btn = builder.get_object("confirm_sign_button")
         confirm_btn.connect("clicked", self.on_confirm_button_clicked)
@@ -110,24 +110,23 @@ class PreSignWidget(Gtk.VBox):
         self.key = key
 
         keyIdsLabel = builder.get_object("key_ids_label")
-        log.info("The Key ID Label can focus: %r, %r",
-            keyIdsLabel.props.can_focus,
-            keyIdsLabel.get_can_focus())
         # Weird. The glade file defines can_focus = False, but it's set to True...
-        keyIdsLabel.set_can_focus(False)
+        keyIdsLabel.set_focusable(False)
         keyIdsLabel.set_markup(format_key_header(self.key.fingerprint))
 
         uidsLabel = builder.get_object("uids_label")
         # FIXME: Check why Builder thinks the widget can focus when the glade file says no
-        uidsLabel.set_can_focus(False)
+        uidsLabel.set_focusable(False)
         markup = format_uidslist(self.key.uidslist)
         uidsLabel.set_markup(markup)
 
         imagebox = builder.get_object("imagebox")
-        for child in imagebox.get_children():
+        child = imagebox.get_first_child()
+        while child:
+            next_child = child.get_next_sibling()
             imagebox.remove(child)
-        imagebox.add(ScalingImage(pixbuf=pixbuf))
-        imagebox.show_all()
+            child = next_child
+        imagebox.append(ScalingImage(pixbuf=pixbuf))
 
         # We save the reference here to expose this infobar to the caller.
         # This is a bit ugly, because it makes this implementation detail part of the
@@ -140,23 +139,25 @@ class PreSignWidget(Gtk.VBox):
         self.infobar_show_error_button = builder.get_object('btn_show_error_details')
 
         ib_error_show = self.infobar_errors.show
+        
+        self.error_dialog = builder.get_object('error_dialog')
+        self.error_dialog_base_text = self.error_dialog.get_property('secondary-text')
+        self.error_dialog.connect("response", lambda d, r: d.hide())
+
+        def show_error(btn):
+            if hasattr(self.infobar_errors, 'exception'):
+                exception = self.infobar_errors.exception
+                self.error_dialog.set_transient_for(self.get_root())
+                self.error_dialog.set_property('secondary-text',
+                    self.error_dialog_base_text % (str(exception),))
+                self.error_dialog.present()
+
+        self.infobar_show_error_button.connect("clicked", show_error)
+
         def show(exception):
             self.infobar_errors.exception = exception
             ib_error_show()
-            def show_error(btn):
-                dialog = Gtk.MessageDialog(
-                    transient_for=self.get_toplevel(),
-                    flags=0,
-                    message_type=Gtk.MessageType.ERROR,
-                    buttons=Gtk.ButtonsType.CLOSE,
-                    text="Error certifying key"
-                )
-                dialog.format_secondary_text(
-                    str(exception) + "\n"
-                    "We don't know any more, sorry :(")
-                dialog.run()
-                dialog.destroy()
-            self.infobar_show_error_button.connect("clicked", show_error)
+            
         self.infobar_errors.show = show
 
     def on_confirm_button_clicked(self, buttonObject, *args):
@@ -173,7 +174,7 @@ class PreSignApp(Gtk.Application):
         self.log = logging.getLogger(__name__)
 
     def on_activate(self, app):
-        window = Gtk.ApplicationWindow()
+        window = Gtk.ApplicationWindow(application=app)
         window.set_title("Key Pre Sign Widget")
         # window.set_size_request(600, 400)
 
@@ -181,9 +182,9 @@ class PreSignApp(Gtk.Application):
             self.psw = PreSignWidget()
 
         self.psw.connect('sign-key-confirmed', self.on_sign_key_confirmed)
-        window.add(self.psw)
+        window.set_child(self.psw)
 
-        window.show_all()
+        window.present()
         self.add_window(window)
 
     def on_sign_key_confirmed(self, keyPreSignWidget, *args):
@@ -196,7 +197,7 @@ class PreSignApp(Gtk.Application):
         if len(args) >= 2:
             image_fname = args[1]
             log.debug("Trying to load pixbuf from %r", image_fname)
-            pixbuf = Gtk.Image.new_from_file(image_fname).get_pixbuf()
+            pixbuf = GdkPixbuf.Pixbuf.new_from_file(image_fname)
         else:
             pixbuf = None
         self.psw = PreSignWidget(key, pixbuf=pixbuf)

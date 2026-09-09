@@ -9,4 +9,4 @@ mv -f "$ATTESTEE_DIR" "${ATTESTEE_DIR}.bak"
 mkdir -p $ATTESTEE_DIR
 echo -n | env GNUPGHOME=${ATTESTEE_DIR}  gpg --pinentry-mode loopback --batch --no-tty --yes --passphrase-fd 0 --quick-generate-key attestee@example.com
 env GNUPGHOME=${ATTESTEE_DIR}  gpg --armor --export attestee@example.com > ${ATTESTEE_DIR}/attestee.pgp.asc
-echo \"GNUPGHOME=${ATTESTEE_DIR}\"   python3 -m keysign.sign_and_encrypt  ${ATTESTEE_DIR}/attestee.pgp.asc
+echo env \"GNUPGHOME=${ATTESTEE_DIR}\"   python3 -m keysign.sign_and_encrypt  ${ATTESTEE_DIR}/attestee.pgp.asc

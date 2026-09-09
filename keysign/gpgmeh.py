@@ -15,8 +15,6 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
-from __future__ import unicode_literals
-
 import base64
 import logging
 import os  # The SigningKeyring uses os.symlink for the agent
@@ -44,6 +42,19 @@ log = logging.getLogger(__name__)
 
 class GPGRuntimeError(RuntimeError):
     pass
+
+class NoSecretKeysError(GPGRuntimeError):
+    def __init__(self, message, homedir=None, all_keys=None):
+        super(NoSecretKeysError, self).__init__(message)
+        self.homedir = homedir
+        self.all_keys = all_keys or []
+        
+    def __str__(self):
+        return "{msg} (Homedir: {homedir}, Keys found: {keys})".format(
+            msg=super(NoSecretKeysError, self).__str__(),
+            homedir=self.homedir,
+            keys=len(self.all_keys)
+        )
 
 class GenEdit:
     _ignored_status = (gpg.constants.STATUS_EOF,
@@ -145,7 +156,7 @@ def sign_key(uid=0, sign_cmd=u"sign", expire=False, check=3,
             status, prompt = yield 'Y'
         elif status == gpg.constants.STATUS_INV_SGNR:
             # seems to happen if you have an expired
-            # (or otherwise unsuable) signing key.
+            # (or otherwise unusable) signing key.
             # The CONSIDERED line should have been issued
             # with details.
             # We don't maintain that state at the moment which is
@@ -362,6 +373,34 @@ def import_signature_gpgme(signature, homedir=None):
 
 
 
+def get_signatures_for_uids_on_key(key, homedir=None):
+    """It seems to be a bit hard to get a key with its signatures,
+    so this is a small helper function"""
+    # esp. get_key does not take a SIGS argument.
+    # What happens if keylist returns multiple keys, e.g. because there
+    # is another key with a UID named as the fpr?  How can I make sure I
+    # get the signatures of any given key?
+    
+    # *sigh* gpgme is killing me. With gpgme 1.8 we have to
+    # set_keylist_mode before we can call keylist.  With gpgme 1.9
+    # keylist takes a mode argument and overrides whatever has been
+    # set before.  In order to come with something compatible with both
+    # 1.8 and 1.9 we have to set_keylist_mode and NOT call ctx.keylist
+    # but rather the bare op_keylist_all.  In 1.8 that requires two
+    # arguments.
+    ctx = DirectoryContext(homedir)
+    mode = gpg.constants.keylist.mode.LOCAL | gpg.constants.keylist.mode.SIGS
+    secret = False
+    ctx.set_keylist_mode(mode)
+    keys = list(ctx.op_keylist_all(key.fpr, secret))
+    # With gpgme 1.9 we can simply do:
+    # keys = list(ctx.keylist(key.fpr), mode=mode)
+    assert len(keys) == 1
+    uid_sigs = {uid.uid: {s.keyid for s in uid.signatures} for uid in keys[0].uids}
+    log.info("Signatures: %r", uid_sigs)
+    return uid_sigs
+
+
 
 def openpgpkey_from_data(keydata):
     c = TempContext()
@@ -399,7 +438,7 @@ def get_public_key_data(fpr, homedir=None):
 def fingerprint_from_keydata(keydata):
     '''Returns the OpenPGP Fingerprint for a given key'''
     openpgpkey = openpgpkey_from_data(keydata)
-    return openpgpkey.fpr
+    return openpgpkey.fingerprint
 
 def get_usable_keys_from_context(ctx, pattern="", secret=False):
     keys = [Key.from_gpgme(key)
@@ -488,17 +527,24 @@ def local_sign_keydata(keydata, expires_in=60*60*24*1, error_cb=None, homedir=No
         # Unfortunately, key_sign does not report back how many
         # signatures were produced (or not produced...)
         # It may raise an error, but I have yet to see that it does...
-        log.info("Locally signed key %s with an exiry in %d secods", fpr, expires_in)
+        log.info("Locally signed key %s with an expiry in %d seconds", fpr, expires_in)
 
 
 def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
     oldctx = DirectoryContext(homedir)
     ctx = TempContextWithAgent(oldctx)
     # We're trying to sign with all available secret keys
-    available_secret_keys = [key for key in ctx.keylist(secret=True)
+    all_secret_keys = list(ctx.keylist(secret=True))
+    available_secret_keys = [key for key in all_secret_keys
         if not (key.disabled or key.revoked or key.invalid or key.expired)]
     log.debug('Setting available sec keys to (%d): %r',
         len(available_secret_keys), available_secret_keys)
+    if not available_secret_keys:
+        raise NoSecretKeysError(
+            "No secret keys available to sign with.",
+            homedir=homedir,
+            all_keys=all_secret_keys
+        )
     ctx.signers = available_secret_keys
 
     ctx.op_import(minimise_key(keydata))
@@ -551,7 +597,11 @@ def sign_keydata_and_encrypt(keydata, error_cb=None, homedir=None):
 
 
 class NoNewSignatures(GPGMEError):
-    pass
+    "We couldn't find a new certification, so the certification is already known"
+    def __init__(self, signature, import_result):
+        self.signature = signature
+        self.import_result = import_result
+        super().__init__()
 class NewRevocations(GPGMEError):
     pass
 class NewSubkey(GPGMEError):
@@ -571,13 +621,14 @@ def decrypt_signature(encrypted_sig, homedir=None):
     decrypted_sig = signature[0]
     temp_ctx.op_import(decrypted_sig)
     result = temp_ctx.op_import_result()
+    log.debug("signature import result: %r", result)
 
     if result.imported != 0:
         log.warning("Trying to import a new key instead of a signature!")
         raise GPGMEError
 
     if result.new_signatures == 0:
-        raise NoNewSignatures()
+        raise NoNewSignatures(signature=decrypted_sig, import_result=result)
     if result.new_revocations != 0:
         raise NewRevocations()
     if result.new_sub_keys != 0:

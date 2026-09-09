@@ -37,6 +37,8 @@ from keysign.gpgmeh import get_usable_secret_keys
 from keysign.gpgmeh import get_public_key_data
 from keysign.gpgmeh import sign_keydata_and_encrypt
 from keysign.gpgmeh import ImportNewCertificationError
+from keysign.gpgmeh import get_signatures_for_uids_on_key
+from keysign.gpgmeh import NoSecretKeysError
 
 from keysign.gpgkey import to_valid_utf8_string
 
@@ -239,7 +241,7 @@ def test_fingerprint_from_data():
 
 
 class TestKey1:
-    def setup(self):
+    def setup_method(self):
         data = read_fixture_file("pubkey-1.asc")
         self.key = openpgpkey_from_data(data)
 
@@ -262,7 +264,7 @@ def test_get_public_key_no_data():
 
 
 class TestGetPublicKeyData:
-    def setup(self):
+    def setup_method(self):
         self.fname = get_fixture_file("pubkey-1.asc")
         original = open(self.fname, 'rb').read()
         # This should be a new, empty directory
@@ -275,7 +277,7 @@ class TestGetPublicKeyData:
     
         self.originalkey = openpgpkey_from_data(original)
 
-    def teardown(self):
+    def teardown_method(self):
         # shutil.rmtree(self.homedir)
         pass
 
@@ -308,7 +310,7 @@ def test_get_empty_usable_keys():
 
 
 class TestGetUsableKeys:
-    def setup(self):
+    def setup_method(self):
         self.fname = get_fixture_file("pubkey-1.asc")
         original = open(self.fname, 'rb').read()
         # This should be a new, empty directory
@@ -321,7 +323,7 @@ class TestGetUsableKeys:
     
         self.originalkey = openpgpkey_from_data(original)
 
-    def teardown(self):
+    def teardown_method(self):
         # shutil.rmtree(self.homedir)
         pass
 
@@ -340,7 +342,7 @@ class TestGetUsableKeys:
 
 
 class TestGetUsableSecretKeys:
-    def setup(self):
+    def setup_method(self):
         self.fname = get_fixture_file("seckey-no-pw-1.asc")
         original = open(self.fname, 'rb').read()
         # This should be a new, empty directory
@@ -353,7 +355,7 @@ class TestGetUsableSecretKeys:
     
         self.originalkey = openpgpkey_from_data(original)
 
-    def teardown(self):
+    def teardown_method(self):
         # shutil.rmtree(self.homedir)
         pass
 
@@ -369,33 +371,6 @@ class TestGetUsableSecretKeys:
         assert 1 == len(keys)
         key = keys[0]
         assert self.originalkey == key
-
-
-def get_signatures_for_uids_on_key(ctx, key):
-    """It seems to be a bit hard to get a key with its signatures,
-    so this is a small helper function"""
-    # esp. get_key does not take a SIGS argument.
-    # What happens if keylist returns multiple keys, e.g. because there
-    # is another key with a UID named as the fpr?  How can I make sure I
-    # get the signatures of any given key?
-    
-    # *sigh* gpgme is killing me. With gpgme 1.8 we have to
-    # set_keylist_mode before we can call keylist.  With gpgme 1.9
-    # keylist takes a mode argument and overrides whatever has been
-    # set before.  In order to come with something compatible with both
-    # 1.8 and 1.9 we have to set_keylist_mode and NOT call ctx.keylist
-    # but rather the bare op_keylist_all.  In 1.8 that requires two
-    # arguments.
-    mode = gpg.constants.keylist.mode.LOCAL | gpg.constants.keylist.mode.SIGS
-    secret = False
-    ctx.set_keylist_mode(mode)
-    keys = list(ctx.op_keylist_all(key.fpr, secret))
-    # With gpgme 1.9 we can simply do:
-    # keys = list(ctx.keylist(key.fpr), mode=mode)
-    assert len(keys) == 1
-    uid_sigs = {uid.uid: [s for s in uid.signatures] for uid in keys[0].uids}
-    log.info("Signatures: %r", uid_sigs)
-    return uid_sigs
 
 
 def export_public_key(keydata):
@@ -417,7 +392,7 @@ class TestSignAndEncrypt:
     SENDER_KEY = "seckey-no-pw-1.asc"
     RECEIVER_KEY = "seckey-no-pw-2.asc"
 
-    def setup(self):
+    def setup_method(self):
         # The "sender" sends its certificate to have it certified by the receiver
         self.key_sender_key = get_fixture_file(self.SENDER_KEY)
         # The "receiver" will receive the certificate, certify it, and send it back to the "sender"
@@ -430,7 +405,7 @@ class TestSignAndEncrypt:
         check_call(sender_gpgcmd + ["--import", self.key_sender_key])
         check_call(receiver_gpgcmd + ["--import", self.key_receiver_key])
 
-    def teardown(self):
+    def teardown_method(self):
         # shutil.rmtree(self.sender_homedir)
         # shutil.rmtree(self.receiver_homedir)
         pass
@@ -463,8 +438,8 @@ class TestSignAndEncrypt:
         uids_before = uids
         assert len(uids_before) == len(sender.get_key(fpr).uids)
 
-        sigs_before = [s for l in get_signatures_for_uids_on_key(sender,
-                                    key).values() for s in l]
+        sigs_before = [s for l in get_signatures_for_uids_on_key(key,
+                                    homedir=sender.homedir).values() for s in l]
         # FIXME: Refactor this a little bit.
         # We have duplication of code with the other test below.
         for uid, uid_enc in zip(uids_before, uid_encrypted):
@@ -486,8 +461,8 @@ class TestSignAndEncrypt:
             log.debug("updated key: %r", updated_key)
             log.debug("updated key sigs: %r", [(uid, uid.signatures) for uid in updated_key.uids])
 
-        sigs_after = [s for l in get_signatures_for_uids_on_key(sender,
-                                    key).values() for s in l]
+        sigs_after = [s for l in get_signatures_for_uids_on_key(key,
+                                    homedir=sender.homedir).values() for s in l]
         assert len(sigs_after) > len(sigs_before)
 
     def test_sign_and_encrypt_double_secret(self):
@@ -525,8 +500,8 @@ class TestSignAndEncrypt:
         assert len(sender_key.uids) == len(uid_encrypted)
 
         uids_before = sender.get_key(fpr).uids
-        sigs_before = [s for l in get_signatures_for_uids_on_key(sender,
-                                    sender_key).values() for s in l]
+        sigs_before = [s for l in get_signatures_for_uids_on_key(sender_key,
+                                    sender.homedir).values() for s in l]
         for uid, uid_enc in zip(uids_before, uid_encrypted):
             uid_enc_str = uid_enc[0].uid
             log.info("Uid enc str: %r", uid_enc_str)
@@ -551,8 +526,8 @@ class TestSignAndEncrypt:
             log.debug("updated key: %r", updated_key)
             log.debug("updated key sigs: %r", [(uid, uid.signatures) for uid in updated_key.uids])
 
-        sigs_after = [s for l in get_signatures_for_uids_on_key(sender,
-                                    sender_key).values() for s in l]
+        sigs_after = [s for l in get_signatures_for_uids_on_key(sender_key,
+                                    sender.homedir).values() for s in l]
 
         assert len(sigs_after) > len(sigs_before)
 
@@ -635,3 +610,38 @@ class TestUtf8(TestSignAndEncrypt):
 #class TestSubKeys(TestSignAndEncrypt):
 #    SENDER_KEY = "seckey-2.asc"
 #    RECEIVER_KEY = "seckey-subkeys.asc"
+
+
+class TestSignAndEncryptNoSecretKey:
+    SENDER_KEY = "seckey-no-pw-1.asc"
+
+    def setup_method(self):
+        self.key_sender_key = get_fixture_file(self.SENDER_KEY)
+        self.key_sender_homedir = tempfile.mkdtemp()
+        sender_gpgcmd = ["gpg", "--homedir={}".format(self.key_sender_homedir)]
+        check_call(sender_gpgcmd + ["--import", self.key_sender_key])
+
+        # The receiver has no keys!
+        self.key_receiver_homedir = tempfile.mkdtemp()
+
+    def teardown_method(self):
+        pass
+
+    def test_sign_and_encrypt_no_keys(self):
+        keydata = open(self.key_sender_key, "rb").read()
+        sender = TempContext()
+        sender.op_import(keydata)
+        result = sender.op_import_result()
+        fpr = result.imports[0].fpr
+        sink = gpg.Data()
+        sender.op_export(fpr, 0, sink)
+        sink.seek(0, 0)
+        public_sender_key = sink.read()
+
+        with pytest.raises(NoSecretKeysError) as exc_info:
+            uid_encrypted = list(sign_keydata_and_encrypt(public_sender_key,
+                                 error_cb=None, homedir=self.key_receiver_homedir))
+        
+        assert "No secret keys available" in str(exc_info.value)
+        assert exc_info.value.homedir == self.key_receiver_homedir
+

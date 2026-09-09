@@ -17,7 +17,6 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
-from __future__ import print_function
 import logging
 import os
 
@@ -145,7 +144,7 @@ class AvahiBrowser(GObject.GObject):
 def main():
     loop = GObject.MainLoop()
     # We're not passing the loop to DBus, because... well, it
-    # does't work... It seems to expect a DBusMainLoop, not
+    # doesn't work... It seems to expect a DBusMainLoop, not
     # an ordinary main loop...
     ab = AvahiBrowser()
 

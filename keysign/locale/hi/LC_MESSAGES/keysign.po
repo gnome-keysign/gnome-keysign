@@ -1,0 +1,538 @@
+# Hindi translation for gnome-keysign.
+# Copyright (C) 2024 gnome-keysign's COPYRIGHT HOLDER
+# This file is distributed under the same license as the gnome-keysign package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Scrambled777 <weblate.scrambled777@simplelogin.com>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-keysign master\n"
+"Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
+"POT-Creation-Date: 2024-08-12 15:26+0000\n"
+"PO-Revision-Date: 2024-08-15 09:03+0530\n"
+"Last-Translator: Scrambled777 <weblate.scrambled777@simplelogin.com>\n"
+"Language-Team: Hindi <indlinux-hindi@lists.sourceforge.net>\n"
+"Language: hi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.12.1\n"
+"X-DL-Lang: hi\n"
+"X-DL-Module: gnome-keysign\n"
+"X-DL-Branch: master\n"
+"X-DL-Domain: locale\n"
+"X-DL-State: Translating\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Gtranslator 46.1\n"
+
+#: data/org.gnome.Keysign.raw.appdata.xml:14
+msgid ""
+"\n"
+"      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
+"      via the local network or Bluetooth.\n"
+"    "
+msgstr ""
+"\n"
+"      GNOME Keysign OpenPGP कुंजियों पर आराम से और सुरक्षित रूप से हस्ताक्षर करने की "
+"अनुमति देता है\n"
+"              स्थानीय नेटवर्क या ब्लूटूथ के माध्यम से।\n"
+"    "
+
+#: data/org.gnome.Keysign.raw.appdata.xml:21
+msgid ""
+"\n"
+"      It can scan another key's barcode and transfer the key securely,\n"
+"      allowing for casual two-party key signing sessions.\n"
+"      It follows best practises by sending the encrypted signatures\n"
+"      to the UIDs of a key using the Email client the user configured\n"
+"      to use.\n"
+"    "
+msgstr ""
+"\n"
+"               यह किसी अन्य कुंजी के बारकोड को स्कैन कर सकता है और कुंजी को सुरक्षित रूप "
+"से स्थानांतरित \n"
+"               कर सकता है, जिससे आकस्मिक दो-पक्षीय कुंजी हस्ताक्षर सत्र की अनुमति "
+"मिलती है।\n"
+"               यह उपयोक्ता द्वारा उपयोग के लिए विन्यस्त किए गए ईमेल क्लाइंट का उपयोग "
+"करके कुंजी के UID \n"
+"               में कूटलेखित हस्ताक्षर को समाप्त करके सर्वोत्तम प्रथाओं का पालन करता है।\n"
+"    "
+
+#. Name
+#: data/org.gnome.Keysign.raw.desktop:2
+msgid "Keysign"
+msgstr "Keysign"
+
+#. Comment
+#: data/org.gnome.Keysign.raw.desktop:3
+msgid ""
+"A keysigning helper to enable you to comfortably exchange OpenPGP keys with "
+"a friend"
+msgstr ""
+"एक कुंजी-हस्ताक्षर सहायक जो आपको किसी मित्र के साथ OpenPGP कुंजी का आराम से आदान-"
+"प्रदान करने में सक्षम बनाता है"
+
+#. Keywords
+#: data/org.gnome.Keysign.raw.desktop:4
+msgid "python;gpg;gnupg;key;openpgp;"
+msgstr "python;gpg;gnupg;कुंजी;openpgp;"
+
+#. Icon
+#: data/org.gnome.Keysign.raw.desktop:7
+msgid "org.gnome.Keysign"
+msgstr "org.gnome.Keysign"
+
+#: keysign/app.py:186
+msgid "Send"
+msgstr "भेजें"
+
+#: keysign/app.py:188 keysign/receive.py:307
+msgid "Receive"
+msgstr "प्राप्त करें"
+
+#: keysign/app.ui:62 keysign/send.ui:1081
+msgid "Internet"
+msgstr "इंटरनेट"
+
+#: keysign/avahioffer.py:83 keysign/bluetoothoffer.py:126
+msgid "Offering key: {}"
+msgstr "कुंजी की पेशकश: {}"
+
+#: keysign/avahioffer.py:84 keysign/bluetoothoffer.py:127
+msgid "Discovery info: {}"
+msgstr "खोज की जानकारी: {}"
+
+#: keysign/avahioffer.py:86
+msgid "Press Enter to stop"
+msgstr "रोकने के लिए Enter दबाएं"
+
+#: keysign/bluetoothoffer.py:117
+msgid "You must provide an argument to identify the key"
+msgstr "आपको कुंजी की पहचान करने के लिए एक तर्क प्रदान करना होगा"
+
+#: keysign/bluetoothoffer.py:128
+msgid "HMAC: {}"
+msgstr "HMAC: {}"
+
+#: keysign/bluetoothoffer.py:129
+msgid "Port: {}"
+msgstr "पोर्ट: {}"
+
+#: keysign/bluetoothoffer.py:132
+msgid "Bluetooth not available"
+msgstr "ब्लूटूथ उपलब्ध नहीं है"
+
+#: keysign/bluetoothoffer.py:137
+msgid "Press Enter to cancel"
+msgstr "रद्द करने के लिए Enter दबाएं"
+
+#: keysign/bluetoothoffer.py:144
+msgid ""
+"\n"
+"Key successfully sent"
+msgstr ""
+"\n"
+"कुंजी सफलतापूर्वक भेजी गई"
+
+#: keysign/bluetoothoffer.py:146
+msgid ""
+"\n"
+"An error occurred: {}"
+msgstr ""
+"\n"
+"एक त्रुटि उत्पन्न हुई: {}"
+
+#: keysign/bluetoothoffer.py:148
+msgid "Press Enter to exit"
+msgstr "बाहर निकलने के लिए Enter दबाएं"
+
+#: keysign/bluetoothreceive.py:135
+msgid "Trying to download the key, please wait"
+msgstr "कुंजी डाउनलोड करने का प्रयास किया जा रहा है, कृपया प्रतीक्षा करें"
+
+#: keysign/dialog_avahi.ui:8
+msgid "Unable to Start Avahi"
+msgstr "Avahi प्रारंभ करने में असमर्थ"
+
+#: keysign/dialog_avahi.ui:9
+msgid ""
+"Keysign is unable to automatically start Avahi. You can try to execute "
+"`systemctl start avahi-daemon` for solving this problem."
+msgstr ""
+"Keysign स्वचालित रूप से Avahi प्रारंभ करने में असमर्थ है। आप इस समस्या को हल करने के लिए "
+"`systemctl start avahi-daemon` निष्पादित करने का प्रयास कर सकते हैं।"
+
+#: keysign/dialog_avahi.ui:23
+msgid "OK"
+msgstr "ठीक है"
+
+#: keysign/gtkexcepthook.py:169
+msgid "Bug Detected"
+msgstr "बग का पता चला"
+
+#: keysign/gtkexcepthook.py:171
+msgid "<big><b>A programming error has been detected.</b></big>"
+msgstr "<big><b>एक प्रोग्रामिंग त्रुटि का पता चला है।</b></big>"
+
+#: keysign/gtkexcepthook.py:174
+msgid ""
+"You may be able to ignore this error and carry on working, but you may get "
+"unexpected results.\n"
+"\n"
+"Please tell the developers about this using the issue tracker if no-one else "
+"has reported it yet."
+msgstr ""
+"हो सकता है कि आप इस त्रुटि को नज़रअंदाज़ करके काम करना जारी रख सकें, लेकिन आपको "
+"अप्रत्याशित परिणाम मिल सकते हैं।\n"
+"\n"
+"कृपया समस्या ट्रैकर का उपयोग करके विकासकर्ता को इसके बारे में बताएं, यदि किसी और ने अभी "
+"तक इसकी सुचना नहीं की है।"
+
+#: keysign/gtkexcepthook.py:183
+msgid "Search Tracker..."
+msgstr "ट्रैकर खोजें..."
+
+#: keysign/gtkexcepthook.py:185
+msgid "Report..."
+msgstr "रिपोर्ट..."
+
+#: keysign/gtkexcepthook.py:187
+msgid "Ignore Error"
+msgstr "त्रुटि को नज़रअंदाज़ करें"
+
+#: keysign/gtkexcepthook.py:188
+msgid "Quit GNOME Keysign"
+msgstr "GNOME Keysign छोड़ें"
+
+#: keysign/gtkexcepthook.py:198
+msgid "Details..."
+msgstr "विवरण..."
+
+#: keysign/gtkexcepthook.py:225 keysign/gtkexcepthook.py:228
+msgid "Exception while analyzing the exception."
+msgstr "अपवाद का विश्लेषण करते समय अपवाद।"
+
+#. TRANSLATORS: Crash report template for github, preceding a traceback.
+#. TRANSLATORS: Please ask users kindly to supply at least an English
+#. TRANSLATORS: title if they are able.
+#: keysign/gtkexcepthook.py:277
+msgid ""
+"            #### Description\n"
+"\n"
+"            Give this report a short descriptive title.\n"
+"            Use something like\n"
+"            \"{feature-that-broke}: {what-went-wrong}\"\n"
+"            for the title, if you can.\n"
+"            Then please replace this text\n"
+"            with a longer description of the bug.\n"
+"            Screenshots or videos are great, too!\n"
+"\n"
+"            #### Steps to reproduce\n"
+"\n"
+"            Please tell us what you were doing\n"
+"            when the error message popped up.\n"
+"            If you can provide step-by-step instructions\n"
+"            on how to reproduce the bug,\n"
+"            that's even better.\n"
+"\n"
+"            #### Traceback\n"
+"        "
+msgstr ""
+"                            #### विवरण\n"
+"\n"
+"                            इस रिपोर्ट को एक संक्षिप्त वर्णनात्मक शीर्षक दें।\n"
+"                            यदि आप कर सकते हैं, तो शीर्षक के लिए \n"
+"            \"{feature-that-broke}: {what-went-rong}\"\n"
+"                            जैसा कुछ उपयोग करें।\n"
+"                            फिर, कृपया इस पाठ को बग के लंबे विवरण से बदलें।\n"
+"                            स्क्रीनशॉट या वीडियो भी बढ़िया हैं!\n"
+"\n"
+"                            #### प्रजनन के चरण\n"
+"\n"
+"                            कृपया हमें बताएं कि त्रुटि संदेश आने पर आप क्या कर रहे थे।\n"
+"                            यदि आप बग को पुन: उत्पन्न करने के बारे में चरण-दर-चरण "
+"निर्देश प्रदान \n"
+"                            कर सकते हैं, तो यह और भी बेहतर है।\n"
+"\n"
+"                            #### ट्रेसबैक\n"
+"        "
+
+#: keysign/keylistwidget.py:82
+msgid "Expires: "
+msgstr "समाप्त:"
+
+#: keysign/receive.py:186
+msgid "Sign Key"
+msgstr "हस्ताक्षर कुंजी"
+
+#: keysign/receive.py:253
+msgid "Select file for saving"
+msgstr "सहेजने के लिए फाइल चुनें"
+
+#: keysign/receive.ui:56
+msgid ""
+"No GNOME Keysign servers around :-(\n"
+"Find a friend to use GNOME Keysign with.\n"
+"You may also suffer from connectivity problems.\n"
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"NoServers/1\">the documentation</a>."
+msgstr ""
+"आसपास कोई GNOME Keysign सर्वर नहीं :-(\n"
+"GNOME Keysign का उपयोग करने के लिए एक मित्र ढूंढें।\n"
+"आप संयोजकता समस्याओं से भी पीड़ित हो सकते हैं।\n"
+"अधिक जानकारी के लिए <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"NoServers/1\">दस्तावेज़</a> पर जाएं।"
+
+#: keysign/receive.ui:108
+msgid ""
+"<small>To sign someone's key, scan their QR or enter security code</small>"
+msgstr ""
+"<small>किसी की कुंजी पर हस्ताक्षर करने के लिए, उनका QR स्कैन करें या सुरक्षा कोड दर्ज करें</"
+"small>"
+
+#: keysign/receive.ui:127
+msgid "<b>Camera</b>"
+msgstr "<b>कैमरा</b>"
+
+#: keysign/receive.ui:142
+msgid "Integrated Web Cam"
+msgstr "एकीकृत वेब कैम"
+
+#: keysign/receive.ui:179 keysign/send.ui:687
+msgid "<b>Security Code</b>"
+msgstr "<b>सुरक्षा कोड</b>"
+
+#: keysign/receive.ui:212
+msgid "Scan Barcode"
+msgstr "बारकोड स्कैन करें"
+
+#: keysign/receive.ui:229
+msgid "Downloading key-data. Please wait..."
+msgstr "कुंजी-डेटा डाउनलोड हो रहा है। कृपया प्रतीक्षा करें..."
+
+#: keysign/receive.ui:254
+msgid "Key download was interrupted!"
+msgstr "कुंजी डाउनलोड बाधित हुआ!"
+
+#: keysign/receive.ui:346
+msgid "Show details about the error"
+msgstr "त्रुटि के बारे में विवरण दिखाएं"
+
+#: keysign/receive.ui:381
+msgid ""
+"Error producing certifications ☹\n"
+"Something went wrong. Sometimes, the passphrase was not correctly entered.\n"
+"You may try again by clicking the \"confirm\" button."
+msgstr ""
+"प्रमाणपत्र बनाने में त्रुटि ☹\n"
+"कुछ गलत हो गया। कभी-कभी, पासफ़्रेज़ सही ढंग से दर्ज नहीं किया गया था।\n"
+"आप \"पुष्टि करें\" बटन पर क्लिक करके पुनः प्रयास कर सकते हैं।"
+
+#: keysign/receive.ui:427
+msgid ""
+"Saves the produced certifications as separate files in a custom directory"
+msgstr "उत्पादित प्रमाणपत्रों को एक तदनुकूल निर्देशिका में अलग फाइलों के रूप में सहेजता है"
+
+#: keysign/receive.ui:442
+msgid ""
+"Imports a temporary version of the produced certifications into the local "
+"keyring"
+msgstr "उत्पादित प्रमाणपत्रों का एक अस्थायी संस्करण स्थानीय कीरिंग में आयात करता है"
+
+#: keysign/receive.ui:487
+msgid ""
+"Successfully produced certifications.\n"
+"You can import a temporary signature to start using the key as if it had "
+"already been properly verified.\n"
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"ProducedSignatures/1\">the documentation</a>."
+msgstr ""
+"सफलतापूर्वक प्रमाणपत्र तैयार किया गया।\n"
+"आप कुंजी का उपयोग शुरू करने के लिए एक अस्थायी हस्ताक्षर आयात कर सकते हैं जैसे कि यह पहले से "
+"ही ठीक से सत्यापित हो चुका हो।\n"
+"अधिक जानकारी के लिए <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"ProducedSignatures/1\">दस्तावेज़</a> पर जाएं।"
+
+#: keysign/receive.ui:541
+msgid "Key"
+msgstr "कुंजी"
+
+#: keysign/receive.ui:574 keysign/send.ui:612
+msgid "UIDs"
+msgstr "UIDs"
+
+#: keysign/receive.ui:652
+msgid ""
+"To sign the key, confirm that you want to sign the following key.\n"
+"This will generate an email that must be sent in order to complete the "
+"signing process."
+msgstr ""
+"कुंजी पर हस्ताक्षर करने के लिए, पुष्टि करें कि आप निम्नलिखित कुंजी पर हस्ताक्षर करना चाहते "
+"हैं।\n"
+"यह एक ईमेल उत्पन्न करेगा जिसे हस्ताक्षर प्रक्रिया को पूरा करने के लिए भेजा जाना चाहिए।"
+
+#: keysign/receive.ui:676
+msgid "C_onfirm"
+msgstr "पुष्टि करें (_o)"
+
+#: keysign/receive.ui:798
+msgid "Signing the following UIDs:"
+msgstr "निम्नलिखित UID पर हस्ताक्षर किया जा रहा है:"
+
+#: keysign/send.py:292
+msgid ""
+"Still trying to get a connection to the Internet. It appears to be slow or "
+"unavailable."
+msgstr ""
+"अभी भी इंटरनेट से जुड़ने का प्रयास किया जा रहा है। वह धीमा या अनुपलब्ध प्रतीत होता है।"
+
+#: keysign/send.py:298
+msgid "There isn't an Internet connection!"
+msgstr "इंटरनेट कनेक्शन नहीं है!"
+
+#: keysign/send.py:413
+#, python-format
+msgid ""
+"An unexpected error occurred:\n"
+"%s"
+msgstr ""
+"एक अप्रत्याशित त्रुटि हुई:\n"
+"%s"
+
+#: keysign/send.ui:7
+msgid "Select and send key"
+msgstr "कुंजी चुनें और भेजें"
+
+#: keysign/send.ui:59
+msgid ""
+"You don't have any keys!\n"
+"Please use, e.g. Seahorse to create one."
+msgstr ""
+"आपके पास कोई कुंजी नहीं है!\n"
+"कृपया, उदा. Seahorse का उपयोग बनाने के लिए करें।"
+
+#: keysign/send.ui:135
+msgid "Very slow or no Internet connection!"
+msgstr "बहुत धीमा या कोई इंटरनेट कनेक्शन नहीं!"
+
+#: keysign/send.ui:204 keysign/send.ui:829
+msgid "The signature has been successfully imported!"
+msgstr "हस्ताक्षर सफलतापूर्वक आयात कर लिया गया है!"
+
+#: keysign/send.ui:230 keysign/send.ui:855
+msgid ""
+"Returns the received certification back to the sender, so that the sender "
+"can make use of your OpenPGP certificate"
+msgstr ""
+"प्राप्त प्रमाणीकरण को प्रेषक को वापस लौटाता है, ताकि प्रेषक आपके OpenPGP प्रमाणपत्र का "
+"उपयोग कर सके"
+
+#: keysign/send.ui:277 keysign/send.ui:900
+msgid "Display more details for the error."
+msgstr "त्रुटि के लिए अधिक विवरण प्रदर्शित करें।"
+
+#: keysign/send.ui:308 keysign/send.ui:931
+msgid "An error occurred while trying to import the signature."
+msgstr "हस्ताक्षर आयात करने का प्रयास करते समय एक त्रुटि उत्पन्न हुई।"
+
+#: keysign/send.ui:386
+msgid "Not imported this certification because it is already known."
+msgstr "इस प्रमाणीकरण को आयात नहीं किया गया क्योंकि यह पहले से ही ज्ञात है।"
+
+#. This refers to the key being certified by someone rather than the key used for
+#. certifying someone
+#: keysign/send.ui:441
+msgid "<b>Select a key for signing</b>"
+msgstr "<b>हस्ताक्षर करने के लिए एक कुंजी चुनें</b>"
+
+#: keysign/send.ui:457
+msgid "<small>Times signed</small>"
+msgstr "<small>हस्ताक्षर करने की संख्या</small>"
+
+#: keysign/send.ui:524
+msgid "Keylist"
+msgstr "कुंजीसूची"
+
+#: keysign/send.ui:544
+msgid ""
+"<small>To have the key signed, the other person must enter the security "
+"code, or scan the QR code</small>"
+msgstr ""
+"<small>कुंजी पर हस्ताक्षर करवाने के लिए, दूसरे व्यक्ति को सुरक्षा कोड दर्ज करना होगा, या "
+"QR कोड को स्कैन करना होगा</small>"
+
+#: keysign/send.ui:571
+msgid "<b>Key Details</b>"
+msgstr "<b>कुंजी विवरण</b>"
+
+#: keysign/send.ui:596
+msgid "Fingerprint"
+msgstr "फिंगरप्रिंट"
+
+#: keysign/send.ui:750
+msgid "<b>QR Code</b>"
+msgstr "<b>QR कोड</b>"
+
+#: keysign/send.ui:975
+msgid ""
+"Could not establish a secure connection.\n"
+"Either your partner has entered a wrong code or someone tried to intercept "
+"your connection."
+msgstr ""
+"सुरक्षित कनेक्शन स्थापित नहीं किया जा सका।\n"
+"या तो आपके पार्टनर ने गलत कोड दर्ज किया है या किसी ने आपके कनेक्शन को बाधित करने का "
+"प्रयास किया है।"
+
+#: keysign/send.ui:993
+msgid ""
+"Key successfully sent.\n"
+"You should receive an email with the signature soon.\n"
+"You can drag and drop the email here to import your certification."
+msgstr ""
+"कुंजी सफलतापूर्वक भेजी गई।\n"
+"आपको जल्द ही हस्ताक्षर के साथ एक ईमेल प्राप्त होना चाहिए।\n"
+"आप अपना प्रमाणन आयात करने के लिए ईमेल को यहां खींच और छोड़ सकते हैं।"
+
+#: keysign/send.ui:1010
+msgid "An unexpected error occurred."
+msgstr "एक अप्रत्याशित त्रुटि हुई।"
+
+#: keysign/send.ui:1039
+msgid "Select and Send key"
+msgstr "कुंजी चुनें और भेजें"
+
+#: keysign/send.ui:1079
+msgid "Also use the Internet to transfer the certificate"
+msgstr "प्रमाणपत्र स्थानांतरित करने के लिए इंटरनेट का भी उपयोग करता है"
+
+#: keysign/util.py:225
+msgid ""
+"Hi $uid,\n"
+"\n"
+"\n"
+"I have just signed your key\n"
+"\n"
+"      $fingerprint\n"
+"\n"
+"\n"
+"Thanks for letting me sign your key!\n"
+"\n"
+"--\n"
+"GNOME Keysign\n"
+msgstr ""
+"नमस्ते $uid,\n"
+"\n"
+"\n"
+"मैंने अभी आपकी कुंजी पर हस्ताक्षर किया हैं\n"
+"\n"
+"      $fingerprint\n"
+"\n"
+"\n"
+"मुझे अपनी कुंजी पर हस्ताक्षर करने देने के लिए धन्यवाद!\n"
+"\n"
+"--\n"
+"GNOME Keysign\n"
+
+#: keysign/wormholereceive.py:85
+msgid "Wrong message authentication code"
+msgstr "गलत संदेश प्रमाणीकरण कोड"
