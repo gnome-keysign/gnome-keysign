@@ -134,11 +134,26 @@ jobs:
         python -m pip install --upgrade pip build setuptools wheel babel BabelGladeExtractor
         PKG_CONFIG_PATH="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig" pip install pygobject
 
-    - name: Compile translation catalogs
+    - name: Generate translated .desktop and .appdata.xml
+      # BuildWithCompile.run() translates the .raw.* files into the final
+      # data/org.gnome.Keysign.desktop and .appdata.xml that MANIFEST.in
+      # expects to find.  Running a dummy build triggers it without
+      # actually installing anything.
+      run: python setup.py build
+
+    - name: Compile translation catalogs (.mo files)
       run: python setup.py compile_catalog
 
     - name: Build sdist and wheel
-      run: python -m build
+      # --no-isolation keeps the build in the current environment so the
+      # pre-generated .mo, .desktop and .appdata.xml files (which are not
+      # in git) are present when the sdist is assembled.
+      run: python -m build --no-isolation
+
+    - name: Verify dist contents
+      run: |
+        echo "=== dist/ ===" && ls -lh dist/
+        echo "=== wheel contents ===" && python -m zipfile -l dist/*.whl | grep -E '(\.mo|\.desktop|\.appdata)' || echo "WARNING: expected files not found in wheel"
 
     - name: Upload wheel to GitHub release
       uses: softprops/action-gh-release@v2

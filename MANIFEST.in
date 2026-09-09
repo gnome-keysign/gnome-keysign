@@ -2,8 +2,7 @@
 # For sdists, this MANIFEST.in seems to be used.
 # http://stackoverflow.com/a/14159430/2015768
 recursive-include keysign/locale *.po
-#recursive-include keysign/locale *.mo
-# include keysign/locale/*/*/*.mo
+recursive-include keysign/locale *.mo
 include data/org.gnome.Keysign.desktop data/org.gnome.Keysign.svg data/org.gnome.Keysign.appdata.xml data/org.gnome.Keysign.raw.desktop data/org.gnome.Keysign.raw.appdata.xml
 include keysign/*.ui
 include COPYING
