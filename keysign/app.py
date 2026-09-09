@@ -100,7 +100,7 @@ class PswMappingReceiveApp(ReceiveApp):
         If we ever want to run a dialog, say a FileSave dialog, then we need to provide
         the top level window of that widget.
         """
-        return self.psw.get_toplevel()
+        return self.psw.get_root()
 
 
 class KeysignApp(Adw.Application):

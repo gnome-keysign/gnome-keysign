@@ -67,3 +67,17 @@ def test_scanner_mapped_callback(mock_present):
         # Assert that the header button properties were correctly updated
         assert not app.header_button.get_sensitive()
         assert app.header_button.get_icon_name() == "go-previous"
+
+
+def test_get_toplevel_finds_the_window_the_widget_is_in():
+    """Signing a key needs the window to parent the email portal on."""
+    from keysign.app import PswMappingReceiveApp
+
+    window = Gtk.Window()
+    psw = Gtk.Box()
+    window.set_child(psw)
+
+    receive = PswMappingReceiveApp.__new__(PswMappingReceiveApp)
+    receive.psw = psw
+
+    assert receive.get_toplevel() is window
