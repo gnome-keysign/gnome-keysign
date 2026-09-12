@@ -51,8 +51,19 @@ class BarcodeReaderGTK(Gtk.Box):
     }
 
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, device=None, pipewire_fd=None, **kwargs):
         super(BarcodeReaderGTK, self).__init__(*args, **kwargs)
+        self.device = device
+        self.pipewire_fd = pipewire_fd
+        # Whether the reader is supposed to be actively capturing, i.e.
+        # whether the *next* set_device()/set_pipewire_fd() should restart
+        # the pipeline. This is tracked explicitly rather than inferred
+        # from the outgoing pipeline's GStreamer state, because a pipeline
+        # that never reached PLAYING/PAUSED (e.g. autovideosrc finding
+        # nothing inside a Flatpak sandbox before the camera portal has
+        # granted access) would otherwise look indistinguishable from one
+        # that was never meant to run at all.
+        self._running = False
         self.connect('unmap', self.on_unmap)
         self.connect('map', self.on_map)
         self.scaling_image = ScalingImage()
@@ -95,25 +106,22 @@ class BarcodeReaderGTK(Gtk.Box):
 
 
     def run(self):
-        p = "autovideosrc  \n"
-        p += " ! tee name=t \n"
-        p += "       t. ! queue ! videoconvert \n"
-        p += "                  ! zbar cache=true attach_frame=true \n"
-        p += "                  ! fakesink \n"
-        p += "       t. ! queue ! videoconvert \n"
-        p += ("                 ! appsink "
-            "sync=false "
-            "name=imagesink "
-            "emit-signals=true "
-            "max-buffers=1 "
-            "drop=true "
-            "caps=\"video/x-raw,format=RGBA\" "
-            "\n"
-            )
-
-        pipeline = p
-        log.info("Launching pipeline %s", pipeline)
-        pipeline = Gst.parse_launch(pipeline)
+        self._running = True
+        if self.pipewire_fd is not None:
+            src = f"pipewiresrc fd={self.pipewire_fd}"
+        elif self.device:
+            src = f"v4l2src device={self.device}"
+        else:
+            src = "autovideosrc"
+        pipeline_str = (
+            f"{src} "
+            " ! videoconvert "
+            " ! zbar cache=true attach_frame=true "
+            " ! videoconvert "
+            " ! appsink sync=false name=imagesink emit-signals=true max-buffers=1 drop=true caps=\"video/x-raw,format=RGBA\""
+        )
+        log.info("Launching pipeline: %s", pipeline_str)
+        pipeline = Gst.parse_launch(pipeline_str)
 
         self.imagesink = pipeline.get_by_name('imagesink')
         self.imagesink.connect("new-sample", self.on_new_sample)
@@ -125,6 +133,41 @@ class BarcodeReaderGTK(Gtk.Box):
         bus.add_signal_watch()
 
         pipeline.set_state(Gst.State.PLAYING)
+
+
+    def set_pipewire_fd(self, fd):
+        """Set PipeWire fd for portal-based camera access."""
+        log.info("Setting PipeWire fd to: %s", fd)
+        # Whether to (re)start is decided by self._running, not by
+        # inspecting the outgoing pipeline's GStreamer state: while
+        # waiting for the portal to grant access, the interim pipeline
+        # (autovideosrc, since neither device nor fd is set yet)
+        # typically fails to reach PLAYING/PAUSED at all inside a
+        # sandbox, so "was it playing?" would wrongly stay false and
+        # we'd never restart once the fd actually arrives.
+        should_restart = self._running
+        if hasattr(self, 'pipeline') and self.pipeline:
+            self.pipeline.set_state(Gst.State.NULL)
+            self.pipeline = None
+        self.pipewire_fd = fd
+        self.device = None
+        if should_restart:
+            self.run()
+
+    def set_device(self, device):
+        log.info("Setting device to: %s", device)
+        if self.device == device:
+            return
+
+        should_restart = self._running
+        if hasattr(self, 'pipeline') and self.pipeline:
+            self.pipeline.set_state(Gst.State.NULL)
+            self.pipeline = None
+
+        self.device = device
+
+        if should_restart:
+            self.run()
 
 
     def on_new_sample(self, appsink):
@@ -167,6 +210,7 @@ class BarcodeReaderGTK(Gtk.Box):
     def on_unmap(self, *args, **kwargs):
         '''Hopefully called when this widget is hidden,
         e.g. when the tab of a notebook has changed'''
+        self._running = False
         self.pipeline.set_state(Gst.State.PAUSED)
         # Actually, we stop the thing for real
         self.pipeline.set_state(Gst.State.NULL)
@@ -236,15 +280,21 @@ class SimpleInterface(ReaderApp):
         vbox.append(self.imagebox)
 
 
-        self.playButton = Gtk.Button.new_from_icon_name("media-play")
-        self.playButton.connect("clicked", self.playToggled)
+        self.playButton = Gtk.ToggleButton()
+        self.playButton.set_icon_name("media-playback-pause-symbolic")
+        self.playButton.connect("toggled", self.playToggled)
         vbox.append(self.playButton)
 
         window.present()
 
 
-    def playToggled(self, w):
-        self.reader.pause()
+    def playToggled(self, button):
+        if button.get_active():
+            self.reader.pause()
+            button.set_icon_name("media-playback-start-symbolic")
+        else:
+            self.reader.pipeline.set_state(Gst.State.PLAYING)
+            button.set_icon_name("media-playback-pause-symbolic")
 
 
     def on_barcode(self, reader, barcode, message, pixbuf):

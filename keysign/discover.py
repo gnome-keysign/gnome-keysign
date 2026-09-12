@@ -1,7 +1,7 @@
 import logging
 
 from twisted.internet import threads
-from twisted.internet.defer import inlineCallbacks, returnValue
+from twisted.internet.defer import inlineCallbacks
 from wormhole.errors import LonelyError
 
 from .wormholereceive import WormholeReceive
@@ -94,7 +94,7 @@ class Discover:
 
         log.debug("Returning key: %r, success: %r, message: %r",
                   key_data, success, message)
-        returnValue((key_data, success, message))
+        return key_data, success, message
 
     def stop(self):
         self.stopped = True

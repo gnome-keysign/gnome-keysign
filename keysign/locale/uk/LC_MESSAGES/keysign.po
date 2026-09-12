@@ -2,14 +2,14 @@
 # Copyright (C) 2020 gnome-keysign's COPYRIGHT HOLDER
 # This file is distributed under the same license as the gnome-keysign package.
 #
-# Yuri Chornoivan <yurchor@ukr.net>, 2020, 2021, 2022.
+# Yuri Chornoivan <yurchor@ukr.net>, 2020, 2021, 2022, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: gnome-keysign master\n"
 "Report-Msgid-Bugs-To: tobiasmue@gnome.org\n"
-"POT-Creation-Date: 2022-12-12 13:18+0000\n"
-"PO-Revision-Date: 2022-12-15 09:04+0200\n"
-"Last-Translator: Fracture dept <yurchor@ukr.net>\n"
+"POT-Creation-Date: 2024-08-12 15:26+0000\n"
+"PO-Revision-Date: 2024-08-12 19:39+0300\n"
+"Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Generated-By: Babel 2.6.0\n"
 "Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n"
 "%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Lokalize 20.12.0\n"
+"X-Generator: Lokalize 23.04.3\n"
 
 #: data/org.gnome.Keysign.raw.appdata.xml:14
 msgid ""
@@ -82,11 +82,11 @@ msgstr "org.gnome.Keysign"
 msgid "Send"
 msgstr "Надіслати"
 
-#: keysign/app.py:188 keysign/receive.py:279
+#: keysign/app.py:188 keysign/receive.py:307
 msgid "Receive"
 msgstr "Отримати"
 
-#: keysign/app.ui:62 keysign/send.ui:1003
+#: keysign/app.ui:62 keysign/send.ui:1081
 msgid "Internet"
 msgstr "Інтернет"
 
@@ -162,15 +162,15 @@ msgstr ""
 msgid "OK"
 msgstr "Гаразд"
 
-#: keysign/gtkexcepthook.py:173
+#: keysign/gtkexcepthook.py:169
 msgid "Bug Detected"
 msgstr "Виявлено ваду"
 
-#: keysign/gtkexcepthook.py:175
+#: keysign/gtkexcepthook.py:171
 msgid "<big><b>A programming error has been detected.</b></big>"
 msgstr "<big><b>Було виявлено помилку у програмному коді.</b></big>"
 
-#: keysign/gtkexcepthook.py:178
+#: keysign/gtkexcepthook.py:174
 msgid ""
 "You may be able to ignore this error and carry on working, but you may get "
 "unexpected results.\n"
@@ -184,34 +184,34 @@ msgstr ""
 "Будь ласка, повідомте про цю помилку розробникам за допомогою системи "
 "стеження за вадами, якщо про неї ще не повідомлено іншими користувачами."
 
-#: keysign/gtkexcepthook.py:187
+#: keysign/gtkexcepthook.py:183
 msgid "Search Tracker..."
 msgstr "Шукати Tracker…"
 
-#: keysign/gtkexcepthook.py:189
+#: keysign/gtkexcepthook.py:185
 msgid "Report..."
 msgstr "Звіт…"
 
-#: keysign/gtkexcepthook.py:191
+#: keysign/gtkexcepthook.py:187
 msgid "Ignore Error"
 msgstr "Ігнорувати помилку"
 
-#: keysign/gtkexcepthook.py:192
+#: keysign/gtkexcepthook.py:188
 msgid "Quit GNOME Keysign"
 msgstr "Вийти з «Підписувача ключів» GNOME"
 
-#: keysign/gtkexcepthook.py:202
+#: keysign/gtkexcepthook.py:198
 msgid "Details..."
 msgstr "Подробиці…"
 
-#: keysign/gtkexcepthook.py:229 keysign/gtkexcepthook.py:232
+#: keysign/gtkexcepthook.py:225 keysign/gtkexcepthook.py:228
 msgid "Exception while analyzing the exception."
 msgstr "Виключення під час спроби проаналізувати виключення."
 
 #. TRANSLATORS: Crash report template for github, preceding a traceback.
 #. TRANSLATORS: Please ask users kindly to supply at least an English
 #. TRANSLATORS: title if they are able.
-#: keysign/gtkexcepthook.py:281
+#: keysign/gtkexcepthook.py:277
 msgid ""
 "            #### Description\n"
 "\n"
@@ -254,15 +254,15 @@ msgstr ""
 "            #### Traceback\n"
 "        "
 
-#: keysign/keylistwidget.py:83
+#: keysign/keylistwidget.py:82
 msgid "Expires: "
 msgstr "Строк дії: "
 
-#: keysign/receive.py:158
+#: keysign/receive.py:186
 msgid "Sign Key"
 msgstr "Підписати ключ"
 
-#: keysign/receive.py:225
+#: keysign/receive.py:253
 msgid "Select file for saving"
 msgstr "Виберіть файл для збереження"
 
@@ -295,7 +295,7 @@ msgstr "<b>Фотоапарат</b>"
 msgid "Integrated Web Cam"
 msgstr "Інтегровано із вебкамерою"
 
-#: keysign/receive.ui:179 keysign/send.ui:609
+#: keysign/receive.ui:179 keysign/send.ui:687
 msgid "<b>Security Code</b>"
 msgstr "<b>Код захисту</b>"
 
@@ -316,9 +316,14 @@ msgid "Show details about the error"
 msgstr "Показати подробиці щодо помилки"
 
 #: keysign/receive.ui:381
+#| msgid ""
+#| "Error producing certifications ☹\n"
+#| "Something went wrong. Sometime, the passphrase was not correctly "
+#| "entered.\n"
+#| "You may try again by clicking the \"confirm\" button."
 msgid ""
 "Error producing certifications ☹\n"
-"Something went wrong. Sometime, the passphrase was not correctly entered.\n"
+"Something went wrong. Sometimes, the passphrase was not correctly entered.\n"
 "You may try again by clicking the \"confirm\" button."
 msgstr ""
 "Сертифікація із помилками ☹\n"
@@ -357,7 +362,7 @@ msgstr ""
 msgid "Key"
 msgstr "Ключ"
 
-#: keysign/receive.ui:574 keysign/send.ui:534
+#: keysign/receive.ui:574 keysign/send.ui:612
 msgid "UIDs"
 msgstr "UID"
 
@@ -380,7 +385,7 @@ msgstr "_Підтвердити"
 msgid "Signing the following UIDs:"
 msgstr "Підписуємо такі UID:"
 
-#: keysign/send.py:251
+#: keysign/send.py:292
 msgid ""
 "Still trying to get a connection to the Internet. It appears to be slow or "
 "unavailable."
@@ -388,11 +393,11 @@ msgstr ""
 "Усе ще намагаємося встановити з'єднання із інтернетом. Здається, з'єднання є "
 "надто повільним або взагалі недоступним."
 
-#: keysign/send.py:257
+#: keysign/send.py:298
 msgid "There isn't an Internet connection!"
 msgstr "Немає з'єднання із інтернетом!"
 
-#: keysign/send.py:348
+#: keysign/send.py:413
 #, python-format
 msgid ""
 "An unexpected error occurred:\n"
@@ -417,11 +422,11 @@ msgstr ""
 msgid "Very slow or no Internet connection!"
 msgstr "З'єднання із інтернетом є дуже повільним або його немає взагалі!"
 
-#: keysign/send.ui:204 keysign/send.ui:751
+#: keysign/send.ui:204 keysign/send.ui:829
 msgid "The signature has been successfully imported!"
 msgstr "Підпис було успішно імпортовано!"
 
-#: keysign/send.ui:230 keysign/send.ui:777
+#: keysign/send.ui:230 keysign/send.ui:855
 msgid ""
 "Returns the received certification back to the sender, so that the sender "
 "can make use of your OpenPGP certificate"
@@ -429,29 +434,33 @@ msgstr ""
 "Повертає отриманий сертифікат відправнику, щоб відправник міг скористатися "
 "вашим сертифікатом OpenPGP"
 
-#: keysign/send.ui:277 keysign/send.ui:822
+#: keysign/send.ui:277 keysign/send.ui:900
 msgid "Display more details for the error."
 msgstr "Показати більше подробиць щодо помилки."
 
-#: keysign/send.ui:308 keysign/send.ui:853
+#: keysign/send.ui:308 keysign/send.ui:931
 msgid "An error occurred while trying to import the signature."
 msgstr "Під час спроби імпортувати підпис сталася помилка."
 
+#: keysign/send.ui:386
+msgid "Not imported this certification because it is already known."
+msgstr "Цю сертифікацію не імпортовано, оскільки вона вже відома."
+
 #. This refers to the key being certified by someone rather than the key used for
 #. certifying someone
-#: keysign/send.ui:363
+#: keysign/send.ui:441
 msgid "<b>Select a key for signing</b>"
 msgstr "<b>Виберіть ключ для підписування</b>"
 
-#: keysign/send.ui:379
+#: keysign/send.ui:457
 msgid "<small>Times signed</small>"
 msgstr "<small>Разів підписано</small>"
 
-#: keysign/send.ui:446
+#: keysign/send.ui:524
 msgid "Keylist"
 msgstr "Список ключів"
 
-#: keysign/send.ui:466
+#: keysign/send.ui:544
 msgid ""
 "<small>To have the key signed, the other person must enter the security "
 "code, or scan the QR code</small>"
@@ -459,23 +468,19 @@ msgstr ""
 "<small>Щоб підписати ключ, інша особа має ввести код захисту або виконати "
 "сканування QR-коду</small>"
 
-#: keysign/send.ui:493
+#: keysign/send.ui:571
 msgid "<b>Key Details</b>"
 msgstr "<b>Параметри ключа</b>"
 
-#: keysign/send.ui:518
+#: keysign/send.ui:596
 msgid "Fingerprint"
 msgstr "Відбиток"
 
-#: keysign/send.ui:672
+#: keysign/send.ui:750
 msgid "<b>QR Code</b>"
 msgstr "<b>QR-код</b>"
 
-#: keysign/send.ui:897
-#| msgid ""
-#| "Could not establish a secure connection.\n"
-#| "Either your partner has entered a wrong code or someone tried to "
-#| "intercept your connection"
+#: keysign/send.ui:975
 msgid ""
 "Could not establish a secure connection.\n"
 "Either your partner has entered a wrong code or someone tried to intercept "
@@ -485,10 +490,7 @@ msgstr ""
 "Або вашим колегою введено помилковий код, або хтось спробував перехопити "
 "ваше з'єднання."
 
-#: keysign/send.ui:915
-#| msgid ""
-#| "Key successfully sent.\n"
-#| "You should receive soon an email with the signature."
+#: keysign/send.ui:993
 msgid ""
 "Key successfully sent.\n"
 "You should receive an email with the signature soon.\n"
@@ -496,25 +498,22 @@ msgid ""
 msgstr ""
 "Ключ успішно надіслано.\n"
 "Невдовзі ви маєте отримати поштове повідомлення із підписом.\n"
-"Ви можете перетягнути повідомлення сюди і скинути його, щоб імпортувати ваші"
-" дані сертифікації."
+"Ви можете перетягнути повідомлення сюди і скинути його, щоб імпортувати ваші "
+"дані сертифікації."
 
-#: keysign/send.ui:932
-#| msgid ""
-#| "An unexpected error occurred:\n"
-#| "%s"
+#: keysign/send.ui:1010
 msgid "An unexpected error occurred."
 msgstr "Сталася неочікувана помилка."
 
-#: keysign/send.ui:961
+#: keysign/send.ui:1039
 msgid "Select and Send key"
 msgstr "Виберіть і надішліть ключ"
 
-#: keysign/send.ui:1001
+#: keysign/send.ui:1079
 msgid "Also use the Internet to transfer the certificate"
 msgstr "Крім того, скористайтеся інтернетом для передавання сертифіката"
 
-#: keysign/util.py:231
+#: keysign/util.py:225
 msgid ""
 "Hi $uid,\n"
 "\n"
@@ -542,6 +541,6 @@ msgstr ""
 "--\n"
 "«Підписувач ключів» GNOME\n"
 
-#: keysign/wormholereceive.py:86
+#: keysign/wormholereceive.py:85
 msgid "Wrong message authentication code"
 msgstr "Помилковий код розпізнавання з повідомлення"

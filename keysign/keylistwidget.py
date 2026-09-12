@@ -1,11 +1,9 @@
 #!/usr/bin/env python
-from __future__ import unicode_literals
 import logging
 import os
 
 import gi
 gi.require_version('Gtk', '4.0')
-#gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 from gi.repository import GObject  # for __gsignals__
 from gi.repository import GLib  # for markup_escape_text
@@ -39,23 +37,6 @@ class ListBoxRowWithKey(Gtk.ListBoxRow):
         label = Gtk.Label(label=s, use_markup=True, xalign=0)
         self.set_child(label)
 
-    @staticmethod
-    def glib_markup_escape_text_to_text(s):
-        """A helper function to return the text type
-        markup_escape_text returns a "str" which is
-        a binary type in python2.
-        This function tries to decode the returned
-        str object.  It will fail in Python3.
-        """
-        m = GLib.markup_escape_text(s)
-        try:
-            ret = m.decode('utf-8')
-        except AttributeError:
-            # We are in Python3 land. All is fine.
-            ret = m
-        return ret
-        
-
     @classmethod
     def format_uid(cls, uid):
         "Returns a pango string for a gpgmeh.UID"
@@ -66,8 +47,7 @@ class ListBoxRowWithKey(Gtk.ListBoxRow):
                           for k in items}
         log.info("format dicT: %r", format_dict)
         d = {k: (log.debug("handling kv: %r %r", k, v),
-                  cls.glib_markup_escape_text_to_text(
-                    "{}".format(v)))[1]
+                  GLib.markup_escape_text("{}".format(v)))[1]
              for k, v in format_dict.items()}
         log.info("Formatting UID %r", d)
         s = fmt.format(**d)
@@ -159,7 +139,7 @@ class KeyListWidget(Gtk.Box):
         if len(list(keys)) <= 0:
             infobar = builder.get_object("infobar")
             infobar.show()
-            l = Gtk.Label("You don't have any OpenPGP keys")
+            l = Gtk.Label(label="You don't have any OpenPGP keys")
             self.listbox.append(l)
         else:
             for key in keys:

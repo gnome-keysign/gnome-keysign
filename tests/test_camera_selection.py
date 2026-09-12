@@ -1,0 +1,152 @@
+"""Tests for KeyFprScanWidget's camera selection dropdown.
+
+On a PipeWire-enabled desktop (the default since Ubuntu 22.04), the same
+physical camera is commonly enumerated twice by GStreamer's plain
+Gst.DeviceMonitor: once via the v4l2 device provider (a real /dev/videoN
+devnode we can hand to v4l2src), and once via the pipewire device
+provider (which only exposes a PipeWire "object.path", not a v4l2
+devnode). Blindly falling back to whatever property happens to be
+present offers the unusable pipewire duplicate as a "camera", which can
+even win the "pick the highest-numbered suitable camera" default
+selection -- so the app starts up pointed at a camera it cannot
+actually open.
+"""
+import gi
+gi.require_version('Gtk', '4.0')
+gi.require_version('Gst', '1.0')
+from gi.repository import Gst
+
+Gst.init(None)
+
+from keysign.keyfprscan import IR_CAMERA_NAME_RE, KeyFprScanWidget
+
+
+class FakeProps:
+    def __init__(self, d):
+        self.d = d
+
+    def get_string(self, key):
+        return self.d.get(key)
+
+
+class FakeDevice:
+    def __init__(self, display_name, props):
+        self.display_name = display_name
+        self.props = FakeProps(props)
+
+    def get_display_name(self):
+        return self.display_name
+
+    def get_properties(self):
+        return self.props
+
+
+class FakeMonitor:
+    """Stand-in for Gst.DeviceMonitor whose device list is set per-test."""
+    devices = []
+
+    def add_filter(self, *a, **kw):
+        pass
+
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
+
+    def get_devices(self):
+        return FakeMonitor.devices
+
+
+def _populate(devices, monkeypatch):
+    FakeMonitor.devices = devices
+    monkeypatch.setattr(Gst.DeviceMonitor, "new", staticmethod(lambda: FakeMonitor()))
+    return KeyFprScanWidget()
+
+
+def test_pipewire_duplicate_of_a_v4l2_camera_is_not_offered(monkeypatch):
+    # The same physical webcam, seen through both device providers.
+    w = _populate([
+        FakeDevice("Integrated Webcam",
+                   {"device.api": "v4l2", "device.path": "/dev/video0"}),
+        FakeDevice("Integrated Webcam",
+                   {"object.path": "/org/freedesktop/pipewire/camera/42"}),
+    ], monkeypatch)
+
+    assert w.camera_devices == {"0": "/dev/video0"}
+    assert w.reader.device == "/dev/video0"
+
+
+def test_real_pipewire_v4l2_devices_are_offered(monkeypatch):
+    # This is the actual property set "gst-device-monitor-1.0 Video/Source"
+    # reports on a real Ubuntu 24.04 desktop: the pipewire device provider
+    # is what enumerates v4l2 cameras, and it reports the devnode under
+    # "api.v4l2.path" rather than "device.path" (which isn't present at
+    # all). Requiring "device.path" specifically, as an earlier version of
+    # this fix did, silently dropped every real camera.
+    w = _populate([
+        FakeDevice("Integrated IR Camera (V4L2)", {
+            "device.api": "v4l2",
+            "api.v4l2.path": "/dev/video0",
+            "object.path": "v4l2:/dev/video0",
+        }),
+        FakeDevice("Integrated Camera (V4L2)", {
+            "device.api": "v4l2",
+            "api.v4l2.path": "/dev/video2",
+            "object.path": "v4l2:/dev/video2",
+        }),
+    ], monkeypatch)
+
+    assert w.camera_devices == {"0": "/dev/video0", "1": "/dev/video2"}
+    # The IR camera must not be the one picked by default.
+    assert w.reader.device == "/dev/video2"
+
+
+def test_object_path_is_used_as_a_last_resort_with_its_scheme_stripped(monkeypatch):
+    w = _populate([
+        FakeDevice("Some Webcam", {
+            "device.api": "v4l2",
+            "object.path": "v4l2:/dev/video3",
+        }),
+    ], monkeypatch)
+
+    assert w.camera_devices == {"0": "/dev/video3"}
+
+
+def test_selecting_a_different_v4l2_camera_still_works(monkeypatch):
+    w = _populate([
+        FakeDevice("Integrated Webcam",
+                   {"device.api": "v4l2", "device.path": "/dev/video0"}),
+        FakeDevice("Integrated IR Camera",
+                   {"device.api": "v4l2", "device.path": "/dev/video1"}),
+        FakeDevice("Logitech USB Camera",
+                   {"device.api": "v4l2", "device.path": "/dev/video2"}),
+    ], monkeypatch)
+
+    assert w.camera_devices == {"0": "/dev/video0", "1": "/dev/video1", "2": "/dev/video2"}
+    # Highest-index suitable (non-IR) camera wins by default.
+    assert w.reader.device == "/dev/video2"
+
+    w.camera_selector.set_active_id("0")
+    assert w.reader.device == "/dev/video0"
+
+
+def test_ir_name_matching_does_not_misfire_on_ordinary_camera_names():
+    # A plain substring check for "ir" would wrongly flag any of these.
+    for name in ["Wireless Webcam", "Circle View Camera", "First Person Cam",
+                 "Logitech HD Pro Webcam C920"]:
+        assert not IR_CAMERA_NAME_RE.search(name), name
+
+    for name in ["Integrated IR Camera", "USB2.0 Infrared Camera", "Infra-Red Cam"]:
+        assert IR_CAMERA_NAME_RE.search(name), name
+
+
+def test_a_falsely_flagged_camera_is_no_longer_deprioritized(monkeypatch):
+    # Regression check for the "ir" substring bug: a camera merely named
+    # "Wireless Webcam" must not be treated as an unsuitable IR camera.
+    w = _populate([
+        FakeDevice("Wireless Webcam",
+                   {"device.api": "v4l2", "device.path": "/dev/video0"}),
+    ], monkeypatch)
+
+    assert w.reader.device == "/dev/video0"

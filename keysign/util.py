@@ -15,7 +15,6 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
-from __future__ import unicode_literals
 
 import hashlib
 import hmac
@@ -29,14 +28,9 @@ from string import Template
 from tempfile import NamedTemporaryFile
 from xml.etree import ElementTree
 
-try:
-    from urllib.parse import urlparse, parse_qs
-    from urllib.parse import ParseResult
-    from urllib.parse import quote
-except ImportError:
-    from urlparse import urlparse, parse_qs
-    from urlparse import ParseResult
-    from urllib2 import quote
+from urllib.parse import urlparse, parse_qs
+from urllib.parse import ParseResult
+from urllib.parse import quote
 
 import requests
 import dbus
@@ -45,13 +39,13 @@ from _dbus_bindings import BUS_DAEMON_NAME, BUS_DAEMON_PATH, BUS_DAEMON_IFACE
 import gi
 
 gi.require_version('Gtk', '4.0')
-#gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib
 
 from .errors import NoBluezDbus, UnpoweredAdapter, NoAdapter
 from .gpgmeh import fingerprint_from_keydata
 from .gpgmeh import sign_keydata_and_encrypt
 from .i18n import _
+from .bluetoothutil import get_local_bt_address
 
 log = logging.getLogger(__name__)
 
@@ -71,12 +65,52 @@ def mac_verify(key, data, mac):
     return result
 
 
-def _email_portal(to, subject=None, body=None, files=None):
-    # The following checks are to ensure Python 2 compatibility
-    if not hasattr(os, 'O_PATH'):
-        os.O_PATH = 2097152
-    if not hasattr(os, 'O_CLOEXEC'):
-        os.O_CLOEXEC = 524288
+def get_window_handle(window):
+    if not window:
+        return ""
+    if isinstance(window, str):
+        return window
+
+    try:
+        import gi
+        gi.require_version('Gtk', '4.0')
+        from gi.repository import Gtk
+
+        # If it has a custom portal_handle attribute (e.g. exported asynchronously on Wayland)
+        if hasattr(window, "portal_handle"):
+            return window.portal_handle
+
+        surface = window.get_surface()
+        if not surface:
+            return ""
+
+        # Try X11
+        try:
+            from gi.repository import GdkX11
+            if isinstance(surface, GdkX11.X11Toplevel):
+                return f"x11:{surface.get_xid()}"
+        except Exception:
+            pass
+
+        # Try Wayland (if it wasn't exported yet or we want to try synchronously)
+        try:
+            from gi.repository import GdkWayland
+            if isinstance(surface, GdkWayland.WaylandToplevel):
+                if not hasattr(window, "_portal_handle_export_started"):
+                    window._portal_handle_export_started = True
+                    def on_handle_exported(toplevel, handle, *args):
+                        window.portal_handle = f"wayland:{handle}"
+                    surface.export_handle(on_handle_exported)
+        except Exception:
+            pass
+    except Exception as e:
+        log = logging.getLogger(__name__)
+        log.debug("Could not get window handle: %s", e)
+
+    return ""
+
+
+def _email_portal(to, subject=None, body=None, files=None, parent_window=None):
     name = "org.freedesktop.portal.Desktop"
     path = "/org/freedesktop/portal/desktop"
     bus = dbus.SessionBus()
@@ -87,9 +121,7 @@ def _email_portal(to, subject=None, body=None, files=None):
         return None
     iface = "org.freedesktop.portal.Email"
     email = dbus.Interface(proxy, iface)
-    # Apparently we are unable to get the parent window XID from the receive class.
-    # Until this is sorted out, we leave the parent window empty.
-    parent_window = ""
+    parent_window_str = get_window_handle(parent_window)
     attrs = []
     # Even if we don't close the file descriptor it should not be a problem because
     # eventually at runtime it will be automatically closed.
@@ -101,7 +133,7 @@ def _email_portal(to, subject=None, body=None, files=None):
             attrs.append(dbus.types.UnixFd(fd))
     opts = {"subject": subject, "address": to, "body": body, "attachment_fds": attrs}
     try:
-        ret = email.ComposeEmail(parent_window, opts)
+        ret = email.ComposeEmail(parent_window_str, opts)
         return ret
     except TypeError:
         log.debug("Email portal is not available")
@@ -185,13 +217,13 @@ def _fix_path_flatpak(files):
     return fixed_files
 
 
-def send_email(to, subject=None, body=None, files=None):
+def send_email(to, subject=None, body=None, files=None, parent_window=None):
     """Tries to send the email using firstly the portal, then the xdg-email
     and as a last attempt the mailto uri"""
     if _using_flatpak():
         files = _fix_path_flatpak(files)
 
-    if _email_portal(to, subject, body, files):
+    if _email_portal(to, subject, body, files, parent_window=parent_window):
         return
 
     try:
@@ -244,7 +276,7 @@ GNOME Keysign
 ''')
 
 
-def sign_keydata_and_send(keydata, error_cb=None):
+def sign_keydata_and_send(keydata, error_cb=None, parent_window=None, send_all_uids=False):
     """Creates, encrypts, and send signatures for each UID on the key
     
     You are supposed to give OpenPGP data which will be passed
@@ -272,7 +304,31 @@ def sign_keydata_and_send(keydata, error_cb=None):
     except AttributeError:
         log.debug("keydata is probably already a bytes type")
 
-    for uid, encrypted_key, plaintext in list(sign_keydata_and_encrypt(keydata, error_cb)):
+    signed_uids = list(sign_keydata_and_encrypt(keydata, error_cb))
+    emailable_uids = [(uid, enc, pt) for uid, enc, pt in signed_uids if uid.email and uid.email != 'unknown']
+    emailless_uids = [(uid, enc, pt) for uid, enc, pt in signed_uids if not uid.email or uid.email == 'unknown']
+
+    emailless_files = []
+    if send_all_uids:
+        for uid, encrypted_key, plaintext in emailless_uids:
+            log.info("Using UID without email: %r", uid)
+            tmpfile = NamedTemporaryFile(prefix='gnome-keysign-',
+                                         suffix='.asc',
+                                         delete=True)
+            filename = tmpfile.name
+            log.info('Writing keydata to %s', filename)
+            tmpfile.write(encrypted_key)
+            tmpfile.flush()
+            tmpfile.file.close()
+            emailless_files.append((uid, tmpfile, plaintext))
+
+    emailable_files = []
+    # If not send_all_uids, we only process emailable_uids as before (plus those without email if we were to process them as before? No, before it processed all and failed on empty email. We now filter them properly or just keep previous behavior if send_all_uids=False? Wait, if send_all_uids is False, we just do the old behavior. 
+    # Actually, if we just process ALL UIDs like before when send_all_uids=False, it will try to send email and fail. That's what the user said: "or just do email as before".
+    
+    uids_to_email = emailable_uids if send_all_uids else signed_uids
+
+    for uid, encrypted_key, plaintext in uids_to_email:
         log.info("Using UID: %r", uid)
         # We expect uid.uid to be a consumable string
         uid_str = uid.uid
@@ -301,8 +357,25 @@ def sign_keydata_and_send(keydata, error_cb=None):
 
         subject = Template(SUBJECT).safe_substitute(ctx)
         body = Template(body).safe_substitute(ctx)
-        send_email(uid.email, subject, body, [filename])
-        yield tmpfile, plaintext
+        
+        if send_all_uids:
+            attachments = [filename] + [f[1].name for f in emailless_files]
+        else:
+            attachments = [filename]
+        
+        email_to = uid.email if uid.email != 'unknown' else ''
+        send_email(email_to, subject, body, attachments, parent_window=parent_window)
+        emailable_files.append((uid, tmpfile, plaintext))
+
+    if send_all_uids and not emailable_uids and emailless_uids:
+        log.warning("No emailable UIDs found. Certifications for email-less UIDs have been created but no emails were sent.")
+
+    if send_all_uids:
+        for uid, tmpfile, plaintext in emailable_files + emailless_files:
+            yield tmpfile, plaintext
+    else:
+        for uid, tmpfile, plaintext in emailable_files:
+            yield tmpfile, plaintext
 
 
 def format_fingerprint(fpr):
@@ -420,62 +493,6 @@ def fix_infobar(infobar):
             make_sure_revealer_does_nothing(c)
             c = c.get_next_sibling()
         child = child.get_next_sibling()
-
-
-def get_local_bt_address():
-    """Check if there is a powered on Bluetooth device and return his address.
-       This is a blocking method"""
-    available = False
-    bus_name = "org.bluez"
-    timeout = 2  # 2 seconds seems to be enough to start a bus service
-    bus = dbus.SystemBus()
-
-    try:
-        _start_bus(bus_name, timeout)
-    except dbus.exceptions.DBusException as e:
-        raise NoBluezDbus(e)
-    else:
-        available_bt = _get_available_bt()
-        for bt in available_bt:
-            adapter = dbus.Interface(bus.get_object("org.bluez", bt), "org.freedesktop.DBus.Properties")
-            power = adapter.Get("org.bluez.Adapter1", "Powered")
-            if power:
-                available = adapter.Get("org.bluez.Adapter1", "Address")
-                break
-
-        if len(available_bt) == 0:
-            # Not a single BT adapter available in the system
-            raise NoAdapter
-        elif not available:
-            # Every BT adapters are powered off
-            raise UnpoweredAdapter
-
-        return available
-
-
-def _start_bus(bus_name, timeout, flags=0):
-    """Manually start the bus, so we can set a custom timeout"""
-    bus = dbus.SystemBus()
-    bus.call_blocking(BUS_DAEMON_NAME, BUS_DAEMON_PATH,
-                      BUS_DAEMON_IFACE,
-                      'StartServiceByName',
-                      'su', (bus_name, flags), timeout=timeout)
-
-
-def _get_available_bt():
-    """Returns the list of available Bluetooth"""
-    available_bt = []
-    bus_name = "org.bluez"
-    object_path = "/org/bluez"
-    bus = dbus.SystemBus()
-    obj = bus.get_object(bus_name, object_path)
-    iface = dbus.Interface(obj, 'org.freedesktop.DBus.Introspectable')
-    xml_string = iface.Introspect()
-    for child in ElementTree.fromstring(xml_string):
-        if child.tag == 'node':
-            bt = '/'.join((object_path, child.attrib['name']))
-            available_bt.append(bt)
-    return available_bt
 
 
 def get_attachments(filename):

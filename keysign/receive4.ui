@@ -1,6 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
 <interface>
   <requires lib="gtk" version="4.0" />
+  <object class="GtkMessageDialog" id="error_dialog">
+    <property name="message-type">error</property>
+    <property name="buttons">close</property>
+    <property name="text" translatable="yes">Error certifying key</property>
+    <property name="secondary-text" translatable="yes">%s
+We don't know any more, sorry :(</property>
+  </object>
   <object class="GtkImage" id="confirm-button-image">
     </object>
   <object class="GtkStack" id="receive_stack">
@@ -32,7 +39,6 @@
                 </child>
                 <child>
                   <object class="GtkBox">
-                    <property name="visible">0</property>
                     <property name="spacing">16</property>
                     <child>
                       <object class="GtkLabel" id="infobar_discover">
@@ -168,14 +174,14 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
               <object class="GtkBox" id="box60">
                 <child>
                   <object class="GtkButton" id="cancel_download_button">
-                    <property name="label">gtk-cancel</property>
+                    <property name="label" translatable="yes">Cancel</property>
                     <property name="focusable">1</property>
                     <property name="receives-default">1</property>
                   </object>
                 </child>
                 <child>
                   <object class="GtkButton" id="redo_download_button">
-                    <property name="label">gtk-redo</property>
+                    <property name="label" translatable="yes">Retry</property>
                     <property name="focusable">1</property>
                     <property name="receives-default">1</property>
                   </object>
@@ -208,7 +214,7 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
                     <property name="spacing">6</property>
                     <child>
                       <object class="GtkButton" id="btn_show_error_details">
-                        <property name="label">gtk-help</property>
+                        <property name="label" translatable="yes">Details</property>
                         <property name="focusable">1</property>
                         <property name="receives-default">1</property>
                         <property name="tooltip-text" translatable="1">Show details about the error</property>
@@ -227,7 +233,6 @@ For more information visit &lt;a href="https://wiki.gnome.org/Apps/Keysign/Doc/N
                 </child>
                 <child>
                   <object class="GtkBox">
-                    <property name="visible">0</property>
                     <property name="spacing">16</property>
                     <child>
                       <object class="GtkLabel" id="infobar_discover2">
@@ -259,7 +264,7 @@ You may try again by clicking the "confirm" button.</property>
                     <property name="spacing">6</property>
                     <child>
                       <object class="GtkButton" id="btn_local_import_save_as">
-                        <property name="label">gtk-save-as</property>
+                        <property name="label" translatable="yes">Save As...</property>
                         <property name="focusable">1</property>
                         <property name="receives-default">1</property>
                         <property name="tooltip-text" translatable="1">Saves the produced certifications as separate files in a custom directory</property>
@@ -267,7 +272,9 @@ You may try again by clicking the "confirm" button.</property>
                     </child>
                     <child>
                       <object class="GtkButton" id="btn_local_import">
-                        <property name="label">gtk-jump-to</property>
+                        <property name="label" translatable="yes">_Import</property>
+                        <property name="use-underline">1</property>
+                        <property name="icon-name">document-import-symbolic</property>
                         <property name="focusable">1</property>
                         <property name="receives-default">1</property>
                         <property name="tooltip-text" translatable="1">Imports a temporary version of the produced certifications into the local keyring</property>
@@ -276,7 +283,7 @@ You may try again by clicking the "confirm" button.</property>
                     <child>
                       <object class="GtkButton" id="btn_upload">
                         <property name="visible">0</property>
-                        <property name="label">gtk-go-up</property>
+                        <property name="label" translatable="yes">Upload</property>
                         <property name="focusable">1</property>
                         <property name="receives-default">1</property>
                       </object>
@@ -288,7 +295,6 @@ You may try again by clicking the "confirm" button.</property>
                 </child>
                 <child>
                   <object class="GtkBox">
-                    <property name="visible">0</property>
                     <property name="spacing">16</property>
                     <child>
                       <object class="GtkLabel" id="infobar_discover1">
@@ -449,7 +455,7 @@ This will generate an email that must be sent in order to complete the signing p
               <object class="GtkBox" id="box90">
                 <child>
                   <object class="GtkButton" id="cancel_signing_button">
-                    <property name="label">gtk-cancel</property>
+                    <property name="label" translatable="yes">Cancel</property>
                     <property name="focusable">1</property>
                     <property name="receives-default">1</property>
                   </object>

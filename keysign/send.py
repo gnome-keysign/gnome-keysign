@@ -4,22 +4,22 @@ import logging
 import mailbox
 import os
 import signal
+from string import Template
+from tempfile import NamedTemporaryFile
 
-try:
-    from urllib.parse import unquote
-except ImportError:
-    from urllib import unquote
+from urllib.parse import unquote
 
 import gi
 gi.require_version('Gtk', '4.0')
-from gi.repository import Gtk
+gi.require_version('Adw', '1')
+from gi.repository import Gtk, Adw
 from gi.repository import GLib
 from gi.repository import Gdk
 from gpg import errors
 from wormhole.errors import ServerConnectionError, LonelyError, WrongPasswordError
 if __name__ == "__main__":
-    from twisted.internet import gtk3reactor
-    gtk3reactor.install()
+    from twisted.internet import gireactor
+    gireactor.install()
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks
 
@@ -38,7 +38,7 @@ if  __name__ == "__main__" and __package__ is None:
 from .keylistwidget import KeyListWidget
 from .KeyPresent import KeyPresentWidget
 from .offer import Offer
-from .util import get_attachments
+from .util import get_attachments, send_email
 from . import gpgmeh
 # We import i18n to have the locale set up for Glade
 from .i18n import _
@@ -52,6 +52,21 @@ except ImportError:
 
 
 DRAG_ACTION = Gdk.DragAction.COPY
+
+
+
+RETURN_SUBJECT = "Your OpenPGP certifications on my key"
+RETURN_BODY = """Hi $uid,
+
+thanks for having signed my key.
+Here are the certifications you produced.
+
+Please import them by, e.g., spawning a terminal and typing
+
+    gpg --import
+
+Then, drag and drop the attachment into your terminal and press Enter.
+"""
 
 
 class SendApp:
@@ -82,10 +97,7 @@ class SendApp:
         self.klw = klw
 
         stack = builder.get_object("send_stack")
-        if hasattr(stack, 'add_child'):
-            stack.add_child(klw)
-        else:
-            stack.add(klw)
+        stack.add_child(klw)
         self.stack = stack
 
         # This is a dirty hack :-/
@@ -288,9 +300,26 @@ class SendApp:
             self.klw.button_ib_import_okay.hide()
         else:
             def return_certification(button):
+                self._tempfiles = []
                 for sender in attestors:
                     log.info("Return certification to %s (%d)",
                         sender, len(decrypted_certifications))
+
+                    tempfiles = []
+                    for cert in decrypted_certifications:
+                        tempfile = NamedTemporaryFile(prefix='gnome-keysign-certifications',
+                                                     suffix='.asc',
+                                                     delete=True)
+                        tempfile.write(cert)
+                        tempfile.file.close()
+                        tempfiles.append(tempfile)
+
+                    ctx = {'uid': sender}
+                    subject = Template(RETURN_SUBJECT).safe_substitute(ctx)
+                    body = Template(RETURN_BODY).safe_substitute(ctx)
+                    send_email(sender, subject=subject, body=body, files=[f.name for f in tempfiles])
+                    # We just keep the object around so that the files do not get deleted before the email has been sent. Once the app quits, we are happy with the files being cleaned up.
+                    self._tempfiles.append(tempfiles)
 
             self.klw.button_ib_import_okay.connect('clicked', return_certification)
             self.klw.button_ib_import_okay.show()
@@ -417,21 +446,20 @@ class SendApp:
 
 
 
-class App(Gtk.Application):
+class App(Adw.Application):
     def __init__(self, *args, **kwargs):
         super(App, self).__init__(*args, **kwargs)
         self.connect('activate', self.on_activate)
         self.send_app = None
-        #self.builder = Gtk.Builder.new_from_file('send.ui')
 
     def on_activate(self, data=None):
         ui_file_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
-            "send.ui")
+            "send4.ui")
         self.builder = Gtk.Builder.new_from_file(ui_file_path)
         window = self.builder.get_object("appwindow")
         assert window
-        window.connect("delete-event", self.on_delete_window)
+        window.connect("close-request", self.on_delete_window)
         self.headerbar = self.builder.get_object("headerbar")
         hb = self.builder.get_object("headerbutton")
         hb.connect("clicked", self.on_header_button_clicked)
@@ -445,7 +473,7 @@ class App(Gtk.Application):
         ss.connect('map', self.on_send_stack_mapped)
         self.send_stack = ss
 
-        window.show_all()
+        window.present()
         self.add_window(window)
 
     @staticmethod
@@ -474,16 +502,12 @@ class App(Gtk.Application):
     def on_resultbox_mapped(self, rb):
         log.debug("Resultbox becomes visible!")
         self.header_button.set_sensitive(True)
-        self.header_button.set_image(
-            Gtk.Image.new_from_icon_name("go-previous",
-                                         Gtk.IconSize.BUTTON))
+        self.header_button.set_icon_name("go-previous")
         self.internet_toggle.hide()
 
     def on_keylist_mapped(self, keylistwidget):
         log.debug("Keylist becomes visible!")
-        self.header_button.set_image(
-            Gtk.Image.new_from_icon_name("view-refresh",
-            Gtk.IconSize.BUTTON))
+        self.header_button.set_icon_name("view-refresh")
         # We don't support refreshing for now.
         self.header_button.set_sensitive(False)
         self.internet_toggle.show()
@@ -496,9 +520,7 @@ class App(Gtk.Application):
     def on_keypresent_mapped(self, kpw):
         log.debug("keypresent becomes visible!")
         self.header_button.set_sensitive(True)
-        self.header_button.set_image(
-            Gtk.Image.new_from_icon_name("go-previous",
-            Gtk.IconSize.BUTTON))
+        self.header_button.set_icon_name("go-previous")
         self.internet_toggle.hide()
 
     def on_send_header_button_clicked(self, button, *args):
@@ -525,7 +547,7 @@ class App(Gtk.Application):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    app = App()
+    app = App(application_id="org.gnome.Keysign.Send")
     try:
         GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
                                   lambda *args: reactor.callFromThread(reactor.stop), None)

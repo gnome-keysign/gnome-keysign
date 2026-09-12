@@ -18,12 +18,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with GNOME Keysign.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from http.server import BaseHTTPRequestHandler, HTTPServer
-    from socketserver import ThreadingMixIn
-except ImportError:
-    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-    from SocketServer import ThreadingMixIn
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from socketserver import ThreadingMixIn
 import logging
 import os
 import socket
@@ -80,12 +76,7 @@ class ThreadedKeyserver(ThreadingMixIn, HTTPServer):
     address_family = socket.AF_INET6
 
     def __init__(self, server_address, *args, **kwargs):
-        if issubclass(self.__class__, object):
-            super(ThreadedKeyserver, self).__init__(server_address, *args, **kwargs)
-        else:
-            HTTPServer.__init__(self, server_address, *args, **kwargs)
-            # WTF? There is no __init__..?
-            # ThreadingMixIn.__init__(self, server_address, *args, **kwargs)
+        super(ThreadedKeyserver, self).__init__(server_address, *args, **kwargs)
 
         def server_bind(self):
             # Override this method to be sure v6only is false: we want to

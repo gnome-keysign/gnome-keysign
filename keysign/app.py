@@ -24,12 +24,16 @@ import sys
 
 import gi
 gi.require_version('Gtk', '4.0')
-from gi.repository import Gtk, GLib
+gi.require_version('Adw', '1')
+from gi.repository import Gtk, GLib, Adw, Gio
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 from gi.repository import Gdk
-from twisted.internet import gtk3reactor
-gtk3reactor.install()
+try:
+    from twisted.internet import gireactor
+    gireactor.install()
+except Exception:
+    pass
 
 from twisted.internet import reactor
 
@@ -65,7 +69,7 @@ from . import gtkexcepthook
 log = logging.getLogger(__name__)
 
 def remove_whitespace(s):
-    cleaned = re.sub('[\s+]', '', s)
+    cleaned = re.sub(r'[\s+]', '', s)
     return cleaned
 
 
@@ -80,8 +84,7 @@ class PswMappingReceiveApp(ReceiveApp):
     in time.
     """
     def __init__(self, mapped_func, builder=None):
-        # ReceiveApp, in Python 2, is an old style object
-        ReceiveApp.__init__(self, builder=builder)
+        super(PswMappingReceiveApp, self).__init__(builder=builder)
         self.func = mapped_func
         
     def on_keydata_downloaded(self, *args, **kwargs):
@@ -96,10 +99,10 @@ class PswMappingReceiveApp(ReceiveApp):
         If we ever want to run a dialog, say a FileSave dialog, then we need to provide
         the top level window of that widget.
         """
-        return self.psw.get_toplevel()
+        return self.psw.get_root()
 
 
-class KeysignApp(Gtk.Application):
+class KeysignApp(Adw.Application):
     def __init__(self, *args, **kwargs):
         super(KeysignApp, self).__init__(*args, **kwargs)
         self.connect('activate', self.on_activate)
@@ -120,6 +123,18 @@ class KeysignApp(Gtk.Application):
         window = builder.get_object(appwindow)
         window.set_title("GNOME Keysign")
         window.connect("close-request", self.on_delete_window)
+
+        def on_realize(win):
+            surface = win.get_surface()
+            try:
+                from gi.repository import GdkWayland
+                if isinstance(surface, GdkWayland.WaylandToplevel):
+                    def on_handle_exported(toplevel, handle, *args):
+                        win.portal_handle = f"wayland:{handle}"
+                    surface.export_handle(on_handle_exported)
+            except Exception:
+                pass
+        window.connect("realize", on_realize)
         self.headerbar = window.get_titlebar()
         self.header_button = builder.get_object("back_refresh_button")
         self.header_button.connect('clicked', self.on_header_button_clicked)
@@ -184,6 +199,18 @@ class KeysignApp(Gtk.Application):
                 "send_stack", _("Send"))
             self.send_receive_stack.add_titled(rs,
                 "receive_stack", _("Receive"))
+
+            # Actions and accelerators to switch between Send and Receive tabs using Alt+S and Alt+R
+            send_action = Gio.SimpleAction.new("switch-to-send", None)
+            send_action.connect("activate", lambda action, parameter: self.send_receive_stack.set_visible_child_name("send_stack"))
+            self.add_action(send_action)
+
+            receive_action = Gio.SimpleAction.new("switch-to-receive", None)
+            receive_action.connect("activate", lambda action, parameter: self.send_receive_stack.set_visible_child_name("receive_stack"))
+            self.add_action(receive_action)
+
+            self.set_accels_for_action("app.switch-to-send", ["<Alt>s"])
+            self.set_accels_for_action("app.switch-to-receive", ["<Alt>r"])
 
         window.present()
         self.add_window(window)
@@ -313,7 +340,8 @@ def main(args=[]):
         args = []
     Gst.init(None)
 
-    app = KeysignApp()
+    Adw.init()
+    app = KeysignApp(application_id="org.gnome.Keysign")
     try:
         GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
                                   lambda *args: reactor.callFromThread(reactor.stop), None)

@@ -84,9 +84,7 @@ def main(args):
     print (_("Discovery info: {}").format(discovery_info))
     offer.start()
     print (_("Press Enter to stop"))
-    try: input_ = raw_input
-    except NameError: input_ = input
-    input_("Press Enter to stop")
+    input("Press Enter to stop")
     offer.stop()
 
 

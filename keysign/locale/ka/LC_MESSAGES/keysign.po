@@ -1,0 +1,455 @@
+# Georgian translation for gnome-keysign.
+# Copyright (C) 2026 gnome-keysign authors.
+# This file is distributed under the same license as the gnome-keysign package.
+# Ekaterine Papava <papava.e@gtu.ge>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gnome-keysign 1.3.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-30 05:57+0100\n"
+"PO-Revision-Date: 2026-01-30 09:59+0100\n"
+"Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
+"Language-Team: Georgian <(nothing)>\n"
+"Language: ka\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+"X-Generator: Poedit 3.8\n"
+
+#: data/org.gnome.Keysign.raw.appdata.xml:14
+msgid ""
+"\n"
+"      GNOME Keysign allows signing OpenPGP keys comfortably and securely\n"
+"      via the local network or Bluetooth.\n"
+"    "
+msgstr ""
+
+#: data/org.gnome.Keysign.raw.appdata.xml:21
+msgid ""
+"\n"
+"      It can scan another key's barcode and transfer the key securely,\n"
+"      allowing for casual two-party key signing sessions.\n"
+"      It follows best practises by sending the encrypted signatures\n"
+"      to the UIDs of a key using the Email client the user configured\n"
+"      to use.\n"
+"    "
+msgstr ""
+
+#. Name
+#: data/org.gnome.Keysign.raw.desktop:2
+msgid "Keysign"
+msgstr "Keysign"
+
+#. Comment
+#: data/org.gnome.Keysign.raw.desktop:3
+msgid ""
+"A keysigning helper to enable you to comfortably exchange OpenPGP keys with "
+"a friend"
+msgstr ""
+
+#. Keywords
+#: data/org.gnome.Keysign.raw.desktop:4
+msgid "python;gpg;gnupg;key;openpgp;"
+msgstr "python;gpg;gnupg;key;openpgp;"
+
+#. Icon
+#: data/org.gnome.Keysign.raw.desktop:7
+msgid "org.gnome.Keysign"
+msgstr "org.gnome.Keysign"
+
+#: keysign/app.py:186
+msgid "Send"
+msgstr "გაგზავნა"
+
+#: keysign/app.py:188 keysign/receive.py:307
+msgid "Receive"
+msgstr "მიღება"
+
+#: keysign/app.ui:62 keysign/send.ui:1081
+msgid "Internet"
+msgstr "ინტერნეტი"
+
+#: keysign/avahioffer.py:83 keysign/bluetoothoffer.py:126
+#, python-brace-format
+msgid "Offering key: {}"
+msgstr ""
+
+#: keysign/avahioffer.py:84 keysign/bluetoothoffer.py:127
+#, python-brace-format
+msgid "Discovery info: {}"
+msgstr "აღმოჩენის ინფორმაცია: {}"
+
+#: keysign/avahioffer.py:86
+msgid "Press Enter to stop"
+msgstr "გასაჩერებლად დააჭირეთ ღილაკს Enter"
+
+#: keysign/bluetoothoffer.py:117
+msgid "You must provide an argument to identify the key"
+msgstr ""
+
+#: keysign/bluetoothoffer.py:128
+#, python-brace-format
+msgid "HMAC: {}"
+msgstr "HMAC: {}"
+
+#: keysign/bluetoothoffer.py:129
+#, python-brace-format
+msgid "Port: {}"
+msgstr "პორტი: {}"
+
+#: keysign/bluetoothoffer.py:132
+msgid "Bluetooth not available"
+msgstr "ბლუთუზი ხელმისაწვდომი არაა"
+
+#: keysign/bluetoothoffer.py:137
+msgid "Press Enter to cancel"
+msgstr "გასაუქმებლად დააჭირეთ ღილაკს Enter"
+
+#: keysign/bluetoothoffer.py:144
+msgid ""
+"\n"
+"Key successfully sent"
+msgstr ""
+"\n"
+"გასაღები წარმატებით გაიგზავნა"
+
+#: keysign/bluetoothoffer.py:146
+#, python-brace-format
+msgid ""
+"\n"
+"An error occurred: {}"
+msgstr ""
+"\n"
+"აღმოჩენილია შეცდომა: {}"
+
+#: keysign/bluetoothoffer.py:148
+msgid "Press Enter to exit"
+msgstr "გასასვლელად დააწექით ღილაკს Enter"
+
+#: keysign/bluetoothreceive.py:135
+msgid "Trying to download the key, please wait"
+msgstr ""
+
+#: keysign/dialog_avahi.ui:8
+msgid "Unable to Start Avahi"
+msgstr "Avahi-ის გაშვება შეუძლებელია"
+
+#: keysign/dialog_avahi.ui:9
+msgid ""
+"Keysign is unable to automatically start Avahi. You can try to execute "
+"`systemctl start avahi-daemon` for solving this problem."
+msgstr ""
+
+#: keysign/dialog_avahi.ui:23
+msgid "OK"
+msgstr "დიახ"
+
+#: keysign/gtkexcepthook.py:169
+msgid "Bug Detected"
+msgstr "აღმოჩენილია შეცდომა"
+
+#: keysign/gtkexcepthook.py:172
+msgid "<big><b>A programming error has been detected.</b></big>"
+msgstr ""
+
+#: keysign/gtkexcepthook.py:175
+msgid ""
+"You may be able to ignore this error and carry on working, but you may get "
+"unexpected results.\n"
+"\n"
+"Please tell the developers about this using the issue tracker if no-one else "
+"has reported it yet."
+msgstr ""
+
+#: keysign/gtkexcepthook.py:183
+msgid "Search Tracker..."
+msgstr ""
+
+#: keysign/gtkexcepthook.py:185
+msgid "Report..."
+msgstr "ანგარიში..."
+
+#: keysign/gtkexcepthook.py:187
+msgid "Ignore Error"
+msgstr "შეცდომის იგნორი"
+
+#: keysign/gtkexcepthook.py:188
+msgid "Quit GNOME Keysign"
+msgstr "გასვლა GNOME Keysign-დან"
+
+#: keysign/gtkexcepthook.py:198
+msgid "Details..."
+msgstr "დეტალები..."
+
+#: keysign/gtkexcepthook.py:225 keysign/gtkexcepthook.py:228
+msgid "Exception while analyzing the exception."
+msgstr ""
+
+#. TRANSLATORS: Crash report template for github, preceding a traceback.
+#. TRANSLATORS: Please ask users kindly to supply at least an English
+#. TRANSLATORS: title if they are able.
+#: keysign/gtkexcepthook.py:277
+#, python-brace-format
+msgid ""
+"            #### Description\n"
+"\n"
+"            Give this report a short descriptive title.\n"
+"            Use something like\n"
+"            \"{feature-that-broke}: {what-went-wrong}\"\n"
+"            for the title, if you can.\n"
+"            Then please replace this text\n"
+"            with a longer description of the bug.\n"
+"            Screenshots or videos are great, too!\n"
+"\n"
+"            #### Steps to reproduce\n"
+"\n"
+"            Please tell us what you were doing\n"
+"            when the error message popped up.\n"
+"            If you can provide step-by-step instructions\n"
+"            on how to reproduce the bug,\n"
+"            that's even better.\n"
+"\n"
+"            #### Traceback\n"
+"        "
+msgstr ""
+
+#: keysign/keylistwidget.py:82
+msgid "Expires: "
+msgstr "ვადა იწურება: "
+
+#: keysign/receive.py:186
+msgid "Sign Key"
+msgstr "გასაღების ხელმოწერა"
+
+#: keysign/receive.py:253
+msgid "Select file for saving"
+msgstr ""
+
+#: keysign/receive.ui:56
+msgid ""
+"No GNOME Keysign servers around :-(\n"
+"Find a friend to use GNOME Keysign with.\n"
+"You may also suffer from connectivity problems.\n"
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"NoServers/1\">the documentation</a>."
+msgstr ""
+
+#: keysign/receive.ui:108
+msgid ""
+"<small>To sign someone's key, scan their QR or enter security code</small>"
+msgstr ""
+
+#: keysign/receive.ui:127
+msgid "<b>Camera</b>"
+msgstr "<b>კამერა</b>"
+
+#: keysign/receive.ui:142
+msgid "Integrated Web Cam"
+msgstr "ინტეგრირებული ვებკამერა"
+
+#: keysign/receive.ui:179 keysign/send.ui:687
+msgid "<b>Security Code</b>"
+msgstr "<b>უსაფრთხოების კოდი</b>"
+
+#: keysign/receive.ui:212
+msgid "Scan Barcode"
+msgstr "შტრიხკოდის სკანირება"
+
+#: keysign/receive.ui:229
+msgid "Downloading key-data. Please wait..."
+msgstr ""
+
+#: keysign/receive.ui:254
+msgid "Key download was interrupted!"
+msgstr "გასაღების გადმოწერა შეწყდა!"
+
+#: keysign/receive.ui:346
+msgid "Show details about the error"
+msgstr "დეტალების ჩვენება შეცდომის შეესახებ"
+
+#: keysign/receive.ui:381
+msgid ""
+"Error producing certifications ☹\n"
+"Something went wrong. Sometimes, the passphrase was not correctly entered.\n"
+"You may try again by clicking the \"confirm\" button."
+msgstr ""
+
+#: keysign/receive.ui:427
+msgid ""
+"Saves the produced certifications as separate files in a custom directory"
+msgstr ""
+
+#: keysign/receive.ui:442
+msgid ""
+"Imports a temporary version of the produced certifications into the local "
+"keyring"
+msgstr ""
+
+#: keysign/receive.ui:487
+msgid ""
+"Successfully produced certifications.\n"
+"You can import a temporary signature to start using the key as if it had "
+"already been properly verified.\n"
+"For more information visit <a href=\"https://wiki.gnome.org/Apps/Keysign/Doc/"
+"ProducedSignatures/1\">the documentation</a>."
+msgstr ""
+
+#: keysign/receive.ui:541
+msgid "Key"
+msgstr "გასაღები"
+
+#: keysign/receive.ui:574 keysign/send.ui:612
+msgid "UIDs"
+msgstr "UID-ები"
+
+#: keysign/receive.ui:652
+msgid ""
+"To sign the key, confirm that you want to sign the following key.\n"
+"This will generate an email that must be sent in order to complete the "
+"signing process."
+msgstr ""
+
+#: keysign/receive.ui:676
+msgid "C_onfirm"
+msgstr "_დასტური"
+
+#: keysign/receive.ui:798
+msgid "Signing the following UIDs:"
+msgstr ""
+
+#: keysign/send.py:292
+msgid ""
+"Still trying to get a connection to the Internet. It appears to be slow or "
+"unavailable."
+msgstr ""
+
+#: keysign/send.py:298
+msgid "There isn't an Internet connection!"
+msgstr "ინტერნეტთან კავშირი არ არსებობს!"
+
+#: keysign/send.py:413
+#, python-format
+msgid ""
+"An unexpected error occurred:\n"
+"%s"
+msgstr ""
+"აღმოჩენილია მოულოდნელი შეცდომა:\n"
+"%s"
+
+#: keysign/send.ui:7
+msgid "Select and send key"
+msgstr "გასაღების არჩევა და გაგზავნა"
+
+#: keysign/send.ui:59
+msgid ""
+"You don't have any keys!\n"
+"Please use, e.g. Seahorse to create one."
+msgstr ""
+"გასაღებები არ გაქვთ!\n"
+"შესაქმნელად გამოიყენეთ, მაგ: Seahorse."
+
+#: keysign/send.ui:135
+msgid "Very slow or no Internet connection!"
+msgstr "ინტერნეტი ძალიან ნელია, ან არ გაქვთ!"
+
+#: keysign/send.ui:204 keysign/send.ui:829
+msgid "The signature has been successfully imported!"
+msgstr ""
+
+#: keysign/send.ui:230 keysign/send.ui:855
+msgid ""
+"Returns the received certification back to the sender, so that the sender "
+"can make use of your OpenPGP certificate"
+msgstr ""
+
+#: keysign/send.ui:277 keysign/send.ui:900
+msgid "Display more details for the error."
+msgstr ""
+
+#: keysign/send.ui:308 keysign/send.ui:931
+msgid "An error occurred while trying to import the signature."
+msgstr ""
+
+#: keysign/send.ui:386
+msgid "Not imported this certification because it is already known."
+msgstr ""
+
+#. This refers to the key being certified by someone rather than the key used for
+#. certifying someone
+#: keysign/send.ui:441
+msgid "<b>Select a key for signing</b>"
+msgstr ""
+
+#: keysign/send.ui:457
+msgid "<small>Times signed</small>"
+msgstr ""
+
+#: keysign/send.ui:524
+msgid "Keylist"
+msgstr "გასაღებების სია"
+
+#: keysign/send.ui:544
+msgid ""
+"<small>To have the key signed, the other person must enter the security "
+"code, or scan the QR code</small>"
+msgstr ""
+
+#: keysign/send.ui:571
+msgid "<b>Key Details</b>"
+msgstr "<b>გასაღების დეტალები</b>"
+
+#: keysign/send.ui:596
+msgid "Fingerprint"
+msgstr "თითის ანაბეჭდი"
+
+#: keysign/send.ui:750
+msgid "<b>QR Code</b>"
+msgstr "<b>QR კოდი</b>"
+
+#: keysign/send.ui:975
+msgid ""
+"Could not establish a secure connection.\n"
+"Either your partner has entered a wrong code or someone tried to intercept "
+"your connection."
+msgstr ""
+
+#: keysign/send.ui:993
+msgid ""
+"Key successfully sent.\n"
+"You should receive an email with the signature soon.\n"
+"You can drag and drop the email here to import your certification."
+msgstr ""
+
+#: keysign/send.ui:1010
+msgid "An unexpected error occurred."
+msgstr "აღმოჩენილია მოულოდნელი შეცდომა."
+
+#: keysign/send.ui:1039
+msgid "Select and Send key"
+msgstr "გასაღების არჩევა და გაგზავნა"
+
+#: keysign/send.ui:1079
+msgid "Also use the Internet to transfer the certificate"
+msgstr ""
+
+#: keysign/util.py:225
+msgid ""
+"Hi $uid,\n"
+"\n"
+"\n"
+"I have just signed your key\n"
+"\n"
+"      $fingerprint\n"
+"\n"
+"\n"
+"Thanks for letting me sign your key!\n"
+"\n"
+"--\n"
+"GNOME Keysign\n"
+msgstr ""
+
+#: keysign/wormholereceive.py:85
+msgid "Wrong message authentication code"
+msgstr "არასწორი შეტყობინების ავთენტიკაციის კოდი"

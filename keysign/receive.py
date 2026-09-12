@@ -22,15 +22,17 @@ import os
 import signal
 import sys
 from textwrap import dedent
+from urllib.parse import unquote
 
 import gi
 gi.require_version('Gtk', '4.0')
-from gi.repository import Gtk, GLib
+gi.require_version('Adw', '1')
+from gi.repository import Gtk, GLib, Adw, Gdk, GObject
 gi.require_version('Gst', '1.0')
 from gi.repository import Gst
 if __name__ == "__main__":
-    from twisted.internet import gtk3reactor
-    gtk3reactor.install()
+    from twisted.internet import gireactor
+    gireactor.install()
 from twisted.internet import reactor, threads
 from twisted.internet.defer import inlineCallbacks
 from wormhole.errors import WrongPasswordError, LonelyError
@@ -63,6 +65,25 @@ log = logging.getLogger(__name__)
 def remove_whitespace(s):
     cleaned = re.sub('[\s+]', '', s)
     return cleaned
+
+
+def format_error(message):
+    """Turns what a transport reports as an error into user facing text
+
+    Depending on which transport failed, and how, we get handed an
+    exception class, an exception instance, a sentence meant for the
+    user, or nothing at all.
+    """
+    if message is None:
+        return _("An unexpected error occurred")
+    if isinstance(message, str):
+        return message
+    if isinstance(message, type) and issubclass(message, BaseException):
+        # Wormhole tells us which error occurred by handing us the class
+        return dedent(message.__doc__ or "").strip() or message.__name__
+    if isinstance(message, BaseException):
+        return str(message) or format_error(type(message))
+    return str(message)
 
 
 class ReceiveApp:
@@ -105,6 +126,10 @@ class ReceiveApp:
         self.scanner = scanner
         self.stack = receive_stack
 
+        drop_target = Gtk.DropTarget.new(GObject.TYPE_STRING, Gdk.DragAction.COPY)
+        drop_target.connect("drop", self.on_drop_data_received)
+        self.scanner.add_controller(drop_target)
+
         self.discovery = AvahiKeysignDiscoveryWithMac()
         ib = builder.get_object('infobar_discovery')
         fix_infobar(ib)
@@ -125,6 +150,24 @@ class ReceiveApp:
         # We call this in async because it can take several seconds to complete and we don't want
         # to stall the UI boot. Also we don't care about having this information immediately.
         threads.deferToThread(self.check_bt_availability)
+
+    def on_drop_data_received(self, target, value, x, y):
+        log.info("recv: Drag data rcvd: %s", value)
+        dragged_data = unquote(value)
+        if dragged_data.startswith("file://"):
+            filename = dragged_data[7:].strip('\r\n\x00')  # remove file://, \r\n and NULL
+            keydata = open(filename, 'br').read()
+
+        elif dragged_data.startswith("-----BEGIN PGP PUBLIC KEY BLOCK-----"):
+            # We assume a raw (well, armored) key to be passed
+            keydata = dragged_data
+
+        else:
+            log.warning("We got a drag with neither file:// nor ----: %s", value)
+            keydata = dragged_data
+
+        self.on_keydata_downloaded(keydata)
+        return True
 
     def on_redo_button_clicked(self, button):
         log.info("redo pressed")
@@ -150,7 +193,12 @@ class ReceiveApp:
         except UnpoweredAdapter as e:
             log.debug("Bluetooth adapter is turned off: %s", e)
 
+    def get_toplevel(self):
+        if self.psw:
+            return self.psw.get_root()
+        return self.stack.get_root()
     def on_keydata_downloaded(self, keydata, pixbuf=None):
+        log.debug("Downloaded keydata of length %d: %s", len(keydata), keydata[:50])
         key = openpgpkey_from_data(keydata)
         psw = PreSignWidget(key, pixbuf)
         psw.connect('sign-key-confirmed',
@@ -170,7 +218,7 @@ class ReceiveApp:
                 log.error(ve.args[0])
         else:
             self.stack.add_child(self.rb)
-            self.result_label.set_label(dedent(message.__doc__))
+            self.result_label.set_label(format_error(message))
             self.stack.set_visible_child(self.rb)
 
     def on_code_changed(self, scanner, entry):
@@ -202,7 +250,7 @@ class ReceiveApp:
         # We need to prevent tmpfiles from going out of
         # scope too early so that they don't get deleted
         try:
-            tmpfiles_plaintext = list(sign_keydata_and_send(keydata))
+            tmpfiles_plaintext = list(sign_keydata_and_send(keydata, parent_window=self.get_toplevel()))
         except GPGRuntimeError as e:
             self.log.exception("Something went wrong with signing the key")
             keyPreSignWidget.infobar_success.hide()
@@ -222,27 +270,7 @@ class ReceiveApp:
 
             def save_as_clicked(button):
                 self.log.info("Save as clicked")
-                dialog = Gtk.FileChooserDialog(_("Select file for saving"),
-                    self.get_toplevel(),
-                    Gtk.FileChooserAction.SAVE,
-                    (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                     Gtk.STOCK_SAVE, Gtk.ResponseType.OK)
-                )
-                response = dialog.run()
-                if response == Gtk.ResponseType.OK:
-                    filename = dialog.get_filename()
-                    self.log.info("Saving file to: %r", filename)
-                    with open(filename, 'wb') as f:
-                        for p in plaintexts:
-                            f.write(p)
-                        for sigfile in self.tmpfiles:
-                            pass
-                            # Hrm. Those are the encrypted files, I think.
-                            # We probably want to offer the plaintext versions, though
-                            #f.write(open(sigfile, 'r').read())
-                else:
-                    self.log.info("Not saving file: %r", response)
-                dialog.destroy()
+                self.save_certifications(plaintexts)
 
             keyPreSignWidget.infobar_save_as_button.connect("clicked", save_as_clicked)
 
@@ -251,6 +279,36 @@ class ReceiveApp:
             # key confirmation page.
             log.debug ("Signed the key: %r", self.tmpfiles)
             # self.stack.set_visible_child_name("scanner")
+
+    def save_certifications(self, plaintexts):
+        """Asks the user for a file name and writes the certifications there
+
+        Gtk.FileDialog is asynchronous, so the writing happens from the
+        callback once the user has picked a file.
+        """
+        dialog = Gtk.FileDialog()
+        dialog.set_title(_("Select file for saving"))
+        dialog.set_initial_name("certifications.asc")
+
+        def on_file_selected(dialog, result):
+            try:
+                gfile = dialog.save_finish(result)
+            except GLib.Error as e:
+                # The user dismissed the dialog, or we could not have the file
+                self.log.info("Not saving the certifications: %s", e)
+                return
+            filename = gfile.get_path()
+            self.log.info("Saving file to: %r", filename)
+            self.write_certifications(filename, plaintexts)
+
+        dialog.save(self.get_toplevel(), None, on_file_selected)
+
+    @staticmethod
+    def write_certifications(filename, plaintexts):
+        """Writes the plaintext certifications to the given file"""
+        with open(filename, 'wb') as f:
+            for plaintext in plaintexts:
+                f.write(plaintext)
 
     def on_list_changed(self, discovery, number, userdata):
         """We show an infobar if we can only receive with Avahi and
@@ -262,7 +320,7 @@ class ReceiveApp:
             ib.hide()
 
 
-class App(Gtk.Application):
+class App(Adw.Application):
     def __init__(self, *args, **kwargs):
         super(App, self).__init__(*args, **kwargs)
         self.connect('activate', self.on_activate)
@@ -274,7 +332,7 @@ class App(Gtk.Application):
             "receive4.ui")
         builder = Gtk.Builder.new_from_file(ui_file)
 
-        window = Gtk.ApplicationWindow(application=app)
+        window = Adw.ApplicationWindow(application=app)
         window.connect("close-request", self.on_delete_window)
         window.set_title(_("Receive"))
         # window.set_size_request(600, 400)
@@ -284,6 +342,19 @@ class App(Gtk.Application):
         receive_stack = self.receive.stack
 
         window.set_child(receive_stack)
+
+        def on_realize(win):
+            surface = win.get_surface()
+            try:
+                from gi.repository import GdkWayland
+                if isinstance(surface, GdkWayland.WaylandToplevel):
+                    def on_handle_exported(toplevel, handle, *args):
+                        win.portal_handle = f"wayland:{handle}"
+                    surface.export_handle(on_handle_exported)
+            except Exception:
+                pass
+        window.connect("realize", on_realize)
+
         window.present()
         self.add_window(window)
 
@@ -299,7 +370,7 @@ def main(args=[]):
         args = []
     Gst.init(None)
 
-    app = App()
+    app = App(application_id="org.gnome.Keysign.Receive")
     try:
         GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
                                   lambda *args: reactor.callFromThread(reactor.stop), None)
