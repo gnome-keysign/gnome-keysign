@@ -349,9 +349,16 @@ class SendApp:
     def show_result(self, success, message):
         self._deactivate_offer()
 
-        self.stack.add_child(self.rb)
-        self.stack.remove(self.kpw)
-        self.kpw = None
+        # offer.start() hands this method to every transport's Deferred
+        # (Avahi, wormhole, Bluetooth), so it can run more than once for
+        # the same send attempt. Guard both steps so a second call is a
+        # no-op instead of re-parenting an already-added widget or trying
+        # to remove a kpw that is already gone.
+        if self.rb.get_parent() is None:
+            self.stack.add_child(self.rb)
+        if self.kpw:
+            self.stack.remove(self.kpw)
+            self.kpw = None
 
         if success:
             self.result_label.hide()
