@@ -182,15 +182,22 @@ class KeyFprScanWidget(Gtk.Box):
             props = device.get_properties()
             device_path = None
             # On a PipeWire-enabled desktop (the default since Ubuntu 22.04),
-            # the same physical camera is commonly reported twice: once by
-            # GStreamer's v4l2 device provider (device.api="v4l2",
-            # device.path="/dev/videoN", a real devnode we can hand to
-            # v4l2src), and once by its pipewire device provider, which only
-            # exposes an "object.path" -- a PipeWire object identifier, not a
-            # v4l2 devnode. Passing that to "v4l2src device=..." fails, so we
-            # only trust entries that are actually backed by v4l2.
+            # Video/Source devices come from GStreamer's pipewire device
+            # provider, which reports the actual v4l2 devnode under
+            # "api.v4l2.path" (not the "device.path" key a standalone v4l2
+            # provider would use). "object.path" is a fallback for older or
+            # differently configured setups: it holds a "v4l2:"-prefixed
+            # URI rather than a plain devnode, so we strip that prefix.
+            # Requiring device.api == "v4l2" keeps out any non-v4l2 source
+            # (e.g. a purely virtual PipeWire camera) that happens to expose
+            # one of these keys without actually being backed by v4l2.
             if props and props.get_string("device.api") == "v4l2":
-                device_path = props.get_string("device.path")
+                device_path = (props.get_string("api.v4l2.path")
+                                or props.get_string("device.path"))
+                if not device_path:
+                    object_path = props.get_string("object.path")
+                    if object_path and object_path.startswith("v4l2:"):
+                        device_path = object_path[len("v4l2:"):]
 
             if not device_path:
                 continue

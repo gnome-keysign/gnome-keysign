@@ -77,6 +77,42 @@ def test_pipewire_duplicate_of_a_v4l2_camera_is_not_offered(monkeypatch):
     assert w.reader.device == "/dev/video0"
 
 
+def test_real_pipewire_v4l2_devices_are_offered(monkeypatch):
+    # This is the actual property set "gst-device-monitor-1.0 Video/Source"
+    # reports on a real Ubuntu 24.04 desktop: the pipewire device provider
+    # is what enumerates v4l2 cameras, and it reports the devnode under
+    # "api.v4l2.path" rather than "device.path" (which isn't present at
+    # all). Requiring "device.path" specifically, as an earlier version of
+    # this fix did, silently dropped every real camera.
+    w = _populate([
+        FakeDevice("Integrated IR Camera (V4L2)", {
+            "device.api": "v4l2",
+            "api.v4l2.path": "/dev/video0",
+            "object.path": "v4l2:/dev/video0",
+        }),
+        FakeDevice("Integrated Camera (V4L2)", {
+            "device.api": "v4l2",
+            "api.v4l2.path": "/dev/video2",
+            "object.path": "v4l2:/dev/video2",
+        }),
+    ], monkeypatch)
+
+    assert w.camera_devices == {"0": "/dev/video0", "1": "/dev/video2"}
+    # The IR camera must not be the one picked by default.
+    assert w.reader.device == "/dev/video2"
+
+
+def test_object_path_is_used_as_a_last_resort_with_its_scheme_stripped(monkeypatch):
+    w = _populate([
+        FakeDevice("Some Webcam", {
+            "device.api": "v4l2",
+            "object.path": "v4l2:/dev/video3",
+        }),
+    ], monkeypatch)
+
+    assert w.camera_devices == {"0": "/dev/video3"}
+
+
 def test_selecting_a_different_v4l2_camera_still_works(monkeypatch):
     w = _populate([
         FakeDevice("Integrated Webcam",
