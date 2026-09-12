@@ -20,6 +20,7 @@
 import sys
 import logging
 import os
+import re
 
 import gi
 gi.require_version('Gtk', '4.0')
@@ -44,6 +45,11 @@ from .scan_barcode import BarcodeReaderGTK
 from . import camera_portal
 
 log = logging.getLogger(__name__)
+
+# Matches "IR", "infrared" or "infra-red" as whole words, so we don't
+# misfire on ordinary camera names that merely happen to contain the
+# letters "ir", e.g. "Wireless Webcam" or "Circle View Camera".
+IR_CAMERA_NAME_RE = re.compile(r'\b(ir|infra-?red)\b', re.IGNORECASE)
 
 
 
@@ -165,7 +171,6 @@ class KeyFprScanWidget(Gtk.Box):
         best_unsuitable_idx = -1
         best_unsuitable_v4l2 = -1
         
-        import re
         def get_v4l2_index(path):
             if not path:
                 return -1
@@ -190,8 +195,7 @@ class KeyFprScanWidget(Gtk.Box):
             if not device_path:
                 continue
                 
-            name_lower = display_name.lower()
-            is_unsuitable = "ir" in name_lower or "infrared" in name_lower or "infra-red" in name_lower
+            is_unsuitable = bool(IR_CAMERA_NAME_RE.search(display_name))
             
             v4l2_num = get_v4l2_index(device_path)
             current_idx = len(self.camera_devices)

@@ -220,6 +220,66 @@ class TestPipelineConstruction:
         assert 'pipewiresrc fd=42' in pipeline_str
 
 
+class TestRestartsEvenIfTheInterimPipelineNeverPlayed:
+    """Regression test for a portal-specific restart bug.
+
+    Inside a Flatpak sandbox, BarcodeReaderGTK gets mapped (on_map() ->
+    run()) before the Camera Portal has answered -- the window has to be
+    visible for the user to see and answer the permission dialog. With
+    neither a device nor a pipewire_fd set yet, that interim pipeline is
+    "autovideosrc", which finds nothing inside the sandbox and gets stuck
+    at READY, never reaching PLAYING/PAUSED.
+
+    set_pipewire_fd() and set_device() used to decide whether to restart
+    by checking whether the *previous* pipeline was in the
+    PLAYING/PAUSED GStreamer state. Since the interim pipeline is stuck
+    at READY, that check concluded "wasn't running" and skipped
+    restarting -- so once the portal actually granted access, the reader
+    never started capturing. Restart is now decided by whether the
+    reader is *supposed* to be running, tracked explicitly.
+    """
+
+    def _pipeline_stuck_at_ready(self):
+        pipeline = MagicMock()
+        pipeline.get_state.return_value = (
+            Gst.StateChangeReturn.FAILURE, Gst.State.READY, Gst.State.PLAYING)
+        return pipeline
+
+    @patch.object(BarcodeReaderGTK, 'run')
+    def test_set_pipewire_fd_restarts_a_reader_that_should_be_running(self, mock_run):
+        reader = BarcodeReaderGTK()
+        reader._running = True
+        reader.pipeline = self._pipeline_stuck_at_ready()
+
+        reader.set_pipewire_fd(42)
+
+        mock_run.assert_called_once()
+        assert reader.pipewire_fd == 42
+        assert reader.device is None
+
+    @patch.object(BarcodeReaderGTK, 'run')
+    def test_set_device_restarts_a_reader_that_should_be_running(self, mock_run):
+        reader = BarcodeReaderGTK()
+        reader._running = True
+        reader.pipeline = self._pipeline_stuck_at_ready()
+
+        reader.set_device("/dev/video2")
+
+        mock_run.assert_called_once()
+
+    @patch.object(BarcodeReaderGTK, 'run')
+    def test_a_reader_that_should_not_be_running_is_left_alone(self, mock_run):
+        # e.g. the scanning page isn't currently visible (on_unmap() fired).
+        reader = BarcodeReaderGTK()
+        reader._running = False
+        reader.pipeline = self._pipeline_stuck_at_ready()
+
+        reader.set_pipewire_fd(42)
+        reader.set_device("/dev/video2")
+
+        mock_run.assert_not_called()
+
+
 # ===== Group C: End-to-End QR Decode via Fake pipewiresrc =====
 
 # Pad template for fake pipewiresrc

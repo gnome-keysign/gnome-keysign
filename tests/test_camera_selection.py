@@ -18,7 +18,7 @@ from gi.repository import Gst
 
 Gst.init(None)
 
-from keysign.keyfprscan import KeyFprScanWidget
+from keysign.keyfprscan import IR_CAMERA_NAME_RE, KeyFprScanWidget
 
 
 class FakeProps:
@@ -92,4 +92,25 @@ def test_selecting_a_different_v4l2_camera_still_works(monkeypatch):
     assert w.reader.device == "/dev/video2"
 
     w.camera_selector.set_active_id("0")
+    assert w.reader.device == "/dev/video0"
+
+
+def test_ir_name_matching_does_not_misfire_on_ordinary_camera_names():
+    # A plain substring check for "ir" would wrongly flag any of these.
+    for name in ["Wireless Webcam", "Circle View Camera", "First Person Cam",
+                 "Logitech HD Pro Webcam C920"]:
+        assert not IR_CAMERA_NAME_RE.search(name), name
+
+    for name in ["Integrated IR Camera", "USB2.0 Infrared Camera", "Infra-Red Cam"]:
+        assert IR_CAMERA_NAME_RE.search(name), name
+
+
+def test_a_falsely_flagged_camera_is_no_longer_deprioritized(monkeypatch):
+    # Regression check for the "ir" substring bug: a camera merely named
+    # "Wireless Webcam" must not be treated as an unsuitable IR camera.
+    w = _populate([
+        FakeDevice("Wireless Webcam",
+                   {"device.api": "v4l2", "device.path": "/dev/video0"}),
+    ], monkeypatch)
+
     assert w.reader.device == "/dev/video0"

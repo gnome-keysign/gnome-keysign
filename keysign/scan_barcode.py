@@ -55,6 +55,15 @@ class BarcodeReaderGTK(Gtk.Box):
         super(BarcodeReaderGTK, self).__init__(*args, **kwargs)
         self.device = device
         self.pipewire_fd = pipewire_fd
+        # Whether the reader is supposed to be actively capturing, i.e.
+        # whether the *next* set_device()/set_pipewire_fd() should restart
+        # the pipeline. This is tracked explicitly rather than inferred
+        # from the outgoing pipeline's GStreamer state, because a pipeline
+        # that never reached PLAYING/PAUSED (e.g. autovideosrc finding
+        # nothing inside a Flatpak sandbox before the camera portal has
+        # granted access) would otherwise look indistinguishable from one
+        # that was never meant to run at all.
+        self._running = False
         self.connect('unmap', self.on_unmap)
         self.connect('map', self.on_map)
         self.scaling_image = ScalingImage()
@@ -97,6 +106,7 @@ class BarcodeReaderGTK(Gtk.Box):
 
 
     def run(self):
+        self._running = True
         if self.pipewire_fd is not None:
             src = f"pipewiresrc fd={self.pipewire_fd}"
         elif self.device:
@@ -128,34 +138,35 @@ class BarcodeReaderGTK(Gtk.Box):
     def set_pipewire_fd(self, fd):
         """Set PipeWire fd for portal-based camera access."""
         log.info("Setting PipeWire fd to: %s", fd)
-        was_playing = False
+        # Whether to (re)start is decided by self._running, not by
+        # inspecting the outgoing pipeline's GStreamer state: while
+        # waiting for the portal to grant access, the interim pipeline
+        # (autovideosrc, since neither device nor fd is set yet)
+        # typically fails to reach PLAYING/PAUSED at all inside a
+        # sandbox, so "was it playing?" would wrongly stay false and
+        # we'd never restart once the fd actually arrives.
+        should_restart = self._running
         if hasattr(self, 'pipeline') and self.pipeline:
-            state = self.pipeline.get_state(0)[1]
-            if state in (Gst.State.PLAYING, Gst.State.PAUSED):
-                was_playing = True
             self.pipeline.set_state(Gst.State.NULL)
             self.pipeline = None
         self.pipewire_fd = fd
         self.device = None
-        if was_playing:
+        if should_restart:
             self.run()
 
     def set_device(self, device):
         log.info("Setting device to: %s", device)
         if self.device == device:
             return
-        
-        is_playing = False
+
+        should_restart = self._running
         if hasattr(self, 'pipeline') and self.pipeline:
-            state = self.pipeline.get_state(0)[1]
-            if state in (Gst.State.PLAYING, Gst.State.PAUSED):
-                is_playing = True
             self.pipeline.set_state(Gst.State.NULL)
             self.pipeline = None
-            
+
         self.device = device
-        
-        if is_playing:
+
+        if should_restart:
             self.run()
 
 
@@ -199,6 +210,7 @@ class BarcodeReaderGTK(Gtk.Box):
     def on_unmap(self, *args, **kwargs):
         '''Hopefully called when this widget is hidden,
         e.g. when the tab of a notebook has changed'''
+        self._running = False
         self.pipeline.set_state(Gst.State.PAUSED)
         # Actually, we stop the thing for real
         self.pipeline.set_state(Gst.State.NULL)
