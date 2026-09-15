@@ -80,10 +80,7 @@ class QRImage(Gtk.DrawingArea):
     def on_gesture_released(self, gesture, n_press, x, y):
         button = gesture.get_current_button()
         if button == 1:
-            w = FullscreenQRImageWindow(data=self.data)
-            root = self.get_root()
-            if root:
-                w.set_transient_for(root)
+            FullscreenQRImageWindow(data=self.data, transient_for=self.get_root())
 
 
     def do_draw(self, cr, widget_width, widget_height):
@@ -202,12 +199,10 @@ class FullscreenQRImageWindow(Gtk.Window):
         self.log = logging.getLogger(__name__)
         super(FullscreenQRImageWindow, self).__init__(*args, **kwargs)
 
-        self.fullscreen()
-        
         self.qrimage = QRImage(data=data, handle_events=False)
         self.qrimage.set_has_tooltip(False)
         self.set_child(self.qrimage)
-        
+
         gesture = Gtk.GestureClick()
         gesture.connect('released', self.on_fullscreen_gesture_released)
         self.add_controller(gesture)
@@ -215,7 +210,13 @@ class FullscreenQRImageWindow(Gtk.Window):
         key_controller.connect('key-released', self.on_fullscreen_key_released)
         self.add_controller(key_controller)
 
+        # GTK4 on Wayland (e.g. GNOME Shell/mutter) does not reliably
+        # honour a fullscreen request made before the window has a
+        # surface: the window ends up shown as a plain, normally-sized
+        # window instead. Presenting first, then fullscreening once the
+        # window is realized, works on both X11 and Wayland.
         self.present()
+        self.fullscreen()
 
     def on_fullscreen_gesture_released(self, gesture, n_press, x, y):
         button = gesture.get_current_button()
