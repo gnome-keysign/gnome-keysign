@@ -10,6 +10,8 @@ import tempfile
 from subprocess import check_call
 
 from pytest_twisted import inlineCallbacks
+from twisted.internet import reactor
+from twisted.internet.task import deferLater
 
 from keysign.bluetoothoffer import BluetoothOffer
 from keysign.gpgmeh import get_public_key_data, openpgpkey_from_data
@@ -73,3 +75,24 @@ def test_offer_sends_the_key_as_bytes():
         received += part
 
     assert received == keydata
+
+
+@inlineCallbacks
+def test_stopping_the_offer_reports_going_back_rather_than_an_error():
+    """Pressing back closes the socket while start() waits in select().
+
+    start() resumes inside its loop, where the socket it was about to
+    accept() on has become None, and the resulting AttributeError reached
+    the user as "An unexpected error occurred".
+    """
+    waiting, _peer = socket.socketpair()
+    offer = BluetoothOffer(key=None)
+    offer.server_socket = waiting
+
+    started = offer.start()
+    yield deferLater(reactor, 0.1, lambda: None)
+    offer.stop()
+    success, message = yield started
+
+    assert not success
+    assert message == "Back", "reported %r instead" % (message,)

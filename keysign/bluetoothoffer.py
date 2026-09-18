@@ -51,6 +51,9 @@ class BluetoothOffer:
                 # only when we are sure that there is already a waiting connection
                 ready_to_read, ready_to_write, in_error = yield threads.deferToThread(
                     select.select, [self.server_socket], [], [], 0.5)
+                # stop() may have closed the socket while we waited above.
+                if self.stopped:
+                    break
                 if ready_to_read:
                     # We are sure that a connection is available, so we can call
                     # accept() without deferring it to a thread
@@ -63,9 +66,13 @@ class BluetoothOffer:
                     success = True
                     message = None
         except Exception as e:
-            log.error("An error occurred: %s" % e)
-            success = False
-            message = e
+            # Closing the socket from stop() is a normal way out of select().
+            if self.stopped:
+                log.debug("Stopped while waiting for a connection: %s", e)
+            else:
+                log.error("An error occurred: %s" % e)
+                success = False
+                message = e
 
         return success, message
 
