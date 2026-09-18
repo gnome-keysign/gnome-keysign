@@ -21,15 +21,12 @@ jobs:
         rm -rf venv
 
 
-    - name: Set up Python
-      uses: actions/setup-python@v7
-      with:
-        python-version: '3.12'
-
     - name: Install system dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y \
+          python3-gpg \
+          python3-venv \
           libgirepository1.0-dev \
           libgirepository-2.0-dev \
           libgtk-4-dev \
@@ -47,31 +44,48 @@ jobs:
           pkg-config \
           libdbus-1-dev
 
+    - name: Create the virtual environment
+      # Built by the system interpreter, so that the gpgme extension
+      # borrowed below is the matching build.
+      run: |
+        python3 -m venv venv
+        venv/bin/python -m pip install --upgrade pip setuptools wheel
+
     - name: Install Python dependencies
       run: |
-        python -m pip install --upgrade pip setuptools wheel
-        PKG_CONFIG_PATH="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig" pip install pygobject gpg dbus-python pillow
-        pip install -r requirements.txt
-        pip install babel BabelGladeExtractor
-        pip install .[test]
+        PKG_CONFIG_PATH="/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig" venv/bin/pip install pygobject dbus-python pillow
+        venv/bin/pip install -r requirements.txt
+        venv/bin/pip install babel BabelGladeExtractor
+        venv/bin/pip install .[test]
+
+    - name: Borrow the gpgme bindings from the distro
+      # PyPI's gpg builds an extension that cannot be imported at all, and
+      # sharing all of dist-packages shadows the pinned zope-interface.
+      run: |
+        SITE=$(venv/bin/python -c "import sysconfig; print(sysconfig.get_paths()['purelib'])")
+        ln -sf /usr/lib/python3/dist-packages/gpg "$SITE/gpg"
+        venv/bin/python -c "import gpg; print('gpgme bindings:', gpg.version.versionstr)"
 
 
     - name: Compile translation catalogs
       run: |
-        python setup.py compile_catalog
+        venv/bin/python setup.py compile_catalog
 
     - name: Test translation round-trip
       run: |
-        python setup.py extract_messages
-        python setup.py update_catalog
+        venv/bin/python setup.py extract_messages
+        venv/bin/python setup.py update_catalog
 
     - name: Run test suite
+      # As a module, not venv/bin/pytest: with --system-site-packages pip
+      # leaves pytest out of the venv when the system already has it, and
+      # then there is no such script to run.
       run: |
-        xvfb-run pytest
+        xvfb-run venv/bin/python -m pytest
 
     - name: Build sdist and egg
       run: |
-        python setup.py sdist bdist_egg
+        venv/bin/python setup.py sdist bdist_egg
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v7
