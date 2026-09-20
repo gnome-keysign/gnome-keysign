@@ -27,6 +27,14 @@ It follows best practises by sending the encrypted signatures to the UIDs of a k
     </screenshot>
   </screenshots>
   <releases>
+    <release version="1.9.8" date="2026-09-28" type="stable">
+      <description>
+        <p>
+         * Fix an unexpected error appearing in place of the send page after leaving the page that offers a key over the Internet
+         * Fix the application failing to start at all on a system without Avahi, where it now explains the problem as intended
+        </p>
+      </description>
+    </release>
     <release version="1.9.7" date="2026-09-17" type="stable">
       <description>
         <p>
