@@ -69,6 +69,31 @@ def test_scanner_mapped_callback(mock_present):
         assert app.header_button.get_icon_name() == "go-previous"
 
 
+def test_a_machine_without_avahi_gets_the_dialog():
+    """Without avahi-daemon the app falls back to explaining itself.
+
+    The dialog is built from dialog_avahi4.ui, which kept a GTK3-only
+    type_hint property long enough to turn that explanation into a
+    traceback, and its title was set before the dialog was looked up.
+    """
+    from keysign.errors import NoAvahiDbus
+
+    presented = []
+    app = KeysignApp(application_id="org.gnome.Keysign.TestNoAvahi")
+    with patch('keysign.app.SendApp') as MockSendApp, \
+         patch('keysign.app.PswMappingReceiveApp',
+               side_effect=NoAvahiDbus("no avahi on the bus")), \
+         patch('gi.repository.Gtk.Window.present',
+               new=lambda window: presented.append(window)):
+        MockSendApp.return_value.stack = Gtk.Stack()
+        app.on_activate(app)
+
+    assert presented, "nothing was shown at all"
+    dialog = presented[0]
+    assert isinstance(dialog, Gtk.MessageDialog)
+    assert dialog.get_title() == "GNOME Keysign"
+
+
 def test_get_toplevel_finds_the_window_the_widget_is_in():
     """Signing a key needs the window to parent the email portal on."""
     from keysign.app import PswMappingReceiveApp

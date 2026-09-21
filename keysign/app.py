@@ -178,10 +178,10 @@ class KeysignApp(Adw.Application):
             appwindow = 'dialog_avahi'
             builder = Gtk.Builder()
             builder.add_objects_from_file(ui_file_path, [appwindow])
+            window = builder.get_object(appwindow)
             window.set_title("GNOME Keysign")
             ok_button = builder.get_object("avahi_ok")
             ok_button.connect('clicked', self.on_delete_window)
-            window = builder.get_object(appwindow)
         else:
             rs = self.receive.stack
 
