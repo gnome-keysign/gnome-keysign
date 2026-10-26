@@ -769,9 +769,9 @@ ujson==6.0.0 \
     --hash=sha256:fd26d4b182b7138fc948cda55fe2e91b70d987731e169e628f42ba22cc6e3cce \
     --hash=sha256:ff3b33d8c8dbbe32936d2056296324371a07ed0b29177e2eb8ec46569436817f
     # via autobahn
-urllib3==2.7.0 \
-    --hash=sha256:231e0ec3b63ceb14667c67be60f2f2c40a518cb38b03af60abc813da26505f4c \
-    --hash=sha256:9fb4c81ebbb1ce9531cce37674bbc6f1360472bc18ca9a553ede278ef7276897
+urllib3==2.8.0 \
+    --hash=sha256:0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3 \
+    --hash=sha256:63bf2ead4c879426ebf22ef2a781eeb4aa3b4ae798a0435506f8687fd5bb9b63
     # via requests
 zipstream-ng==1.9.3 \
     --hash=sha256:6614580d7ae56bc9f3c2a342210108450e2d191b62038e818bae7845612584b7 \
