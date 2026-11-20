@@ -341,7 +341,8 @@ def main(args=[]):
     Gst.init(None)
 
     Adw.init()
-    app = KeysignApp(application_id="org.gnome.Keysign")
+    app = KeysignApp(application_id="org.gnome.Keysign",
+                     flags=Gio.ApplicationFlags.NON_UNIQUE)
     try:
         GLib.unix_signal_add_full(GLib.PRIORITY_HIGH, signal.SIGINT,
                                   lambda *args: reactor.callFromThread(reactor.stop), None)
