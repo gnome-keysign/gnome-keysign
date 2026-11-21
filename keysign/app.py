@@ -114,6 +114,11 @@ class KeysignApp(Adw.Application):
         self.pre_sign_widget = None
 
     def on_activate(self, app):
+        window = self.get_active_window()
+        if window:
+            window.present()
+            return
+
         ui_file_path = os.path.join(
             os.path.dirname(os.path.abspath(__file__)),
             "app4.ui")
@@ -215,8 +220,11 @@ class KeysignApp(Adw.Application):
         window.present()
         self.add_window(window)
 
-    def run(self, args=[]):
-        super(KeysignApp, self).run()
+    def run(self, args=None):
+        if args is None:
+            args = sys.argv
+        self.release()
+        return super(KeysignApp, self).run(args)
 
     @staticmethod
     def on_delete_window(*args):
@@ -330,14 +338,15 @@ class KeysignApp(Adw.Application):
         self.internet_toggle.hide()
 
 
-def main(args=[]):
+def main(args=None):
+    if args is None:
+        args = sys.argv
+    GLib.set_prgname("gnome-keysign")
     logging.basicConfig(
         level=logging.DEBUG,
         format='%(name)s (%(levelname)s): %(message)s')
     log = logging.getLogger(__name__)
     log.debug('Running main with args: %s', args)
-    if not args:
-        args = []
     Gst.init(None)
 
     Adw.init()
