@@ -69,6 +69,7 @@ keysign = ["*.ui", "locale/*/*/*.mo"]
 version = {attr = "keysign._version.__version__"}
 
 [tool.setuptools.data-files]
+"share/dbus-1/services" = ["data/org.gnome.Keysign.service"]
 "share/applications" = ["data/org.gnome.Keysign.desktop"]
 "share/metainfo" = ["data/org.gnome.Keysign.appdata.xml"]
 "share/icons/hicolor/scalable/apps" = ["data/org.gnome.Keysign.svg"]
