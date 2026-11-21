@@ -7,3 +7,4 @@ Exec=python3 -m keysign
 Icon=org.gnome.Keysign
 Categories=GTK;GNOME;Utility;
 StartupNotify=true
+DBusActivatable=true
